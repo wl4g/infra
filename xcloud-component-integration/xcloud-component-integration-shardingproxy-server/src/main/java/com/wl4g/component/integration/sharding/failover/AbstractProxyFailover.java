@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -40,7 +41,9 @@ import javax.sql.DataSource;
 
 import org.apache.shardingsphere.infra.config.RuleConfiguration;
 import org.apache.shardingsphere.infra.config.datasource.DataSourceConfiguration;
+import org.apache.shardingsphere.infra.lock.ShardingSphereLock;
 import org.apache.shardingsphere.infra.metadata.ShardingSphereMetaData;
+import org.apache.shardingsphere.proxy.backend.context.ProxyContext;
 import org.apache.shardingsphere.readwritesplitting.api.ReadwriteSplittingRuleConfiguration;
 import org.apache.shardingsphere.readwritesplitting.api.rule.ReadwriteSplittingDataSourceRuleConfiguration;
 
@@ -86,80 +89,103 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
         getWorker().scheduleWithRandomDelay(this, 1_000L, 6_000L, 10_000L, TimeUnit.MILLISECONDS);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void run() {
+        final String failoverLockName = getSchemaName().concat(".failover");
+        Optional<ShardingSphereLock> op = ProxyContext.getInstance().getLock();
         try {
-            FailoverSchemaConfiguration oldFailoverConfig = loadFailoverSchemaConfiguration(true);
-
-            // Other rule configurations do not need to be update.
-            List<RuleConfiguration> newRuleConfigs = new ArrayList<>(oldFailoverConfig.getOtherRuleConfigs());
-
-            boolean anyChanaged = false;
-            for (ReadwriteSplittingRuleConfiguration oldRwRuleConfig : safeList(oldFailoverConfig.getReadwriteRuleConfigs())) {
-                // New read-write-splitting dataSources.
-                List<ReadwriteSplittingDataSourceRuleConfiguration> newRwDataSources = new ArrayList<>(4);
-
-                for (ReadwriteSplittingDataSourceRuleConfiguration oldRwDataSource : safeList(oldRwRuleConfig.getDataSources())) {
-                    // Obtain backend node admin dataSource.
-                    DataSource adminDataSource = obtainSelectedBackendNodeAdminDataSource(oldRwDataSource.getName(),
-                            oldRwDataSource.getReadDataSourceNames());
-
-                    log.debug("Inspecting ... oldRwDataSourceConfig: {}, actual admin dataSource: {}",
-                            () -> toJSONString(oldRwDataSource), () -> adminDataSource);
-
-                    try (JdbcOperator operator = new JdbcOperator(adminDataSource);) {
-                        // Inspect primary/standby latest information.
-                        S result = inspecting(operator);
-                        log.info("Inspected rwDataSourceName: {}, nodeInfo: {}", () -> oldRwDataSource.getName(),
-                                () -> toJSONString(result));
-
-                        // Selection new primary node.
-                        notEmpty(result.getPrimaryNodes(), "Not found latest master node information");
-                        NodeInfo newPrimaryNode = chooseNewPrimaryNode(result.getPrimaryNodes());
-
-                        // TODO
-                        // Transform db host/port to external(loadBalancer)
-                        // host/port.
-                        String newPrimaryDataSourceName = findMatchingNewPrimaryDataSourceName(
-                                oldFailoverConfig.getAllDataSourceConfigs(), oldRwDataSource, newPrimaryNode);
-                        String oldPrimaryDataSourceName = oldRwDataSource.getWriteDataSourceName();
-
-                        // Check dataSource primary changed?
-                        if (isChangedPrimaryNode(newPrimaryNode, newPrimaryDataSourceName, oldPrimaryDataSourceName)) {
-                            // Gets changed new read dataSourceNames
-                            List<String> newReadDataSourceNames = getChangedNewReadDataSourceNames(
-                                    oldFailoverConfig.getAllDataSourceConfigs(), oldRwDataSource, result.getStandbyNodes());
-
-                            // New read-write-splitting dataSource.
-                            ReadwriteSplittingDataSourceRuleConfiguration newRwDataSource = new ReadwriteSplittingDataSourceRuleConfiguration(
-                                    oldRwDataSource.getName(), oldRwDataSource.getAutoAwareDataSourceName(),
-                                    newPrimaryDataSourceName, newReadDataSourceNames, oldRwDataSource.getLoadBalancerName());
-                            newRwDataSources.add(newRwDataSource);
-                            anyChanaged = true;
-                        } else { // Not changed
-                            newRwDataSources.add(oldRwDataSource);
-                            log.debug(
-                                    "Skiping change read-write-splitting, becuase primary dataSourceName it's up to date. {}, actualSchemaName: {}, schemaName: {}",
-                                    oldPrimaryDataSourceName, oldRwDataSource.getName(), getSchemaName());
-                        }
-                    }
+            if (op.isPresent()) { // In GovernanceMetaContexts mode running
+                if (op.get().tryLock(failoverLockName, 10_000L)) {
+                    processFailover();
                 }
-                if (!newRwDataSources.isEmpty()) {
-                    newRuleConfigs
-                            .add(new ReadwriteSplittingRuleConfiguration(newRwDataSources, oldRwRuleConfig.getLoadBalancers()));
-                }
-            }
-
-            if (anyChanaged && !newRuleConfigs.isEmpty()) {
-                doChangeReadwriteSplittingRuleConfiguration(newRuleConfigs);
+            } else { // In StandardMetaContexts mode running
+                processFailover();
             }
         } catch (Exception e) {
             log.error("Failed to process backend nodes primary-standby failover.", e);
+        } finally {
+            if (op.isPresent()) {
+                op.get().releaseLock(failoverLockName);
+            }
         }
     }
 
-    protected DataSource obtainSelectedBackendNodeAdminDataSource(String haReadwriteDataSourceName,
+    @SuppressWarnings("unchecked")
+    private void processFailover() throws Exception {
+        FailoverSchemaConfiguration oldFailoverConfig = loadFailoverSchemaConfiguration(true);
+
+        // Other rule configurations do not need to be update.
+        List<RuleConfiguration> newRuleConfigs = new ArrayList<>(oldFailoverConfig.getOtherRuleConfigs());
+
+        boolean anyChanaged = false;
+        for (ReadwriteSplittingRuleConfiguration oldRwRuleConfig : safeList(oldFailoverConfig.getReadwriteRuleConfigs())) {
+            // New read-write-splitting dataSources.
+            List<ReadwriteSplittingDataSourceRuleConfiguration> newRwDataSources = new ArrayList<>(4);
+
+            for (ReadwriteSplittingDataSourceRuleConfiguration oldRwDataSource : safeList(oldRwRuleConfig.getDataSources())) {
+                // Obtain backend node admin dataSource.
+                DataSource adminDataSource = obtainSelectedBackendNodeAdminDataSource(oldRwDataSource.getName(),
+                        oldRwDataSource.getReadDataSourceNames());
+
+                log.debug("Inspecting ... oldRwDataSourceConfig: {}, actual admin dataSource: {}",
+                        () -> toJSONString(oldRwDataSource), () -> adminDataSource);
+
+                try (JdbcOperator operator = new JdbcOperator(adminDataSource);) {
+                    // Inspect primary/standby latest information.
+                    S result = inspecting(operator);
+                    log.info("Inspected rwDataSourceName: {}, nodeInfo: {}", () -> oldRwDataSource.getName(),
+                            () -> toJSONString(result));
+
+                    // Selection new primary node.
+                    notEmpty(result.getPrimaryNodes(), "Not found latest master node information");
+                    NodeInfo newPrimaryNode = chooseNewPrimaryNode(result.getPrimaryNodes());
+
+                    // TODO
+                    // Transform db host/port to external(loadBalancer)
+                    // host/port.
+                    String newPrimaryDataSourceName = findMatchingNewPrimaryDataSourceName(
+                            oldFailoverConfig.getAllDataSourceConfigs(), oldRwDataSource, newPrimaryNode);
+                    String oldPrimaryDataSourceName = oldRwDataSource.getWriteDataSourceName();
+
+                    // Check dataSource primary changed?
+                    if (isChangedPrimaryNode(newPrimaryNode, newPrimaryDataSourceName, oldPrimaryDataSourceName)) {
+                        // Gets changed new read dataSourceNames
+                        List<String> newReadDataSourceNames = getChangedNewReadDataSourceNames(
+                                oldFailoverConfig.getAllDataSourceConfigs(), oldRwDataSource, result.getStandbyNodes());
+
+                        // New read-write-splitting dataSource.
+                        ReadwriteSplittingDataSourceRuleConfiguration newRwDataSource = new ReadwriteSplittingDataSourceRuleConfiguration(
+                                oldRwDataSource.getName(), oldRwDataSource.getAutoAwareDataSourceName(), newPrimaryDataSourceName,
+                                newReadDataSourceNames, oldRwDataSource.getLoadBalancerName());
+                        newRwDataSources.add(newRwDataSource);
+                        anyChanaged = true;
+                    } else { // Not changed
+                        newRwDataSources.add(oldRwDataSource);
+                        log.debug(
+                                "Skiping change read-write-splitting, becuase primary dataSourceName it's up to date. {}, actualSchemaName: {}, schemaName: {}",
+                                oldPrimaryDataSourceName, oldRwDataSource.getName(), getSchemaName());
+                    }
+                }
+            }
+            if (!newRwDataSources.isEmpty()) {
+                newRuleConfigs.add(new ReadwriteSplittingRuleConfiguration(newRwDataSources, oldRwRuleConfig.getLoadBalancers()));
+            }
+        }
+
+        if (anyChanaged && !newRuleConfigs.isEmpty()) {
+            doChangeReadwriteSplittingRuleConfiguration(newRuleConfigs);
+        }
+    }
+
+    /**
+     * Obtain selection back-end node administrator dataSource.
+     * 
+     * @param haReadwriteDataSourceName
+     * @param readDataSourceNames
+     * @return
+     * @throws SQLException
+     */
+    private synchronized DataSource obtainSelectedBackendNodeAdminDataSource(String haReadwriteDataSourceName,
             List<String> readDataSourceNames) throws SQLException {
         HikariDataSource adminDataSource = cachingAdminDataSources.get(haReadwriteDataSourceName);
         if (nonNull(adminDataSource)) {
@@ -218,20 +244,16 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
                 format("Failed to build backend connection. metadata dataSources: %s", metadata.getResource().getDataSources()));
     }
 
+    /**
+     * Decoration creating administrator dataSource properties.
+     * 
+     * @param ruleDataSourceName
+     * @param ruleDataSourceJdbcHost
+     * @param ruldDataSourceJdbcPort
+     * @param adminDataSource
+     */
     protected abstract void decorateAdminBackendDataSource(String ruleDataSourceName, String ruleDataSourceJdbcHost,
             int ruldDataSourceJdbcPort, HikariDataSource adminDataSource);
-
-    /**
-     * Gets the schema name of the target to be processed by the current
-     * failover.
-     * 
-     * Notes: a failover instance is responsible for monitoring a schema.
-     * 
-     * @return
-     */
-    protected String getSchemaName() {
-        return metadata.getName();
-    }
 
     /**
      * Choosing new primary node {@link NodeInfo}
@@ -252,7 +274,7 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
      * @see https://shardingsphere.apache.org/document/current/cn/features/governance/management/registry-center/#metadataschemenamedatasources
      * @return
      */
-    protected boolean isChangedPrimaryNode(NodeInfo newPrimaryNode, String newPrimaryDataSourceName,
+    private boolean isChangedPrimaryNode(NodeInfo newPrimaryNode, String newPrimaryDataSourceName,
             String oldPrimaryDataSourceName) {
         return !StringUtils2.equals(oldPrimaryDataSourceName, newPrimaryDataSourceName);
     }
@@ -274,6 +296,24 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
         return newReadDataSourceNames;
     }
 
+    /**
+     * Gets the schema name of the target to be processed by the current
+     * failover.
+     * 
+     * Notes: a failover instance is responsible for monitoring a schema.
+     * 
+     * @return
+     */
+    private String getSchemaName() {
+        return metadata.getName();
+    }
+
+    /**
+     * Load failover schema configuration.
+     * 
+     * @param useCache
+     * @return
+     */
     private synchronized FailoverSchemaConfiguration loadFailoverSchemaConfiguration(boolean useCache) {
         if (useCache && nonNull(cachingFailoverSchemaConfig)) {
             return cachingFailoverSchemaConfig;
