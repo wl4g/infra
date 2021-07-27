@@ -20,9 +20,11 @@ import static com.wl4g.component.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.component.common.lang.Assert2.notEmpty;
 import static com.wl4g.component.common.lang.Assert2.notNullOf;
 import static com.wl4g.component.common.lang.Assert2.state;
+import static com.wl4g.component.common.log.SmartLoggerFactory.getLogger;
 import static com.wl4g.component.common.serialize.JacksonUtils.toJSONString;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -34,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -48,11 +51,13 @@ import org.apache.shardingsphere.readwritesplitting.api.ReadwriteSplittingRuleCo
 import org.apache.shardingsphere.readwritesplitting.api.rule.ReadwriteSplittingDataSourceRuleConfiguration;
 
 import com.wl4g.component.common.lang.StringUtils2;
+import com.wl4g.component.common.log.SmartLogger;
 import com.wl4g.component.common.task.GenericTaskRunner;
 import com.wl4g.component.common.task.RunnerProperties;
 import com.wl4g.component.common.task.RunnerProperties.StartupMode;
 import com.wl4g.component.integration.sharding.failover.ProxyFailover.NodeStats;
 import com.wl4g.component.integration.sharding.failover.ProxyFailover.NodeStats.NodeInfo;
+import com.wl4g.component.integration.sharding.failover.exception.UnreachablePrimaryNodeFailoverException;
 import com.wl4g.component.integration.sharding.failover.initializer.FailoverAbstractBootstrapInitializer;
 import com.wl4g.component.integration.sharding.failover.jdbc.JdbcOperator;
 import com.wl4g.component.integration.sharding.util.HostUtil;
@@ -82,11 +87,12 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
         super(new RunnerProperties(StartupMode.NOSTARTUP, 1));
         this.initializer = notNullOf(initializer, "initializer");
         this.metadata = notNullOf(metadata, "metadata");
+        FailoverShutdownManager.getInstance().addShutdownDestroyHandler(this);
     }
 
     @Override
     protected void postStartupProperties() throws Exception {
-        getWorker().scheduleWithRandomDelay(this, 1_000L, 6_000L, 10_000L, TimeUnit.MILLISECONDS);
+        getWorker().scheduleWithRandomDelay(this, 3_000L, 10_000L, 30_000L, TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -96,13 +102,17 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
         try {
             if (op.isPresent()) { // In GovernanceMetaContexts mode running
                 if (op.get().tryLock(failoverLockName, 10_000L)) {
+                    log.info("Obtained failover execution lock, prepare for processing...");
                     processFailover();
+                } else {
+                    log.warn("No obtained failover execution lock, skip for processing...");
                 }
             } else { // In StandardMetaContexts mode running
+                log.info("In standard context running, direct for processing...");
                 processFailover();
             }
         } catch (Exception e) {
-            log.error("Failed to process backend nodes primary-standby failover.", e);
+            log.error("Failed to process backend nodes primary-slave failover.", e);
         } finally {
             if (op.isPresent()) {
                 op.get().releaseLock(failoverLockName);
@@ -127,7 +137,7 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
                 DataSource adminDataSource = obtainSelectedBackendNodeAdminDataSource(oldRwDataSource.getName(),
                         oldRwDataSource.getReadDataSourceNames());
 
-                log.debug("Inspecting ... oldRwDataSourceConfig: {}, actual admin dataSource: {}",
+                log.debug("Inspecting ... oldRwDataSourceConfig: {}, actualAdminDataSource: {}",
                         () -> toJSONString(oldRwDataSource), () -> adminDataSource);
 
                 try (JdbcOperator operator = new JdbcOperator(adminDataSource);) {
@@ -137,7 +147,8 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
                             () -> toJSONString(result));
 
                     // Selection new primary node.
-                    notEmpty(result.getPrimaryNodes(), "Not found latest master node information");
+                    notEmpty(result.getPrimaryNodes(), UnreachablePrimaryNodeFailoverException.class,
+                            "No primary node information is currently queried.");
                     NodeInfo newPrimaryNode = chooseNewPrimaryNode(result.getPrimaryNodes());
 
                     // TODO
@@ -370,7 +381,7 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
      * @param newReadWriteSplittingRuleConfigs
      */
     private void doChangeReadwriteSplittingRuleConfiguration(List<RuleConfiguration> newReadWriteSplittingRuleConfigs) {
-        log.info("Do changed new read-write-splitting rule configuration ... - {}", newReadWriteSplittingRuleConfigs);
+        log.info("Changed new read-write-splitting rule configuration ... - {}", newReadWriteSplittingRuleConfigs);
         initializer.updateSchemaRuleConfiguration(getSchemaName(), newReadWriteSplittingRuleConfigs);
     }
 
@@ -381,6 +392,43 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
         private Collection<RuleConfiguration> allRuleConfigs;
         private List<ReadwriteSplittingRuleConfiguration> readwriteRuleConfigs;
         private List<RuleConfiguration> otherRuleConfigs;
+    }
+
+    static class FailoverShutdownManager {
+        private static final SmartLogger log = getLogger(FailoverShutdownManager.class);
+        private static final FailoverShutdownManager INSTANCE = new FailoverShutdownManager();
+        private static final List<AbstractProxyFailover<? extends NodeStats>> shutdownFailovers = new Vector<>(4);
+        private Thread shutdownThread;
+
+        public static FailoverShutdownManager getInstance() {
+            return INSTANCE;
+        }
+
+        public void addShutdownDestroyHandler(AbstractProxyFailover<? extends NodeStats> failover) {
+            shutdownFailovers.add(notNullOf(failover, "failover"));
+            initIfNecessary();
+        }
+
+        /**
+         * Initialization failovers to JVM shutdown handlers.
+         */
+        private synchronized void initIfNecessary() {
+            if (isNull(shutdownThread)) {
+                shutdownThread = new Thread(() -> {
+                    safeList(shutdownFailovers).forEach(failover -> {
+                        safeMap(failover.cachingAdminDataSources).forEach((dataSourceName, adminDataSource) -> {
+                            try {
+                                log.info("Closing adminDataSource: {}, of '{}'", adminDataSource, dataSourceName);
+                                adminDataSource.close();
+                            } catch (Exception e) {
+                                log.info("Unable close adminDataSource: {}, of '{}'", adminDataSource, dataSourceName);
+                            }
+                        });
+                    });
+                });
+            }
+        }
+
     }
 
 }
