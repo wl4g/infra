@@ -42,8 +42,10 @@ import java.util.concurrent.TimeUnit;
 
 import javax.sql.DataSource;
 
+import org.apache.shardingsphere.governance.context.metadata.GovernanceMetaDataContexts;
 import org.apache.shardingsphere.infra.config.RuleConfiguration;
 import org.apache.shardingsphere.infra.config.datasource.DataSourceConfiguration;
+import org.apache.shardingsphere.infra.config.properties.ConfigurationPropertyKey;
 import org.apache.shardingsphere.infra.lock.ShardingSphereLock;
 import org.apache.shardingsphere.infra.metadata.ShardingSphereMetaData;
 import org.apache.shardingsphere.proxy.backend.context.ProxyContext;
@@ -58,6 +60,7 @@ import com.wl4g.component.common.task.RunnerProperties.StartupMode;
 import com.wl4g.component.integration.sharding.failover.ProxyFailover.NodeStats;
 import com.wl4g.component.integration.sharding.failover.ProxyFailover.NodeStats.NodeInfo;
 import com.wl4g.component.integration.sharding.failover.config.FailoverConfiguration;
+import com.wl4g.component.integration.sharding.failover.exception.FailoverException;
 import com.wl4g.component.integration.sharding.failover.exception.UnreachablePrimaryNodeFailoverException;
 import com.wl4g.component.integration.sharding.failover.initializer.FailoverAbstractBootstrapInitializer;
 import com.wl4g.component.integration.sharding.failover.jdbc.JdbcOperator;
@@ -103,14 +106,19 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
         final String lockName = getSchemaName().concat(".failover");
         Optional<ShardingSphereLock> op = ProxyContext.getInstance().getLock();
         try {
-            if (op.isPresent()) { // In GovernanceMetaContexts mode running
+            if (ProxyContext.getInstance().getMetaDataContexts() instanceof GovernanceMetaDataContexts) { // In-GovernanceMetaContexts-mode.
+                assert op.isPresent() : new FailoverException(
+                        format("Failover running in governance mode, the lock must be enabled. Please check config '%s'",
+                                ConfigurationPropertyKey.LOCK_ENABLED.getKey()),
+                        null);
+
                 if (op.get().tryLock(lockName, 10_000L)) {
                     log.info("Obtained failover execution lock, prepare for processing ...");
                     processFailover();
                 } else {
                     log.warn("No obtained failover execution lock, skip for processing.");
                 }
-            } else { // In StandardMetaContexts mode running
+            } else { // In StandardMetaContexts mode.
                 log.info("In standard context running, direct for processing ...");
                 processFailover();
             }

@@ -84,7 +84,7 @@ public abstract class GenericTaskRunner<C extends RunnerProperties> implements C
             // Create worker(if necessary)
             if (configProperties.getConcurrency() > 0) {
                 // See:https://www.jianshu.com/p/e7ab1ac8eb4c
-                ThreadFactory tf = new NamedThreadFactory(getClass().getSimpleName().concat("-worker"));
+                ThreadFactory tf = new NamedThreadFactory(getThreadNamePrefix().concat("-worker"));
                 worker = new SafeScheduledTaskPoolExecutor(configProperties.getConcurrency(), configProperties.getKeepAliveTime(),
                         tf, configProperties.getAcceptQueue(), configProperties.getReject());
             } else {
@@ -97,7 +97,7 @@ public abstract class GenericTaskRunner<C extends RunnerProperties> implements C
                 run(); // Sync execution.
                 break;
             case ASYNC:
-                header = new NamedThreadFactory(getClass().getSimpleName().concat("-header")).newThread(this);
+                header = new NamedThreadFactory(getThreadNamePrefix().concat("-header")).newThread(this);
                 header.start();
                 break;
             default:
@@ -137,6 +137,10 @@ public abstract class GenericTaskRunner<C extends RunnerProperties> implements C
      */
     protected void postCloseProperties() throws IOException {
         // Ignore
+    }
+
+    protected String getThreadNamePrefix() {
+        return getClass().getSimpleName();
     }
 
     /**

@@ -66,6 +66,8 @@ props:
   query-with-cipher-column: true
   sql-show: true
   check-table-metadata-enabled: false
+  # Notes: If failover is enabled and distributed governance mode is adopted, lock must be opened.
+  lock-enabled: true # Default by false
   failover-enable: true # Default by true
   failover-inspectInitialDelayMs: 3_000
   failover-inspectMinDelayMs: 3_000
