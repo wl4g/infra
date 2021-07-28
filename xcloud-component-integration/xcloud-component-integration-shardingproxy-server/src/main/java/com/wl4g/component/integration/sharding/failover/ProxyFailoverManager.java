@@ -86,10 +86,11 @@ public final class ProxyFailoverManager {
         return this;
     }
 
+    @SuppressWarnings("unchecked")
     public void startAll() {
         for (ProxyFailover<? extends NodeStats> failover : failovers) {
             try {
-                if (!((AbstractProxyFailover<? extends NodeStats>) failover).isStarted()) {
+                if (!((AbstractProxyFailover<NodeStats>) failover).isStarted()) {
                     failover.start();
                 }
             } catch (Exception e) {

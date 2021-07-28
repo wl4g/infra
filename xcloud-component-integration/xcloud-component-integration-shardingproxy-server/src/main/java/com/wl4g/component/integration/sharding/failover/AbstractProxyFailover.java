@@ -57,6 +57,7 @@ import com.wl4g.component.common.task.RunnerProperties;
 import com.wl4g.component.common.task.RunnerProperties.StartupMode;
 import com.wl4g.component.integration.sharding.failover.ProxyFailover.NodeStats;
 import com.wl4g.component.integration.sharding.failover.ProxyFailover.NodeStats.NodeInfo;
+import com.wl4g.component.integration.sharding.failover.config.FailoverConfiguration;
 import com.wl4g.component.integration.sharding.failover.exception.UnreachablePrimaryNodeFailoverException;
 import com.wl4g.component.integration.sharding.failover.initializer.FailoverAbstractBootstrapInitializer;
 import com.wl4g.component.integration.sharding.failover.jdbc.JdbcOperator;
@@ -92,7 +93,9 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
 
     @Override
     protected void postStartupProperties() throws Exception {
-        getWorker().scheduleWithRandomDelay(this, 3_000L, 10_000L, 30_000L, TimeUnit.MILLISECONDS);
+        FailoverConfiguration failoverConfig = ProxyContext.getInstance().getFailoverConfig();
+        getWorker().scheduleWithRandomDelay(this, failoverConfig.getInspectInitialDelayMs(),
+                failoverConfig.getInspectMinDelayMs(), failoverConfig.getInspectMaxDelayMs(), TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -315,7 +318,7 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
      * 
      * @return
      */
-    private String getSchemaName() {
+    protected String getSchemaName() {
         return metadata.getName();
     }
 

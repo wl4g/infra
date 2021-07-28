@@ -43,13 +43,17 @@
 			<includes>
 				<include>*.jar</include>
 			</includes>
+			<excludes>
+				<exclude>shardingproxy.jar</exclude>
+				<exclude>shardingproxy-sources.jar</exclude>
+			</excludes>
 		</fileSet>
 		<fileSet>
-			<directory>.</directory>
+			<directory>target</directory>
 			<outputDirectory>ext-lib</outputDirectory>
-			<excludes>
-				<exclude>*/**</exclude>
-			</excludes>
+			<includes>
+				<include>shardingproxy.jar</include>
+			</includes>
 		</fileSet>
 		<fileSet>
 			<directory>.</directory>

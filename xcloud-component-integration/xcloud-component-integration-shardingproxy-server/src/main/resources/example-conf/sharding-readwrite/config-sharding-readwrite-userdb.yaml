@@ -24,8 +24,7 @@ schemaName: userdb
 # @see:org.apache.shardingsphere.proxy.config.ProxyConfigurationLoader#loadRuleConfiguration
 dataSource:
   username: root
-  #password: 'zzx!@#$%'
-  password: root  
+  password: 123456
   connectionTimeoutMilliseconds: 30000
   idleTimeoutMilliseconds: 60000
   maxLifetimeMilliseconds: 1800000

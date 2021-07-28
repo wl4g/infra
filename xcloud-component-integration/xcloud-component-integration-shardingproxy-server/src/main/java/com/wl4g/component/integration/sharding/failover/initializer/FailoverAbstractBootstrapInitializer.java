@@ -99,6 +99,7 @@ public abstract class FailoverAbstractBootstrapInitializer implements BootstrapI
         TransactionContexts transactionContexts = decorateTransactionContexts(createTransactionContexts(metaDataContexts),
                 xaTransactionMangerType);
         ProxyContext.getInstance().init(metaDataContexts, transactionContexts);
+        ProxyContext.getInstance().getFailoverConfig().merge(yamlConfig.getServerConfiguration().getProps());
         setDatabaseServerInfo();
     }
 

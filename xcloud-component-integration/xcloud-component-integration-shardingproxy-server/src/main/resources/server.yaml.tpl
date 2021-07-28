@@ -65,3 +65,11 @@ props:
   query-with-cipher-column: true
   sql-show: true
   check-table-metadata-enabled: false
+  failover-enable: true # Default by true
+  failover-inspectInitialDelayMs: 3_000
+  failover-inspectMinDelayMs: 3_000
+  failover-inspectMaxDelayMs: 10_000
+  # Failover admin dataSource configuration.
+  # Notes: This configuration is used for read-write separation data source failover. Therefore, the same account
+  #   password must be created for all master and slave databases before service startup.
+  failover-admin-datasource-props-json-for-userdb: '{"username":"root","password":"123456"}'

@@ -23,8 +23,10 @@ import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import java.util.List;
 
 import org.apache.shardingsphere.infra.metadata.ShardingSphereMetaData;
+import org.apache.shardingsphere.proxy.backend.context.ProxyContext;
 
 import com.wl4g.component.integration.sharding.failover.AbstractProxyFailover;
+import com.wl4g.component.integration.sharding.failover.config.FailoverConfiguration.FailoverAdminUser;
 import com.wl4g.component.integration.sharding.failover.initializer.FailoverAbstractBootstrapInitializer;
 import com.wl4g.component.integration.sharding.failover.jdbc.JdbcOperator;
 import com.wl4g.component.integration.sharding.failover.mysql.stats.MySQL57GroupReplicationNodeStats;
@@ -67,9 +69,10 @@ public class MySQL57GroupReplicationProxyFailover extends AbstractProxyFailover<
             int ruleDataSourceJdbcPort, HikariDataSource adminDataSource) {
         adminDataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
         adminDataSource.setJdbcUrl(format(MYSQL57_ADM_JDBC_URL_TPL, ruleDataSourceJdbcHost, ruleDataSourceJdbcPort));
-        // TODO use configuration username/password
-        adminDataSource.setUsername("root");
-        adminDataSource.setPassword("root");
+
+        FailoverAdminUser adminUser = ProxyContext.getInstance().getFailoverConfig().getAdminUsers().get(getSchemaName());
+        adminDataSource.setUsername(adminUser.getUsername());
+        adminDataSource.setPassword(adminUser.getPassword());
     }
 
     private static final String SQL_MGR_MEMBERS = "SELECT rgm.CHANNEL_NAME AS channelName,rgm.MEMBER_ID AS nodeId,rgm.MEMBER_HOST AS nodeHost,rgm.MEMBER_PORT AS nodePort,rgm.MEMBER_STATE AS nodeState,@@read_only AS readOnly,@@super_read_only AS superReadOnly,(CASE(SELECT VARIABLE_VALUE FROM `performance_schema`.`global_status` WHERE VARIABLE_NAME='group_replication_primary_member') WHEN '' THEN 'UNKOWN' WHEN rgm.MEMBER_ID THEN 'PRIMARY' ELSE 'STANDBY' END ) AS nodeRole FROM `performance_schema`.`replication_group_members` rgm";
