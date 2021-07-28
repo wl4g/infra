@@ -140,21 +140,30 @@ public abstract class GenericTaskRunner<C extends RunnerProperties> implements C
     }
 
     /**
-     * Is the current runner active.
-     * 
-     * @return
-     */
-    protected boolean isActive() {
-        return nonNull(header) && !header.isInterrupted() && running.get();
-    }
-
-    /**
      * Gets configuration properties.
      * 
      * @return
      */
     protected C getConfig() {
         return configProperties;
+    }
+
+    /**
+     * Is the current runner active.
+     * 
+     * @return
+     */
+    public boolean isActive() {
+        return nonNull(header) && !header.isInterrupted() && isStarted();
+    }
+
+    /**
+     * Is the current runner started.
+     * 
+     * @return
+     */
+    public boolean isStarted() {
+        return running.get();
     }
 
     /**

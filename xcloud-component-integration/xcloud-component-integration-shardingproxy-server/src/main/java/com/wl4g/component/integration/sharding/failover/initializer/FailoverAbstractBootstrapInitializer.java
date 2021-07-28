@@ -70,19 +70,7 @@ public abstract class FailoverAbstractBootstrapInitializer implements BootstrapI
 
     @Override
     public final void init(final YamlProxyConfiguration yamlConfig, final int port) throws SQLException {
-        ProxyConfiguration proxyConfig = getProxyConfiguration(yamlConfig);
-        MetaDataContexts metaDataContexts = decorateMetaDataContexts(createMetaDataContexts(proxyConfig));
-        for (MetaDataAwareEventSubscriber each : ShardingSphereServiceLoader
-                .getSingletonServiceInstances(MetaDataAwareEventSubscriber.class)) {
-            each.setMetaDataContexts(metaDataContexts);
-            ShardingSphereEventBus.getInstance().register(each);
-        }
-        String xaTransactionMangerType = metaDataContexts.getProps()
-                .getValue(ConfigurationPropertyKey.XA_TRANSACTION_MANAGER_TYPE);
-        TransactionContexts transactionContexts = decorateTransactionContexts(createTransactionContexts(metaDataContexts),
-                xaTransactionMangerType);
-        ProxyContext.getInstance().init(metaDataContexts, transactionContexts);
-        setDatabaseServerInfo();
+        initContext(yamlConfig, true);
         initScalingWorker(yamlConfig);
 
         //
@@ -91,6 +79,27 @@ public abstract class FailoverAbstractBootstrapInitializer implements BootstrapI
         ProxyFailoverManager.getInstance().init(this).startAll();
 
         shardingSphereProxy.start(port);
+    }
+
+    //
+    // ADD for failover.
+    //
+    protected void initContext(final YamlProxyConfiguration yamlConfig, boolean registerSubscriber) throws SQLException {
+        ProxyConfiguration proxyConfig = getProxyConfiguration(yamlConfig);
+        MetaDataContexts metaDataContexts = decorateMetaDataContexts(createMetaDataContexts(proxyConfig));
+        for (MetaDataAwareEventSubscriber each : ShardingSphereServiceLoader
+                .getSingletonServiceInstances(MetaDataAwareEventSubscriber.class)) {
+            each.setMetaDataContexts(metaDataContexts);
+            if (registerSubscriber) {
+                ShardingSphereEventBus.getInstance().register(each);
+            }
+        }
+        String xaTransactionMangerType = metaDataContexts.getProps()
+                .getValue(ConfigurationPropertyKey.XA_TRANSACTION_MANAGER_TYPE);
+        TransactionContexts transactionContexts = decorateTransactionContexts(createTransactionContexts(metaDataContexts),
+                xaTransactionMangerType);
+        ProxyContext.getInstance().init(metaDataContexts, transactionContexts);
+        setDatabaseServerInfo();
     }
 
     private MetaDataContexts createMetaDataContexts(final ProxyConfiguration proxyConfig) throws SQLException {

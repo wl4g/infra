@@ -75,17 +75,6 @@ public final class ProxyFailoverManager {
                 throw new UnsupportedOperationException(format("Not supported failover database type: %s", databaseType));
             }
         }
-        return this;
-    }
-
-    public void startAll() {
-        for (ProxyFailover<? extends NodeStats> failover : failovers) {
-            try {
-                failover.start();
-            } catch (Exception e) {
-                throw new IllegalStateException(e);
-            }
-        }
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
@@ -93,6 +82,20 @@ public final class ProxyFailoverManager {
                 stopAll();
             }
         });
+
+        return this;
+    }
+
+    public void startAll() {
+        for (ProxyFailover<? extends NodeStats> failover : failovers) {
+            try {
+                if (!((AbstractProxyFailover<? extends NodeStats>) failover).isStarted()) {
+                    failover.start();
+                }
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
+            }
+        }
     }
 
     public void stopAll() {

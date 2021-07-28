@@ -58,16 +58,15 @@ RUN echo -e "echo \"Starting \${SHARDING_NAME}:${SHARDING_VERSION} ... \"\n" >>/
 RUN echo -e "mkdir -p \${SHARDING_LOG_DIR}\n" >>/start.sh
 
 # Startup commands.
-RUN echo -e "cmdRun=\"export SHARDING_LOG_DIR=${SHARDING_LOG_DIR}; \${CMD_NOHUP} java -server \${DEBUG_OPTS} -Xms256M -Xmx1G -XX:+UseG1GC -XX:MaxGCPauseMillis=20 \
--XX:InitiatingHeapOccupancyPercent=35 -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:LargePageSizeInBytes=128m \
--XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70 -Djava.awt.headless=true \
--XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=\${SHARDING_LOG_DIR}/jvm_dump.hprof -XX:-OmitStackTraceInFastThrow \
--Xloggc:\${SHARDING_LOG_DIR}/\${SHARDING_NAME}-gc.log -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps \
--XX:+PrintGCTimeStamps -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=10 -XX:GCLogFileSize=100M \
--Dfile.encoding=UTF-8 -Djava.security.egd=file:/dev/./urandom \
+RUN echo -e "cmdRun=\"\${CMD_NOHUP} java -server \${DEBUG_OPTS} -Xms256M -Xmx1G \
+-XX:MaxGCPauseMillis=20 -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:LargePageSizeInBytes=128m \
+-XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70 -XX:InitiatingHeapOccupancyPercent=35 \
+-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=${SHARDING_LOG_DIR}/jvm_dump.hprof -Xloggc:${SHARDING_LOG_DIR}/shardingproxy-gc.log -verbose:gc \
+-XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=10 -XX:GCLogFileSize=100M \
+-Dfile.encoding=UTF-8 -Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom \
 -cp .:${SHARDING_HOME}/conf:${SHARDING_CLASSPATH}:${SHARDING_HOME}/ext-lib/*:${SHARDING_HOME}/lib/* ${SHARDING_MAINCLASS} \
-1>\${SHARDING_LOG_DIR}/\${SHARDING_NAME}.stdout \
-2>\${SHARDING_LOG_DIR}/\${SHARDING_NAME}.stderr\"" >>/start.sh
+1>${SHARDING_LOG_DIR}/${SHARDING_NAME}.stdout \
+2>${SHARDING_LOG_DIR}/${SHARDING_NAME}.stderr\"" >>/start.sh
 
 # Print. (if debug mode)
 RUN echo -e "\n[ -n \"\$SHARDING_DEBUG\" ] && echo \$cmdRun\n" >>/start.sh

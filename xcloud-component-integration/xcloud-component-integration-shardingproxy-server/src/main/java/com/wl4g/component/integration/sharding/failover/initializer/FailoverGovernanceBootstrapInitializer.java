@@ -168,7 +168,8 @@ public final class FailoverGovernanceBootstrapInitializer extends FailoverAbstra
     }
 
     @Override
-    public void updateSchemaRuleConfiguration(String schemaName, Collection<? extends RuleConfiguration> schemaRuleConfigs) {
+    public synchronized void updateSchemaRuleConfiguration(String schemaName,
+            Collection<? extends RuleConfiguration> schemaRuleConfigs) {
         SchemaRuleRegistryService schemaRuleService = governanceFacade.getRegistryCenter().getSchemaRuleService();
         schemaRuleService.persist(schemaName, safeList(schemaRuleConfigs).stream().map(c -> c).collect(toList()));
     }

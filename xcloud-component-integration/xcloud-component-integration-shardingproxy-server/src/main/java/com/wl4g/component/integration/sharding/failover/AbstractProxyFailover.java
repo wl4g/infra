@@ -97,25 +97,25 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
 
     @Override
     public void run() {
-        final String failoverLockName = getSchemaName().concat(".failover");
+        final String lockName = getSchemaName().concat(".failover");
         Optional<ShardingSphereLock> op = ProxyContext.getInstance().getLock();
         try {
             if (op.isPresent()) { // In GovernanceMetaContexts mode running
-                if (op.get().tryLock(failoverLockName, 10_000L)) {
-                    log.info("Obtained failover execution lock, prepare for processing...");
+                if (op.get().tryLock(lockName, 10_000L)) {
+                    log.info("Obtained failover execution lock, prepare for processing ...");
                     processFailover();
                 } else {
-                    log.warn("No obtained failover execution lock, skip for processing...");
+                    log.warn("No obtained failover execution lock, skip for processing.");
                 }
             } else { // In StandardMetaContexts mode running
-                log.info("In standard context running, direct for processing...");
+                log.info("In standard context running, direct for processing ...");
                 processFailover();
             }
         } catch (Exception e) {
             log.error("Failed to process backend nodes primary-slave failover.", e);
         } finally {
             if (op.isPresent()) {
-                op.get().releaseLock(failoverLockName);
+                op.get().releaseLock(lockName);
             }
         }
     }
