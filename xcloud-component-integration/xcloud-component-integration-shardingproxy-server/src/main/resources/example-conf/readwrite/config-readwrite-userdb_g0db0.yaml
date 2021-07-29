@@ -35,11 +35,11 @@ dataSource:
 # Datasource configuration.
 dataSources:
   primary_userdb_g0db0_1:
-    url: jdbc:mysql://127.0.0.1:13306/userdb_g0db0?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8
+    url: jdbc:mysql://wl4g.debug:13306/userdb_g0db0?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8
   standby_userdb_g0db0_1:
-    url: jdbc:mysql://127.0.0.1:13307/userdb_g0db0?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8
+    url: jdbc:mysql://wl4g.debug:13307/userdb_g0db0?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8
   standby_userdb_g0db0_2:
-    url: jdbc:mysql://127.0.0.1:13308/userdb_g0db0?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8
+    url: jdbc:mysql://wl4g.debug:13308/userdb_g0db0?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8
 
 # Schema rule configuration.
 rules:

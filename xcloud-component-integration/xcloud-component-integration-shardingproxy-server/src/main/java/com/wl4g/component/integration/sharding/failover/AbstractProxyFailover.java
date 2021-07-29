@@ -158,8 +158,8 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
 
                 // Try inspecting all primary and standby nodes.
                 S newNodeStats = null;
-                boolean attempt = true;
-                while (attempt) {
+                boolean attempting = true;
+                while (attempting) {
                     try (JdbcOperator operator = new JdbcOperator(delegate.get());) {
                         // Inspect primary/standby latest information.
                         S result = inspecting(operator);
@@ -169,13 +169,13 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
 
                         if (nonNull(newNodeStats)) { // Valid?
                             if (newNodeStats.checkValid()) {
-                                attempt = false;
+                                attempting = false;
                             } else {
                                 delegate.next(); // Invalid
                             }
                         }
                     } catch (NoNextAdminDataSourceFailoverException e) {
-                        attempt = false;
+                        attempting = false;
                         throw e;
                     } catch (Exception e) {
                         delegate.next();
@@ -201,7 +201,7 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
                             defineSchemaConfig.getAllDataSourceConfigs(), oldRwDataSource, newNodeStats.getStandbyNodes());
                     if (CollectionUtils2.isEmpty(newReadDataSourceNames)) {
                         throw new InvalidStateFailoverException(
-                                format("Failed to failover, No matches found new read dataSource names by standbyNodes: %s",
+                                format("No matches found new read dataSource names by standbyNodes: %s",
                                         newNodeStats.getStandbyNodes()));
                     }
 
@@ -448,8 +448,8 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
             }
         }
 
-        return new OriginalDefineSchemaConfigurationWrapper(allDataSourceConfigs, allRuleConfigs, readwriteRuleConfigs,
-                otherRuleConfigs);
+        return (cachingDefineSchemaConfig = new OriginalDefineSchemaConfigurationWrapper(allDataSourceConfigs, allRuleConfigs,
+                readwriteRuleConfigs, otherRuleConfigs));
     }
 
     /**
