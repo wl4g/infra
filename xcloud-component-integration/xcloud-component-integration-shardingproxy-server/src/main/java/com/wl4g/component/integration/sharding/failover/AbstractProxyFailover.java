@@ -26,7 +26,6 @@ import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.sql.SQLException;
@@ -118,10 +117,10 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
                         null);
 
                 if (op.get().tryLock(lockName, 10_000L)) {
-                    log.info("Obtained failover execution lock, prepare for processing ...");
+                    log.info("Obtained failover sentry lock, prepare for processing ...");
                     processFailover();
                 } else {
-                    log.warn("No obtained failover execution lock, skip for processing.");
+                    log.warn("No obtained failover sentry lock, skip for processing.");
                 }
             } else { // In StandardMetaContexts mode.
                 log.info("In standard context running, direct for processing ...");
@@ -168,7 +167,7 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
                     NodeInfo newPrimaryNode = chooseNewPrimaryNode(result.getPrimaryNodes());
 
                     // Transform get new primary dataSource name.
-                    String newPrimaryDataSourceName = transformToNewPrimaryDataSourceName(defineSchemaConfig, oldRwDataSource,
+                    String newPrimaryDataSourceName = transformToMappedDataSourceName(defineSchemaConfig, oldRwDataSource,
                             newPrimaryNode);
                     String oldPrimaryDataSourceName = oldRwDataSource.getWriteDataSourceName();
 
@@ -306,40 +305,33 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
      * 
      * @param defineSchemaConfig
      * @param oldRwDataSource
-     * @param newPrimaryNode
+     * @param node
      * @return
      */
-    private String transformToNewPrimaryDataSourceName(OriginalDefineSchemaConfigurationWrapper defineSchemaConfig,
-            ReadwriteSplittingDataSourceRuleConfiguration oldRwDataSource, NodeInfo newPrimaryNode) {
+    private String transformToMappedDataSourceName(OriginalDefineSchemaConfigurationWrapper defineSchemaConfig,
+            ReadwriteSplittingDataSourceRuleConfiguration oldRwDataSource, NodeInfo node) {
         // Transform DB host/port to external(LB) address.
-        List<DataSourceAddressMapping> mappings = ProxyContext.getInstance().getFailoverConfig()
-                .getAdminDataSourceConfig(getSchemaName()).getDataSourceAddressMappings();
+        DataSourceAddressMapping mapping = ProxyContext.getInstance().getFailoverConfig()
+                .getAdminDataSourceConfig(getSchemaName()).getMappedByInternalAddress(node);
 
         // First, find by newPrimaryNode mapping external addresses.
-        for (DataSourceAddressMapping mapping : safeList(mappings)) {
-            HostAndPort internal = mapping.getParsedInternalAddress();
-            if (internal.getPort() == newPrimaryNode.getPort()
-                    && HostUtil.isSameHost(internal.getHost(), newPrimaryNode.getHost())) {
-
-                for (HostAndPort external : safeList(mapping.getParsedExternalAddress())) {
-                    String newPrimaryDataSourceName = findMatchingDataSourceName(defineSchemaConfig.getAllDataSourceConfigs(),
-                            oldRwDataSource, external.getHost(), external.getPort());
-                    if (!isBlank(newPrimaryDataSourceName)) {
-                        return newPrimaryDataSourceName;
-                    }
-                }
+        for (HostAndPort external : safeList(mapping.getParsedExternalAddress())) {
+            String newPrimaryDataSourceName = findMatchingDataSourceName(defineSchemaConfig.getAllDataSourceConfigs(),
+                    oldRwDataSource, external.getHost(), external.getPort());
+            if (!isBlank(newPrimaryDataSourceName)) {
+                return newPrimaryDataSourceName;
             }
         }
 
         // Fallback, find by newPrimaryNode internal address.
         String newPrimaryDataSourceName = findMatchingDataSourceName(defineSchemaConfig.getAllDataSourceConfigs(),
-                oldRwDataSource, newPrimaryNode.getHost(), newPrimaryNode.getPort());
+                oldRwDataSource, node.getHost(), node.getPort());
         if (!isBlank(newPrimaryDataSourceName)) {
             return newPrimaryDataSourceName;
         }
 
         throw new InvalidStateFailoverException(
-                format("No matches found new primary dataSource names by newPrimaryNode: %s", newPrimaryNode));
+                format("No matches found new primary dataSource names by newPrimaryNode: %s", node));
     }
 
     /**
@@ -367,9 +359,22 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
     private List<String> getChangedNewReadDataSourceNames(Map<String, DataSourceConfiguration> allDataSourceConfigs,
             ReadwriteSplittingDataSourceRuleConfiguration oldRwDataSource, List<? extends NodeInfo> newStandbyNodes) {
 
-        List<String> newReadDataSourceNames = safeList(newStandbyNodes).stream()
-                .map(n -> findMatchingDataSourceName(allDataSourceConfigs, oldRwDataSource, n.getHost(), n.getPort()))
-                .collect(toList());
+        List<String> newReadDataSourceNames = new ArrayList<>(4);
+        for (NodeInfo node : safeList(newStandbyNodes)) {
+            // Transform to external addresses by mapping.
+            DataSourceAddressMapping mapping = ProxyContext.getInstance().getFailoverConfig()
+                    .getAdminDataSourceConfig(getSchemaName()).getMappedByInternalAddress(node);
+
+            // Find matches definition read dataSource name by external
+            // addresses.
+            for (HostAndPort external : safeList(mapping.getParsedExternalAddress())) {
+                String dataSourceName = findMatchingDataSourceName(allDataSourceConfigs, oldRwDataSource, external.getHost(),
+                        external.getPort());
+                if (!isBlank(dataSourceName)) {
+                    newReadDataSourceNames.add(dataSourceName);
+                }
+            }
+        }
         return newReadDataSourceNames;
     }
 
@@ -434,7 +439,7 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
             if (oldAllRwDataSourceNames.contains(defineDataSourceName)) {
                 JdbcInformation info = JdbcUtil.resolve(jdbcUrl);
                 if (info.getPort() == externalDbPort && HostUtil.isSameHost(info.getHost(), externalDbHost)) {
-                    return ent.getKey(); // Define dataSource name.
+                    return defineDataSourceName; // Define dataSource name.
                 }
             }
         }

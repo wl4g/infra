@@ -33,7 +33,9 @@ import org.apache.shardingsphere.proxy.backend.context.ProxyContext;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.net.HostAndPort;
 import com.wl4g.component.common.lang.StringUtils2;
+import com.wl4g.component.integration.sharding.failover.ProxyFailover.NodeStats.NodeInfo;
 import com.wl4g.component.integration.sharding.failover.exception.InvalidStateFailoverException;
+import com.wl4g.component.integration.sharding.util.HostUtil;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -101,6 +103,16 @@ public class FailoverConfiguration {
         private long idleTimeout = 0L;
         private long maxLifetime = 180_000L;
         private List<DataSourceAddressMapping> dataSourceAddressMappings = new ArrayList<>();
+
+        public DataSourceAddressMapping getMappedByInternalAddress(NodeInfo node) {
+            for (DataSourceAddressMapping mapping : safeList(getDataSourceAddressMappings())) {
+                HostAndPort internal = mapping.getParsedInternalAddress();
+                if (internal.getPort() == node.getPort() && HostUtil.isSameHost(internal.getHost(), node.getHost())) {
+                    return mapping;
+                }
+            }
+            return null;
+        }
 
         @Getter
         @Setter
