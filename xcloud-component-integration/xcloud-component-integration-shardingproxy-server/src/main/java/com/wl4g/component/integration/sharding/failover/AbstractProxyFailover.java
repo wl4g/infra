@@ -159,7 +159,7 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
                 try (JdbcOperator operator = new JdbcOperator(adminDataSource);) {
                     // Inspect primary/standby latest information.
                     S result = inspecting(operator);
-                    log.info("Inspected rwDataSourceName: {}, nodeInfo: {}", () -> oldRwDataSource.getName(),
+                    log.debug("Inspected rwDataSourceName: {}, nodeInfo: {}", () -> oldRwDataSource.getName(),
                             () -> toJSONString(result));
 
                     // Selection new primary node.
@@ -445,7 +445,12 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
      * @param newReadWriteSplittingRuleConfigs
      */
     private void doChangeReadwriteSplittingRuleConfiguration(List<RuleConfiguration> newReadWriteSplittingRuleConfigs) {
-        log.info("Changed new read-write-splitting rule configuration ... - {}", newReadWriteSplittingRuleConfigs);
+        log.info("\n");
+        log.info("----------------------------------------------------------");
+        log.warn("=>> FAILED, PERFORMING PRIMARY-STANDBY HANDOVER !!! <<=");
+        log.info("=>> Changed new read-write-splitting rule configuration ... - {}",
+                toJSONString(newReadWriteSplittingRuleConfigs));
+        log.info("----------------------------------------------------------\n");
         initializer.updateSchemaRuleConfiguration(getSchemaName(), newReadWriteSplittingRuleConfigs);
     }
 
