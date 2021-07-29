@@ -17,8 +17,10 @@ package com.wl4g.component.integration.sharding.util;
 
 import static com.wl4g.component.common.lang.StringUtils2.eqIgnCase;
 import static com.wl4g.component.common.log.SmartLoggerFactory.getLogger;
+import static java.lang.String.format;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import com.wl4g.component.common.log.SmartLogger;
 
@@ -41,16 +43,15 @@ public abstract class HostUtil {
             InetAddress h2 = InetAddress.getByName(host2);
             if (eqIgnCase(h1.getHostName(), h2.getHostName())) {
                 return true;
-            } else if (eqIgnCase(h1.getCanonicalHostName(), h2.getCanonicalHostName())) {
-                return true;
             } else {
-                return false;
+                return eqIgnCase(h1.getCanonicalHostName(), h2.getCanonicalHostName());
             }
+        } catch (UnknownHostException e) {
+            return false;
         } catch (Exception e) {
-            // log.error(format("Unable to compare hosts. '%s' and
-            // '%s'",host1,host2),e);
-            throw new IllegalStateException(e);
+            log.warn(format("Unable to compare hosts. '%s' and '%s', reason: %s", host1, host2, e.getMessage()));
         }
+        return false;
     }
 
 }
