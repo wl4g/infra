@@ -28,4 +28,9 @@ public class PostgresqlNodeStats extends NodeStats {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public boolean checkValid() {
+        // TODO Auto-generated method stub
+        return false;
+    }
 }

@@ -44,6 +44,8 @@ public interface ProxyFailover<S extends NodeStats> extends Closeable {
 
         public abstract List<? extends NodeInfo> getStandbyNodes();
 
+        public abstract boolean checkValid();
+
         @Getter
         @Setter
         public static abstract class NodeInfo {

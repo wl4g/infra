@@ -16,28 +16,28 @@
 package com.wl4g.component.integration.sharding.failover.exception;
 
 /**
- * {@link UnreachablePrimaryNodeFailoverException}
+ * {@link NoNextAdminDataSourceFailoverException}
  * 
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version 2021-07-27 v1.0.0
  * @since v1.0.0
  */
-public class UnreachablePrimaryNodeFailoverException extends FailoverException {
+public class NoNextAdminDataSourceFailoverException extends FailoverException {
     private static final long serialVersionUID = 841579612586305322L;
 
-    public UnreachablePrimaryNodeFailoverException() {
+    public NoNextAdminDataSourceFailoverException() {
         this(null, null);
     }
 
-    public UnreachablePrimaryNodeFailoverException(String message) {
+    public NoNextAdminDataSourceFailoverException(String message) {
         this(message, null);
     }
 
-    public UnreachablePrimaryNodeFailoverException(String message, Exception cause) {
+    public NoNextAdminDataSourceFailoverException(String message, Exception cause) {
         super(message, cause);
     }
 
-    public UnreachablePrimaryNodeFailoverException(Exception cause) {
+    public NoNextAdminDataSourceFailoverException(Exception cause) {
         super(cause);
     }
 

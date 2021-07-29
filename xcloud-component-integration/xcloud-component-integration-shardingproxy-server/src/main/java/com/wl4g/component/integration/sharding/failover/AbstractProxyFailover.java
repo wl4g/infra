@@ -17,7 +17,6 @@ package com.wl4g.component.integration.sharding.failover;
 
 import static com.wl4g.component.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.component.common.collection.CollectionUtils2.safeMap;
-import static com.wl4g.component.common.lang.Assert2.notEmpty;
 import static com.wl4g.component.common.lang.Assert2.notNullOf;
 import static com.wl4g.component.common.lang.Assert2.state;
 import static com.wl4g.component.common.log.SmartLoggerFactory.getLogger;
@@ -65,8 +64,10 @@ import com.wl4g.component.integration.sharding.failover.config.FailoverConfigura
 import com.wl4g.component.integration.sharding.failover.config.FailoverConfiguration.FailoverAdminDataSourceConfig.DataSourceAddressMapping;
 import com.wl4g.component.integration.sharding.failover.exception.FailoverException;
 import com.wl4g.component.integration.sharding.failover.exception.InvalidStateFailoverException;
+import com.wl4g.component.integration.sharding.failover.exception.NoNextAdminDataSourceFailoverException;
 import com.wl4g.component.integration.sharding.failover.exception.UnreachablePrimaryNodeFailoverException;
 import com.wl4g.component.integration.sharding.failover.initializer.FailoverAbstractBootstrapInitializer;
+import com.wl4g.component.integration.sharding.failover.jdbc.DelegateAdminDataSourceWrapper;
 import com.wl4g.component.integration.sharding.failover.jdbc.JdbcOperator;
 import com.wl4g.component.integration.sharding.util.HostUtil;
 import com.wl4g.component.integration.sharding.util.JdbcUtil;
@@ -88,7 +89,7 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
 
     private final FailoverAbstractBootstrapInitializer initializer;
     private final ShardingSphereMetaData metadata;
-    private final Map<String, HikariDataSource> cachingAdminDataSources = new ConcurrentHashMap<>(4);
+    private final Map<String, DelegateAdminDataSourceWrapper> cachingAdminDataSources = new ConcurrentHashMap<>(4);
     private OriginalDefineSchemaConfigurationWrapper cachingDefineSchemaConfig;
 
     public AbstractProxyFailover(FailoverAbstractBootstrapInitializer initializer, ShardingSphereMetaData metadata) {
@@ -127,7 +128,7 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
                 processFailover();
             }
         } catch (Exception e) {
-            log.error("Failed to process backend nodes primary-slave failover.", e);
+            log.error("Failed to process backend dbnodes primary standby failover.", e);
         } finally {
             if (op.isPresent()) {
                 op.get().releaseLock(lockName);
@@ -149,50 +150,72 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
 
             for (ReadwriteSplittingDataSourceRuleConfiguration oldRwDataSource : safeList(oldRwRuleConfig.getDataSources())) {
                 // Obtain backend node admin dataSource.
-                DataSource adminDataSource = obtainSelectedBackendNodeAdminDataSource(oldRwDataSource.getName(),
-                        oldRwDataSource.getReadDataSourceNames());
+                DelegateAdminDataSourceWrapper delegate = obtainSelectedBackendNodeAdminDataSource(oldRwDataSource.getName(),
+                        oldRwDataSource.getWriteDataSourceName(), oldRwDataSource.getReadDataSourceNames());
 
                 log.debug("Inspecting ... oldRwDataSourceConfig: {}, actualAdminDataSource: {}",
-                        () -> toJSONString(oldRwDataSource), () -> adminDataSource);
+                        () -> toJSONString(oldRwDataSource), () -> delegate);
 
-                try (JdbcOperator operator = new JdbcOperator(adminDataSource);) {
-                    // Inspect primary/standby latest information.
-                    S result = inspecting(operator);
-                    log.debug("Inspected rwDataSourceName: {}, nodeInfo: {}", () -> oldRwDataSource.getName(),
-                            () -> toJSONString(result));
+                // Try inspecting all primary and standby nodes.
+                S newNodeStats = null;
+                boolean attempt = true;
+                while (attempt) {
+                    try (JdbcOperator operator = new JdbcOperator(delegate.get());) {
+                        // Inspect primary/standby latest information.
+                        S result = inspecting(operator);
+                        log.debug("Inspected rwDataSourceName: {}, nodeStats: {}", () -> oldRwDataSource.getName(),
+                                () -> toJSONString(result));
+                        newNodeStats = result;
 
-                    // Selection new primary node.
-                    notEmpty(result.getPrimaryNodes(), UnreachablePrimaryNodeFailoverException.class,
-                            "No primary node information is currently queried.");
-                    NodeInfo newPrimaryNode = chooseNewPrimaryNode(result.getPrimaryNodes());
-
-                    // Transform get new primary dataSource name.
-                    String newPrimaryDataSourceName = transformToMappedDataSourceName(defineSchemaConfig, oldRwDataSource,
-                            newPrimaryNode);
-                    String oldPrimaryDataSourceName = oldRwDataSource.getWriteDataSourceName();
-
-                    // Check dataSource primary changed?
-                    if (isChangedPrimaryNode(newPrimaryNode, newPrimaryDataSourceName, oldPrimaryDataSourceName)) {
-                        // Gets changed new read dataSourceNames
-                        List<String> newReadDataSourceNames = getChangedNewReadDataSourceNames(
-                                defineSchemaConfig.getAllDataSourceConfigs(), oldRwDataSource, result.getStandbyNodes());
-                        if (CollectionUtils2.isEmpty(newReadDataSourceNames)) {
-                            throw new InvalidStateFailoverException(format(
-                                    "No matches found new read dataSource names by standbyNodes: %s", result.getStandbyNodes()));
+                        if (nonNull(newNodeStats)) { // Valid?
+                            if (newNodeStats.checkValid()) {
+                                attempt = false;
+                            } else {
+                                delegate.next(); // Invalid
+                            }
                         }
-
-                        // New read-write-splitting dataSource.
-                        ReadwriteSplittingDataSourceRuleConfiguration newRwDataSource = new ReadwriteSplittingDataSourceRuleConfiguration(
-                                oldRwDataSource.getName(), oldRwDataSource.getAutoAwareDataSourceName(), newPrimaryDataSourceName,
-                                newReadDataSourceNames, oldRwDataSource.getLoadBalancerName());
-                        newRwDataSources.add(newRwDataSource);
-                        anyChanaged = true;
-                    } else { // Not changed
-                        newRwDataSources.add(oldRwDataSource);
-                        log.debug(
-                                "Skiping change read-write-splitting, becuase primary dataSourceName it's up to date. {}, actualSchemaName: {}, schemaName: {}",
-                                oldPrimaryDataSourceName, oldRwDataSource.getName(), getSchemaName());
+                    } catch (NoNextAdminDataSourceFailoverException e) {
+                        attempt = false;
+                        throw e;
+                    } catch (Exception e) {
+                        delegate.next();
+                        log.error("Failed to inspect. rwDataSourceName: {}", oldRwDataSource.getName(), e);
                     }
+                }
+
+                // Selection new primary node.
+                if (CollectionUtils2.isEmpty(newNodeStats.getPrimaryNodes())) {
+                    throw new UnreachablePrimaryNodeFailoverException("No primary node information is currently queried.");
+                }
+                NodeInfo newPrimaryNode = chooseNewPrimaryNode(newNodeStats.getPrimaryNodes());
+
+                // Transform get new primary dataSource name.
+                String newPrimaryDataSourceName = transformToMappedDataSourceName(defineSchemaConfig, oldRwDataSource,
+                        newPrimaryNode);
+                String oldPrimaryDataSourceName = oldRwDataSource.getWriteDataSourceName();
+
+                // Check dataSource primary changed?
+                if (isChangedPrimaryNode(newPrimaryNode, newPrimaryDataSourceName, oldPrimaryDataSourceName)) {
+                    // Gets changed new read dataSourceNames
+                    List<String> newReadDataSourceNames = getChangedNewReadDataSourceNames(
+                            defineSchemaConfig.getAllDataSourceConfigs(), oldRwDataSource, newNodeStats.getStandbyNodes());
+                    if (CollectionUtils2.isEmpty(newReadDataSourceNames)) {
+                        throw new InvalidStateFailoverException(
+                                format("Failed to failover, No matches found new read dataSource names by standbyNodes: %s",
+                                        newNodeStats.getStandbyNodes()));
+                    }
+
+                    // New read-write-splitting dataSource.
+                    ReadwriteSplittingDataSourceRuleConfiguration newRwDataSource = new ReadwriteSplittingDataSourceRuleConfiguration(
+                            oldRwDataSource.getName(), oldRwDataSource.getAutoAwareDataSourceName(), newPrimaryDataSourceName,
+                            newReadDataSourceNames, oldRwDataSource.getLoadBalancerName());
+                    newRwDataSources.add(newRwDataSource);
+                    anyChanaged = true;
+                } else { // Not changed
+                    newRwDataSources.add(oldRwDataSource);
+                    log.debug(
+                            "Skiping change read-write-splitting, becuase primary dataSourceName it's up to date. {}, actualSchemaName: {}, schemaName: {}",
+                            oldPrimaryDataSourceName, oldRwDataSource.getName(), getSchemaName());
                 }
             }
             if (!newRwDataSources.isEmpty()) {
@@ -209,33 +232,42 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
      * Obtain selection back-end node administrator dataSource.
      * 
      * @param haReadwriteDataSourceName
+     * @param writeDataSourceName
      * @param readDataSourceNames
      * @return
      * @throws SQLException
      */
-    private synchronized DataSource obtainSelectedBackendNodeAdminDataSource(String haReadwriteDataSourceName,
-            List<String> readDataSourceNames) throws SQLException {
-        HikariDataSource adminDataSource = cachingAdminDataSources.get(haReadwriteDataSourceName);
-        if (nonNull(adminDataSource)) {
-            // Detecting & checking dataSource active?
-            try {
-                adminDataSource.getConnection().close();
-                return adminDataSource;
-            } catch (SQLException e) {
-                adminDataSource.close();
-                cachingAdminDataSources.remove(haReadwriteDataSourceName); // reset
-                log.warn("Deaded caching dataSource: {}({}), reason: {}", adminDataSource, adminDataSource.getJdbcUrl(),
-                        e.getMessage());
-            }
-        }
-        log.info("Trying obtain next node admin dataSource ... - {}", haReadwriteDataSourceName);
+    private synchronized DelegateAdminDataSourceWrapper obtainSelectedBackendNodeAdminDataSource(String haReadwriteDataSourceName,
+            String writeDataSourceName, List<String> readDataSourceNames) throws SQLException {
 
+        // Merge current schema rule read-write dataSourceNames.
+        List<String> mergeCurrentSchemaRuleRwDataSourceNames = new ArrayList<>(readDataSourceNames);
+        mergeCurrentSchemaRuleRwDataSourceNames.add(writeDataSourceName);
+
+        // First, load from caching.
+        DelegateAdminDataSourceWrapper delegate = cachingAdminDataSources.get(haReadwriteDataSourceName);
+        if (nonNull(delegate)) {
+            // Detecting & checking selected dataSource active?
+            // try {
+            // delegate.get().getConnection().close();
+            return delegate;
+            // } catch (Exception e) {
+            // delegate.get().close();
+            // cachingAdminDataSources.remove(haReadwriteDataSourceName);//reset
+            // log.warn("Deaded caching dataSource: {}({}), reason: {}",
+            // delegate, delegate.get().getJdbcUrl(), e.getMessage());
+            // }
+        }
+
+        log.info("Trying obtain next dbnodes admin dataSource ... - {}", haReadwriteDataSourceName);
+
+        delegate = new DelegateAdminDataSourceWrapper();
         for (Entry<String, DataSource> ent : metadata.getResource().getDataSources().entrySet()) {
             String dsName = ent.getKey();
             // Skip data source names that do not belong to the data source
             // collection of the current read-write separation configuration.
             // (YAML tag: !READWRITE_SPLITTING)
-            if (!safeList(readDataSourceNames).contains(dsName)) {
+            if (!mergeCurrentSchemaRuleRwDataSourceNames.contains(dsName)) {
                 continue;
             }
 
@@ -254,7 +286,7 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
                 // Setup basic JDBC configuration.
                 FailoverAdminDataSourceConfig adminDataSourceConfig = ProxyContext.getInstance().getFailoverConfig()
                         .getAdminDataSourceConfig(getSchemaName());
-                adminDataSource = new HikariDataSource();
+                HikariDataSource adminDataSource = new HikariDataSource();
                 adminDataSource.setUsername(adminDataSourceConfig.getUsername());
                 adminDataSource.setPassword(adminDataSourceConfig.getPassword());
                 adminDataSource.setConnectionTimeout(adminDataSourceConfig.getConnectionTimeout());
@@ -266,15 +298,17 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
                 // Custom admin dataSource JDBC configuration.
                 decorateAdminBackendDataSource(dsName, info.getHost(), info.getPort(), adminDataSource);
 
-                cachingAdminDataSources.put(haReadwriteDataSourceName, adminDataSource);
-                return adminDataSource;
+                cachingAdminDataSources.put(haReadwriteDataSourceName, delegate.addDataSource(dsName, adminDataSource));
             } catch (Exception e) {
                 log.warn("Cannot build backend connection of dataSourceName: {}", dsName);
             }
         }
+        if (delegate.hasAvailable()) {
+            return delegate;
+        }
 
-        throw new SQLException(
-                format("Failed to build backend connection. metadata dataSources: %s", metadata.getResource().getDataSources()));
+        throw new SQLException(format("Cannot to build backend admin delegate dataSource. all biz dataSources: %s",
+                metadata.getResource().getDataSources()));
     }
 
     /**
@@ -493,12 +527,12 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
             if (isNull(shutdownThread)) {
                 shutdownThread = new Thread(() -> {
                     safeList(shutdownFailovers).forEach(failover -> {
-                        safeMap(failover.cachingAdminDataSources).forEach((dataSourceName, adminDataSource) -> {
+                        safeMap(failover.cachingAdminDataSources).forEach((dataSourceName, delegate) -> {
                             try {
-                                log.info("Closing adminDataSource: {}, of '{}'", adminDataSource, dataSourceName);
-                                adminDataSource.close();
+                                log.info("Closing adminDataSource: {}, of '{}'", delegate, dataSourceName);
+                                delegate.close();
                             } catch (Exception e) {
-                                log.info("Unable close adminDataSource: {}, of '{}'", adminDataSource, dataSourceName);
+                                log.info("Unable close adminDataSource: {}, of '{}'", delegate, dataSourceName);
                             }
                         });
                     });
