@@ -16,24 +16,28 @@
 package com.wl4g.component.integration.sharding.failover.exception;
 
 /**
- * {@link InvalidConfigurationFailoverException}
+ * {@link InvalidStateFailoverException}
  * 
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version 2021-07-27 v1.0.0
  * @since v1.0.0
  */
-public class InvalidConfigurationFailoverException extends FailoverException {
+public class InvalidStateFailoverException extends FailoverException {
     private static final long serialVersionUID = 841579612586305322L;
 
-    public InvalidConfigurationFailoverException() {
+    public InvalidStateFailoverException() {
         this(null, null);
     }
 
-    public InvalidConfigurationFailoverException(String message, Exception cause) {
+    public InvalidStateFailoverException(String message) {
+        this(message, null);
+    }
+
+    public InvalidStateFailoverException(String message, Exception cause) {
         super(message, cause);
     }
 
-    public InvalidConfigurationFailoverException(Exception cause) {
+    public InvalidStateFailoverException(Exception cause) {
         super(cause);
     }
 

@@ -31,6 +31,10 @@ public class FailoverException extends ShardingSphereException {
         this(null, null);
     }
 
+    public FailoverException(String message) {
+        this(message, null);
+    }
+
     public FailoverException(String message, Exception cause) {
         super(message, cause);
     }

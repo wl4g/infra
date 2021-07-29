@@ -52,6 +52,16 @@ public interface ProxyFailover<S extends NodeStats> extends Closeable {
             public abstract String getHost();
 
             public abstract int getPort();
+
+            public String toAddressString() {
+                return getHost() + ":" + getPort();
+            }
+
+            @Override
+            public String toString() {
+                return toAddressString();
+            }
+
         }
 
     }
