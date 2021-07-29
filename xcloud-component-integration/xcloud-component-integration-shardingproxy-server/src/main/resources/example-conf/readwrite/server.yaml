@@ -78,19 +78,19 @@ props:
           "schemaName": "userdb",
           "username": "root",
           "password": "123456",
-          "backendDbNodeAddressMapping": [{
-              "internalNodeAddress": "wanglsir-pro:13306",
-              "externalMappingAddresses": [
+          "dataSourceAddressMapping": [{
+              "internalAddress": "wanglsir-pro:13306",
+              "externalAddresses": [
                   "wl4g.debug:13306"
               ]
           },{
-              "internalNodeAddress": "wanglsir-pro:13307",
-              "externalMappingAddresses": [
+              "internalAddress": "wanglsir-pro:13307",
+              "externalAddresses": [
                   "wl4g.debug:13307"
               ]
           },{
-              "internalNodeAddress": "wanglsir-pro:13308",
-              "externalMappingAddresses": [
+              "internalAddress": "wanglsir-pro:13308",
+              "externalAddresses": [
                   "wl4g.debug:13308"
               ]
           }]
