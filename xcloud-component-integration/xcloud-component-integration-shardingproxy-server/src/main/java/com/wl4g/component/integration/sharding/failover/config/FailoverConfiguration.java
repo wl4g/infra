@@ -20,21 +20,19 @@ import static com.wl4g.component.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.component.common.serialize.JacksonUtils.parseJSON;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
-import static java.util.Collections.synchronizedMap;
-import static java.util.stream.Collectors.toMap;
+import static java.util.Collections.synchronizedList;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.beanutils.BeanUtilsBean2;
 import org.apache.shardingsphere.proxy.backend.context.ProxyContext;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.net.HostAndPort;
+import com.wl4g.component.common.lang.StringUtils2;
 import com.wl4g.component.integration.sharding.failover.exception.InvalidStateFailoverException;
 
 import lombok.AllArgsConstructor;
@@ -58,30 +56,35 @@ public class FailoverConfiguration {
     private long inspectInitialDelayMs = 3_000L;
     private long inspectMinDelayMs = 10_000L;
     private long inspectMaxDelayMs = 30_000L;
-    private Map<String, FailoverAdminDataSourceConfig> adminDataSourceConfigs = synchronizedMap(new HashMap<>());
+    private List<FailoverAdminDataSourceConfig> adminDataSourceConfigs = synchronizedList(new ArrayList<>());
 
-    public void merge(Properties props) {
+    public FailoverConfiguration mergeFrom(FailoverConfiguration config) {
         try {
-            Map<Object, Object> failoverProps = safeMap(props).entrySet().stream()
-                    .filter(e -> valueOf(e.getKey()).startsWith(KEY_PREFIX))
-                    .collect(toMap(e -> valueOf(e.getKey()).substring(KEY_PREFIX.length()), e -> e.getValue()));
-            BeanUtilsBean2.getInstance().copyProperties(this, failoverProps);
-
-            List<FailoverAdminDataSourceConfig> configs = parseJSON(valueOf(failoverProps.get(KEY_DB_PREFIX)),
-                    new TypeReference<List<FailoverAdminDataSourceConfig>>() {
-                    });
-            safeList(configs).forEach(c -> {
-                // Check schemaName.
-                if (!ProxyContext.getInstance().getAllSchemaNames().contains(c.getSchemaName())) {
-                    throw new InvalidStateFailoverException(
-                            format("Invalid failover configuration. unknown schemaName: %s", c.getSchemaName()), null);
-                }
-                adminDataSourceConfigs.put(c.getSchemaName(), c);
-            });
-
+            BeanUtilsBean2.getInstance().copyProperties(this, config);
+            return this;
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    public FailoverAdminDataSourceConfig getAdminDataSourceConfig(String schemaName) {
+        return safeList(getAdminDataSourceConfigs()).stream().filter(c -> StringUtils2.equals(c.getSchemaName(), schemaName))
+                .findFirst().orElse(null);
+    }
+
+    public static FailoverConfiguration build(Properties props) {
+        FailoverConfiguration config = parseJSON(valueOf(safeMap(props).get(KEY_FAILOVER_CONF_JSON)),
+                FailoverConfiguration.class);
+        safeList(config.getAdminDataSourceConfigs()).forEach(c -> {
+            // Check schemaName.
+            if (!ProxyContext.getInstance().getAllSchemaNames().contains(c.getSchemaName())) {
+                throw new InvalidStateFailoverException(
+                        format("Invalid failover configuration. unknown schemaName: %s", c.getSchemaName()), null);
+            }
+            // Parse DB internal/external address.
+            safeList(c.getDataSourceAddressMappings()).forEach(m -> m.parse());
+        });
+        return config;
     }
 
     @Getter
@@ -104,11 +107,19 @@ public class FailoverConfiguration {
         @AllArgsConstructor
         @NoArgsConstructor
         public final static class DataSourceAddressMapping {
-            private HostAndPort internalAddress;
-            private List<HostAndPort> externalAddresses = new ArrayList<>();
+            private String internalAddress;
+            private List<String> externalAddresses = new ArrayList<>();
+
+            // Parsed hostAndPort string.
+            private @JsonIgnore transient HostAndPort parsedInternalAddress;
+            private @JsonIgnore transient List<HostAndPort> parsedExternalAddress = new ArrayList<>();
+
+            void parse() {
+                this.parsedInternalAddress = HostAndPort.fromString(getInternalAddress());
+                safeList(getExternalAddresses()).forEach(addr -> this.parsedExternalAddress.add(HostAndPort.fromString(addr)));
+            }
         }
     }
 
-    private static final String KEY_PREFIX = "failover-";
-    private static final String KEY_DB_PREFIX = "admin-datasource-configuration-json"; // admin-dataSource-configuration
+    private static final String KEY_FAILOVER_CONF_JSON = "failover-configuration-json"; // failover-admin-dataSource-configuration
 }

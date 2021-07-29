@@ -254,7 +254,7 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
 
                 // Setup basic JDBC configuration.
                 FailoverAdminDataSourceConfig adminDataSourceConfig = ProxyContext.getInstance().getFailoverConfig()
-                        .getAdminDataSourceConfigs().get(getSchemaName());
+                        .getAdminDataSourceConfig(getSchemaName());
                 adminDataSource = new HikariDataSource();
                 adminDataSource.setUsername(adminDataSourceConfig.getUsername());
                 adminDataSource.setPassword(adminDataSourceConfig.getPassword());
@@ -312,13 +312,16 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
     private String transformToNewPrimaryDataSourceName(OriginalDefineSchemaConfigurationWrapper defineSchemaConfig,
             ReadwriteSplittingDataSourceRuleConfiguration oldRwDataSource, NodeInfo newPrimaryNode) {
         // Transform DB host/port to external(LB) address.
-        List<DataSourceAddressMapping> mappings = ProxyContext.getInstance().getFailoverConfig().getAdminDataSourceConfigs()
-                .get(getSchemaName()).getDataSourceAddressMappings();
+        List<DataSourceAddressMapping> mappings = ProxyContext.getInstance().getFailoverConfig()
+                .getAdminDataSourceConfig(getSchemaName()).getDataSourceAddressMappings();
 
         // First, find by newPrimaryNode mapping external addresses.
         for (DataSourceAddressMapping mapping : safeList(mappings)) {
-            if (HostUtil.isSameHost(mapping.getInternalAddress().toString(), newPrimaryNode.toAddressString())) {
-                for (HostAndPort external : safeList(mapping.getExternalAddresses())) {
+            HostAndPort internal = mapping.getParsedInternalAddress();
+            if (internal.getPort() == newPrimaryNode.getPort()
+                    && HostUtil.isSameHost(internal.getHost(), newPrimaryNode.getHost())) {
+
+                for (HostAndPort external : safeList(mapping.getParsedExternalAddress())) {
                     String newPrimaryDataSourceName = findMatchingDataSourceName(defineSchemaConfig.getAllDataSourceConfigs(),
                             oldRwDataSource, external.getHost(), external.getPort());
                     if (!isBlank(newPrimaryDataSourceName)) {

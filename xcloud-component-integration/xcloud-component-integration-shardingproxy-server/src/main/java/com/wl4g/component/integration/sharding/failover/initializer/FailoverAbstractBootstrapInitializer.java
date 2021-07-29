@@ -53,6 +53,7 @@ import org.apache.shardingsphere.transaction.context.TransactionContexts;
 import org.apache.shardingsphere.transaction.context.impl.StandardTransactionContexts;
 
 import com.wl4g.component.integration.sharding.failover.ProxyFailoverManager;
+import com.wl4g.component.integration.sharding.failover.config.FailoverConfiguration;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -99,8 +100,11 @@ public abstract class FailoverAbstractBootstrapInitializer implements BootstrapI
         TransactionContexts transactionContexts = decorateTransactionContexts(createTransactionContexts(metaDataContexts),
                 xaTransactionMangerType);
         ProxyContext.getInstance().init(metaDataContexts, transactionContexts);
-        ProxyContext.getInstance().getFailoverConfig().merge(yamlConfig.getServerConfiguration().getProps());
         setDatabaseServerInfo();
+
+        // ADD merge failover configuration.
+        FailoverConfiguration failoverConfig = FailoverConfiguration.build(yamlConfig.getServerConfiguration().getProps());
+        ProxyContext.getInstance().getFailoverConfig().mergeFrom(failoverConfig);
     }
 
     private MetaDataContexts createMetaDataContexts(final ProxyConfiguration proxyConfig) throws SQLException {

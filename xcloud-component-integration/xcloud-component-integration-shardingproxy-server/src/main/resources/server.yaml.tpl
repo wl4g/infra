@@ -66,33 +66,35 @@ props:
   sql-show: true
   check-table-metadata-enabled: false
   failover-enable: true # Default by true
-  failover-inspectInitialDelayMs: 3_000
-  failover-inspectMinDelayMs: 3_000
-  failover-inspectMaxDelayMs: 10_000
   # Failover admin dataSource configuration.
   # Notes: This configuration is used for read-write separation data source failover. Therefore, the same account
   #   password must be created for all master and slave databases before service startup.
-  failover-admin-datasource-configuration-json: |-
-      [{
-          "schemaName": "userdb",
-          "username": "root",
-          "password": "123456",
-          "dataSourceAddressMapping": [{
-              "internalAddress": "wanglsir-pro:13306",
-              "externalAddresses": [
-                  "wl4g.debug:13306"
-              ]
-          },{
-              "internalAddress": "wanglsir-pro:13307",
-              "externalAddresses": [
-                  "wl4g.debug:13307"
-              ]
-          },{
-              "internalAddress": "wanglsir-pro:13308",
-              "externalAddresses": [
-                  "wl4g.debug:13308"
-              ]
-          }]
-      }]
+  failover-configuration-json: |-
+     {
+         "inspectInitialDelayMs": 3000,
+         "inspectMinDelayMs": 3000,
+         "inspectMaxDelayMs": 10000,
+         "adminDataSourceConfigs": [{
+             "schemaName": "userdb",
+             "username": "root",
+             "password": "123456",
+             "dataSourceAddressMappings": [{
+                 "internalAddress": "wanglsir-pro:13306",
+                 "externalAddresses": [
+                     "wl4g.debug:13306"
+                 ]
+             }, {
+                 "internalAddress": "wanglsir-pro:13307",
+                 "externalAddresses": [
+                     "wl4g.debug:13307"
+                 ]
+             }, {
+                 "internalAddress": "wanglsir-pro:13308",
+                 "externalAddresses": [
+                     "wl4g.debug:13308"
+                 ]
+             }]
+         }]
+     }
   # Notes: If failover is enabled and distributed governance mode is adopted, lock must be opened.
   lock-enabled: true # Default by false
