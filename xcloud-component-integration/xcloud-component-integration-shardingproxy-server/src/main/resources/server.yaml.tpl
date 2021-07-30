@@ -74,23 +74,23 @@ props:
          "inspectInitialDelayMs": 3000,
          "inspectMinDelayMs": 3000,
          "inspectMaxDelayMs": 10000,
-         "adminDataSourceConfigs": [{
+         "adminDataSources": [{
              "schemaName": "userdb",
              "username": "root",
              "password": "123456",
-             "dataSourceAddressMappings": [{
-                 "internalAddress": "wanglsir-pro:13306",
-                 "externalAddresses": [
+             "mappings": [{
+                 "internalAddr": "wanglsir-pro:13306",
+                 "externalAddrs": [
                      "wl4g.debug:13306"
                  ]
              }, {
-                 "internalAddress": "wanglsir-pro:13307",
-                 "externalAddresses": [
+                 "internalAddr": "wanglsir-pro:13307",
+                 "externalAddrs": [
                      "wl4g.debug:13307"
                  ]
              }, {
-                 "internalAddress": "wanglsir-pro:13308",
-                 "externalAddresses": [
+                 "internalAddr": "wanglsir-pro:13308",
+                 "externalAddrs": [
                      "wl4g.debug:13308"
                  ]
              }]

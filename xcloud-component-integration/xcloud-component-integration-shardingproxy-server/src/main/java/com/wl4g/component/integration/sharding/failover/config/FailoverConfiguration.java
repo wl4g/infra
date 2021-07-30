@@ -58,7 +58,7 @@ public class FailoverConfiguration {
     private long inspectInitialDelayMs = 3_000L;
     private long inspectMinDelayMs = 10_000L;
     private long inspectMaxDelayMs = 30_000L;
-    private List<FailoverAdminDataSourceConfig> adminDataSourceConfigs = synchronizedList(new ArrayList<>());
+    private List<FailoverAdminDataSourceConfig> adminDataSources = synchronizedList(new ArrayList<>());
 
     public FailoverConfiguration mergeFrom(FailoverConfiguration config) {
         try {
@@ -70,21 +70,21 @@ public class FailoverConfiguration {
     }
 
     public FailoverAdminDataSourceConfig getAdminDataSourceConfig(String schemaName) {
-        return safeList(getAdminDataSourceConfigs()).stream().filter(c -> StringUtils2.equals(c.getSchemaName(), schemaName))
+        return safeList(getAdminDataSources()).stream().filter(c -> StringUtils2.equals(c.getSchemaName(), schemaName))
                 .findFirst().orElse(null);
     }
 
     public static FailoverConfiguration build(Properties props) {
         FailoverConfiguration config = parseJSON(valueOf(safeMap(props).get(KEY_FAILOVER_CONF_JSON)),
                 FailoverConfiguration.class);
-        safeList(config.getAdminDataSourceConfigs()).forEach(c -> {
+        safeList(config.getAdminDataSources()).forEach(c -> {
             // Check schemaName.
             if (!ProxyContext.getInstance().getAllSchemaNames().contains(c.getSchemaName())) {
                 throw new InvalidStateFailoverException(
                         format("Invalid failover configuration. unknown schemaName: %s", c.getSchemaName()), null);
             }
             // Parse DB internal/external address.
-            safeList(c.getDataSourceAddressMappings()).forEach(m -> m.parse());
+            safeList(c.getMappings()).forEach(m -> m.parse());
         });
         return config;
     }
@@ -102,11 +102,11 @@ public class FailoverConfiguration {
         private int minimumIdle = 1;
         private long idleTimeout = 0L;
         private long maxLifetime = 180_000L;
-        private List<DataSourceAddressMapping> dataSourceAddressMappings = new ArrayList<>();
+        private List<DataSourceAddressMapping> mappings = new ArrayList<>();
 
         public DataSourceAddressMapping getMappedByInternalAddress(NodeInfo node) {
-            for (DataSourceAddressMapping mapping : safeList(getDataSourceAddressMappings())) {
-                HostAndPort internal = mapping.getParsedInternalAddress();
+            for (DataSourceAddressMapping mapping : safeList(getMappings())) {
+                HostAndPort internal = mapping.getParsedInternalAddr();
                 if (internal.getPort() == node.getPort() && HostUtil.isSameHost(internal.getHost(), node.getHost())) {
                     return mapping;
                 }
@@ -119,16 +119,16 @@ public class FailoverConfiguration {
         @AllArgsConstructor
         @NoArgsConstructor
         public final static class DataSourceAddressMapping {
-            private String internalAddress;
-            private List<String> externalAddresses = new ArrayList<>();
+            private String internalAddr;
+            private List<String> externalAddrs = new ArrayList<>();
 
             // Parsed hostAndPort string.
-            private @JsonIgnore transient HostAndPort parsedInternalAddress;
-            private @JsonIgnore transient List<HostAndPort> parsedExternalAddress = new ArrayList<>();
+            private @JsonIgnore transient HostAndPort parsedInternalAddr;
+            private @JsonIgnore transient List<HostAndPort> parsedExternalAddrs = new ArrayList<>();
 
             void parse() {
-                this.parsedInternalAddress = HostAndPort.fromString(getInternalAddress());
-                safeList(getExternalAddresses()).forEach(addr -> this.parsedExternalAddress.add(HostAndPort.fromString(addr)));
+                this.parsedInternalAddr = HostAndPort.fromString(getInternalAddr());
+                safeList(getExternalAddrs()).forEach(addr -> this.parsedExternalAddrs.add(HostAndPort.fromString(addr)));
             }
         }
     }

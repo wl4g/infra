@@ -39,6 +39,7 @@ public abstract class JdbcUtil {
         URI uri = URI.create(jdbcUrl.substring(jdbcUrl.indexOf("jdbc:") + 5));
         notNull(uri.getHost(), "Unable resolve jdbc url host from: %s", jdbcUrl);
         isTrue(uri.getPort() > 0, "Unable resolve jdbc url port from: %s", jdbcUrl);
+
         String dbname = uri.getPath();
         dbname = startsWith(dbname, "/") ? dbname.substring(1) : dbname;
         return new JdbcInformation("jdbc:".concat(uri.getScheme()), uri.getHost(), uri.getPort(), dbname);

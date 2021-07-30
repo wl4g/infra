@@ -15,6 +15,7 @@
  */
 package com.wl4g.component.integration.sharding.failover.jdbc;
 
+import static com.wl4g.component.common.lang.Assert2.notNullOf;
 import static com.wl4g.component.common.log.SmartLoggerFactory.getLogger;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
@@ -25,6 +26,8 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.sql.DataSource;
 
 import com.wl4g.component.common.log.SmartLogger;
 import com.wl4g.component.integration.sharding.failover.exception.InvalidStateFailoverException;
@@ -48,12 +51,12 @@ public final class DelegateAdminDataSourceWrapper implements Iterator<HikariData
         }
     });
 
-    private AtomicInteger selectionPos = new AtomicInteger(-1);
+    private final AtomicInteger selectionPos = new AtomicInteger(DEFAULT_SELECTION_POS);
     private volatile HikariDataSource selection;
 
     @Override
     public boolean hasNext() {
-        return selectionPos.incrementAndGet() <= (dataSources.size() - 1);
+        return (selectionPos.get() + 1) < dataSources.size();
     }
 
     @Override
@@ -62,21 +65,24 @@ public final class DelegateAdminDataSourceWrapper implements Iterator<HikariData
             throw new NoNextAdminDataSourceFailoverException(
                     format("Currently attempted: %s, all dataSources: %s", selectionPos.get(), dataSources));
         }
+        selectionPos.incrementAndGet(); // +1
+
         int index = 0;
         for (String dsname : dataSources.keySet()) {
             if (index++ == selectionPos.get()) {
-                return selection = dataSources.get(dsname);
+                return (selection = dataSources.get(dsname));
             }
         }
+
         throw new NoNextAdminDataSourceFailoverException(
                 format("Currently attempted: %s, all dataSources: %s", selectionPos.get(), dataSources));
     }
 
-    public boolean hasAvailable() {
+    public boolean available() {
         return !dataSources.isEmpty();
     }
 
-    public HikariDataSource get() {
+    public DataSource get() {
         if (isNull(selection)) {
             next();
         }
@@ -86,8 +92,13 @@ public final class DelegateAdminDataSourceWrapper implements Iterator<HikariData
         return selection;
     }
 
-    public synchronized DelegateAdminDataSourceWrapper addDataSource(String dataSourceName, HikariDataSource dataSource) {
-        this.dataSources.put(dataSourceName, dataSource);
+    public DelegateAdminDataSourceWrapper reset() {
+        selectionPos.set(DEFAULT_SELECTION_POS);
+        return this;
+    }
+
+    public synchronized DelegateAdminDataSourceWrapper putDataSource(String dataSourceName, HikariDataSource dataSource) {
+        dataSources.put(notNullOf(dataSourceName, "dataSourceName"), notNullOf(dataSource, "dataSource"));
         return this;
     }
 
@@ -97,9 +108,10 @@ public final class DelegateAdminDataSourceWrapper implements Iterator<HikariData
             try {
                 ds.close();
             } catch (Exception e) {
-                log.error("", e);
+                log.error(format("Cannot close original dataSource. - %s", ds.getJdbcUrl()), e);
             }
         });
     }
 
+    private static final int DEFAULT_SELECTION_POS = 0;
 }
