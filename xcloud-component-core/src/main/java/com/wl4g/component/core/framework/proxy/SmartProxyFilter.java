@@ -43,41 +43,30 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
  */
 public interface SmartProxyFilter extends Ordered {
 
-	/**
-	 * Check whether the current class proxy is supported.
-	 * 
-	 * @param target
-	 * @param actualOriginalTargetClass
-	 * @return
-	 */
-	boolean supportTypeProxy(Object target, Class<?> actualOriginalTargetClass);
+    /**
+     * Check whether the current class proxy is supported.
+     * 
+     * @param target
+     * @param actualOriginalTargetClass
+     * @return
+     */
+    boolean supportTypeProxy(Object target, Class<?> actualOriginalTargetClass);
 
-	/**
-	 * Check whether the current method proxy is supported.
-	 * 
-	 * @param method
-	 * @param actualOriginalTargetClass
-	 * @param args
-	 * @return
-	 */
-	default boolean supportMethodProxy(Object target, Method method, Class<?> actualOriginalTargetClass, Object... args) {
-		return true;
-	}
+    /**
+     * Check whether the current method proxy is supported.
+     * 
+     * @param method
+     * @param actualOriginalTargetClass
+     * @param args
+     * @return
+     */
+    default boolean supportMethodProxy(Object target, Method method, Class<?> actualOriginalTargetClass, Object... args) {
+        return true;
+    }
 
-	// default Object[] preHandle(@NotNull Object target, @NotNull Method
-	// method, @Nullable Object[] args) {
-	// return args;
-	// }
-
-	default Object doInvoke(@NotNull InvocationChain chain, @NotNull Object target, @NotNull Method method,
-			@Nullable Object[] args) throws Exception {
-		return chain.doInvoke(target, method, args);
-	}
-
-	// default Object postHandle(@NotNull Object target, @NotNull Method method,
-	// @Nullable Object[] args, @Nullable Object result,
-	// @NotNull Throwable ex) {
-	// return result;
-	// }
+    default Object doInvoke(@NotNull InvocationChain chain, @NotNull Object target, @NotNull Method method,
+            @Nullable Object[] args) throws Exception {
+        return chain.doInvoke(target, method, args);
+    }
 
 }

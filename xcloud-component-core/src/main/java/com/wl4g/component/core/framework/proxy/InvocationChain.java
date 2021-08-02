@@ -28,6 +28,8 @@ import java.util.List;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
+import org.springframework.core.annotation.AnnotationAwareOrderComparator;
+
 import com.wl4g.component.common.log.SmartLogger;
 
 /**
@@ -39,24 +41,26 @@ import com.wl4g.component.common.log.SmartLogger;
  * @see {@link org.apache.catalina.core.ApplicationFilterChain#internalDoFilter()}
  */
 public class InvocationChain {
-	protected final SmartLogger log = getLogger(InvocationChain.class);
+    protected final SmartLogger log = getLogger(getClass());
 
-	private final List<SmartProxyFilter> filters;
-	private int index;
+    private final List<SmartProxyFilter> filters;
+    private int index;
 
-	public InvocationChain(List<SmartProxyFilter> filters) {
-		this.filters = notNullOf(filters, "filters");
-		this.index = 0;
-	}
+    public InvocationChain(List<SmartProxyFilter> filters) {
+        notNullOf(filters, "filters");
+        AnnotationAwareOrderComparator.sort(filters);
+        this.filters = filters;
+        this.index = 0;
+    }
 
-	public Object doInvoke(@NotNull Object target, @NotNull Method method, @Nullable Object[] args) throws Exception {
-		log.trace("Invoking smart proxied filter at index: {}", index);
-		if (index >= filters.size()) {
-			// When none of the filters execute the actual target method, it
-			// must be called at the end.
-			return method.invoke(target, args);
-		}
-		return filters.get(index++).doInvoke(this, target, method, args);
-	}
+    public Object doInvoke(@NotNull Object target, @NotNull Method method, @Nullable Object[] args) throws Exception {
+        log.trace("Invoking smart proxied filter at index: {}", index);
+        if (index >= filters.size()) {
+            // When none of the filters execute the actual target method, it
+            // must be called at the end.
+            return method.invoke(target, args);
+        }
+        return filters.get(index++).doInvoke(this, target, method, args);
+    }
 
 }

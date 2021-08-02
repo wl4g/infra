@@ -325,6 +325,14 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
         return newNodeStats;
     }
 
+    /**
+     * Custom admin JDBC dataSource configuration.
+     * 
+     * @param ruleDataSourceName
+     * @param ruleDataSourceJdbcHost
+     * @param ruldDataSourceJdbcPort
+     * @param adminDataSource
+     */
     protected abstract void decorateAdminBackendDataSource(String ruleDataSourceName, String ruleDataSourceJdbcHost,
             int ruldDataSourceJdbcPort, HikariDataSource adminDataSource);
 
