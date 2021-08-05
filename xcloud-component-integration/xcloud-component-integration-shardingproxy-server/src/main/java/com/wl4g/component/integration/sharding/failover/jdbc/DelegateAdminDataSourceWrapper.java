@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.sql.DataSource;
 
 import com.wl4g.component.common.log.SmartLogger;
+import com.wl4g.component.integration.sharding.failover.exception.FailoverException;
 import com.wl4g.component.integration.sharding.failover.exception.InvalidStateFailoverException;
 import com.wl4g.component.integration.sharding.failover.exception.NoNextAdminDataSourceFailoverException;
 import com.zaxxer.hikari.HikariDataSource;
@@ -62,8 +63,8 @@ public final class DelegateAdminDataSourceWrapper implements Iterator<HikariData
     @Override
     public synchronized HikariDataSource next() {
         if (!hasNext()) {
-            throw new NoNextAdminDataSourceFailoverException(
-                    format("Currently attempted: %s, all dataSources: %s", selectionPos.get(), dataSources));
+            throw new NoNextAdminDataSourceFailoverException(format(
+                    "There are no more data sources. attempted: %s, all dataSources: %s", selectionPos.get(), dataSources));
         }
         selectionPos.incrementAndGet(); // +1
 
@@ -74,8 +75,8 @@ public final class DelegateAdminDataSourceWrapper implements Iterator<HikariData
             }
         }
 
-        throw new NoNextAdminDataSourceFailoverException(
-                format("Currently attempted: %s, all dataSources: %s", selectionPos.get(), dataSources));
+        throw new FailoverException(
+                format("Failed to get data sources. attempted: %s, all dataSources: %s", selectionPos.get(), dataSources));
     }
 
     public boolean available() {

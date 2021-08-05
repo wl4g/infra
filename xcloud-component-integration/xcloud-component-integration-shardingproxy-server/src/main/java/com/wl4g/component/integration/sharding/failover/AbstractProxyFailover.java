@@ -54,6 +54,7 @@ import org.apache.shardingsphere.readwritesplitting.api.rule.ReadwriteSplittingD
 
 import com.google.common.net.HostAndPort;
 import com.wl4g.component.common.collection.CollectionUtils2;
+import com.wl4g.component.common.lang.HostUtil;
 import com.wl4g.component.common.lang.StringUtils2;
 import com.wl4g.component.common.log.SmartLogger;
 import com.wl4g.component.common.task.GenericTaskRunner;
@@ -71,7 +72,6 @@ import com.wl4g.component.integration.sharding.failover.exception.UnreachablePri
 import com.wl4g.component.integration.sharding.failover.initializer.FailoverAbstractBootstrapInitializer;
 import com.wl4g.component.integration.sharding.failover.jdbc.DelegateAdminDataSourceWrapper;
 import com.wl4g.component.integration.sharding.failover.jdbc.JdbcOperator;
-import com.wl4g.component.integration.sharding.util.HostUtil;
 import com.wl4g.component.integration.sharding.util.JdbcUtil;
 import com.wl4g.component.integration.sharding.util.JdbcUtil.JdbcInformation;
 import com.zaxxer.hikari.HikariDataSource;
@@ -148,7 +148,7 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
         SchemaConfigurationWrapper newSchemaConfig = loadSchemaConfiguration();
 
         // Other rule configurations do not need to be update.
-        List<RuleConfiguration> newRuleConfigs = new ArrayList<>(newSchemaConfig.getOtherRuleConfigs());
+        List<RuleConfiguration> newAllRuleConfigs = new ArrayList<>(newSchemaConfig.getOtherRuleConfigs());
 
         boolean anyChanaged = false;
         for (ReadwriteSplittingRuleConfiguration newRwRuleConfig : safeList(newSchemaConfig.getReadwriteRuleConfigs())) {
@@ -199,13 +199,14 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
                 }
             }
             if (!newRwDataSources.isEmpty()) {
-                newRuleConfigs.add(new ReadwriteSplittingRuleConfiguration(newRwDataSources, newRwRuleConfig.getLoadBalancers()));
+                newAllRuleConfigs
+                        .add(new ReadwriteSplittingRuleConfiguration(newRwDataSources, newRwRuleConfig.getLoadBalancers()));
             }
         }
 
         // Do changed
-        if (anyChanaged && !newRuleConfigs.isEmpty()) {
-            doChangeReadwriteSplittingRuleConfiguration(newRuleConfigs);
+        if (anyChanaged && !newAllRuleConfigs.isEmpty()) {
+            doChangeReadwriteSplittingRuleConfiguration(newAllRuleConfigs);
         }
     }
 
@@ -308,10 +309,11 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
                 if (nonNull(newNodeStats) && newNodeStats.checkValid()) {
                     attempting = false;
                 } else {
-                    delegate.next(); // Invalid
+                    delegate.next(); // Try to next node
                 }
             } catch (NoNextAdminDataSourceFailoverException e) {
                 attempting = false;
+                delegate.reset(); // Unavailable nodes may have recovered?
                 throw e;
             } catch (Exception e) {
                 delegate.next();

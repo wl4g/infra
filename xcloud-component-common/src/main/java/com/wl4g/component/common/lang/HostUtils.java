@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.component.integration.sharding.util;
+package com.wl4g.component.common.lang;
 
 import static com.wl4g.component.common.lang.StringUtils2.eqIgnCase;
 import static com.wl4g.component.common.log.SmartLoggerFactory.getLogger;
@@ -25,14 +25,14 @@ import java.net.UnknownHostException;
 import com.wl4g.component.common.log.SmartLogger;
 
 /**
- * {@link HostUtil}
+ * {@link HostUtils}
  * 
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version 2021-07-20 v1.0.0
  * @since v1.0.0
  */
-public abstract class HostUtil {
-    protected static final SmartLogger log = getLogger(HostUtil.class);
+public abstract class HostUtils {
+    protected static final SmartLogger log = getLogger(HostUtils.class);
 
     public static boolean isSameHost(String host1, String host2) {
         if (eqIgnCase(host1, host2)) {
