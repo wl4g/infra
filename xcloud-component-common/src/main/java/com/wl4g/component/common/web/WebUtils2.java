@@ -849,7 +849,7 @@ public abstract class WebUtils2 {
                 // insensitive.
                 if (equalsIgnoreCase(hostKey, headerName)) {
                     // me.domain.com:8080
-                    serverName = headerName;
+                    serverName = request.getHeader(headerName);
                     if (headerName.contains(":")) {
                         String[] part = split(headerName, ":");
                         serverName = part[0];
