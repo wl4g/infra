@@ -173,14 +173,14 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
                 NodeInfo newPrimaryNode = chooseNewPrimaryNode(newNodeStats.getPrimaryNodes());
 
                 // Transform get new primary dataSource name.
-                String newPrimaryDataSourceName = transformToMappedDataSourceName(oldSchemaConfig.getAllDataSourceConfigs(),
-                        oldRwDataSource, newPrimaryNode);
+                String newPrimaryDataSourceName = transformToMappedNewPrimaryDataSourceName(
+                        oldSchemaConfig.getAllDataSourceConfigs(), oldRwDataSource, newPrimaryNode);
                 String oldPrimaryDataSourceName = oldRwDataSource.getWriteDataSourceName();
 
                 // Check dataSource primary changed?
                 if (isChangedPrimaryNode(newPrimaryDataSourceName, oldPrimaryDataSourceName)) {
                     // Gets changed new read dataSourceNames
-                    List<String> newReadDataSourceNames = getChangedNewReadDataSourceNames(
+                    List<String> newReadDataSourceNames = transformToMappedNewReadDataSourceNames(
                             oldSchemaConfig.getAllDataSourceConfigs(), oldRwDataSource, newNodeStats.getStandbyNodes());
                     if (CollectionUtils2.isEmpty(newReadDataSourceNames)) {
                         throw new InvalidStateFailoverException(
@@ -352,16 +352,15 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
     }
 
     /**
-     * First, convert the internal address of the database instance to the
-     * external mapping address, and then calculate the latest master node
-     * dataSourceName.
+     * Transform internal address of the database instance to the external
+     * mapping address, and then calculate the new primary node dataSourceName.
      * 
      * @param allDataSourceConfigs
      * @param oldRwDataSource
      * @param newPrimaryNode
      * @return
      */
-    private String transformToMappedDataSourceName(Map<String, DataSourceConfiguration> allDataSourceConfigs,
+    private String transformToMappedNewPrimaryDataSourceName(Map<String, DataSourceConfiguration> allDataSourceConfigs,
             ReadwriteSplittingDataSourceRuleConfiguration oldRwDataSource, NodeInfo newPrimaryNode) {
         // Transform DB host/port to external(LB) address.
         DataSourceAddressMapping mapping = ProxyContext.getInstance().getFailoverConfig()
@@ -400,19 +399,21 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
     }
 
     /**
-     * Gets changed new read dataSource names.
+     * Transform internal address of the database instance to the external
+     * mapping address, and then calculate the new standby nodes
+     * dataSourceNames.
      * 
      * @param allDataSourceConfigs
      * @param oldRwDataSource
      * @param newStandbyNodes
      * @return
      */
-    private List<String> getChangedNewReadDataSourceNames(Map<String, DataSourceConfiguration> allDataSourceConfigs,
+    private List<String> transformToMappedNewReadDataSourceNames(Map<String, DataSourceConfiguration> allDataSourceConfigs,
             ReadwriteSplittingDataSourceRuleConfiguration oldRwDataSource, List<? extends NodeInfo> newStandbyNodes) {
 
         List<String> newReadDataSourceNames = new ArrayList<>(4);
         for (NodeInfo node : safeList(newStandbyNodes)) {
-            // Transform to external addresses by mapping.
+            // Transform DB host/port to external(LB) address.
             DataSourceAddressMapping mapping = ProxyContext.getInstance().getFailoverConfig()
                     .getAdminDataSourceConfig(getSchemaName()).getMappedByInternalAddress(node);
 

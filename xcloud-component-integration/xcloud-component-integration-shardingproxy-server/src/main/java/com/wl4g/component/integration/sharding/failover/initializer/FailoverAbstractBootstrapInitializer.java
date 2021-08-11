@@ -195,6 +195,8 @@ public abstract class FailoverAbstractBootstrapInitializer implements BootstrapI
 
     public abstract Collection<RuleConfiguration> loadRuleConfigs(String schemaName);
 
+    public abstract Collection<String> loadDisableDataSources(String schemaName);
+
     public abstract void updateSchemaRuleConfiguration(String schemaName,
             Collection<? extends RuleConfiguration> schemaRuleConfigs);
 

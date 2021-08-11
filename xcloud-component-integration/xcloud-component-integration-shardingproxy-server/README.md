@@ -1,9 +1,10 @@
 # XCloud Component for Sharding Proxy Server
+
 > It's an enhanced package that integrates shardingsphere-proxy and shardingsphere-scaling
 
 ## 1. Compile building
 
-- Step1: First, building of `[shardingsphere](https://github.com/apache/shardingsphere)`
+- Step1: First, building of [`shardingsphere`](https://github.com/apache/shardingsphere)
 
 ```bash
 git clone https://github.com/apache/shardingsphere.git
@@ -12,7 +13,7 @@ git checkout 5.0.0-beta
 mvn clean install -DskipTests -Dmaven.test.skip=true -T 2C
 ```
 
-- Step2: Building of `[xcloud-component](https://github.com/wl4g/xcloud-component)`
+- Step2: Building of [`xcloud-component`](https://github.com/wl4g/xcloud-component)
 
 ```bash
 # git clone https://github.com/wl4g/xcloud-component.git
@@ -97,7 +98,7 @@ group_replication_applier  3d4ed671-9dec-11eb-9723-c0b5d741e9d5  wanglsir-pro  1
 
 Under the same schemaName, multiple sharding databases must be the same. See source code: [org.apache.shardingsphere.infra.metadata.ShardingSphereMetaData](https://github.com/apache/shardingsphere/blob/5.0.0-beta/shardingsphere-infra/shardingsphere-infra-common/src/main/java/org/apache/shardingsphere/infra/metadata/ShardingSphereMetaData.java#L35) and [org.apache.shardingsphere.infra.metadata.resource.ShardingSphereResource](https://github.com/apache/shardingsphere/blob/5.0.0-beta/shardingsphere-infra/shardingsphere-infra-common/src/main/java/org/apache/shardingsphere/infra/metadata/resource/ShardingSphereResource.java#L43)
 
-- 2. How can the `/myShardingProxy/state/datanodes/mySchema` node in ZK disable data sources? Reference source code:
+- 2. How can the `/myShardingProxy/states/datanodes/mySchema` node in ZK disable data sources? Reference source code:
 
 [DataSourceStatusRegistryService.java#loadDisabledDataSources()](https://github.com/apache/shardingsphere/blob/master/shardingsphere-governance/shardingsphere-governance-core/src/main/java/org/apache/shardingsphere/governance/core/registry/state/service/DataSourceStatusRegistryService.java#L44)
 
@@ -156,4 +157,8 @@ props:
 | adminDataSources.mappings.internalAddr | The access address of each data source library instance may be an external load balancing or proxy address (one-to-many) to external addresses. |
 | adminDataSources.mappings.externalAddrs | The access address of each data source library instance may be an external load balancing or proxy address (many-to-one) to internal address. |
 
-Notice: In the governance mode (cluster), the distributed lock must be enabled. It is disabled by default.  `lock-enabled: true`
+Notices:
+
+- You can configure to enable or disable read-write failover as follows: `failover-enable: true|false`
+- In the governance mode (cluster), the distributed lock must be enabled. It is disabled by default. &nbsp; `lock-enabled: true`
+- Compatible with dataSources disabled in support registry center path: `/myShardingProxy/states/datanodes/mySchema`

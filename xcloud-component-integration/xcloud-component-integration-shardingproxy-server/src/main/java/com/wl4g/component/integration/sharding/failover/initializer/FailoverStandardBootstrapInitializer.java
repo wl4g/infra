@@ -21,6 +21,7 @@ import static com.wl4g.component.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.component.common.lang.Assert2.notNullOf;
 import static com.wl4g.component.common.serialize.JacksonUtils.toJSONString;
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toMap;
 
 import java.sql.SQLException;
@@ -90,6 +91,12 @@ public final class FailoverStandardBootstrapInitializer extends FailoverAbstract
     @Override
     public Collection<RuleConfiguration> loadRuleConfigs(String schemaName) {
         return ProxyContext.getInstance().getMetaData(schemaName).getRuleMetaData().getConfigurations();
+    }
+
+    @Override
+    public Collection<String> loadDisableDataSources(String schemaName) {
+        // TODO not supported!!!
+        return emptyList();
     }
 
     @SuppressWarnings("unchecked")

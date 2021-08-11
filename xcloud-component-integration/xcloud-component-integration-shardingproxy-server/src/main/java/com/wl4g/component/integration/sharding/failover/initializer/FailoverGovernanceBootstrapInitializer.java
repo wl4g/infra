@@ -168,6 +168,11 @@ public final class FailoverGovernanceBootstrapInitializer extends FailoverAbstra
     }
 
     @Override
+    public Collection<String> loadDisableDataSources(String schemaName) {
+        return governanceFacade.getRegistryCenter().getDataSourceStatusService().loadDisabledDataSources(schemaName);
+    }
+
+    @Override
     public synchronized void updateSchemaRuleConfiguration(String schemaName,
             Collection<? extends RuleConfiguration> schemaRuleConfigs) {
         SchemaRuleRegistryService schemaRuleService = governanceFacade.getRegistryCenter().getSchemaRuleService();

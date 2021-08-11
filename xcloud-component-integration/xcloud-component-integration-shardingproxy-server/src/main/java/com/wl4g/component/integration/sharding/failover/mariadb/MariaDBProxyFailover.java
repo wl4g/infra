@@ -44,7 +44,6 @@ public class MariaDBProxyFailover extends AbstractProxyFailover<OracleNodeStats>
     @Override
     protected void decorateAdminBackendDataSource(String ruleDataSourceName, String ruleDataSourceJdbcHost,
             int ruldDataSourceJdbcPort, HikariDataSource adminDataSource) {
-        // TODO Auto-generated method stub
-
+        throw new UnsupportedOperationException();
     }
 }
