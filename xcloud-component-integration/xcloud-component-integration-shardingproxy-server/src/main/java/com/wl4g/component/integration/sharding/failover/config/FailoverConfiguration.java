@@ -32,7 +32,7 @@ import org.apache.shardingsphere.proxy.backend.context.ProxyContext;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.net.HostAndPort;
-import com.wl4g.component.common.lang.HostUtil;
+import com.wl4g.component.common.lang.HostUtils;
 import com.wl4g.component.common.lang.StringUtils2;
 import com.wl4g.component.integration.sharding.failover.ProxyFailover.NodeStats.NodeInfo;
 import com.wl4g.component.integration.sharding.failover.exception.InvalidStateFailoverException;
@@ -107,7 +107,7 @@ public class FailoverConfiguration {
         public DataSourceAddressMapping getMappedByInternalAddress(NodeInfo node) {
             for (DataSourceAddressMapping mapping : safeList(getMappings())) {
                 HostAndPort internal = mapping.getParsedInternalAddr();
-                if (internal.getPort() == node.getPort() && HostUtil.isSameHost(internal.getHost(), node.getHost())) {
+                if (internal.getPort() == node.getPort() && HostUtils.isSameHost(internal.getHost(), node.getHost())) {
                     return mapping;
                 }
             }

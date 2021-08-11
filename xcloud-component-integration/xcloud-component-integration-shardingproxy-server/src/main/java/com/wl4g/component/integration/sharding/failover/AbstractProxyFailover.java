@@ -54,7 +54,7 @@ import org.apache.shardingsphere.readwritesplitting.api.rule.ReadwriteSplittingD
 
 import com.google.common.net.HostAndPort;
 import com.wl4g.component.common.collection.CollectionUtils2;
-import com.wl4g.component.common.lang.HostUtil;
+import com.wl4g.component.common.lang.HostUtils;
 import com.wl4g.component.common.lang.StringUtils2;
 import com.wl4g.component.common.log.SmartLogger;
 import com.wl4g.component.common.task.GenericTaskRunner;
@@ -80,7 +80,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * {@link AbstractProxyFailover}
+ * It has been officially implemented
+ * {@link org.apache.shardingsphere.dbdiscovery.mgr.MGRDatabaseDiscoveryType},
+ * but the 5.0.0-beta is still very unstable. Therefore, at present, we still
+ * use the self implemented failover.
  * 
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version 2021-07-18 v1.0.0
@@ -99,7 +102,7 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
         super(new RunnerProperties(StartupMode.NOSTARTUP, 1));
         this.initializer = notNullOf(initializer, "initializer");
         this.metadata = notNullOf(metadata, "metadata");
-        FailoverShutdownManager.getInstance().addShutdownDestroyHandler(this);
+        FailoverShutdownManager.getInstance().addShutdownHandler(this);
     }
 
     @Override
@@ -119,16 +122,16 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
         final String lockName = getSchemaName().concat(".failover");
         Optional<ShardingSphereLock> op = ProxyContext.getInstance().getLock();
         try {
-            if (ProxyContext.getInstance().getMetaDataContexts() instanceof GovernanceMetaDataContexts) { // Governance(cluster)-mode.
+            if (ProxyContext.getInstance().getMetaDataContexts() instanceof GovernanceMetaDataContexts) { // Governance(cluster)mode.
                 assert op.isPresent() : new FailoverException(
                         format("Failover running in governance mode, the lock must be enabled. Please check config '%s'",
                                 ConfigurationPropertyKey.LOCK_ENABLED.getKey()));
 
-                if (op.get().tryLock(lockName, 10_000L)) {
-                    log.info("Obtained failover sentry lock, prepare for processing ...");
+                if (op.get().tryLock(lockName, ProxyContext.getInstance().getFailoverConfig().getInspectMinDelayMs())) {
+                    log.info("Locked, failover processing ...");
                     processFailover();
                 } else {
-                    log.warn("No obtain failover sentry lock, skip for processing.");
+                    log.warn("No obtain failover lock, skip for processing.");
                 }
             } else { // Standard(local) mode.
                 log.info("In standard context running, direct for processing ...");
@@ -145,17 +148,17 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
 
     @SuppressWarnings("unchecked")
     private void processFailover() throws Exception {
-        SchemaConfigurationWrapper newSchemaConfig = loadSchemaConfiguration();
+        SchemaConfigurationWrapper oldSchemaConfig = loadSchemaConfiguration();
 
         // Other rule configurations do not need to be update.
-        List<RuleConfiguration> newAllRuleConfigs = new ArrayList<>(newSchemaConfig.getOtherRuleConfigs());
+        List<RuleConfiguration> newAllRuleConfigs = new ArrayList<>(oldSchemaConfig.getOtherRuleConfigs());
 
         boolean anyChanaged = false;
-        for (ReadwriteSplittingRuleConfiguration newRwRuleConfig : safeList(newSchemaConfig.getReadwriteRuleConfigs())) {
+        for (ReadwriteSplittingRuleConfiguration oldRwRuleConfig : safeList(oldSchemaConfig.getReadwriteRuleConfigs())) {
             // New read-write-splitting dataSources.
             List<ReadwriteSplittingDataSourceRuleConfiguration> newRwDataSources = new ArrayList<>(4);
 
-            for (ReadwriteSplittingDataSourceRuleConfiguration oldRwDataSource : safeList(newRwRuleConfig.getDataSources())) {
+            for (ReadwriteSplittingDataSourceRuleConfiguration oldRwDataSource : safeList(oldRwRuleConfig.getDataSources())) {
                 // Obtain backend node admin dataSource.
                 DelegateAdminDataSourceWrapper delegate = obtainSelectedBackendNodeAdminDataSource(oldRwDataSource.getName(),
                         oldRwDataSource.getWriteDataSourceName(), oldRwDataSource.getReadDataSourceNames());
@@ -170,15 +173,15 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
                 NodeInfo newPrimaryNode = chooseNewPrimaryNode(newNodeStats.getPrimaryNodes());
 
                 // Transform get new primary dataSource name.
-                String newPrimaryDataSourceName = transformToMappedDataSourceName(newSchemaConfig, oldRwDataSource,
-                        newPrimaryNode);
+                String newPrimaryDataSourceName = transformToMappedDataSourceName(oldSchemaConfig.getAllDataSourceConfigs(),
+                        oldRwDataSource, newPrimaryNode);
                 String oldPrimaryDataSourceName = oldRwDataSource.getWriteDataSourceName();
 
                 // Check dataSource primary changed?
-                if (isChangedPrimaryNode(newPrimaryNode, newPrimaryDataSourceName, oldPrimaryDataSourceName)) {
+                if (isChangedPrimaryNode(newPrimaryDataSourceName, oldPrimaryDataSourceName)) {
                     // Gets changed new read dataSourceNames
                     List<String> newReadDataSourceNames = getChangedNewReadDataSourceNames(
-                            newSchemaConfig.getAllDataSourceConfigs(), oldRwDataSource, newNodeStats.getStandbyNodes());
+                            oldSchemaConfig.getAllDataSourceConfigs(), oldRwDataSource, newNodeStats.getStandbyNodes());
                     if (CollectionUtils2.isEmpty(newReadDataSourceNames)) {
                         throw new InvalidStateFailoverException(
                                 format("No matches found new read dataSource names by standbyNodes: %s",
@@ -200,7 +203,7 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
             }
             if (!newRwDataSources.isEmpty()) {
                 newAllRuleConfigs
-                        .add(new ReadwriteSplittingRuleConfiguration(newRwDataSources, newRwRuleConfig.getLoadBalancers()));
+                        .add(new ReadwriteSplittingRuleConfiguration(newRwDataSources, oldRwRuleConfig.getLoadBalancers()));
             }
         }
 
@@ -306,7 +309,7 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
                 newNodeStats = result;
 
                 // Check inspected result valid?
-                if (nonNull(newNodeStats) && newNodeStats.checkValid()) {
+                if (nonNull(newNodeStats) && newNodeStats.valid()) {
                     attempting = false;
                 } else {
                     delegate.next(); // Try to next node
@@ -353,48 +356,46 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
      * external mapping address, and then calculate the latest master node
      * dataSourceName.
      * 
-     * @param defineSchemaConfig
+     * @param allDataSourceConfigs
      * @param oldRwDataSource
-     * @param node
+     * @param newPrimaryNode
      * @return
      */
-    private String transformToMappedDataSourceName(SchemaConfigurationWrapper defineSchemaConfig,
-            ReadwriteSplittingDataSourceRuleConfiguration oldRwDataSource, NodeInfo node) {
+    private String transformToMappedDataSourceName(Map<String, DataSourceConfiguration> allDataSourceConfigs,
+            ReadwriteSplittingDataSourceRuleConfiguration oldRwDataSource, NodeInfo newPrimaryNode) {
         // Transform DB host/port to external(LB) address.
         DataSourceAddressMapping mapping = ProxyContext.getInstance().getFailoverConfig()
-                .getAdminDataSourceConfig(getSchemaName()).getMappedByInternalAddress(node);
+                .getAdminDataSourceConfig(getSchemaName()).getMappedByInternalAddress(newPrimaryNode);
 
         // First, find by newPrimaryNode mapping external addresses.
         for (HostAndPort external : safeList(mapping.getParsedExternalAddrs())) {
-            String newPrimaryDataSourceName = findMatchingDataSourceName(defineSchemaConfig.getAllDataSourceConfigs(),
-                    oldRwDataSource, external.getHost(), external.getPort());
+            String newPrimaryDataSourceName = findMatchingDataSourceName(allDataSourceConfigs, oldRwDataSource,
+                    external.getHost(), external.getPort());
             if (!isBlank(newPrimaryDataSourceName)) {
                 return newPrimaryDataSourceName;
             }
         }
 
         // Fallback, find by newPrimaryNode internal address.
-        String newPrimaryDataSourceName = findMatchingDataSourceName(defineSchemaConfig.getAllDataSourceConfigs(),
-                oldRwDataSource, node.getHost(), node.getPort());
+        String newPrimaryDataSourceName = findMatchingDataSourceName(allDataSourceConfigs, oldRwDataSource,
+                newPrimaryNode.getHost(), newPrimaryNode.getPort());
         if (!isBlank(newPrimaryDataSourceName)) {
             return newPrimaryDataSourceName;
         }
 
         throw new InvalidStateFailoverException(
-                format("No matches found new primary dataSource names by newPrimaryNode: %s", node));
+                format("No matches found new primary dataSource names by newPrimaryNode: %s", newPrimaryNode));
     }
 
     /**
      * Check whether the master node has been changed.
      * 
-     * @param newPrimaryNode
      * @param newPrimaryDataSourceName
      * @param oldPrimaryDataSourceName
      * @see https://shardingsphere.apache.org/document/current/cn/features/governance/management/registry-center/#metadataschemenamedatasources
      * @return
      */
-    private boolean isChangedPrimaryNode(NodeInfo newPrimaryNode, String newPrimaryDataSourceName,
-            String oldPrimaryDataSourceName) {
+    private boolean isChangedPrimaryNode(String newPrimaryDataSourceName, String oldPrimaryDataSourceName) {
         return !StringUtils2.equals(oldPrimaryDataSourceName, newPrimaryDataSourceName);
     }
 
@@ -449,8 +450,8 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
         Map<String, DataSourceConfiguration> allDataSourceConfigs = initializer.loadDataSourceConfigs(getSchemaName());
         Collection<RuleConfiguration> allRuleConfigs = initializer.loadRuleConfigs(getSchemaName());
 
-        List<ReadwriteSplittingRuleConfiguration> readwriteRuleConfigs = new ArrayList<>(2);
-        List<RuleConfiguration> otherRuleConfigs = new ArrayList<>(2);
+        List<ReadwriteSplittingRuleConfiguration> readwriteRuleConfigs = new ArrayList<>(4);
+        List<RuleConfiguration> otherRuleConfigs = new ArrayList<>(4);
 
         for (RuleConfiguration ruleConfig : safeList(allRuleConfigs)) {
             if (ruleConfig instanceof ReadwriteSplittingRuleConfiguration) {
@@ -483,7 +484,7 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
 
             if (oldAllRwDataSourceNames.contains(defineDataSourceName)) {
                 JdbcInformation info = JdbcUtil.resolve(jdbcUrl);
-                if (info.getPort() == externalDbPort && HostUtil.isSameHost(info.getHost(), externalDbHost)) {
+                if (info.getPort() == externalDbPort && HostUtils.isSameHost(info.getHost(), externalDbHost)) {
                     return defineDataSourceName; // Define dataSource name.
                 }
             }
@@ -531,16 +532,16 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
      * @since v1.0.0
      */
     static class FailoverShutdownManager {
-        private static final SmartLogger log = getLogger(FailoverShutdownManager.class);
         private static final FailoverShutdownManager INSTANCE = new FailoverShutdownManager();
-        private static final List<AbstractProxyFailover<? extends NodeStats>> shutdownFailovers = new Vector<>(4);
+        private final SmartLogger log = getLogger(FailoverShutdownManager.class);
+        private final List<AbstractProxyFailover<? extends NodeStats>> shutdownFailovers = new Vector<>(4);
         private Thread shutdownThread;
 
         public static FailoverShutdownManager getInstance() {
             return INSTANCE;
         }
 
-        public void addShutdownDestroyHandler(AbstractProxyFailover<? extends NodeStats> failover) {
+        public void addShutdownHandler(AbstractProxyFailover<? extends NodeStats> failover) {
             shutdownFailovers.add(notNullOf(failover, "failover"));
             initIfNecessary();
         }

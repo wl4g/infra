@@ -1,12 +1,11 @@
 # XCloud Component for Sharding Proxy Server
 > It's an enhanced package that integrates shardingsphere-proxy and shardingsphere-scaling
 
-
 ## 1. Compile building
 
 - Step1: First, building of `[shardingsphere](https://github.com/apache/shardingsphere)`
 
-```
+```bash
 git clone https://github.com/apache/shardingsphere.git
 cd shardingsphere
 git checkout 5.0.0-beta
@@ -15,7 +14,7 @@ mvn clean install -DskipTests -Dmaven.test.skip=true -T 2C
 
 - Step2: Building of `[xcloud-component](https://github.com/wl4g/xcloud-component)`
 
-```
+```bash
 # git clone https://github.com/wl4g/xcloud-component.git
 cd xcloud-component
 mvn clean install -DskipTests -Dmaven.test.skip=true -T 2C
@@ -25,7 +24,7 @@ mvn clean install -DskipTests -Dmaven.test.skip=true -T 2C
 
 Directories:
 
-```
+```text
 ├── demo_data
 │   ├── group_sharding
 │   │   ├── sharding1.jpg
@@ -40,7 +39,7 @@ Directories:
 
 - Step4: Startup shardingsphere proxy(v4 and v5 Choose one)  
 
-```
+```bash
 java -jar shardingproxy-{version}-bin.jar 3307 /example-conf/readwrite
 # or:
 # java -cp xxx com.wl4g.ShardingProxy 3307 /example-conf/readwrite
@@ -62,7 +61,9 @@ DELETE FROM userdb.t_user WHERE id=10000000;
 
 ## 3. Failover
 
-- `[MySQL5.7 Group Replication](https://dev.mysql.com/doc/refman/5.7/en/group-replication.html)` implementation theory
+> Notice: It has been officially implemented [org.apache.shardingsphere.dbdiscovery.mgr.MGRDatabaseDiscoveryType](https://github.com/apache/shardingsphere/blob/master/shardingsphere-features/shardingsphere-db-discovery/shardingsphere-db-discovery-provider/shardingsphere-db-discovery-mgr/src/main/java/org/apache/shardingsphere/dbdiscovery/mgr/MGRDatabaseDiscoveryType.java), but the 5.0.0-beta is still very unstable. Therefore, at present, we still use the self implemented failover.
+
+- `[MySQL5.7 Group Replication](https://dev.mysql.com/doc/refman/5.7/en/group-replication.html)` implementation theory:
 
 ```sql
 SELECT
@@ -90,11 +91,69 @@ group_replication_applier  05e9eb4f-9dec-11eb-8b2e-c0b5d741e9d5  wanglsir-pro  1
 group_replication_applier  3d4ed671-9dec-11eb-9723-c0b5d741e9d5  wanglsir-pro  13308 ONLINE  0  0  STANDBY
 ```
 
-
 ## 4. FQA
 
-- Read write Split or sharding support different types of databases?
+- 1. Can the same schema support different types of databases at the same time under read-write splitting and fragment splitting modes?
 
-> Under the same schemaName, multiple sharding databases must be the same. See source code: [org.apache.shardingsphere.infra.metadata.ShardingSphereMetaData](https://github.com/apache/shardingsphere/blob/5.0.0-beta/shardingsphere-infra/shardingsphere-infra-common/src/main/java/org/apache/shardingsphere/infra/metadata/ShardingSphereMetaData.java#L35) and [org.apache.shardingsphere.infra.metadata.resource.ShardingSphereResource](https://github.com/apache/shardingsphere/blob/5.0.0-beta/shardingsphere-infra/shardingsphere-infra-common/src/main/java/org/apache/shardingsphere/infra/metadata/resource/ShardingSphereResource.java#L43)
+Under the same schemaName, multiple sharding databases must be the same. See source code: [org.apache.shardingsphere.infra.metadata.ShardingSphereMetaData](https://github.com/apache/shardingsphere/blob/5.0.0-beta/shardingsphere-infra/shardingsphere-infra-common/src/main/java/org/apache/shardingsphere/infra/metadata/ShardingSphereMetaData.java#L35) and [org.apache.shardingsphere.infra.metadata.resource.ShardingSphereResource](https://github.com/apache/shardingsphere/blob/5.0.0-beta/shardingsphere-infra/shardingsphere-infra-common/src/main/java/org/apache/shardingsphere/infra/metadata/resource/ShardingSphereResource.java#L43)
 
+- 2. How can the `/myShardingProxy/state/datanodes/mySchema` node in ZK disable data sources? Reference source code:
 
+[DataSourceStatusRegistryService.java#loadDisabledDataSources()](https://github.com/apache/shardingsphere/blob/master/shardingsphere-governance/shardingsphere-governance-core/src/main/java/org/apache/shardingsphere/governance/core/registry/state/service/DataSourceStatusRegistryService.java#L44)
+
+- 3. How do I configure failover? for example:
+
+```config
+cat server.yaml
+
+props:
+  failover-enable: true # Default by true
+  # Failover admin dataSource configuration.
+  # Notes: This configuration is used for read-write separation data source failover. Therefore, the same account
+  #   password must be created for all master and slave databases before service startup.
+  failover-configuration-json: |-
+     {
+         "inspectInitialDelayMs": 3000,
+         "inspectMinDelayMs": 3000,
+         "inspectMaxDelayMs": 10000,
+         "adminDataSources": [{
+             "schemaName": "userdb",
+             "username": "root",
+             "password": "123456",
+             "mappings": [{
+                 "internalAddr": "wanglsir-pro:13306",
+                 "externalAddrs": [
+                     "wl4g.debug:13306"
+                 ]
+             }, {
+                 "internalAddr": "wanglsir-pro:13307",
+                 "externalAddrs": [
+                     "wl4g.debug:13307"
+                 ]
+             }, {
+                 "internalAddr": "wanglsir-pro:13308",
+                 "externalAddrs": [
+                     "wl4g.debug:13308"
+                 ]
+             }]
+         }]
+     }
+  # Notes: If failover is enabled and distributed governance mode is adopted, lock must be opened.
+  lock-enabled: true # Default by false
+```
+
+> [Details refer to 'example-conf/sharding-readwrite/server.yaml'](src/main/resources/example-conf/sharding-readwrite/server.yaml)
+
+| Attribute | Description |
+|-|-|
+| inspectInitialDelayMs | Monitor the initial start waiting time of the inspecting backend read/write dataSources group thread (ms). |
+| inspectMinDelayMs | Monitor the min interval time inspecting read/write dataSources group thread (ms). |
+| inspectMaxDelayMs | Monitor the max interval time inspecting read/write dataSources group thread (ms). |
+| adminDataSources  | Admin dataSource configuration for inspection. |
+| adminDataSources.schemaName | The virtual database schemaName corresponding to config-xx.yaml (Must be consistent). |
+| adminDataSources.username | The account name of the data source grouped by the patrol database (some databases may be ordinary accounts, the query cluster state information no permission) |
+| adminDataSources.password | Same as `adminDataSources.username` |
+| adminDataSources.mappings.internalAddr | The access address of each data source library instance may be an external load balancing or proxy address (one-to-many) to external addresses. |
+| adminDataSources.mappings.externalAddrs | The access address of each data source library instance may be an external load balancing or proxy address (many-to-one) to internal address. |
+
+Notice: In the governance mode (cluster), the distributed lock must be enabled. It is disabled by default.  `lock-enabled: true`

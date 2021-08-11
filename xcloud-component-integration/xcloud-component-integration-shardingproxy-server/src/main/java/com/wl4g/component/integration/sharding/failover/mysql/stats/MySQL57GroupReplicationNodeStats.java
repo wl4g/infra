@@ -23,7 +23,7 @@ public class MySQL57GroupReplicationNodeStats extends NodeStats {
     private List<GroupReplicationNodeInfo> standbyNodes;
 
     @Override
-    public boolean checkValid() {
+    public boolean valid() {
         for (GroupReplicationNodeInfo n : nodes) {
             // Group Replication node role must be: PRIMARY/STANDBY only
             // effective, If the status is unknown, the current master node

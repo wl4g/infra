@@ -29,7 +29,7 @@ public class OracleNodeStats extends NodeStats {
     }
 
     @Override
-    public boolean checkValid() {
+    public boolean valid() {
         // TODO Auto-generated method stub
         return false;
     }
