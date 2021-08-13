@@ -26,6 +26,7 @@ import static java.lang.String.valueOf;
 import static java.util.Collections.synchronizedMap;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -39,7 +40,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 import javax.sql.DataSource;
 
@@ -96,7 +96,7 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
     private final FailoverAbstractBootstrapInitializer initializer;
     private final ShardingSphereMetaData metadata;
     private final Map<String, DelegateAdminDataSourceWrapper> cachingAdminDataSources = new ConcurrentHashMap<>(4);
-    private final Map<String, List<String>> initDefineRWDataSources = synchronizedMap(new HashMap<>(4));
+    private final Map<String, List<String>> schemaInitDefineRWDataSources = synchronizedMap(new HashMap<>(4));
 
     public AbstractProxyFailover(FailoverAbstractBootstrapInitializer initializer, ShardingSphereMetaData metadata) {
         super(new RunnerProperties(StartupMode.NOSTARTUP, 1));
@@ -109,18 +109,10 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
     protected void postStartupProperties() throws Exception {
         FailoverConfiguration failoverConfig = ProxyContext.getInstance().getFailoverConfig();
         getWorker().scheduleWithRandomDelay(this, failoverConfig.getInspectInitialDelayMs(),
-                failoverConfig.getInspectMinDelayMs(), failoverConfig.getInspectMaxDelayMs(), TimeUnit.MILLISECONDS);
+                failoverConfig.getInspectMinDelayMs(), failoverConfig.getInspectMaxDelayMs(), MILLISECONDS);
 
-        // Initial load final define schema read-write dataSources.
-        SchemaConfigurationWrapper initSchemaConfig = loadSchemaConfiguration();
-        for (ReadwriteSplittingRuleConfiguration rwRule : safeList(initSchemaConfig.getReadwriteRuleConfigs())) {
-            for (ReadwriteSplittingDataSourceRuleConfiguration rwds : rwRule.getDataSources()) {
-                List<String> mergeRWDataSources = new ArrayList<>(4);
-                mergeRWDataSources.addAll(rwds.getReadDataSourceNames());
-                mergeRWDataSources.add(rwds.getWriteDataSourceName());
-                initDefineRWDataSources.put(rwds.getName(), mergeRWDataSources);
-            }
-        }
+        // Initial read-write dataSources.
+        initSchemaReadwriteDefineDataSources();
     }
 
     @Override
@@ -148,6 +140,23 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
         } finally {
             if (op.isPresent()) {
                 op.get().releaseLock(lockName);
+            }
+        }
+    }
+
+    /**
+     * Read write splitting definition dataSources in initialization schema.
+     */
+    private void initSchemaReadwriteDefineDataSources() {
+        // Initial load final define schema read-write dataSources.
+        SchemaConfigurationWrapper initSchemaConfig = loadSchemaConfiguration();
+
+        for (ReadwriteSplittingRuleConfiguration rwRule : safeList(initSchemaConfig.getReadwriteRuleConfigs())) {
+            for (ReadwriteSplittingDataSourceRuleConfiguration rwds : rwRule.getDataSources()) {
+                List<String> mergeRWDataSources = new ArrayList<>(4);
+                mergeRWDataSources.addAll(rwds.getReadDataSourceNames());
+                mergeRWDataSources.add(rwds.getWriteDataSourceName());
+                schemaInitDefineRWDataSources.put(rwds.getName(), mergeRWDataSources);
             }
         }
     }
@@ -369,13 +378,16 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
      */
     private String transformToMappedNewPrimaryDataSourceName(Map<String, DataSourceConfiguration> allDataSourceConfigs,
             ReadwriteSplittingDataSourceRuleConfiguration oldRwDataSource, NodeInfo newPrimaryNode) {
+        // Load init define read-write dataSources.
+        List<String> initDefineRwDataSources = schemaInitDefineRWDataSources.get(oldRwDataSource.getName());
+
         // Transform DB host/port to external(LB) address.
         DataSourceAddressMapping mapping = ProxyContext.getInstance().getFailoverConfig()
                 .getAdminDataSourceConfig(getSchemaName()).getMappedByInternalAddress(newPrimaryNode);
 
         // First, find by newPrimaryNode mapping external addresses.
         for (HostAndPort external : safeList(mapping.getParsedExternalAddrs())) {
-            String newPrimaryDataSourceName = findMatchingDataSourceName(allDataSourceConfigs, oldRwDataSource,
+            String newPrimaryDataSourceName = findMatchingDataSourceName(allDataSourceConfigs, initDefineRwDataSources,
                     external.getHost(), external.getPort());
             if (!isBlank(newPrimaryDataSourceName)) {
                 return newPrimaryDataSourceName;
@@ -383,7 +395,7 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
         }
 
         // Fallback, find by newPrimaryNode internal address.
-        String newPrimaryDataSourceName = findMatchingDataSourceName(allDataSourceConfigs, oldRwDataSource,
+        String newPrimaryDataSourceName = findMatchingDataSourceName(allDataSourceConfigs, initDefineRwDataSources,
                 newPrimaryNode.getHost(), newPrimaryNode.getPort());
         if (!isBlank(newPrimaryDataSourceName)) {
             return newPrimaryDataSourceName;
@@ -418,6 +430,9 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
     private List<String> transformToMappedNewReadDataSourceNames(Map<String, DataSourceConfiguration> allDataSourceConfigs,
             ReadwriteSplittingDataSourceRuleConfiguration oldRwDataSource, List<? extends NodeInfo> newStandbyNodes) {
 
+        // Load init define read-write dataSources.
+        List<String> initDefineRwDataSources = schemaInitDefineRWDataSources.get(oldRwDataSource.getName());
+
         List<String> newReadDataSourceNames = new ArrayList<>(4);
         for (NodeInfo node : safeList(newStandbyNodes)) {
             // Transform DB host/port to external(LB) address.
@@ -427,8 +442,8 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
             // Find matches definition read dataSource name by external
             // addresses.
             for (HostAndPort external : safeList(mapping.getParsedExternalAddrs())) {
-                String dataSourceName = findMatchingDataSourceName(allDataSourceConfigs, oldRwDataSource, external.getHost(),
-                        external.getPort());
+                String dataSourceName = findMatchingDataSourceName(allDataSourceConfigs, initDefineRwDataSources,
+                        external.getHost(), external.getPort());
                 if (!isBlank(dataSourceName)) {
                     newReadDataSourceNames.add(dataSourceName);
                 }
@@ -485,21 +500,19 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
      * Transform matching configuration dataSource name by host and port.
      * 
      * @param allDataSourceConfigs
-     * @param oldRwDataSource
-     * @param nodes
+     * @param initDefineRwDataSources
+     * @param externalDbHost
+     * @param externalDbPort
      * @return
      */
     private String findMatchingDataSourceName(Map<String, DataSourceConfiguration> allDataSourceConfigs,
-            ReadwriteSplittingDataSourceRuleConfiguration oldRwDataSource, String externalDbHost, int externalDbPort) {
-
-        List<String> oldAllRwDataSourceNames = new ArrayList<>(oldRwDataSource.getReadDataSourceNames());
-        oldAllRwDataSourceNames.add(oldRwDataSource.getWriteDataSourceName());
+            List<String> initDefineRwDataSources, String externalDbHost, int externalDbPort) {
 
         for (Entry<String, DataSourceConfiguration> ent : safeMap(allDataSourceConfigs).entrySet()) {
             String defineDataSourceName = ent.getKey();
             String jdbcUrl = valueOf(ent.getValue().getProps().get("jdbcUrl"));
 
-            if (oldAllRwDataSourceNames.contains(defineDataSourceName)) {
+            if (initDefineRwDataSources.contains(defineDataSourceName)) {
                 JdbcInformation info = JdbcUtil.resolve(jdbcUrl);
                 if (info.getPort() == externalDbPort && HostUtils.isSameHost(info.getHost(), externalDbHost)) {
                     return defineDataSourceName; // Define dataSource name.
