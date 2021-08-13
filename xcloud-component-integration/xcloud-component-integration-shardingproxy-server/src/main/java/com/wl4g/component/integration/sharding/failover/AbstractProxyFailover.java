@@ -26,6 +26,7 @@ import static java.lang.String.valueOf;
 import static java.util.Collections.synchronizedMap;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.sql.SQLException;
@@ -95,8 +96,7 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
     private final FailoverAbstractBootstrapInitializer initializer;
     private final ShardingSphereMetaData metadata;
     private final Map<String, DelegateAdminDataSourceWrapper> cachingAdminDataSources = new ConcurrentHashMap<>(4);
-    private final Map<String, ReadwriteSplittingDataSourceRuleConfiguration> initDefineRWDataSources = synchronizedMap(
-            new HashMap<>(4));
+    private final Map<String, List<String>> initDefineRWDataSources = synchronizedMap(new HashMap<>(4));
 
     public AbstractProxyFailover(FailoverAbstractBootstrapInitializer initializer, ShardingSphereMetaData metadata) {
         super(new RunnerProperties(StartupMode.NOSTARTUP, 1));
@@ -113,8 +113,14 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
 
         // Initial load final define schema read-write dataSources.
         SchemaConfigurationWrapper initSchemaConfig = loadSchemaConfiguration();
-        initSchemaConfig.getReadwriteRuleConfigs()
-                .forEach(rw -> rw.getDataSources().forEach(rwds -> initDefineRWDataSources.put(rwds.getName(), rwds)));
+        for (ReadwriteSplittingRuleConfiguration rwRule : safeList(initSchemaConfig.getReadwriteRuleConfigs())) {
+            for (ReadwriteSplittingDataSourceRuleConfiguration rwds : rwRule.getDataSources()) {
+                List<String> mergeRWDataSources = new ArrayList<>(4);
+                mergeRWDataSources.addAll(rwds.getReadDataSourceNames());
+                mergeRWDataSources.add(rwds.getWriteDataSourceName());
+                initDefineRWDataSources.put(rwds.getName(), mergeRWDataSources);
+            }
+        }
     }
 
     @Override
@@ -148,6 +154,7 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
 
     @SuppressWarnings("unchecked")
     private void processFailover() throws Exception {
+        // Load last-time configuration before read-write dataSources change.
         SchemaConfigurationWrapper oldSchemaConfig = loadSchemaConfiguration();
 
         // Other rule configurations do not need to be update.
@@ -448,12 +455,21 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
      * @return
      */
     private SchemaConfigurationWrapper loadSchemaConfiguration() {
+        // Load all dataSources.
         Map<String, DataSourceConfiguration> allDataSourceConfigs = initializer.loadDataSourceConfigs(getSchemaName());
+
+        // Load disabled dataSources.
+        Collection<String> disableDataSources = initializer.loadDisableDataSources(getSchemaName());
+
+        // Excluding disable dataSource.
+        allDataSourceConfigs = safeMap(allDataSourceConfigs).entrySet().stream()
+                .filter(e -> !disableDataSources.contains(e.getKey())).collect(toMap(e -> e.getKey(), e -> e.getValue()));
+
+        // Load all rules.
         Collection<RuleConfiguration> allRuleConfigs = initializer.loadRuleConfigs(getSchemaName());
 
         List<ReadwriteSplittingRuleConfiguration> readwriteRuleConfigs = new ArrayList<>(4);
         List<RuleConfiguration> otherRuleConfigs = new ArrayList<>(4);
-
         for (RuleConfiguration ruleConfig : safeList(allRuleConfigs)) {
             if (ruleConfig instanceof ReadwriteSplittingRuleConfiguration) {
                 readwriteRuleConfigs.add((ReadwriteSplittingRuleConfiguration) ruleConfig);

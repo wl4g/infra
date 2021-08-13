@@ -159,6 +159,6 @@ props:
 
 Notices:
 
-- You can configure to enable or disable read-write failover as follows: `failover-enable: true|false`
+- You can configure to enable or disable read-write failover as follows. `failover-enable: true|false`
 - In the governance mode (cluster), the distributed lock must be enabled. It is disabled by default. &nbsp; `lock-enabled: true`
 - Compatible with dataSources disabled in support registry center path: `/myShardingProxy/states/datanodes/mySchema`
