@@ -38,7 +38,7 @@ import com.wl4g.component.common.lang.Assert2;
  * @version v1.0 2019年8月1日
  * @since
  */
-public class RegisteredUnmodifiableList<E> implements List<E> {
+public class OnceUnmodifiableList<E> implements List<E> {
 
 	/**
 	 * Read only list.
@@ -50,7 +50,7 @@ public class RegisteredUnmodifiableList<E> implements List<E> {
 	 */
 	final private AtomicBoolean modified = new AtomicBoolean(false);
 
-	public RegisteredUnmodifiableList(List<E> readOnlyList) {
+	public OnceUnmodifiableList(List<E> readOnlyList) {
 		Assert2.state(null != readOnlyList, "Once modifiable read only list must not be null.");
 		this.readOnlyList = synchronizedList(readOnlyList);
 	}

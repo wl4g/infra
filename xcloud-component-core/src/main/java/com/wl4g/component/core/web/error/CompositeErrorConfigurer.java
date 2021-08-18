@@ -15,23 +15,23 @@
  */
 package com.wl4g.component.core.web.error;
 
-import org.springframework.core.annotation.Order;
-
-import com.wl4g.component.common.collection.RegisteredUnmodifiableList;
-import com.wl4g.component.core.web.error.AbstractErrorAutoConfiguration.ErrorHandlerProperties;
+import static com.wl4g.component.common.lang.Assert2.notNull;
+import static com.wl4g.component.common.lang.Assert2.state;
+import static com.wl4g.component.common.web.rest.RespBase.RetCode.SYS_ERR;
+import static java.util.Collections.sort;
+import static java.util.Objects.nonNull;
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.wl4g.component.common.collection.CollectionUtils2.isEmpty;
-import static com.wl4g.component.common.lang.Assert2.notNull;
-import static com.wl4g.component.common.lang.Assert2.state;
-import static com.wl4g.component.common.web.rest.RespBase.RetCode.*;
-import static java.util.Collections.sort;
-import static java.util.Objects.nonNull;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
+import org.springframework.core.annotation.Order;
+
+import com.wl4g.component.common.collection.OnceUnmodifiableList;
+import com.wl4g.component.core.web.error.AbstractErrorAutoConfiguration.ErrorHandlerProperties;
 
 /**
  * Composite error configure adapter.
@@ -42,50 +42,50 @@ import static org.springframework.core.annotation.AnnotationUtils.findAnnotation
  */
 public class CompositeErrorConfigurer extends ErrorConfigurer {
 
-	/**
-	 * Error configures.
-	 */
-	protected final List<ErrorConfigurer> configures = new RegisteredUnmodifiableList<>(new ArrayList<>());
+    /**
+     * Error configures.
+     */
+    protected final List<ErrorConfigurer> configures = new OnceUnmodifiableList<>(new ArrayList<>());
 
-	public CompositeErrorConfigurer(ErrorHandlerProperties config, List<ErrorConfigurer> configures) {
-		super(config);
-		state(!isEmpty(configures), "Error configures has at least one.");
-		// Sort by order.
-		sort(configures, (o1, o2) -> {
-			Order order1 = findAnnotation(o1.getClass(), Order.class);
-			Order order2 = findAnnotation(o2.getClass(), Order.class);
-			notNull(order1, "ErrorConfigure implements must Order must be annotated.");
-			notNull(order2, "ErrorConfigure implements must Order must be annotated.");
-			int compare = order1.value() - order2.value();
-			state(compare != 0, String.format("ErrorConfigure implements %s:%s and %s:%s order conflict!", o1.getClass(),
-					order1.value(), o2.getClass(), order2.value()));
-			return compare;
-		});
-		this.configures.addAll(configures);
-	}
+    public CompositeErrorConfigurer(ErrorHandlerProperties config, List<ErrorConfigurer> configures) {
+        super(config);
+        state(!isEmpty(configures), "Error configures has at least one.");
+        // Sort by order.
+        sort(configures, (o1, o2) -> {
+            Order order1 = findAnnotation(o1.getClass(), Order.class);
+            Order order2 = findAnnotation(o2.getClass(), Order.class);
+            notNull(order1, "ErrorConfigure implements must Order must be annotated.");
+            notNull(order2, "ErrorConfigure implements must Order must be annotated.");
+            int compare = order1.value() - order2.value();
+            state(compare != 0, String.format("ErrorConfigure implements %s:%s and %s:%s order conflict!", o1.getClass(),
+                    order1.value(), o2.getClass(), order2.value()));
+            return compare;
+        });
+        this.configures.addAll(configures);
+    }
 
-	@Override
-	public Integer getStatus(Map<String, Object> model, Throwable th) {
-		for (ErrorConfigurer c : configures) {
-			Integer status = c.getStatus(model, th);
-			if (nonNull(status)) {
-				return status;
-			}
-		}
-		// Fallback.
-		return SYS_ERR.getErrcode();
-	}
+    @Override
+    public Integer getStatus(Map<String, Object> model, Throwable th) {
+        for (ErrorConfigurer c : configures) {
+            Integer status = c.getStatus(model, th);
+            if (nonNull(status)) {
+                return status;
+            }
+        }
+        // Fallback.
+        return SYS_ERR.getErrcode();
+    }
 
-	@Override
-	public String getRootCause(Map<String, Object> model, Throwable th) {
-		for (ErrorConfigurer c : configures) {
-			String errmsg = c.getRootCause(model, th);
-			if (!isBlank(errmsg)) {
-				return errmsg;
-			}
-		}
-		// Fallback.
-		return "Unknown error";
-	}
+    @Override
+    public String getRootCause(Map<String, Object> model, Throwable th) {
+        for (ErrorConfigurer c : configures) {
+            String errmsg = c.getRootCause(model, th);
+            if (!isBlank(errmsg)) {
+                return errmsg;
+            }
+        }
+        // Fallback.
+        return "Unknown error";
+    }
 
 }

@@ -20,12 +20,12 @@ import static java.lang.System.out;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.wl4g.component.common.collection.RegisteredSetList;
+import com.wl4g.component.common.collection.UniqueList;
 
 public class RegisteredSetListTests {
 
 	public static void main(String[] args) {
-		List<String> list1 = new RegisteredSetList<>(new ArrayList<>());
+		List<String> list1 = new UniqueList<>(new ArrayList<>());
 		list1.add("a");
 		list1.add("A");
 		list1.add(null);

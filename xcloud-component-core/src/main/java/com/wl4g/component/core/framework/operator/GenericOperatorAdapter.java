@@ -43,7 +43,7 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.core.ResolvableType;
 
-import com.wl4g.component.common.collection.RegisteredUnmodifiableMap;
+import com.wl4g.component.common.collection.OnceUnmodifiableMap;
 import com.wl4g.component.common.log.SmartLogger;
 
 /**
@@ -60,13 +60,13 @@ public abstract class GenericOperatorAdapter<K extends Enum<?>, O extends Operat
     /**
      * Generic registrar of operator alias names.
      */
-    protected final Map<K, O> operatorAliasRegistry = synchronizedMap(new RegisteredUnmodifiableMap<>(new HashMap<>()));
+    protected final Map<K, O> operatorAliasRegistry = synchronizedMap(new OnceUnmodifiableMap<>(new HashMap<>()));
 
     /**
      * Generic registrar of operator classes.
      */
     protected final Map<Class<? extends Operator<Enum<?>>>, O> operatorClassRegistry = synchronizedMap(
-            new RegisteredUnmodifiableMap<>(new HashMap<>()));
+            new OnceUnmodifiableMap<>(new HashMap<>()));
 
     /**
      * Kind type class of operator provider.

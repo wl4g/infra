@@ -37,7 +37,7 @@ import com.wl4g.component.common.lang.Assert2;
  * @version v1.0 2019年8月1日
  * @since
  */
-public class RegisteredUnmodifiableMap<K, V> implements Map<K, V> {
+public class OnceUnmodifiableMap<K, V> implements Map<K, V> {
 
 	/**
 	 * Read only map.
@@ -49,7 +49,7 @@ public class RegisteredUnmodifiableMap<K, V> implements Map<K, V> {
 	 */
 	final private AtomicBoolean modified = new AtomicBoolean(false);
 
-	public RegisteredUnmodifiableMap(Map<K, V> readOnlyMap) {
+	public OnceUnmodifiableMap(Map<K, V> readOnlyMap) {
 		Assert2.state(null != readOnlyMap, "Once modifiable read only map must not be null.");
 		if (!(readOnlyMap instanceof ConcurrentMap)) {
 			readOnlyMap = synchronizedMap(readOnlyMap);

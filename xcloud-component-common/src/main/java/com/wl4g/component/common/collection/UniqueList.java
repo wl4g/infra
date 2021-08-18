@@ -38,7 +38,7 @@ import java.util.ListIterator;
  * @see {@link List}
  * @see {@link Set}
  */
-public class RegisteredSetList<E> implements List<E> {
+public class UniqueList<E> implements List<E> {
 
 	/**
 	 * Origin list object.
@@ -50,11 +50,11 @@ public class RegisteredSetList<E> implements List<E> {
 	 */
 	final private boolean overlay;
 
-	public RegisteredSetList(List<E> orig) {
+	public UniqueList(List<E> orig) {
 		this(orig, false);
 	}
 
-	public RegisteredSetList(List<E> orig, boolean overlay) {
+	public UniqueList(List<E> orig, boolean overlay) {
 		notNullOf(orig, "origList");
 		this.orig = synchronizedList(orig);
 		this.overlay = overlay;
