@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>xcloud-component-integration-shardingproxy-server</artifactId>
+	<artifactId>xcloud-component-integration-shardingproxy</artifactId>
 	<packaging>jar</packaging>
 	<name>XCloud Component Integration Shardingsphere Proxy</name>
 	<url>http://xcloud.wl4g.com</url>
-	<description>A XCloud Component Integration Framework integrating Shardingsphere Proxy.</description>
+	<description>A XCloud Component Integration Shardingsphere Proxy.</description>
 	<organization>
 		<name>wl4g</name>
 		<url>https://xcloud.wl4g.com</url>

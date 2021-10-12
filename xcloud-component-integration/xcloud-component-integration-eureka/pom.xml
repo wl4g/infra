@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>xcloud-component-integration-circuitbreaker-hystrix-turbine-server</artifactId>
+	<artifactId>xcloud-component-integration-eureka</artifactId>
 	<packaging>jar</packaging>
-	<name>XCloud Component Integration Hystrix-Turbine Server</name>
+	<name>XCloud Component Integration Eureka Server</name>
 	<url>http://xcloud.wl4g.com</url>
-	<description>A XCloud Component Integration CircuitBreaker Hystrix-Turbine Server.</description>
+	<description>A XCloud Component Integration Eureka Server.</description>
 	<organization>
 		<name>wl4g</name>
 		<url>https://xcloud.wl4g.com</url>
@@ -58,7 +58,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
-		<final.name>hystrix-turbine-server</final.name>
+		<final.name>eureka-server</final.name>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
@@ -78,22 +78,18 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+			<artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-netflix-hystrix-dashboard</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-netflix-turbine</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 	</dependencies>
 	<build>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
-				<filtering>false</filtering>
+				<filtering>true</filtering>
 				<includes>
 					<include>**.*</include>
 				</includes>
@@ -121,61 +117,77 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<finalName>eureka-${project.parent.version}-bin</finalName>
+					<mainClass>com.wl4g.EurekaServer</mainClass>
+					<!-- <layout>ZIP</layout> -->
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 	<profiles>
-		<profile>
-			<id>mvnAssTar</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-assembly-plugin</artifactId>
-						<configuration>
-							<finalName>${final.name}-${project.version}-bin</finalName>
-							<appendAssemblyId>false</appendAssemblyId>
-							<descriptors>
-								<descriptor>src/main/assemble/package.xml</descriptor>
-							</descriptors>
-						</configuration>
-						<executions>
-							<execution>
-								<id>make-assembly</id>
-								<phase>package</phase>
-								<goals>
-									<goal>single</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>springExecJar</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.springframework.boot</groupId>
-						<artifactId>spring-boot-maven-plugin</artifactId>
-						<configuration>
-							<mainClass>com.wl4g.HystrixTurbineServer</mainClass>
-							<finalName>${final.name}-${project.version}-bin</finalName>
-						</configuration>
-						<executions>
-							<execution>
-								<goals>
-									<goal>repackage</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
+	    <profile>
+            <id>mvnAssTar</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <configuration>
+                            <finalName>${final.name}-${project.version}-bin</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>src/main/assemble/package.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>make-assembly</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>springExecJar</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <configuration>
+                            <mainClass>com.wl4g.EurekaServer</mainClass>
+                            <finalName>${final.name}-${project.version}-bin</finalName>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>repackage</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 		<profile>
             <id>release</id>
             <build>

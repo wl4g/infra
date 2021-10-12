@@ -2,11 +2,11 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>xcloud-component-integration</artifactId>
+	<artifactId>xcloud-component-integration-canal</artifactId>
 	<packaging>pom</packaging>
-	<name>XCloud Component Integration</name>
+	<name>XCloud Component Integration Alibaba Canal</name>
 	<url>http://xcloud.wl4g.com</url>
-	<description>A XCloud Component Integration Projects.</description>
+	<description>A XCloud Component Integration Alibaba Canal Projects.</description>
 	<organization>
 		<name>wl4g</name>
 		<url>https://xcloud.wl4g.com</url>
@@ -53,39 +53,18 @@
 	</developers>
 	<parent>
 		<groupId>com.wl4g</groupId>
-		<artifactId>xcloud-component</artifactId>
+		<artifactId>xcloud-component-integration</artifactId>
 		<version>2.0.0</version>
 	</parent>
 	<modules>
-		<module>xcloud-component-integration-feign-common</module>
-		<module>xcloud-component-integration-feign-core</module>
-		<module>xcloud-component-integration-feign-istio</module>
-		<module>xcloud-component-integration-feign-springcloud</module>
-		<module>xcloud-component-integration-feign-springcloud-dubbo</module>
-		<module>xcloud-component-integration-feign-springcloud-seata</module>
-		<module>xcloud-component-integration-feign-example</module>
-		<module>xcloud-component-integration-canal</module>
-		<module>xcloud-component-integration-eureka</module>
-		<!--<module>xcloud-component-integration-nacos</module> -->
-		<!--<module>xcloud-component-integration-consul</module> -->
-		<!--<module>xcloud-component-integration-zookeeper</module> -->
-		<!--<module>xcloud-component-integration-shardingproxy</module> -->
-		<module>xcloud-component-integration-turbine</module>
+		<module>xcloud-component-integration-canal-launcher</module>
+		<module>xcloud-component-integration-canal-admin</module>
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
-		<apache-dubbo-starter.version>2.7.10</apache-dubbo-starter.version>
+		<canal.version>1.1.5</canal.version>
 	</properties>
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.apache.dubbo</groupId>
-				<artifactId>dubbo-spring-boot-starter</artifactId>
-				<version>${apache-dubbo-starter.version}</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 	<build>
 		<resources>
 			<resource>
