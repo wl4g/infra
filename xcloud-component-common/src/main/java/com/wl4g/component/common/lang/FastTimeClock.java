@@ -33,7 +33,7 @@ public abstract class FastTimeClock {
      * The difference between any absolute time and relative nanosecond time at
      * JVM startup.
      */
-    public static final long vmTimeDiff = (long) (System.currentTimeMillis() - System.nanoTime() / 100_0000);
+    private static final long vmTimeDiff = (long) (System.currentTimeMillis() - System.nanoTime() / 100_0000);
 
     public static long currentTimeMillis() {
         return (long) ((System.nanoTime() / 100_0000) + vmTimeDiff);
