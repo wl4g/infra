@@ -39,122 +39,122 @@ import com.google.common.eventbus.EventBus;
  */
 public class EventBusSupport implements Closeable {
 
-	/** {@link EventBus} */
-	protected final EventBus bus;
+    /** {@link EventBus} */
+    protected final EventBus bus;
 
-	/** {@link ThreadPoolExecutor} */
-	protected ThreadPoolExecutor executor;
+    /** {@link ThreadPoolExecutor} */
+    protected ThreadPoolExecutor executor;
 
-	public EventBusSupport(int eventThreads) {
-		isTrueOf(eventThreads > 0, "eventThreads >0");
-		this.bus = initEventBus(eventThreads);
-	}
+    public EventBusSupport(int eventThreads) {
+        isTrueOf(eventThreads > 0, "eventThreads >0");
+        this.bus = initEventBus(eventThreads);
+    }
 
-	/**
-	 * Gets default singleton instance of {@link EventBusSupport}.
-	 * 
-	 * @param config
-	 * @return
-	 */
-	public static EventBusSupport getDefault(int eventThreads) {
-		if (isNull(DEFAULT)) { // Single checked
-			synchronized (EventBusSupport.class) {
-				if (isNull(DEFAULT)) { // Double checked
-					DEFAULT = new EventBusSupport(eventThreads);
-				}
-			}
-		}
-		return DEFAULT;
-	}
+    /**
+     * Gets or create singleton instance of {@link EventBusSupport}.
+     * 
+     * @param config
+     * @return
+     */
+    public static EventBusSupport getOrCreate(int eventThreads) {
+        if (isNull(DEFAULT)) { // Single checked
+            synchronized (EventBusSupport.class) {
+                if (isNull(DEFAULT)) { // Double checked
+                    DEFAULT = new EventBusSupport(eventThreads);
+                }
+            }
+        }
+        return DEFAULT;
+    }
 
-	/**
-	 * Gets {@link EventBus} instance.
-	 * 
-	 * @return
-	 */
-	public EventBus getBus() {
-		return bus;
-	}
+    /**
+     * Gets {@link EventBus} instance.
+     * 
+     * @return
+     */
+    public EventBus getBus() {
+        return bus;
+    }
 
-	/**
-	 * Registers all subscriber methods. </br>
-	 * see {@link EventBus#register(Object)}
-	 * 
-	 * @param objects
-	 *            object whose subscriber methods should be registered.
-	 */
-	public void register(Object... objects) {
-		if (nonNull(objects)) {
-			for (Object obj : objects) {
-				this.bus.register(obj);
-			}
-		}
-	}
+    /**
+     * Registers all subscriber methods. </br>
+     * see {@link EventBus#register(Object)}
+     * 
+     * @param objects
+     *            object whose subscriber methods should be registered.
+     */
+    public void register(Object... objects) {
+        if (nonNull(objects)) {
+            for (Object obj : objects) {
+                this.bus.register(obj);
+            }
+        }
+    }
 
-	/**
-	 * Unregisters all subscriber methods. </br>
-	 * see {@link EventBus#unregister(Object)}
-	 * 
-	 * @param objects
-	 *            object whose subscriber methods should be registered.
-	 */
-	public void unregister(Object... objects) {
-		if (nonNull(objects)) {
-			for (Object obj : objects) {
-				this.bus.unregister(obj);
-			}
-		}
-	}
+    /**
+     * Unregisters all subscriber methods. </br>
+     * see {@link EventBus#unregister(Object)}
+     * 
+     * @param objects
+     *            object whose subscriber methods should be registered.
+     */
+    public void unregister(Object... objects) {
+        if (nonNull(objects)) {
+            for (Object obj : objects) {
+                this.bus.unregister(obj);
+            }
+        }
+    }
 
-	/**
-	 * Post events to bus. </br>
-	 * see {@link EventBus#post(Object)}
-	 * 
-	 * @param events
-	 */
-	public void post(Object... events) {
-		if (isActive()) {
-			getBus().post(events);
-		}
-	}
+    /**
+     * Post events to bus. </br>
+     * see {@link EventBus#post(Object)}
+     * 
+     * @param events
+     */
+    public void post(Object... events) {
+        if (isActive()) {
+            getBus().post(events);
+        }
+    }
 
-	/**
-	 * Check {@link EventBus} worker is active?
-	 * 
-	 * @return
-	 */
-	public boolean isActive() {
-		return nonNull(executor) && !executor.isShutdown();
-	}
+    /**
+     * Check {@link EventBus} worker is active?
+     * 
+     * @return
+     */
+    public boolean isActive() {
+        return nonNull(executor) && !executor.isShutdown();
+    }
 
-	@Override
-	public void close() throws IOException {
-		if (isActive()) {
-			executor.shutdown();
-		}
-	}
+    @Override
+    public void close() throws IOException {
+        if (isActive()) {
+            executor.shutdown();
+        }
+    }
 
-	/**
-	 * Init create {@link EventBus}
-	 * 
-	 * @param eventThreads
-	 * @return
-	 */
-	private final EventBus initEventBus(int eventThreads) {
-		final AtomicInteger incr = new AtomicInteger(0);
-		ThreadPoolExecutor executor = new ThreadPoolExecutor(eventThreads, eventThreads, 0, MILLISECONDS,
-				new LinkedBlockingQueue<>(), r -> {
-					Thread t = new Thread(r, "scm-event-".concat(valueOf(incr.getAndIncrement())));
-					if (t.isDaemon())
-						t.setDaemon(false);
-					if (t.getPriority() != Thread.NORM_PRIORITY)
-						t.setPriority(Thread.NORM_PRIORITY);
-					return t;
-				});
-		return new AsyncEventBus("scm-event-bus", executor);
-	}
+    /**
+     * Init create {@link EventBus}
+     * 
+     * @param eventThreads
+     * @return
+     */
+    private final EventBus initEventBus(int eventThreads) {
+        final AtomicInteger incr = new AtomicInteger(0);
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(eventThreads, eventThreads, 0, MILLISECONDS,
+                new LinkedBlockingQueue<>(), r -> {
+                    Thread t = new Thread(r, "scm-event-".concat(valueOf(incr.getAndIncrement())));
+                    if (t.isDaemon())
+                        t.setDaemon(false);
+                    if (t.getPriority() != Thread.NORM_PRIORITY)
+                        t.setPriority(Thread.NORM_PRIORITY);
+                    return t;
+                });
+        return new AsyncEventBus(getClass().getSimpleName(), executor);
+    }
 
-	/** Single default instance of {@link EventBusSupport} */
-	private static volatile EventBusSupport DEFAULT;
+    /** Single default instance of {@link EventBusSupport} */
+    private static volatile EventBusSupport DEFAULT;
 
 }
