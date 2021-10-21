@@ -26,6 +26,7 @@ package com.wl4g.component.common.lang;
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version 2021-09-17 v1.0.0
  * @since v1.0.0
+ * @see https://stackoverflow.com/questions/510462/is-system-nanotime-completely-useless
  */
 public abstract class FastTimeClock {
 
