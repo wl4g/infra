@@ -59,8 +59,6 @@ import redis.clients.jedis.util.SafeEncoder;
  * Redis client agnostic {@link CursorSpec} implementation continuously loading
  * additional results from Redis server until reaching its starting point
  * {@code zero}. <br />
- * <strong>Note:</strong> Please note that the {@link ScanCursor} has to be
- * initialized ({@link #start()} prior to usage.
  * 
  * <font color=red> Note: redis scan is reverse binary iteration, not sequential
  * pointer iteration. </font> See: <a href=

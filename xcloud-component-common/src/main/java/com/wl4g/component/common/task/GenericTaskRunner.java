@@ -76,7 +76,7 @@ public abstract class GenericTaskRunner<C extends RunnerProperties> implements C
      * 
      * @throws Exception
      */
-    public void start() throws Exception {
+    public GenericTaskRunner<C> initialize() throws Exception {
         if (running.compareAndSet(false, true)) {
             // Call PreStartup
             preStartupProperties();
@@ -109,6 +109,7 @@ public abstract class GenericTaskRunner<C extends RunnerProperties> implements C
         } else {
             log.warn("Could not startup runner! because already builders are read-only and do not allow task modification");
         }
+        return this;
     }
 
     /**
