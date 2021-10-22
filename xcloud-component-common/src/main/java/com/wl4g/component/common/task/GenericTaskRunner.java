@@ -76,7 +76,7 @@ public abstract class GenericTaskRunner<C extends RunnerProperties> implements C
      * 
      * @throws Exception
      */
-    public GenericTaskRunner<C> initialize() throws Exception {
+    public GenericTaskRunner<C> initialize() {
         if (running.compareAndSet(false, true)) {
             // Call PreStartup
             preStartupProperties();
@@ -115,28 +115,28 @@ public abstract class GenericTaskRunner<C extends RunnerProperties> implements C
     /**
      * Pre startup properties
      */
-    protected void preStartupProperties() throws Exception {
+    protected void preStartupProperties() {
         // Ignore
     }
 
     /**
      * Post startup properties
      */
-    protected void postStartupProperties() throws Exception {
+    protected void postStartupProperties() {
         // Ignore
     }
 
     /**
      * Pre close properties
      */
-    protected void preCloseProperties() throws IOException {
+    protected void preCloseProperties() {
         // Ignore
     }
 
     /**
      * Post close properties
      */
-    protected void postCloseProperties() throws IOException {
+    protected void postCloseProperties() {
         // Ignore
     }
 
