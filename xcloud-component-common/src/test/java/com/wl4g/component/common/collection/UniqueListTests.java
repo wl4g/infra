@@ -22,7 +22,7 @@ import java.util.List;
 
 import com.wl4g.component.common.collection.UniqueList;
 
-public class RegisteredSetListTests {
+public class UniqueListTests {
 
 	public static void main(String[] args) {
 		List<String> list1 = new UniqueList<>(new ArrayList<>());
