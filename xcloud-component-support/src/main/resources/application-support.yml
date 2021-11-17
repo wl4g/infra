@@ -15,16 +15,16 @@ spring:
   xcloud:
     component:
       #support:
-      #  cli.enable: false # Default by false
+      #  cli.enabled: false # Default by false
       #  jedis:
-      #    enable: false # Default by true
+      #    enabled: false # Default by true
       #    #passwd: ""
       #    connect-timeout: 10000
       #    max-attempts: 10
       #    nodes: ${IAM_REDIS_NODES:owner-node5:6379,owner-node5:6380,owner-node5:6381,owner-node3:7379,owner-node3:7380,owner-node3:7381}
       #  notification:
       #    mail:
-      #      enable: false # Default[false]
+      #      enabled: false # Default by false
       #      host: mail.google.com
       #      port: 465
       #      username: xcloud-component@gmail.com
@@ -47,7 +47,7 @@ spring:
       #        tpl2: Your verification code is：${code} valid for 5 minutes. You can't tell anyone if you're dead. Thank you for using!
       #    # Some configuration...
       #    sms:
-      #      enable: false # Default[false]
+      #      enabled: false # Default by false
       #      aliyun:
       #        regionId: cn-hangzhou
       #        accessKeyId: ${ALIYUN_KEY}
@@ -57,7 +57,7 @@ spring:
       #          tpl1: SMS_140726862 # Alarm notice template.
       #          tpl2: SMS_109490228 # VerificationCode notice template.
       #    vms:
-      #      enable: false # Default[false]
+      #      enabled: false # Default by false
       #      aliyun:
       #        regionId: cn-hangzhou
       #        accessKeyId: ${ALIYUN_KEY}
@@ -67,23 +67,23 @@ spring:
       #          tpl1: TTS_184825642 # Alarm notice template.
       #          tpl2: TTS_184820765 # VerificationCode notice template.
       #    wechat:
-      #      enable: false # Default[false]
+      #      enabled: false # Default by false
       #      # Some configuration...
       #    qq:
-      #      enable: false # Default[false]
+      #      enabled: false # Default by false
       #      # Some configuration...
       #    apns:
-      #      enable: false # Default[false]
+      #      enabled: false # Default by false
       #      # Some configuration...
       #    bark:
-      #      enable: false # Default[false]
+      #      enabled: false # Default by false
       #      # Some configuration...
       #    dingtalk:
-      #      enable: false # Default[false]
+      #      enabled: false # Default by false
       #      # Some configuration...
       #    facebook:
-      #      enable: false # Default[false]
+      #      enabled: false # Default by false
       #      # Some configuration...
       #    twitter:
-      #      enable: false # Default[false]
+      #      enabled: false # Default by false
       #      # Some configuration...

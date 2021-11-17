@@ -5,7 +5,7 @@ com.wl4g.component.core.boot.listener.DefaultLauncherConfigurerApplicationListen
 
 # Application Auto Configuration.
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.wl4g.component.core.boot.DefaultBootstrapAutoConfiguration,\
+com.wl4g.component.core.boot.BootstrappingAutoConfiguration,\
 com.wl4g.component.core.framework.beans.NamingPrototypeBeanAutoConfiguration,\
 com.wl4g.component.core.framework.operator.GenericOperatorAutoConfiguration,\
 com.wl4g.component.core.framework.proxy.SmartProxyAutoConfiguration,\

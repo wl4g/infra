@@ -15,8 +15,8 @@
  */
 package com.wl4g.component.data.config;
 
-import static com.wl4g.component.data.constant.DataComponentConstant.KEY_HOTSPOT_LOADER_PREFIX;
-import static com.wl4g.component.data.constant.DataComponentConstant.KEY_MYBATIS_PREFIX;
+import static com.wl4g.component.data.constant.DataConfigConstant.KEY_HOTSPOT_LOADER_PREFIX;
+import static com.wl4g.component.data.constant.DataConfigConstant.KEY_MYBATIS_PREFIX;
 
 import java.util.Properties;
 
@@ -49,79 +49,79 @@ import com.wl4g.component.data.mybatis.mapper.PreparedBeanMapperInterceptor;
 @ConditionalOnClass(SqlSessionFactory.class)
 public class MybatisAutoConfiguration {
 
-	@Bean
-	@ConfigurationProperties(prefix = KEY_MYBATIS_PREFIX)
-	public MybatisProperties mybatisProperties() {
-		return new MybatisProperties();
-	}
+    @Bean
+    @ConfigurationProperties(prefix = KEY_MYBATIS_PREFIX)
+    public MybatisProperties mybatisProperties() {
+        return new MybatisProperties();
+    }
 
-	// --- Hotspot loader. ---
+    // --- Hotspot loader. ---
 
-	@Bean
-	@ConditionalOnJdwpDebug(enableProperty = KEY_HOTSPOT_LOADER_PREFIX + ".enable")
-	@ConfigurationProperties(prefix = KEY_HOTSPOT_LOADER_PREFIX)
-	// @ConditionalOnBean(SmartSqlSessionFactoryBean.class)
-	public HotspotLoaderProperties hotspotLoaderProperties() {
-		return new HotspotLoaderProperties();
-	}
+    @Bean
+    @ConditionalOnJdwpDebug(enableProperty = KEY_HOTSPOT_LOADER_PREFIX + ".enabled")
+    @ConfigurationProperties(prefix = KEY_HOTSPOT_LOADER_PREFIX)
+    // @ConditionalOnBean(SmartSqlSessionFactoryBean.class)
+    public HotspotLoaderProperties hotspotLoaderProperties() {
+        return new HotspotLoaderProperties();
+    }
 
-	@Bean
-	@ConditionalOnBean(value = { HotspotLoaderProperties.class })
-	public SqlSessionMapperHotspotLoader sqlSessionMapperHotspotLoader(SqlSessionFactoryBean sessionFactory,
-			HotspotLoaderProperties config) {
-		return new SqlSessionMapperHotspotLoader(sessionFactory, config);
-	}
+    @Bean
+    @ConditionalOnBean(value = { HotspotLoaderProperties.class })
+    public SqlSessionMapperHotspotLoader sqlSessionMapperHotspotLoader(SqlSessionFactoryBean sessionFactory,
+            HotspotLoaderProperties config) {
+        return new SqlSessionMapperHotspotLoader(sessionFactory, config);
+    }
 
-	// --- Mapper ID generators. ---
+    // --- Mapper ID generators. ---
 
-	/**
-	 * A better recommendation is to use a dedicated ID generation
-	 * services.</br>
-	 * <p>
-	 * for example: <a href='https://github.com/wl4g/xcloud-dguid'>Dguid -
-	 * https://github.com/wl4g/xcloud-dguid</a>
-	 * </p>
-	 * 
-	 * @return
-	 */
-	@Bean
-	@ConditionalOnMissingBean
-	public IdGenerator defaultIdGenerator() {
-		return new IdGenerator() {
-		};
-	}
+    /**
+     * A better recommendation is to use a dedicated ID generation
+     * services.</br>
+     * <p>
+     * for example: <a href='https://github.com/wl4g/xcloud-dguid'>Dguid -
+     * https://github.com/wl4g/xcloud-dguid</a>
+     * </p>
+     * 
+     * @return
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    public IdGenerator defaultIdGenerator() {
+        return new IdGenerator() {
+        };
+    }
 
-	// --- Mapper interceptors. ---
+    // --- Mapper interceptors. ---
 
-	@Bean
-	@ConditionalOnClass(PageHelper.class)
-	@Order(ORDER_PAGEHELPER)
-	public PageHelper githubPageHelper() {
-		Properties props = new Properties();
-		props.setProperty("dialect", "mysql");
-		props.setProperty("reasonable", "true");
-		props.setProperty("supportMethodsArguments", "true");
-		props.setProperty("returnPageInfo", "check");
-		props.setProperty("params", "count=countSql");
-		PageHelper page = new PageHelper();
-		page.setProperties(props); // 添加插件
-		return page;
-	}
+    @Bean
+    @ConditionalOnClass(PageHelper.class)
+    @Order(ORDER_PAGEHELPER)
+    public PageHelper githubPageHelper() {
+        Properties props = new Properties();
+        props.setProperty("dialect", "mysql");
+        props.setProperty("reasonable", "true");
+        props.setProperty("supportMethodsArguments", "true");
+        props.setProperty("returnPageInfo", "check");
+        props.setProperty("params", "count=countSql");
+        PageHelper page = new PageHelper();
+        page.setProperties(props); // 添加插件
+        return page;
+    }
 
-	@Bean
-	@Order(ORDER_PREPARED_BEAN_MAPPER)
-	public PreparedBeanMapperInterceptor preparedBeanMapperInterceptor() {
-		return new PreparedBeanMapperInterceptor();
-	}
+    @Bean
+    @Order(ORDER_PREPARED_BEAN_MAPPER)
+    public PreparedBeanMapperInterceptor preparedBeanMapperInterceptor() {
+        return new PreparedBeanMapperInterceptor();
+    }
 
-	/**
-	 * Make sure that the prepared bean mapper interceptor is executed the
-	 * earliest. </br>
-	 * </br>
-	 * Note: mybatis {@link Interceptor} is reverse, that is, the last execution
-	 * that is first added to {@link InterceptorChain}
-	 */
-	public static final int ORDER_PREPARED_BEAN_MAPPER = Ordered.LOWEST_PRECEDENCE;
-	public static final int ORDER_PAGEHELPER = ORDER_PREPARED_BEAN_MAPPER - 1;
+    /**
+     * Make sure that the prepared bean mapper interceptor is executed the
+     * earliest. </br>
+     * </br>
+     * Note: mybatis {@link Interceptor} is reverse, that is, the last execution
+     * that is first added to {@link InterceptorChain}
+     */
+    public static final int ORDER_PREPARED_BEAN_MAPPER = Ordered.LOWEST_PRECEDENCE;
+    public static final int ORDER_PAGEHELPER = ORDER_PREPARED_BEAN_MAPPER - 1;
 
 }

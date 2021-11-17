@@ -21,37 +21,22 @@ spring:
     location: classpath:banner.txt
   xcloud:
     component:
-      framework:
-        default-boot-configurer:
+      core:
+        bootstrapping:
           enabled: false
-        naming-prototype-factory:
+        naming-beanfactory:
           enabled: false
         generic-operator:
           enabled: false
-        smart-proxy:
+        smart-proxies:
           enabled: false
-      web:
-        embedded-webapps:
-          enabled: false
-        human-date-converter:
-          enabled: false
-        global-error:
-          enabled: false
-
-#management:
-#  port: 8099
-#  context-path: /admin
-#  security:
-#    enabled: true
-#  endpoints:
-#    web:
-#      exposure:
-#        include: '*'
-#    health:
-#      sensitive: true
-#  endpoint:
-#      health:
-#        show-details: ALWAYS
+        web:
+          embedded-webapps:
+            enabled: false
+          human-date-converter:
+            enabled: false
+          global-error:
+            enabled: false
 
 # Eureka configuration.
 # https://github.com/Netflix/eureka/wiki/Configuring-Eureka
@@ -105,5 +90,5 @@ server:
     basedir: /tmp/${spring.application.name}
     access-log-enabled: false
     accesslog.directory: logs/
-    backgroundProcessorDelay: 30 #seconds
+    backgroundProcessorDelay: 30
     max-thread: 50 # Max worker threads(default:200).

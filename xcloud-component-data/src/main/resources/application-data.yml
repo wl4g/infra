@@ -13,6 +13,6 @@ spring:
     component:
       data:
         #mybatis-loader:
-        #  enable: false # Default by auto(currently running in JVM jdwp mode?)
+        #  enabled: false # Default by auto(currently running in JVM jdwp mode?)
         #  fastFail: false # Default by false
         #  monitorLoaderIntervalMs: 1000 # Default by 1000ms

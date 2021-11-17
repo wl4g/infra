@@ -17,7 +17,8 @@ package com.wl4g.component.support.cache.jedis;
 
 import static com.wl4g.component.common.log.SmartLoggerFactory.getLogger;
 import static com.wl4g.component.common.serialize.JacksonUtils.toJSONString;
-import static com.wl4g.component.support.constant.SupportConstant.KEY_SUPPORT_JEDIS_PREFIX;
+import static com.wl4g.component.support.constant.SupportConfigConstant.KEY_SUPPORT_JEDIS_PREFIX;
+import static redis.clients.jedis.HostAndPort.parseString;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -35,7 +36,6 @@ import org.springframework.context.annotation.Bean;
 
 import com.wl4g.component.common.log.SmartLogger;
 
-import static redis.clients.jedis.HostAndPort.parseString;
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPool;
@@ -51,167 +51,167 @@ import redis.clients.jedis.exceptions.JedisException;
  * @version v1.0 2018年9月16日
  * @since
  */
-@ConditionalOnProperty(name = KEY_SUPPORT_JEDIS_PREFIX + ".enable", matchIfMissing = true)
+@ConditionalOnProperty(name = KEY_SUPPORT_JEDIS_PREFIX + ".enabled", matchIfMissing = true)
 public class JedisClientAutoConfiguration {
-	protected final SmartLogger log = getLogger(getClass());
+    protected final SmartLogger log = getLogger(getClass());
 
-	// Optional
-	@Bean
-	@ConfigurationProperties(prefix = KEY_SUPPORT_JEDIS_PREFIX)
-	@ConditionalOnClass({ JedisCluster.class, JedisPool.class }) // or-relationship
-	@ConditionalOnMissingBean({ JedisCluster.class, JedisPool.class }) // or-relationship
-	public JedisProperties jedisProperties() {
-		return new JedisProperties();
-	}
+    // Optional
+    @Bean
+    @ConfigurationProperties(prefix = KEY_SUPPORT_JEDIS_PREFIX)
+    @ConditionalOnClass({ JedisCluster.class, JedisPool.class }) // or-relationship
+    @ConditionalOnMissingBean({ JedisCluster.class, JedisPool.class }) // or-relationship
+    public JedisProperties jedisProperties() {
+        return new JedisProperties();
+    }
 
-	// Requires
-	@Bean
-	public JedisClientFactoryBean jedisClientFactoryBean(@Autowired(required = false) JedisProperties config,
-			@Autowired(required = false) JedisCluster jedisCluster, @Autowired(required = false) JedisPool jedisPool) {
-		return new JedisClientFactoryBean(config, jedisCluster, jedisPool);
-	}
+    // Requires
+    @Bean
+    public JedisClientFactoryBean jedisClientFactoryBean(@Autowired(required = false) JedisProperties config,
+            @Autowired(required = false) JedisCluster jedisCluster, @Autowired(required = false) JedisPool jedisPool) {
+        return new JedisClientFactoryBean(config, jedisCluster, jedisPool);
+    }
 
-	// Requires
-	@Bean(BEAN_NAME_REDIS)
-	public JedisService jedisService(JedisClientFactoryBean factory) throws Exception {
-		return new JedisService(factory.getObject());
-	}
+    // Requires
+    @Bean(BEAN_NAME_REDIS)
+    public JedisService jedisService(JedisClientFactoryBean factory) throws Exception {
+        return new JedisService(factory.getObject());
+    }
 
-	/**
-	 * Jedis properties.
-	 * 
-	 * @author Wangl.sir <wanglsir@gmail.com, 983708408@qq.com>
-	 * @version v1.0 2018年9月16日
-	 * @since
-	 */
-	public static class JedisProperties implements Serializable {
-		private final static long serialVersionUID = 1906168160146495488L;
+    /**
+     * Jedis properties.
+     * 
+     * @author Wangl.sir <wanglsir@gmail.com, 983708408@qq.com>
+     * @version v1.0 2018年9月16日
+     * @since
+     */
+    public static class JedisProperties implements Serializable {
+        private final static long serialVersionUID = 1906168160146495488L;
 
-		protected SmartLogger log = getLogger(getClass());
+        protected SmartLogger log = getLogger(getClass());
 
-		private List<String> nodes = new ArrayList<>();
-		private String passwd;
-		private String clientName;
-		private int connTimeout = 10_000;
-		private int soTimeout = 10_000;
-		private int maxAttempts = 20;
-		private int database = 0;
+        private List<String> nodes = new ArrayList<>();
+        private String passwd;
+        private String clientName;
+        private int connTimeout = 10_000;
+        private int soTimeout = 10_000;
+        private int maxAttempts = 20;
+        private int database = 0;
 
-		private JedisPoolConfig poolConfig = new JedisPoolConfig();
-		private boolean safeMode = true;
+        private JedisPoolConfig poolConfig = new JedisPoolConfig();
+        private boolean safeMode = true;
 
-		public JedisProperties() {
-			// Default settings.
-			/*
-			 * [Note:] importants, The default value is - 1, that is, there is
-			 * no time-out for acquiring resources, which will lead to deadlock.
-			 */
-			this.poolConfig.setMaxWaitMillis(10000);
-			this.poolConfig.setMinIdle(10);
-			this.poolConfig.setMaxIdle(100);
-			this.poolConfig.setMaxTotal(60000);
-		}
+        public JedisProperties() {
+            // Default settings.
+            /*
+             * [Note:] importants, The default value is - 1, that is, there is
+             * no time-out for acquiring resources, which will lead to deadlock.
+             */
+            this.poolConfig.setMaxWaitMillis(10000);
+            this.poolConfig.setMinIdle(10);
+            this.poolConfig.setMaxIdle(100);
+            this.poolConfig.setMaxTotal(60000);
+        }
 
-		public List<String> getNodes() {
-			return nodes;
-		}
+        public List<String> getNodes() {
+            return nodes;
+        }
 
-		public void setNodes(List<String> nodes) {
-			this.nodes = nodes;
-		}
+        public void setNodes(List<String> nodes) {
+            this.nodes = nodes;
+        }
 
-		public String getPasswd() {
-			return passwd;
-		}
+        public String getPasswd() {
+            return passwd;
+        }
 
-		public void setPasswd(String passwd) {
-			this.passwd = passwd;
-		}
+        public void setPasswd(String passwd) {
+            this.passwd = passwd;
+        }
 
-		public String getClientName() {
-			return clientName;
-		}
+        public String getClientName() {
+            return clientName;
+        }
 
-		public void setClientName(String clientName) {
-			this.clientName = clientName;
-		}
+        public void setClientName(String clientName) {
+            this.clientName = clientName;
+        }
 
-		public int getConnTimeout() {
-			return connTimeout;
-		}
+        public int getConnTimeout() {
+            return connTimeout;
+        }
 
-		public void setConnTimeout(int connTimeout) {
-			this.connTimeout = connTimeout;
-		}
+        public void setConnTimeout(int connTimeout) {
+            this.connTimeout = connTimeout;
+        }
 
-		public int getSoTimeout() {
-			return soTimeout;
-		}
+        public int getSoTimeout() {
+            return soTimeout;
+        }
 
-		public void setSoTimeout(int soTimeout) {
-			this.soTimeout = soTimeout;
-		}
+        public void setSoTimeout(int soTimeout) {
+            this.soTimeout = soTimeout;
+        }
 
-		public int getMaxAttempts() {
-			return maxAttempts;
-		}
+        public int getMaxAttempts() {
+            return maxAttempts;
+        }
 
-		public void setMaxAttempts(int maxAttempts) {
-			this.maxAttempts = maxAttempts;
-		}
+        public void setMaxAttempts(int maxAttempts) {
+            this.maxAttempts = maxAttempts;
+        }
 
-		public int getDatabase() {
-			return database;
-		}
+        public int getDatabase() {
+            return database;
+        }
 
-		public void setDatabase(int database) {
-			this.database = database;
-		}
+        public void setDatabase(int database) {
+            this.database = database;
+        }
 
-		public JedisPoolConfig getPoolConfig() {
-			return poolConfig;
-		}
+        public JedisPoolConfig getPoolConfig() {
+            return poolConfig;
+        }
 
-		public void setPoolConfig(JedisPoolConfig poolConfig) {
-			this.poolConfig = poolConfig;
-		}
+        public void setPoolConfig(JedisPoolConfig poolConfig) {
+            this.poolConfig = poolConfig;
+        }
 
-		public boolean isSafeMode() {
-			return safeMode;
-		}
+        public boolean isSafeMode() {
+            return safeMode;
+        }
 
-		public void setSafeMode(boolean safeMode) {
-			this.safeMode = safeMode;
-		}
+        public void setSafeMode(boolean safeMode) {
+            this.safeMode = safeMode;
+        }
 
-		public final Set<HostAndPort> parseHostAndPort() throws Exception {
-			try {
-				Set<HostAndPort> haps = new HashSet<HostAndPort>();
-				for (String node : getNodes()) {
-					boolean matched = defaultNodePattern.matcher(node).matches();
-					if (!matched) {
-						throw new IllegalArgumentException("illegal ip or port");
-					}
-					haps.add(parseString(node));
-				}
-				return haps;
-			} catch (Exception e) {
-				throw new JedisException("Resolve of redis cluster configuration failure.", e);
-			}
-		}
+        public final Set<HostAndPort> parseHostAndPort() throws Exception {
+            try {
+                Set<HostAndPort> haps = new HashSet<HostAndPort>();
+                for (String node : getNodes()) {
+                    boolean matched = defaultNodePattern.matcher(node).matches();
+                    if (!matched) {
+                        throw new IllegalArgumentException("illegal ip or port");
+                    }
+                    haps.add(parseString(node));
+                }
+                return haps;
+            } catch (Exception e) {
+                throw new JedisException("Resolve of redis cluster configuration failure.", e);
+            }
+        }
 
-		@Override
-		public String toString() {
-			return getClass().getSimpleName().concat(" - ").concat(toJSONString(this));
-		}
+        @Override
+        public String toString() {
+            return getClass().getSimpleName().concat(" - ").concat(toJSONString(this));
+        }
 
-		private final static Pattern defaultNodePattern = Pattern.compile("^.+[:]\\d{1,9}\\s*$");
+        private final static Pattern defaultNodePattern = Pattern.compile("^.+[:]\\d{1,9}\\s*$");
 
-	}
+    }
 
-	/**
-	 * Resolving spring byName injection conflict.
-	 */
-	public static final String BEAN_NAME_REDIS = "JedisAutoConfiguration.JedisService.Bean";
+    /**
+     * Resolving spring byName injection conflict.
+     */
+    public static final String BEAN_NAME_REDIS = "JedisAutoConfiguration.JedisService.Bean";
 
 }

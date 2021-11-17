@@ -13,19 +13,19 @@
 spring:
   xcloud:
     component:
-      framework:
-        default-boot-configurer:
+      core:
+        bootstrapping:
           enabled: false
-        naming-prototype-factory:
+        naming-beanfactory:
           enabled: false
         generic-operator:
           enabled: false
-        smart-proxy:
+        smart-proxies:
           enabled: false
-      web:
-        embedded-webapps:
-          enabled: false
-        human-date-converter:
-          enabled: false
-        global-error:
-          enabled: false
+        web:
+          embedded-webapps:
+            enabled: false
+          human-date-converter:
+            enabled: false
+          global-error:
+            enabled: false

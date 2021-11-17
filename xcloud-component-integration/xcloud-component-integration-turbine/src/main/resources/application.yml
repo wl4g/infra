@@ -17,8 +17,8 @@ spring:
     active: dev # for default
   xcloud:
     component:
-      framework:
-        default-boot-configurer:
+      core:
+        bootstrapping:
           enabled: false
         naming-prototype-factory:
           enabled: false
@@ -26,28 +26,13 @@ spring:
           enabled: false
         smart-proxy:
           enabled: false
-      web:
-        embedded-webapps:
-          enabled: false
-        human-date-converter:
-          enabled: false
-        global-error:
-          enabled: false
-
-management:
-#  port: 8099
-#  context-path: /admin
-#  security:
-#    enabled: true
-  endpoints:
-    web:
-      exposure:
-        include: '*'
-    health:
-      sensitive: true
-  endpoint:
-      health:
-        show-details: ALWAYS
+        web:
+          embedded-webapps:
+            enabled: false
+          human-date-converter:
+            enabled: false
+          global-error:
+            enabled: false
 
 # Eureka configuration.
 eureka:

@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import com.wl4g.component.core.boot.DefaultBootstrapAutoConfiguration;
+import com.wl4g.component.core.boot.BootstrappingAutoConfiguration;
 import com.wl4g.component.core.web.versions.annotation.ApiVersion;
 import com.wl4g.component.core.web.versions.annotation.ApiVersionMapping;
 import com.wl4g.component.core.web.versions.annotation.EnableApiVersionManagement;
@@ -38,7 +38,7 @@ import com.wl4g.component.core.web.versions.annotation.EnableApiVersionManagemen
  * @see https://spring.io/guides/gs/testing-web/
  */
 @EnableApiVersionManagement("com.wl4g.component.core.web.versions")
-@SpringBootApplication(exclude = { DefaultBootstrapAutoConfiguration.class })
+@SpringBootApplication(exclude = { BootstrappingAutoConfiguration.class })
 public class ApiVersionControllerTests {
 
 	public static void main(String[] args) throws Exception {

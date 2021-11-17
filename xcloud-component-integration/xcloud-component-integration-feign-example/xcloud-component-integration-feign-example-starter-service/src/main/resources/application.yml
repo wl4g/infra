@@ -26,7 +26,7 @@ spring:
           mapperLocations: classpath:mybatis/**/*Mapper.xml
           typeAliasesPackage: com.wl4g.component.integration.example.bean.*
   datasource:
-    schema: classpath:sql/example.sql
+    schema: classpath*:sql/example.sql
 
 # Logging configuration.
 logging:

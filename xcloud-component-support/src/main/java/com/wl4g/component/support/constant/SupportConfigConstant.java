@@ -17,24 +17,26 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.data.constant;
+package com.wl4g.component.support.constant;
 
 import com.wl4g.component.core.constant.BaseConstant;
 
 /**
- * {@link DataComponentConstant}
+ * {@link SupportConfigConstant}
  * 
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version v1.0 2021-01-20
  * @sine v1.0
  * @see
  */
-public abstract class DataComponentConstant extends BaseConstant {
+public abstract class SupportConfigConstant extends BaseConstant {
 
-	public static final String KEY_DATA_BASE_PREFIX = "spring.xcloud.component.data";
+    public static final String KEY_PREFIX_MODULE_SUPPORT = "spring.xcloud.component.support.";
 
-	public static final String KEY_MYBATIS_PREFIX = KEY_DATA_BASE_PREFIX + ".mybatis";
+    public static final String KEY_SUPPORT_CLI_PREFIX = KEY_PREFIX_MODULE_SUPPORT + "cli";
 
-	public static final String KEY_HOTSPOT_LOADER_PREFIX = KEY_DATA_BASE_PREFIX + ".mybatis-loader";
+    public static final String KEY_SUPPORT_NOTIFY_PREFIX = KEY_PREFIX_MODULE_SUPPORT + "notification";
+
+    public static final String KEY_SUPPORT_JEDIS_PREFIX = KEY_PREFIX_MODULE_SUPPORT + "jedis";
 
 }

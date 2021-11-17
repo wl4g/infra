@@ -30,7 +30,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.google.gson.Gson;
-import com.wl4g.component.core.boot.DefaultBootstrapAutoConfiguration;
+import com.wl4g.component.core.boot.BootstrappingAutoConfiguration;
 import com.wl4g.component.integration.feign.core.GithubService1.GitHubContributor;
 import com.wl4g.component.integration.feign.core.SpringBootFeignTests.SampleRetryer;
 import com.wl4g.component.integration.feign.core.annotation.EnableFeignConsumers;
@@ -41,46 +41,46 @@ import feign.Retryer;
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test1")
 @SpringBootTest(classes = SpringBootFeignTests.class)
-@EnableAutoConfiguration(exclude = { DefaultBootstrapAutoConfiguration.class, JedisClientAutoConfiguration.class })
+@EnableAutoConfiguration(exclude = { BootstrappingAutoConfiguration.class, JedisClientAutoConfiguration.class })
 @EnableFeignConsumers(basePackages = "com.wl4g.component.integration.feign.core", defaultConfiguration = { SampleRetryer.class })
 public class SpringBootFeignTests {
 
-	private Logger log = LoggerFactory.getLogger(SpringBootFeignTests.class);
+    private Logger log = LoggerFactory.getLogger(SpringBootFeignTests.class);
 
-	@Autowired
-	private GithubService1 githubService1;
+    @Autowired
+    private GithubService1 githubService1;
 
-	@Autowired
-	private GithubService2 githubService2;
+    @Autowired
+    private GithubService2 githubService2;
 
-	@Autowired
-	private GithubService3 githubService3;
+    @Autowired
+    private GithubService3 githubService3;
 
-	@Test
-	public void test1() {
-		List<GitHubContributor> contributors = githubService1.getContributors("wl4g", "xcloud-component");
-		log.info(">>> Result:");
-		log.info("contributors={}", new Gson().toJson(contributors));
-	}
+    @Test
+    public void test1() {
+        List<GitHubContributor> contributors = githubService1.getContributors("wl4g", "xcloud-component");
+        log.info(">>> Result:");
+        log.info("contributors={}", new Gson().toJson(contributors));
+    }
 
-	@Test
-	public void test2() {
-		List<GitHubRepoModel> repos = githubService2.getRepos("wl4g");
-		log.info(">>> Result:");
-		log.info("repos={}", new Gson().toJson(repos));
-	}
+    @Test
+    public void test2() {
+        List<GitHubRepoModel> repos = githubService2.getRepos("wl4g");
+        log.info(">>> Result:");
+        log.info("repos={}", new Gson().toJson(repos));
+    }
 
-	@Test
-	public void test3() {
-		List<GitHubRepoModel> repos = githubService3.getRepos("wl4g");
-		log.info(">>> Result:");
-		log.info("repos={}", new Gson().toJson(repos));
-	}
+    @Test
+    public void test3() {
+        List<GitHubRepoModel> repos = githubService3.getRepos("wl4g");
+        log.info(">>> Result:");
+        log.info("repos={}", new Gson().toJson(repos));
+    }
 
-	public static class SampleRetryer extends Retryer.Default {
-		public SampleRetryer() {
-			super(200, SECONDS.toMillis(2), 3);
-		}
-	}
+    public static class SampleRetryer extends Retryer.Default {
+        public SampleRetryer() {
+            super(200, SECONDS.toMillis(2), 3);
+        }
+    }
 
 }

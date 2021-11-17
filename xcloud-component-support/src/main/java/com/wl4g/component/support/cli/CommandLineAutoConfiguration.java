@@ -15,12 +15,13 @@
  */
 package com.wl4g.component.support.cli;
 
+import static com.wl4g.component.support.constant.SupportConfigConstant.KEY_SUPPORT_CLI_PREFIX;
+
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 
 import com.wl4g.component.support.cli.repository.DefaultProcessRepository;
 import com.wl4g.component.support.cli.repository.ProcessRepository;
-import static com.wl4g.component.support.constant.SupportConstant.KEY_SUPPORT_CLI_PREFIX;
 
 /**
  * Command-line support auto configuration.
@@ -29,17 +30,17 @@ import static com.wl4g.component.support.constant.SupportConstant.KEY_SUPPORT_CL
  * @version v1.0.0 2019-10-20
  * @since
  */
-@ConditionalOnProperty(name = KEY_SUPPORT_CLI_PREFIX + ".enable", matchIfMissing = false)
+@ConditionalOnProperty(name = KEY_SUPPORT_CLI_PREFIX + ".enabled", matchIfMissing = false)
 public class CommandLineAutoConfiguration {
 
-	@Bean
-	public ProcessRepository processRepository() {
-		return new DefaultProcessRepository();
-	}
+    @Bean
+    public ProcessRepository processRepository() {
+        return new DefaultProcessRepository();
+    }
 
-	@Bean
-	public DestroableProcessManager nodeProcessManagerImpl(ProcessRepository repository) {
-		return new NodeProcessManagerImpl(repository);
-	}
+    @Bean
+    public DestroableProcessManager nodeProcessManagerImpl(ProcessRepository repository) {
+        return new NodeProcessManagerImpl(repository);
+    }
 
 }

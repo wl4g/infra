@@ -3,7 +3,7 @@
  * <Wanglsir@gmail.com, 983708408@qq.com> Technology CO.LTD.
  * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License";
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -29,18 +29,20 @@ package com.wl4g.component.core.constant;
  */
 public abstract class CoreConfigConstant extends BaseConstant {
 
-	public static final String KEY_BOOT_DEFAULT = "spring.xcloud.component.framework.default-boot-configurer";
+    public static final String KEY_PREFIX_MODULE_CORE = "spring.xcloud.component.core.";
 
-	public static final String KEY_NAMING_PROTOYPE_FACTORY = "spring.xcloud.component.framework.naming-prototype-factory";
+    public static final String KEY_BOOTSTRAPPING = KEY_PREFIX_MODULE_CORE + "bootstrapping";
 
-	public static final String KEY_GENERIC_OPERATOR = "spring.xcloud.component.framework.generic-operator";
+    public static final String KEY_NAMING_PROTOYPE_FACTORY = KEY_PREFIX_MODULE_CORE + "naming-beanfactory";
 
-	public static final String KEY_SMART_PROXY = "spring.xcloud.component.framework.smart-proxy";
+    public static final String KEY_GENERIC_OPERATOR = KEY_PREFIX_MODULE_CORE + "generic-operator";
 
-	public static final String KEY_WEB_HUMAN_DATE_CONVERTER = "spring.xcloud.component.web.human-date-converter";
+    public static final String KEY_SMART_PROXY = KEY_PREFIX_MODULE_CORE + "smart-proxies";
 
-	public static final String KEY_WEB_GLOBAL_ERROR = "spring.xcloud.component.web.global-error";
+    public static final String KEY_WEB_HUMAN_DATE_CONVERTER = KEY_PREFIX_MODULE_CORE + "web.human-date-converter";
 
-	public static final String KEY_WEB_EMBEDDED_WEBAPP = "spring.xcloud.component.web.embedded-webapps";
+    public static final String KEY_WEB_GLOBAL_ERROR = KEY_PREFIX_MODULE_CORE + "web.global-error";
+
+    public static final String KEY_WEB_EMBEDDED_WEBAPP = KEY_PREFIX_MODULE_CORE + "web.embedded-webapps";
 
 }

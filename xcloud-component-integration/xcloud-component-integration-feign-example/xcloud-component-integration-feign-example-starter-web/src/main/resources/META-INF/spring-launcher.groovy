@@ -45,7 +45,7 @@ class IamWebSpringLauncherConfigurer implements ISpringLauncherConfigurer {
 		if (isPresent("org.springframework.cloud.openfeign.FeignClient") && isPresent("org.springframework.cloud.openfeign.FeignAutoConfiguration")) {
 			configName.append(",example-web-scf");
 			location.append(",classpath:/scf/")
-		} else if (isPresent("com.wl4g.component.rpc.feign.core.annotation.FeignConsumer")) {
+		} else if (isPresent("com.wl4g.component.integration.feign.core.annotation.FeignConsumer")) {
 			configName.append(",example-web-sbf");
 			location.append(",classpath:/sbf/")
 		} else if (isPresent("com.alibaba.dubbo.rpc.Filter") && isPresent("com.alibaba.boot.dubbo.autoconfigure.DubboAutoConfiguration")) {
