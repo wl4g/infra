@@ -33,8 +33,8 @@ public abstract class DataConfigConstant extends BaseConstant {
 
     public static final String KEY_PREFIX_MODULE_DATA = "spring.xcloud.component.data.";
 
-    public static final String KEY_MYBATIS_PREFIX = KEY_PREFIX_MODULE_DATA + ".mybatis";
+    public static final String KEY_MYBATIS_PREFIX = KEY_PREFIX_MODULE_DATA + "mybatis";
 
-    public static final String KEY_HOTSPOT_LOADER_PREFIX = KEY_PREFIX_MODULE_DATA + ".mybatis-loader";
+    public static final String KEY_HOTSPOT_LOADER_PREFIX = KEY_PREFIX_MODULE_DATA + "mybatis-loader";
 
 }

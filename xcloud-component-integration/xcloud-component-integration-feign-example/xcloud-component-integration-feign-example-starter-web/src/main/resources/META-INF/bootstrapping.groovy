@@ -20,12 +20,12 @@
 
 import static com.wl4g.component.common.lang.ClassUtils2.isPresent
 import static org.springframework.boot.context.config.ConfigFileApplicationListener.*
-import com.wl4g.component.core.boot.listener.ISpringLauncherConfigurer
+import com.wl4g.component.core.boot.listener.IBootstrappingConfigurer
 
 /**
- * IAM web implementation of {@link ISpringLauncherConfigurer}
+ * Example web implementation of {@link IBootstrappingConfigurer}
  */
-class IamWebSpringLauncherConfigurer implements ISpringLauncherConfigurer {
+class ExampleWebIBootstrappingConfigurer implements IBootstrappingConfigurer {
 
 	@Override
 	def int getOrder() {
@@ -33,7 +33,7 @@ class IamWebSpringLauncherConfigurer implements ISpringLauncherConfigurer {
 	}
 
 	@Override
-	def Properties defaultProperties() {
+	def Properties defaultProperties(Properties prevDefaultProperties) {
 		def defaultProperties = new Properties()
 		// Preset spring.config.name
 		// for example: spring auto load for 'application-dev.yml/application-data-dev.yml'

@@ -46,7 +46,7 @@ logging:
     de.codecentric.boot.admin: INFO
     org:
       springframework:
-        boot.context.config: DEBUG # Print load config
+        boot.context: DEBUG # Print load config
       apache: INFO
     feign: DEBUG
     com:

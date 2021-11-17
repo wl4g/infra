@@ -20,40 +20,46 @@
 
 import static com.wl4g.component.common.lang.ClassUtils2.isPresent
 import static org.springframework.boot.context.config.ConfigFileApplicationListener.*
-import com.wl4g.component.core.boot.listener.ISpringLauncherConfigurer
+
+import org.springframework.boot.Banner
+
+import com.wl4g.component.core.boot.listener.IBootstrappingConfigurer
 
 /**
- * Example facade implementation of {@link ISpringLauncherConfigurer}
+ * Default implementation of {@link IBootstrappingConfigurer}
  */
-class ExampleFacadeSpringLauncherConfigurer implements ISpringLauncherConfigurer {
+class DefaultIBootstrappingConfigurer implements IBootstrappingConfigurer {
 
 	@Override
 	def int getOrder() {
-		return -100
+		return 0
+	}
+
+	def Banner.Mode bannerMode(Banner.Mode prevMode) {
+		return Banner.Mode.LOG;
 	}
 
 	@Override
-	def Properties defaultProperties() {
+	def Properties defaultProperties(Properties prevDefaultProperties) {
 		def defaultProperties = new Properties()
 		// Preset spring.config.name
 		// for example: spring auto load for 'application-dev.yml/application-data-dev.yml'
-		def configName = new StringBuffer("application,example-web")
+		defaultProperties.put(CONFIG_NAME_PROPERTY,
+				"""
+application,
+application-data,
+application-service,
+application-web,
+""")
 
 		// Preset spring.config.location
-		// for example: spring auto load for 'classpath:/application-web-dev.yml'
+		// for example: spring auto load for 'classpath:/application-data-dev.yml'
 		def location = new StringBuffer("classpath:/")
 		if (isPresent("org.springframework.cloud.openfeign.FeignClient") && isPresent("org.springframework.cloud.openfeign.FeignAutoConfiguration")) {
-			configName.append(",example-web-scf");
 			location.append(",classpath:/scf/")
-		} else if (isPresent("com.wl4g.component.integration.feign.core.annotation.FeignConsumer")) {
-			configName.append(",example-web-sbf");
+		} else if (isPresent("com.wl4g.component.rpc.springboot.feign.annotation.SpringBootFeignClient")) {
 			location.append(",classpath:/sbf/")
-		} else if (isPresent("com.alibaba.dubbo.rpc.Filter") && isPresent("com.alibaba.boot.dubbo.autoconfigure.DubboAutoConfiguration")) {
-			configName.append(",example-web-dubbo");
-			location.append(",classpath:/dubbo/")
 		}
-
-		defaultProperties.put(CONFIG_NAME_PROPERTY, configName.toString())
 		defaultProperties.put(CONFIG_ADDITIONAL_LOCATION_PROPERTY, location.toString())
 
 		return defaultProperties
