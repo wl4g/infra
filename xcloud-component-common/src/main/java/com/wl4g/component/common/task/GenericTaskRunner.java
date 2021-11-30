@@ -48,7 +48,7 @@ public abstract class GenericTaskRunner<C extends RunnerProperties> implements C
     private final AtomicBoolean running = new AtomicBoolean(false);
 
     /** Runner task properties configuration. */
-    private final C configProperties;
+    protected final C config;
 
     /** Runner master thread. */
     private Thread header;
@@ -63,7 +63,7 @@ public abstract class GenericTaskRunner<C extends RunnerProperties> implements C
 
     public GenericTaskRunner(C config) {
         notNull(config, "GenericTaskRunner properties can't null");
-        this.configProperties = config;
+        this.config = config;
     }
 
     @Override
@@ -82,17 +82,17 @@ public abstract class GenericTaskRunner<C extends RunnerProperties> implements C
             preStartupProperties();
 
             // Create worker(if necessary)
-            if (configProperties.getConcurrency() > 0) {
+            if (config.getConcurrency() > 0) {
                 // See:https://www.jianshu.com/p/e7ab1ac8eb4c
                 ThreadFactory tf = new NamedThreadFactory(getThreadNamePrefix().concat("-worker"));
-                worker = new SafeScheduledTaskPoolExecutor(configProperties.getConcurrency(), configProperties.getKeepAliveTime(),
-                        tf, configProperties.getAcceptQueue(), configProperties.getReject());
+                worker = new SafeScheduledTaskPoolExecutor(config.getConcurrency(), config.getKeepAliveTime(), tf,
+                        config.getAcceptQueue(), config.getReject());
             } else {
                 log.warn("No start threads worker, because the number of workthreads is less than 0");
             }
 
             // Header asynchronously execution.(if necessary)
-            switch (configProperties.getStartupMode()) {
+            switch (config.getStartupMode()) {
             case SYNC:
                 run(); // Sync execution.
                 break;
@@ -150,7 +150,7 @@ public abstract class GenericTaskRunner<C extends RunnerProperties> implements C
      * @return
      */
     protected C getConfig() {
-        return configProperties;
+        return config;
     }
 
     /**
