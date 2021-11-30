@@ -56,6 +56,9 @@ public abstract class ApplicationTaskRunner<C extends RunnerProperties> extends 
     @Override
     public void run(ApplicationArguments args) throws Exception {
         super.initialize();
+        onApplicationStarted(args);
     }
+
+    protected abstract void onApplicationStarted(ApplicationArguments args);
 
 }
