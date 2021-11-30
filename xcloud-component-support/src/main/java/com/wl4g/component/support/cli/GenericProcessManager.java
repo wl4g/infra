@@ -47,6 +47,7 @@ import com.wl4g.component.common.cli.ProcessUtils.DelegateProcess;
 import com.wl4g.component.common.cli.ssh2.SSH2Holders;
 import com.wl4g.component.common.cli.ssh2.SshjHolder.CommandSessionWrapper;
 import com.wl4g.component.common.task.RunnerProperties;
+import com.wl4g.component.core.task.ApplicationTaskRunner;
 import com.wl4g.component.support.cli.command.DestroableCommand;
 import com.wl4g.component.support.cli.command.LocalDestroableCommand;
 import com.wl4g.component.support.cli.command.RemoteDestroableCommand;
@@ -57,7 +58,6 @@ import com.wl4g.component.support.cli.process.LocalDestroableProcess;
 import com.wl4g.component.support.cli.process.SshdDestroableProcess;
 import com.wl4g.component.support.cli.process.SshjDestroableProcess;
 import com.wl4g.component.support.cli.repository.ProcessRepository;
-import com.wl4g.component.support.task.ApplicationTaskRunner;
 
 import ch.ethz.ssh2.Session;
 

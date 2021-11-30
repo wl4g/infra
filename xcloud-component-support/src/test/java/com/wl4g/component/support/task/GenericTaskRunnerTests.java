@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.wl4g.component.common.task.RunnerProperties;
+import com.wl4g.component.core.task.ApplicationTaskRunner;
 
 /**
  * {@link ApplicationTaskRunner} tests.

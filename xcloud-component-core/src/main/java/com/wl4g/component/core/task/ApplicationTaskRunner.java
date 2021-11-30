@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.component.support.task;
+package com.wl4g.component.core.task;
 
 import static com.wl4g.component.common.log.SmartLoggerFactory.getLogger;
 
