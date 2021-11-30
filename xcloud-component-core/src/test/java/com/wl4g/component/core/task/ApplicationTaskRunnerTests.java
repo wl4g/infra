@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.component.support.task;
+package com.wl4g.component.core.task;
 
 import static java.lang.System.currentTimeMillis;
 
@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.wl4g.component.common.task.RunnerProperties;
-import com.wl4g.component.core.task.ApplicationTaskRunner;
 
 /**
  * {@link ApplicationTaskRunner} tests.
@@ -31,7 +30,7 @@ import com.wl4g.component.core.task.ApplicationTaskRunner;
  * @version v1.0 2019年6月2日
  * @since
  */
-public class GenericTaskRunnerTests {
+public class ApplicationTaskRunnerTests {
 
     public static void main(String[] args) throws Exception {
         // submitForCompleteTest1();

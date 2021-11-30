@@ -28,6 +28,7 @@ import java.util.concurrent.locks.Lock;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.ApplicationArguments;
 import org.springframework.util.Assert;
 
 import com.wl4g.component.support.cache.jedis.JedisService;
@@ -91,7 +92,7 @@ public class NodeProcessManagerImpl extends GenericProcessManager {
     }
 
     @Override
-    public void run() {
+    protected void onApplicationStarted(ApplicationArguments args) throws Exception {
         getWorker().scheduleWithRandomDelay(() -> {
             try {
                 doInspectForProcessesDestroy(getDestroyLockName());

@@ -65,6 +65,7 @@ public abstract class ApplicationTaskRunner<C extends RunnerProperties> extends 
         }
     }
 
-    protected abstract void onApplicationStarted(ApplicationArguments args) throws Exception;
+    protected void onApplicationStarted(ApplicationArguments args) throws Exception {
+    }
 
 }
