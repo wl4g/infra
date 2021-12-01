@@ -48,7 +48,7 @@ public abstract class GenericTaskRunner<C extends RunnerProperties> implements C
     private final AtomicBoolean running = new AtomicBoolean(false);
 
     /** Runner task properties configuration. */
-    protected final C config;
+    private final C config;
 
     /** Runner master thread. */
     private Thread header;
