@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.util.Assert;
 
+import com.wl4g.component.common.task.SafeScheduledTaskPoolExecutor;
 import com.wl4g.component.support.cache.jedis.JedisService;
 import com.wl4g.component.support.cache.locks.JedisLockManager;
 import com.wl4g.component.support.cli.destroy.DestroySignal;
@@ -92,8 +93,8 @@ public class NodeProcessManagerImpl extends GenericProcessManager {
     }
 
     @Override
-    protected void onApplicationStarted(ApplicationArguments args) throws Exception {
-        getWorker().scheduleWithRandomDelay(() -> {
+    protected void onApplicationStarted(ApplicationArguments args, SafeScheduledTaskPoolExecutor worker) throws Exception {
+        worker.scheduleWithRandomDelay(() -> {
             try {
                 doInspectForProcessesDestroy(getDestroyLockName());
             } catch (Exception e) {

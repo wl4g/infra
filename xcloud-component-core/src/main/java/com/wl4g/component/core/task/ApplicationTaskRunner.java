@@ -26,6 +26,7 @@ import org.springframework.boot.ApplicationRunner;
 import com.wl4g.component.common.log.SmartLogger;
 import com.wl4g.component.common.task.GenericTaskRunner;
 import com.wl4g.component.common.task.RunnerProperties;
+import com.wl4g.component.common.task.SafeScheduledTaskPoolExecutor;
 
 /**
  * Application generic local scheduler & task runner.
@@ -61,11 +62,11 @@ public abstract class ApplicationTaskRunner<C extends RunnerProperties> extends 
     public void run(ApplicationArguments args) throws Exception {
         if (running.compareAndSet(false, true)) {
             super.initialize();
-            onApplicationStarted(args);
+            onApplicationStarted(args, getWorker());
         }
     }
 
-    protected void onApplicationStarted(ApplicationArguments args) throws Exception {
+    protected void onApplicationStarted(ApplicationArguments args, SafeScheduledTaskPoolExecutor worker) throws Exception {
     }
 
 }
