@@ -72,14 +72,12 @@ public abstract class GenericTaskRunner<C extends RunnerProperties> implements C
     }
 
     /**
-     * Auto initialization on startup.
-     * 
-     * @throws Exception
+     * Startup and initialization.
      */
-    public GenericTaskRunner<C> initialize() {
+    public void start() {
         if (running.compareAndSet(false, true)) {
             // Call PreStartup
-            preStartupProperties();
+            startingPropertiesSet();
 
             // Create worker(if necessary)
             if (config.getConcurrency() > 0) {
@@ -105,41 +103,45 @@ public abstract class GenericTaskRunner<C extends RunnerProperties> implements C
             }
 
             // Call post startup
-            postStartupProperties();
+            startedPropertiesSet();
         } else {
             log.warn("Could not startup runner! because already builders are read-only and do not allow task modification");
         }
-        return this;
     }
 
     /**
-     * Pre startup properties
+     * Do starting properties processing.
      */
-    protected void preStartupProperties() {
+    protected void startingPropertiesSet() {
         // Ignore
     }
 
     /**
-     * Post startup properties
+     * Do started properties processing.
      */
-    protected void postStartupProperties() {
+    protected void startedPropertiesSet() {
         // Ignore
     }
 
     /**
-     * Pre close properties
+     * Closing properties processing.
      */
-    protected void preCloseProperties() {
+    protected void closingPropertiesSet() {
         // Ignore
     }
 
     /**
-     * Post close properties
+     * Closed properties processing.
      */
-    protected void postCloseProperties() {
+    protected void closedPropertiesSet() {
         // Ignore
     }
 
+    /**
+     * Gets task runner thread-pools names prefix.
+     * 
+     * @return
+     */
     protected String getThreadNamePrefix() {
         return getClass().getSimpleName();
     }
@@ -215,7 +217,7 @@ public abstract class GenericTaskRunner<C extends RunnerProperties> implements C
     public void close() throws IOException {
         if (running.compareAndSet(true, false)) {
             // Call pre close
-            preCloseProperties();
+            closingPropertiesSet();
 
             // Close for thread pool worker.
             if (!isNull(worker)) {
@@ -238,7 +240,7 @@ public abstract class GenericTaskRunner<C extends RunnerProperties> implements C
             }
 
             // Call post close
-            postCloseProperties();
+            closedPropertiesSet();
         }
     }
 

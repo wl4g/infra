@@ -20,7 +20,7 @@ import org.apache.shardingsphere.infra.metadata.ShardingSphereMetaData;
 import com.wl4g.component.integration.sharding.failover.AbstractProxyFailover;
 import com.wl4g.component.integration.sharding.failover.initializer.FailoverAbstractBootstrapInitializer;
 import com.wl4g.component.integration.sharding.failover.jdbc.JdbcOperator;
-import com.wl4g.component.integration.sharding.failover.oracle.stats.OracleNodeStats;
+import com.wl4g.component.integration.sharding.failover.mariadb.stats.MariaDBNodeStats;
 import com.zaxxer.hikari.HikariDataSource;
 
 /**
@@ -30,14 +30,14 @@ import com.zaxxer.hikari.HikariDataSource;
  * @version 2021-07-19 v1.0.0
  * @since v1.0.0
  */
-public class MariaDBProxyFailover extends AbstractProxyFailover<OracleNodeStats> {
+public class MariaDBProxyFailover extends AbstractProxyFailover<MariaDBNodeStats> {
 
     public MariaDBProxyFailover(FailoverAbstractBootstrapInitializer initializer, ShardingSphereMetaData metadata) {
         super(initializer, metadata);
     }
 
     @Override
-    public OracleNodeStats inspecting(JdbcOperator operator) throws Exception {
+    public MariaDBNodeStats inspecting(JdbcOperator operator) throws Exception {
         throw new UnsupportedOperationException();
     }
 

@@ -106,7 +106,7 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
     }
 
     @Override
-    protected void postStartupProperties() throws Exception {
+    protected void startingPropertiesSet() {
         FailoverConfiguration failoverConfig = ProxyContext.getInstance().getFailoverConfig();
         getWorker().scheduleWithRandomDelay(this, failoverConfig.getInspectInitialDelayMs(),
                 failoverConfig.getInspectMinDelayMs(), failoverConfig.getInspectMaxDelayMs(), MILLISECONDS);

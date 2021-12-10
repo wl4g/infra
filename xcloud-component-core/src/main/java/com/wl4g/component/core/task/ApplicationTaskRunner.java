@@ -61,7 +61,7 @@ public abstract class ApplicationTaskRunner<C extends RunnerProperties> extends 
     @Override
     public void run(ApplicationArguments args) throws Exception {
         if (running.compareAndSet(false, true)) {
-            super.initialize();
+            super.start();
             onApplicationStarted(args, getWorker());
         }
     }
