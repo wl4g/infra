@@ -61,9 +61,12 @@
 		<final.name>shardingproxy</final.name>
 		<bootstrap-classname>com.wl4g.ShardingProxy</bootstrap-classname>
 		<!-- Interagtion with 4.x -->
+		<!-- <shardingsphere.version>4.1.1</shardingsphere.version> -->
 		<!-- <curator.version>2.10.0</curator.version> -->
 		<!-- <guava.version>18.0</guava.version> -->
 		<!-- Interagtion with 5.x -->
+		<!-- <shardingsphere.version>5.0.0-beta</shardingsphere.version> -->
+		<shardingsphere.version>5.0.0</shardingsphere.version>
 		<curator.version>5.1.0</curator.version>
 	</properties>
 	<dependencyManagement>
@@ -106,13 +109,18 @@
 		<!-- <dependency> -->
 		<!-- <groupId>org.apache.shardingsphere</groupId> -->
 		<!-- <artifactId>sharding-proxy-bootstrap</artifactId> -->
-		<!-- <version>4.1.1</version> -->
+		<!-- <version>${shardingsphere.version}</version> -->
 		<!-- </dependency> -->
 		<!-- Interagtion with 5.x -->
 		<dependency>
 			<groupId>org.apache.shardingsphere</groupId>
 			<artifactId>shardingsphere-proxy-bootstrap</artifactId>
-			<version>5.0.0-beta</version>
+			<version>${shardingsphere.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.shardingsphere</groupId>
+			<artifactId>shardingsphere-agent-metrics-prometheus</artifactId>
+			<version>${shardingsphere.version}</version>
 		</dependency>
 	</dependencies>
 	<build>

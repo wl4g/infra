@@ -21,23 +21,28 @@
 # 
 ######################################################################################################
 
-# Governance configuration.
-governance:
-  name: shardingproxy
-  overwrite: true
-  registryCenter:
-    type: ZooKeeper
-    serverLists: localhost:2181
-    props:
-      retryIntervalMilliseconds: 500
-      timeToLiveSeconds: 60
-      maxRetries: 3
-      operationTimeoutMilliseconds: 500
+#mode:
+#  type: Cluster
+#  repository:
+#    type: ZooKeeper
+#    props:
+#      namespace: governance_ds
+#      server-lists: localhost:2181
+#      retryIntervalMilliseconds: 500
+#      timeToLiveSeconds: 60
+#      maxRetries: 3
+#      operationTimeoutMilliseconds: 500
+#  overwrite: false
 
-# Scaling configration.
 #scaling:
-#  blockQueueSize: 
-#  workerThread: 
+#  blockQueueSize: 10000
+#  workerThread: 40
+#  clusterAutoSwitchAlgorithm:
+#    type: IDLE
+#    props:
+#      incremental-task-idle-minute-threshold: 30
+#  dataConsistencyCheckAlgorithm:
+#    type: DEFAULT
 
 # Global rules configuration.
 # @see:org.apache.shardingsphere.proxy.config.yaml.YamlProxyRuleConfiguration#rules
@@ -45,27 +50,33 @@ governance:
 rules:
 - !AUTHORITY
   users: # Note: it will cover the account number of the real database!!!
-    - root@:123456
     - userdb@:123456
   provider:
-    type: NATIVE
+    type: ALL_PRIVILEGES_PERMITTED # ALL_PRIVILEGES_PERMITTED|NATIVE
     #props:
 
 # Global properties configuration.
 props:
   max-connections-size-per-query: 1
-  acceptor-size: 16  # The default value is available processors count * 2.
-  executor-size: 16  # Infinite by default.
+  kernel-executor-size: 16  # Infinite by default.
   proxy-frontend-flush-threshold: 128  # The default value is 128.
-    # LOCAL: Proxy will run with LOCAL transaction.
-    # XA: Proxy will run with XA transaction.
-    # BASE: Proxy will run with B.A.S.E transaction.
-  proxy-transaction-type: LOCAL
   proxy-opentracing-enabled: false
-  proxy-hint-enabled: false
-  query-with-cipher-column: true
-  sql-show: true
+  proxy-hint-enabled: true
+  sql-show: false
   check-table-metadata-enabled: false
+  lock-wait-timeout-milliseconds: 50000 # The maximum time to wait for a lock
+  show-process-list-enabled: false
+  # Proxy backend query fetch size. A larger value may increase the memory usage of ShardingSphere Proxy.
+  # The default value is -1, which means set the minimum value for different JDBC drivers.
+  proxy-backend-query-fetch-size: -1
+  check-duplicate-table-enabled: false
+  sql-comment-parse-enabled: false
+  proxy-frontend-executor-size: 0 # Proxy frontend executor size. The default value is 0, which means let Netty decide.
+  # Available options of proxy backend executor suitable: OLAP(default), OLTP. The OLTP option may reduce time cost of 
+  # writing packets to client, but it may increase the latency of SQL execution if client connections are more than 
+  # proxy-frontend-netty-executor-size, especially executing slow SQL.
+  proxy-backend-executor-suitable: OLAP
+  # ------------- Custom failover -----------
   failover-enable: true # Default by true
   # Failover admin dataSource configuration.
   # Notes: This configuration is used for read-write separation data source failover. Therefore, the same account
@@ -80,19 +91,19 @@ props:
              "username": "root",
              "password": "123456",
              "mappings": [{
-                 "internalAddr": "wanglsir-pro:13306",
+                 "internalAddr": "wanglsir-pro:33061",
                  "externalAddrs": [
-                     "wl4g.debug:13306"
+                     "wl4g.debug:33061"
                  ]
              }, {
-                 "internalAddr": "wanglsir-pro:13307",
+                 "internalAddr": "wanglsir-pro:33062",
                  "externalAddrs": [
-                     "wl4g.debug:13307"
+                     "wl4g.debug:33062"
                  ]
              }, {
-                 "internalAddr": "wanglsir-pro:13308",
+                 "internalAddr": "wanglsir-pro:33063",
                  "externalAddrs": [
-                     "wl4g.debug:13308"
+                     "wl4g.debug:33063"
                  ]
              }]
          }]

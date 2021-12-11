@@ -21,8 +21,8 @@
 schemaName: userdb_g0db0
 
 # Default datasource configuration.
-# @see:org.apache.shardingsphere.proxy.config.ProxyConfigurationLoader#loadRuleConfiguration
-dataSource:
+# @see:com.wl4g.component.integration.sharding.config.ProxyConfigurationLoader2#loadRuleConfiguration
+defaultDataSource:
   username: root
   password: 123456
   connectionTimeoutMilliseconds: 30000
@@ -30,16 +30,15 @@ dataSource:
   maxLifetimeMilliseconds: 1800000
   maxPoolSize: 50
   minPoolSize: 1
-  maintenanceIntervalMilliseconds: 30000
 
 # Datasource configuration.
 dataSources:
   primary_userdb_g0db0_1:
-    url: jdbc:mysql://wl4g.debug:13306/userdb_g0db0?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8
+    url: 'jdbc:mysql://wl4g.debug:33061/userdb_g0db0?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8'
   standby_userdb_g0db0_1:
-    url: jdbc:mysql://wl4g.debug:13307/userdb_g0db0?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8
+    url: 'jdbc:mysql://wl4g.debug:33062/userdb_g0db0?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8'
   standby_userdb_g0db0_2:
-    url: jdbc:mysql://wl4g.debug:13308/userdb_g0db0?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8
+    url: 'jdbc:mysql://wl4g.debug:33063/userdb_g0db0?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8'
 
 # Schema rule configuration.
 rules:

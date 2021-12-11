@@ -22,11 +22,10 @@ import java.sql.SQLException;
 
 import org.apache.shardingsphere.proxy.arguments.BootstrapArguments;
 import org.apache.shardingsphere.proxy.config.YamlProxyConfiguration;
+import org.apache.shardingsphere.proxy.frontend.ShardingSphereProxy;
 import org.apache.shardingsphere.proxy.initializer.BootstrapInitializer;
 
 import com.wl4g.component.integration.sharding.config.ProxyConfigurationLoader2;
-import com.wl4g.component.integration.sharding.failover.initializer.FailoverGovernanceBootstrapInitializer;
-import com.wl4g.component.integration.sharding.failover.initializer.FailoverStandardBootstrapInitializer;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -40,15 +39,16 @@ public final class ShardingProxy {
     public static void main(final String[] args) throws IOException, SQLException {
         BootstrapArguments bootstrapArgs = new BootstrapArguments(args);
         YamlProxyConfiguration yamlConfig = ProxyConfigurationLoader2.load(bootstrapArgs.getConfigurationPath());
-        createBootstrapInitializer(yamlConfig).init(yamlConfig, bootstrapArgs.getPort());
+        createBootstrapInitializer().init(yamlConfig, bootstrapArgs.getPort());
+        new ShardingSphereProxy().start(bootstrapArgs.getPort());
     }
 
-    private static BootstrapInitializer createBootstrapInitializer(final YamlProxyConfiguration yamlConfig) {
+    private static BootstrapInitializer createBootstrapInitializer() {
+        return new BootstrapInitializer();
         //
         // ADD for failover.
         //
-        return null == yamlConfig.getServerConfiguration().getGovernance() ? new FailoverStandardBootstrapInitializer()
-                : new FailoverGovernanceBootstrapInitializer();
+        // return new FailoverGovernanceBootstrapInitializer();
     }
 
 }
