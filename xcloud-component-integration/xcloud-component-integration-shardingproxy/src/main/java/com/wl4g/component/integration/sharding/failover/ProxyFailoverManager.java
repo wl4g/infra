@@ -34,7 +34,7 @@ import org.apache.shardingsphere.proxy.backend.context.ProxyContext;
 import com.wl4g.component.common.lang.SimpleVersionComparator;
 import com.wl4g.component.common.log.SmartLogger;
 import com.wl4g.component.integration.sharding.failover.ProxyFailover.NodeStats;
-import com.wl4g.component.integration.sharding.failover.initializer.FailoverAbstractBootstrapInitializer;
+import com.wl4g.component.integration.sharding.failover.initializer.FailoverBootstrapInitializer;
 import com.wl4g.component.integration.sharding.failover.mariadb.MariaDBProxyFailover;
 import com.wl4g.component.integration.sharding.failover.mysql.MySQL57GroupReplicationProxyFailover;
 import com.wl4g.component.integration.sharding.failover.oracle.OracleProxyFailover;
@@ -54,7 +54,7 @@ public final class ProxyFailoverManager {
     private ProxyFailoverManager() {
     }
 
-    public ProxyFailoverManager init(FailoverAbstractBootstrapInitializer initializer) {
+    public ProxyFailoverManager init(FailoverBootstrapInitializer initializer) {
         notNullOf(initializer, "initializer");
 
         ProxyContext proxy = ProxyContext.getInstance();

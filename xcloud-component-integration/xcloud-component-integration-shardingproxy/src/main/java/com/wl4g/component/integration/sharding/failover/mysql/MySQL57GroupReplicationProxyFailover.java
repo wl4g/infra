@@ -25,7 +25,7 @@ import java.util.List;
 import org.apache.shardingsphere.infra.metadata.ShardingSphereMetaData;
 
 import com.wl4g.component.integration.sharding.failover.AbstractProxyFailover;
-import com.wl4g.component.integration.sharding.failover.initializer.FailoverAbstractBootstrapInitializer;
+import com.wl4g.component.integration.sharding.failover.initializer.FailoverBootstrapInitializer;
 import com.wl4g.component.integration.sharding.failover.jdbc.JdbcOperator;
 import com.wl4g.component.integration.sharding.failover.mysql.stats.MySQL57GroupReplicationNodeStats;
 import com.wl4g.component.integration.sharding.failover.mysql.stats.MySQL57GroupReplicationNodeStats.GroupReplicationNodeInfo;
@@ -40,7 +40,7 @@ import com.zaxxer.hikari.HikariDataSource;
  */
 public class MySQL57GroupReplicationProxyFailover extends AbstractProxyFailover<MySQL57GroupReplicationNodeStats> {
 
-    public MySQL57GroupReplicationProxyFailover(FailoverAbstractBootstrapInitializer initializer,
+    public MySQL57GroupReplicationProxyFailover(FailoverBootstrapInitializer initializer,
             ShardingSphereMetaData metadata) {
         super(initializer, metadata);
     }

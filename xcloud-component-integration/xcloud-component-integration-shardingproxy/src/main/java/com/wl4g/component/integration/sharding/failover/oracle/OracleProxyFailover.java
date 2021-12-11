@@ -18,7 +18,7 @@ package com.wl4g.component.integration.sharding.failover.oracle;
 import org.apache.shardingsphere.infra.metadata.ShardingSphereMetaData;
 
 import com.wl4g.component.integration.sharding.failover.AbstractProxyFailover;
-import com.wl4g.component.integration.sharding.failover.initializer.FailoverAbstractBootstrapInitializer;
+import com.wl4g.component.integration.sharding.failover.initializer.FailoverBootstrapInitializer;
 import com.wl4g.component.integration.sharding.failover.jdbc.JdbcOperator;
 import com.wl4g.component.integration.sharding.failover.oracle.stats.OracleNodeStats;
 import com.zaxxer.hikari.HikariDataSource;
@@ -32,7 +32,7 @@ import com.zaxxer.hikari.HikariDataSource;
  */
 public class OracleProxyFailover extends AbstractProxyFailover<OracleNodeStats> {
 
-    public OracleProxyFailover(FailoverAbstractBootstrapInitializer initializer, ShardingSphereMetaData metadata) {
+    public OracleProxyFailover(FailoverBootstrapInitializer initializer, ShardingSphereMetaData metadata) {
         super(initializer, metadata);
     }
 

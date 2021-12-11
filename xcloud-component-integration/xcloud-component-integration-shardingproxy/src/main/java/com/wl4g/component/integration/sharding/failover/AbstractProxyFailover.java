@@ -43,7 +43,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
-import org.apache.shardingsphere.governance.context.metadata.GovernanceMetaDataContexts;
 import org.apache.shardingsphere.infra.config.RuleConfiguration;
 import org.apache.shardingsphere.infra.config.datasource.DataSourceConfiguration;
 import org.apache.shardingsphere.infra.config.properties.ConfigurationPropertyKey;
@@ -55,6 +54,7 @@ import org.apache.shardingsphere.readwritesplitting.api.rule.ReadwriteSplittingD
 
 import com.google.common.net.HostAndPort;
 import com.wl4g.component.common.collection.CollectionUtils2;
+import com.wl4g.component.common.lang.Assert2;
 import com.wl4g.component.common.lang.HostUtils;
 import com.wl4g.component.common.lang.StringUtils2;
 import com.wl4g.component.common.log.SmartLogger;
@@ -70,7 +70,7 @@ import com.wl4g.component.integration.sharding.failover.exception.FailoverExcept
 import com.wl4g.component.integration.sharding.failover.exception.InvalidStateFailoverException;
 import com.wl4g.component.integration.sharding.failover.exception.NoNextAdminDataSourceFailoverException;
 import com.wl4g.component.integration.sharding.failover.exception.UnreachablePrimaryNodeFailoverException;
-import com.wl4g.component.integration.sharding.failover.initializer.FailoverAbstractBootstrapInitializer;
+import com.wl4g.component.integration.sharding.failover.initializer.FailoverBootstrapInitializer;
 import com.wl4g.component.integration.sharding.failover.jdbc.DelegateAdminDataSourceWrapper;
 import com.wl4g.component.integration.sharding.failover.jdbc.JdbcOperator;
 import com.wl4g.component.integration.sharding.util.JdbcUtil;
@@ -93,12 +93,12 @@ import lombok.Getter;
 public abstract class AbstractProxyFailover<S extends NodeStats> extends GenericTaskRunner<RunnerProperties>
         implements ProxyFailover<S> {
 
-    private final FailoverAbstractBootstrapInitializer initializer;
+    private final FailoverBootstrapInitializer initializer;
     private final ShardingSphereMetaData metadata;
     private final Map<String, DelegateAdminDataSourceWrapper> cachingAdminDataSources = new ConcurrentHashMap<>(4);
     private final Map<String, List<String>> schemaInitDefineRWDataSources = synchronizedMap(new HashMap<>(4));
 
-    public AbstractProxyFailover(FailoverAbstractBootstrapInitializer initializer, ShardingSphereMetaData metadata) {
+    public AbstractProxyFailover(FailoverBootstrapInitializer initializer, ShardingSphereMetaData metadata) {
         super(new RunnerProperties(StartupMode.NOSTARTUP, 1));
         this.initializer = notNullOf(initializer, "initializer");
         this.metadata = notNullOf(metadata, "metadata");
@@ -120,20 +120,14 @@ public abstract class AbstractProxyFailover<S extends NodeStats> extends Generic
         final String lockName = getSchemaName().concat(".failover");
         Optional<ShardingSphereLock> op = ProxyContext.getInstance().getLock();
         try {
-            if (ProxyContext.getInstance().getMetaDataContexts() instanceof GovernanceMetaDataContexts) { // Governance(cluster)mode.
-                assert op.isPresent() : new FailoverException(
-                        format("Failover running in governance mode, the lock must be enabled. Please check config '%s'",
-                                ConfigurationPropertyKey.LOCK_ENABLED.getKey()));
-
-                if (op.get().tryLock(lockName, ProxyContext.getInstance().getFailoverConfig().getInspectMinDelayMs())) {
-                    log.info("Locked, failover processing ...");
-                    processFailover();
-                } else {
-                    log.warn("No obtain failover lock, skip for processing.");
-                }
-            } else { // Standard(local) mode.
-                log.info("In standard context running, direct for processing ...");
+            Assert2.isTrue(op.isPresent(), FailoverException.class,
+                    "Failover running in governance mode, the lock must be enabled. Please check config '%s'",
+                    ConfigurationPropertyKey.LOCK_ENABLED.getKey());
+            if (op.get().tryLock(lockName, ProxyContext.getInstance().getFailoverConfig().getInspectMinDelayMs())) {
+                log.info("Locked, failover processing ...");
                 processFailover();
+            } else {
+                log.warn("No obtain failover lock, skip for processing.");
             }
         } catch (Exception e) {
             log.error("Failed to process backend dbnodes primary standby failover.", e);
