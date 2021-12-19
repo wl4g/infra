@@ -31,7 +31,9 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 /**
- * ShardingSphere-Proxy Bootstrap.
+ * ShardingSphere Proxy Bootstrap.
+ * 
+ * @see https://github.com/apache/shardingsphere/blob/5.0.0/shardingsphere-proxy/shardingsphere-proxy-bootstrap/src/main/java/org/apache/shardingsphere/proxy/Bootstrap.java
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ShardingProxy {

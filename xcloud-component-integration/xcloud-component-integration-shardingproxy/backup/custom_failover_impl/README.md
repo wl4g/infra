@@ -217,3 +217,64 @@ Under the same schemaName, multiple sharding databases must be the same. See sou
 - [org.apache.shardingsphere.mode.manager.cluster.coordinator.registry.status.StatusNode.java](https://github1s.com/apache/shardingsphere/blob/5.0.0/shardingsphere-mode/shardingsphere-mode-type/shardingsphere-cluster-mode/shardingsphere-cluster-mode-core/src/main/java/org/apache/shardingsphere/mode/manager/cluster/coordinator/registry/status/StatusNode.java)
 
 - [org.apache.shardingsphere.mode.manager.cluster.coordinator.registry.status.storage.node.StorageStatusNode.java](https://github.com/apache/shardingsphere/blob/5.0.0/shardingsphere-mode/shardingsphere-mode-type/shardingsphere-cluster-mode/shardingsphere-cluster-mode-core/src/main/java/org/apache/shardingsphere/mode/manager/cluster/coordinator/registry/status/storage/node/StorageStatusNode.java)
+
+### 6.3 How do I configuration failover ?
+
+```yaml
+cat server.yaml
+
+props:
+  failover-enable: true # Default by true
+  # Failover admin dataSource configuration.
+  # Notes: This configuration is used for read-write separation data source failover. Therefore, the same account
+  #   password must be created for all master and slave databases before service startup.
+  failover-configuration-json: |-
+     {
+         "inspectInitialDelayMs": 3000,
+         "inspectMinDelayMs": 3000,
+         "inspectMaxDelayMs": 10000,
+         "adminDataSources": [{
+             "schemaName": "userdb",
+             "username": "root",
+             "password": "123456",
+             "mappings": [{
+                 "internalAddr": "wanglsir-pro:33061",
+                 "externalAddrs": [
+                     "wl4g.debug:33061"
+                 ]
+             }, {
+                 "internalAddr": "wanglsir-pro:33062",
+                 "externalAddrs": [
+                     "wl4g.debug:33062"
+                 ]
+             }, {
+                 "internalAddr": "wanglsir-pro:33063",
+                 "externalAddrs": [
+                     "wl4g.debug:33063"
+                 ]
+             }]
+         }]
+     }
+  # Notice: If failover is enabled and distributed governance mode is adopted, lock must be opened.
+  lock-enabled: true # Default by false
+```
+
+> [Details refer to 'example/sharding-readwrite/server.yaml'](src/main/resources/example/sharding-readwrite/server.yaml)
+
+| Attribute | Description |
+| --- | --- |
+| inspectInitialDelayMs | Monitor the initial start waiting time of the inspecting backend read/write dataSources group thread (ms). |
+| inspectMinDelayMs | Monitor the min interval time inspecting read/write dataSources group thread (ms). |
+| inspectMaxDelayMs | Monitor the max interval time inspecting read/write dataSources group thread (ms). |
+| adminDataSources  | Admin dataSource configuration for inspection. |
+| adminDataSources.schemaName | The virtual database schemaName corresponding to config-xx.yaml (Must be consistent). |
+| adminDataSources.username | The account name of the data source grouped by the patrol database (some databases may be ordinary accounts, the query cluster state information no permission) |
+| adminDataSources.password | Same as `adminDataSources.username` |
+| adminDataSources.mappings.internalAddr | The access address of each data source library instance may be an external load balancing or proxy address (one-to-many) to external addresses. |
+| adminDataSources.mappings.externalAddrs | The access address of each data source library instance may be an external load balancing or proxy address (many-to-one) to internal address. |
+
+- **Notice**
+
+- You can configure to enable or disable read-write failover as follows. `failover-enable: true|false`
+- In the governance mode (cluster), the distributed lock must be enabled. It is disabled by default. &nbsp; `lock-enabled: true`
+- Compatible with dataSources disabled in support registry center path: `/myShardingProxy/states/datanodes/mySchema`

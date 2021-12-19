@@ -42,6 +42,7 @@ import org.apache.shardingsphere.infra.yaml.config.pojo.algorithm.YamlShardingSp
 import org.apache.shardingsphere.infra.yaml.config.swapper.mode.ModeConfigurationYamlSwapper;
 import org.apache.shardingsphere.mode.manager.ContextManager;
 import org.apache.shardingsphere.mode.manager.ContextManagerBuilderFactory;
+import org.apache.shardingsphere.mode.manager.cluster.coordinator.RegistryCenter;
 import org.apache.shardingsphere.mode.metadata.MetaDataContexts;
 import org.apache.shardingsphere.proxy.backend.context.ProxyContext;
 import org.apache.shardingsphere.proxy.config.ProxyConfiguration;
@@ -74,7 +75,11 @@ import lombok.extern.slf4j.Slf4j;
 public final class FailoverBootstrapInitializer {
 
     private final ShardingSphereProxy shardingSphereProxy = new ShardingSphereProxy();
-    private final GovernanceFacade governanceFacade = new GovernanceFacade();
+    private final RegistryCenter registryCenter;
+
+    public FailoverBootstrapInitializer(final int port) {
+        this.registryCenter = new RegistryCenter(null, port); // TODO
+    }
 
     /**
      * Initialize.
@@ -187,24 +192,24 @@ public final class FailoverBootstrapInitializer {
     }
 
     //
-    // ADD for failover
+    // ADD for FAILOVER
     //
 
     public Map<String, DataSourceConfiguration> loadDataSourceConfigs(String schemaName) {
-        return governanceFacade.getRegistryCenter().getDataSourceService().load(schemaName);
+        return registryCenter.getRegistryCenter().getDataSourceService().load(schemaName);
     }
 
     public Collection<RuleConfiguration> loadRuleConfigs(String schemaName) {
-        return governanceFacade.getRegistryCenter().getSchemaRuleService().load(schemaName);
+        return registryCenter.getRegistryCenter().getSchemaRuleService().load(schemaName);
     }
 
     public Collection<String> loadDisableDataSources(String schemaName) {
-        return governanceFacade.getRegistryCenter().getDataSourceStatusService().loadDisabledDataSources(schemaName);
+        return registryCenter.getRegistryCenter().getDataSourceStatusService().loadDisabledDataSources(schemaName);
     }
 
     public synchronized void updateSchemaRuleConfiguration(String schemaName,
             Collection<? extends RuleConfiguration> schemaRuleConfigs) {
-        SchemaRuleRegistryService schemaRuleService = governanceFacade.getRegistryCenter().getSchemaRuleService();
+        SchemaRuleRegistryService schemaRuleService = registryCenter.getRegistryCenter().getSchemaRuleService();
         schemaRuleService.persist(schemaName, safeList(schemaRuleConfigs).stream().map(c -> c).collect(toList()));
     }
 
