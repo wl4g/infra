@@ -62,7 +62,7 @@ props:
   proxy-frontend-flush-threshold: 128  # The default value is 128.
   proxy-opentracing-enabled: false
   proxy-hint-enabled: true
-  sql-show: false
+  sql-show: true
   check-table-metadata-enabled: false
   lock-wait-timeout-milliseconds: 50000 # The maximum time to wait for a lock
   show-process-list-enabled: false

@@ -17,6 +17,8 @@
 
 package org.apache.shardingsphere.dbdiscovery.mgr;
 
+import static java.util.Objects.isNull;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -42,6 +44,9 @@ import org.apache.shardingsphere.infra.eventbus.ShardingSphereEventBus;
 import org.apache.shardingsphere.infra.rule.event.impl.DataSourceDisabledEvent;
 import org.apache.shardingsphere.infra.rule.event.impl.PrimaryDataSourceChangedEvent;
 
+import com.wl4g.component.integration.sharding.dbdiscovery.mgr.ExtensionDiscoveryConfigHelper;
+import com.wl4g.component.integration.sharding.util.ConfigPropertySource;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -53,33 +58,36 @@ import lombok.extern.slf4j.Slf4j;
 public final class MGRDatabaseDiscoveryType implements DatabaseDiscoveryType {
 
     private static final String PLUGIN_STATUS = "SELECT * FROM information_schema.PLUGINS WHERE PLUGIN_NAME='group_replication'";
-
     private static final String MEMBER_COUNT = "SELECT count(*) FROM performance_schema.replication_group_members";
-
     private static final String GROUP_NAME = "SELECT * FROM performance_schema.global_variables WHERE VARIABLE_NAME='group_replication_group_name'";
-
     private static final String SINGLE_PRIMARY = "SELECT * FROM performance_schema.global_variables WHERE VARIABLE_NAME='group_replication_single_primary_mode'";
-
     private static final String MEMBER_LIST = "SELECT MEMBER_HOST, MEMBER_PORT, MEMBER_STATE FROM performance_schema.replication_group_members";
 
     private static CoordinatorRegistryCenter coordinatorRegistryCenter;
-
     private static final Map<String, ScheduleJobBootstrap> SCHEDULE_JOB_BOOTSTRAP_MAP = new HashMap<>(16, 1);
 
-    // BUGFIX:
-    private String oldPrimaryDataSource = "";
+    // [for ADD BUGFIX]
+    // private String oldPrimaryDataSource="";
+    private String oldPrimaryDataSource;
 
+    // [for ADD FEATURE]
     @Getter
     @Setter
-    private Properties props = new Properties();
+    private Properties props = new ConfigPropertySource();
+
+    // [for ADD EXTENSION property]
+    private ExtensionDiscoveryConfigHelper extDiscoveryConfig;
 
     @Override
     public void checkDatabaseDiscoveryConfiguration(final String schemaName, final Map<String, DataSource> dataSourceMap)
             throws SQLException {
-        // BUGFIX:
-        DataSource defaultPrimaryDS = dataSourceMap.entrySet().iterator().next().getValue();
+        // [for ADD BUGFIX]
+        // DataSource
+        // defaultPrimaryDS=dataSourceMap.entrySet().iterator().next().getValue();
+        // try(Connection
+        // connection=dataSourceMap.getOrDefault(oldPrimaryDataSource,defaultPrimaryDS).getConnection();
 
-        try (Connection connection = dataSourceMap.getOrDefault(oldPrimaryDataSource, defaultPrimaryDS).getConnection();
+        try (Connection connection = dataSourceMap.get(oldPrimaryDataSource).getConnection();
                 Statement statement = connection.createStatement()) {
             checkPluginIsActive(statement);
             checkMemberCount(statement);
@@ -178,19 +186,39 @@ public final class MGRDatabaseDiscoveryType implements DatabaseDiscoveryType {
     }
 
     private String findPrimaryDataSourceName(final String primaryDataSourceURL, final Map<String, DataSource> dataSourceMap) {
+        // String result = "";
+        // for (Entry<String, DataSource> entry : dataSourceMap.entrySet()) {
+        // String url;
+        // try (Connection connection = entry.getValue().getConnection()) {
+        // url = connection.getMetaData().getURL();
+        // if (null != url && url.contains(primaryDataSourceURL)) {
+        // return entry.getKey();
+        // }
+        // } catch (final SQLException ex) {
+        // log.error("An exception occurred while find primary data source
+        // name", ex);
+        // }
+        // }
+        // return result;
+
+        // [for ADD DataSource URL addresses mapping matches]
         String result = "";
         for (Entry<String, DataSource> entry : dataSourceMap.entrySet()) {
             String url;
             try (Connection connection = entry.getValue().getConnection()) {
                 url = connection.getMetaData().getURL();
-                if (null != url && url.contains(primaryDataSourceURL)) {
-                    return entry.getKey();
+                if (null != url) {
+                    if (url.contains(primaryDataSourceURL)
+                            || ExtensionDiscoveryConfigHelper.matchs(getExtDiscoveryConfig(), url, primaryDataSourceURL)) {
+                        return entry.getKey();
+                    }
                 }
             } catch (final SQLException ex) {
                 log.error("An exception occurred while find primary data source name", ex);
             }
         }
         return result;
+
     }
 
     @Override
@@ -212,10 +240,13 @@ public final class MGRDatabaseDiscoveryType implements DatabaseDiscoveryType {
     private List<String> findMemberDataSourceURLs(final Map<String, DataSource> activeDataSourceMap) {
         List<String> result = new LinkedList<>();
 
-        // BUGFIX:
-        DataSource defaultPrimaryDS = activeDataSourceMap.entrySet().iterator().next().getValue();
+        // [for ADD BUGFIX]
+        // DataSource
+        // defaultPrimaryDS=dataSourceMap.entrySet().iterator().next().getValue();
+        // try(Connection
+        // connection=dataSourceMap.getOrDefault(oldPrimaryDataSource,defaultPrimaryDS).getConnection();
 
-        try (Connection connection = activeDataSourceMap.getOrDefault(oldPrimaryDataSource, defaultPrimaryDS).getConnection();
+        try (Connection connection = activeDataSourceMap.get(oldPrimaryDataSource).getConnection();
                 Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery(MEMBER_LIST);
             while (resultSet.next()) {
@@ -282,6 +313,9 @@ public final class MGRDatabaseDiscoveryType implements DatabaseDiscoveryType {
         }
     }
 
+    /**
+     * {@link org.apache.shardingsphere.dbdiscovery.rule.DatabaseDiscoveryRule#startMonitor}
+     */
     @Override
     public void startPeriodicalUpdate(final String schemaName, final Map<String, DataSource> dataSourceMap,
             final Collection<String> disabledDataSourceNames, final String groupName, final String primaryDataSourceName) {
@@ -310,4 +344,18 @@ public final class MGRDatabaseDiscoveryType implements DatabaseDiscoveryType {
     public String getType() {
         return "MGR";
     }
+
+    // [for ADD EXTENSION property]
+    private ExtensionDiscoveryConfigHelper getExtDiscoveryConfig() {
+        if (isNull(extDiscoveryConfig)) {
+            synchronized (this) {
+                if (isNull(extDiscoveryConfig)) {
+                    this.extDiscoveryConfig = ExtensionDiscoveryConfigHelper
+                            .build(props.getProperty(ExtensionDiscoveryConfigHelper.PROPS_KEY));
+                }
+            }
+        }
+        return extDiscoveryConfig;
+    }
+
 }

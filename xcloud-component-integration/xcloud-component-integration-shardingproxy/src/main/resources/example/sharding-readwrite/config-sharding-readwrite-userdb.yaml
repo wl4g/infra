@@ -35,23 +35,23 @@ defaultDataSource:
 dataSources:
 #################################### Sharding datasource group0 ####################################
   ds_userdb_g0db0_0:
-    url: 'jdbc:mysql://n0.rds.local:3306/userdb_g0db0?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8'
+    url: 'jdbc:mysql://localhost:33060/userdb_g0db0?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8'
   ds_userdb_g0db0_1:
-    url: 'jdbc:mysql://n1.rds.local:3306/userdb_g0db0?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8'
+    url: 'jdbc:mysql://localhost:33061/userdb_g0db0?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8'
   ds_userdb_g0db0_2:
-    url: 'jdbc:mysql://n2.rds.local:3306/userdb_g0db0?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8'
+    url: 'jdbc:mysql://localhost:33062/userdb_g0db0?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8'
   ds_userdb_g0db1_0:
-    url: 'jdbc:mysql://n0.rds.local:3306/userdb_g0db1?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8'
+    url: 'jdbc:mysql://localhost:33060/userdb_g0db1?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8'
   ds_userdb_g0db1_1:
-    url: 'jdbc:mysql://n1.rds.local:3306/userdb_g0db1?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8'
+    url: 'jdbc:mysql://localhost:33061/userdb_g0db1?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8'
   ds_userdb_g0db1_2:
-    url: 'jdbc:mysql://n2.rds.local:3306/userdb_g0db1?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8'
+    url: 'jdbc:mysql://localhost:33062/userdb_g0db1?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8'
   ds_userdb_g0db2_0:
-    url: 'jdbc:mysql://n0.rds.local:3306/userdb_g0db2?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8'
+    url: 'jdbc:mysql://localhost:33060/userdb_g0db2?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8'
   ds_userdb_g0db2_1:
-    url: 'jdbc:mysql://n1.rds.local:3306/userdb_g0db2?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8'
+    url: 'jdbc:mysql://localhost:33061/userdb_g0db2?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8'
   ds_userdb_g0db2_2:
-    url: 'jdbc:mysql://n2.rds.local:3306/userdb_g0db2?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8'
+    url: 'jdbc:mysql://localhost:33062/userdb_g0db2?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8'
 
 # Schema rules configuration.
 rules:
@@ -59,8 +59,8 @@ rules:
  - !SHARDING
   tables:
     t_user:
-      actualDataNodes: ha_userdb_g0db${0..2}.t_user_${0..2}
-      #actualDataNodes: 'ha_userdb_g0db0.t_user_${0..3},ha_userdb_g0db1.t_user_${0..2},ha_userdb_g0db2.t_user_${0..2},ha_userdb_g0db${0..2}.t_user_${0..2}'
+      actualDataNodes: rw_userdb_g0db${0..2}.t_user_${0..2}
+      #actualDataNodes: 'rw_userdb_g0db0.t_user_${0..3},rw_userdb_g0db1.t_user_${0..2},rw_userdb_g0db2.t_user_${0..2},rw_userdb_g0db${0..2}.t_user_${0..2}'
       #databaseStrategy:
       tableStrategy:
         standard:
@@ -85,7 +85,7 @@ rules:
     group0_database_inline:
       type: INLINE
       props:
-        algorithm-expression: ha_userdb_g0db${(id % 9) as int}
+        algorithm-expression: rw_userdb_g0db${(id % 9) as int}
     group0_table_volume_range: # see:org.apache.shardingsphere.sharding.algorithm.sharding.range.VolumeBasedRangeShardingAlgorithm
       type: VOLUME_RANGE2
       props: # Must use quotation marks(string) or you cannot get them.
@@ -99,49 +99,50 @@ rules:
         worker-id: '1' # Range[0,1024),see:org.apache.shardingsphere.sharding.algorithm.keygen.SnowflakeKeyGenerateAlgorithm#getWorkerId()
  - !READWRITE_SPLITTING
   dataSources:
-    ha_userdb_g0db0:
+    rw_userdb_g0db0:
       writeDataSourceName: ds_userdb_g0db0_1
       readDataSourceNames:
         - ds_userdb_g0db0_1
         - ds_userdb_g0db0_2
-      loadBalancerName: randomBalancer0
-    ha_userdb_g0db1:
+      loadBalancerName: r_lb_0
+    rw_userdb_g0db1:
       writeDataSourceName: ds_userdb_g0db1_1
       readDataSourceNames:
         - ds_userdb_g0db1_1
         - ds_userdb_g0db1_2
-      loadBalancerName: randomBalancer0
-    ha_userdb_g0db2:
+      loadBalancerName: r_lb_0
+    rw_userdb_g0db2:
       writeDataSourceName: ds_userdb_g0db2_1
       readDataSourceNames:
         - ds_userdb_g0db2_1
         - ds_userdb_g0db2_2
-      loadBalancerName: randomBalancer0
+      loadBalancerName: r_lb_0
   loadBalancers:
-    randomBalancer0:
+    r_lb_0:
       type: RANDOM
  - !DB_DISCOVERY
    dataSources:
-     pr_userdb_g0db0:
-       discoveryTypeName: mgr
+     ha_userdb_g0db0:
+       discoveryTypeName: cn-south1-a1-mgr-g0-0
        dataSourceNames:
          - ds_userdb_g0db0_0
          - ds_userdb_g0db0_1
          - ds_userdb_g0db0_2
-     pr_userdb_g0db1:
-       discoveryTypeName: mgr
+     ha_userdb_g0db1:
+       discoveryTypeName: cn-south1-a1-mgr-g0-0
        dataSourceNames:
          - ds_userdb_g0db1_0
          - ds_userdb_g0db1_1
          - ds_userdb_g0db1_2
-     pr_userdb_g0db2:
-       discoveryTypeName: mgr
+     ha_userdb_g0db2:
+       discoveryTypeName: cn-south1-a1-mgr-g0-0
        dataSourceNames:
          - ds_userdb_g0db2_0
          - ds_userdb_g0db2_1
          - ds_userdb_g0db2_2
    discoveryTypes:
-     mgr:
+     # HA MGR architecture see: https://blog.csdn.net/n88Lpo/article/details/118315051
+     cn-south1-a1-mgr-g0-0:
        type: MGR
        props:
          # Must be consistent with the MGR configuration group name.
@@ -151,3 +152,19 @@ rules:
          groupName: 5db40c3c-180c-11e9-afbf-005056ac6820
          zkServerLists: 'localhost:2181'
          keepAliveCron: '0/5 * * * * ?'
+         extensionDiscoveryConfigJson: |-
+           {
+             "memberHostMappings": [{
+                 "n0.rds.local:3306": [
+                     "127.0.0.1:33060"
+                 ]
+             }, {
+                 "n1.rds.local:3306": [
+                     "127.0.0.1:33061"
+                 ]
+             }, {
+                 "n2.rds.local:3306": [
+                     "127.0.0.1:33062"
+                 ]
+             }]
+           }
