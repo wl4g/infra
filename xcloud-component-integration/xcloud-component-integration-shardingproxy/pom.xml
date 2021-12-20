@@ -122,6 +122,11 @@
 			<artifactId>shardingsphere-agent-metrics-prometheus</artifactId>
 			<version>${shardingsphere.version}</version>
 		</dependency>
+		<!-- <dependency> -->
+		<!-- <groupId>org.apache.shardingsphere</groupId> -->
+		<!-- <artifactId>shardingsphere-agent-core</artifactId> -->
+		<!-- <version>${shardingsphere.version}</version> -->
+		<!-- </dependency> -->
 	</dependencies>
 	<build>
 		<finalName>${final.name}</finalName>

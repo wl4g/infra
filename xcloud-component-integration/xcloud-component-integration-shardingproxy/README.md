@@ -101,6 +101,8 @@ DELETE FROM userdb.t_user WHERE id=10000000;
 
 - [https://github.com/apache/shardingsphere/blob/5.0.0/shardingsphere-proxy/shardingsphere-proxy-bootstrap/src/main/resources/conf/config-database-discovery.yaml](https://github.com/apache/shardingsphere/blob/5.0.0/shardingsphere-proxy/shardingsphere-proxy-bootstrap/src/main/resources/conf/config-database-discovery.yaml)
 
+- [Adjust discovery api feature. #13902](https://github.com/apache/shardingsphere/issues/13902)
+
 - [基于 Docker 离线部署 MYSQL MGR 高可用生产集群](https://blogs.wl4g.com/archives/2477)
 
 - [基于 Host 离线部署 MYSQL MGR 高可用生产集群](https://blogs.wl4g.com/archives/650)
@@ -217,3 +219,47 @@ Under the same schemaName, multiple sharding databases must be the same. See sou
 - [org.apache.shardingsphere.mode.manager.cluster.coordinator.registry.status.StatusNode.java](https://github1s.com/apache/shardingsphere/blob/5.0.0/shardingsphere-mode/shardingsphere-mode-type/shardingsphere-cluster-mode/shardingsphere-cluster-mode-core/src/main/java/org/apache/shardingsphere/mode/manager/cluster/coordinator/registry/status/StatusNode.java)
 
 - [org.apache.shardingsphere.mode.manager.cluster.coordinator.registry.status.storage.node.StorageStatusNode.java](https://github.com/apache/shardingsphere/blob/5.0.0/shardingsphere-mode/shardingsphere-mode-type/shardingsphere-cluster-mode/shardingsphere-cluster-mode-core/src/main/java/org/apache/shardingsphere/mode/manager/cluster/coordinator/registry/status/storage/node/StorageStatusNode.java)
+
+- for example zookeeper storage data directories.
+
+```bash
+/mgr-elasticjob/MGR-pr_userdb_g0db0
+/mgr-elasticjob/MGR-pr_userdb_g0db1
+/mgr-elasticjob/MGR-pr_userdb_g0db2
+/mgr-elasticjob/MGR-pr_userdb_g0db0/config
+/mgr-elasticjob/MGR-pr_userdb_g0db0/instances
+/mgr-elasticjob/MGR-pr_userdb_g0db0/leader
+/mgr-elasticjob/MGR-pr_userdb_g0db0/servers
+/mgr-elasticjob/MGR-pr_userdb_g0db0/sharding
+/mgr-elasticjob/MGR-pr_userdb_g0db0/instances/192.168.0.101@-@51940
+/mgr-elasticjob/MGR-pr_userdb_g0db0/leader/election
+/mgr-elasticjob/MGR-pr_userdb_g0db0/leader/sharding
+/mgr-elasticjob/MGR-pr_userdb_g0db0/leader/election/instance
+/mgr-elasticjob/MGR-pr_userdb_g0db0/servers/192.168.0.101
+/mgr-elasticjob/MGR-pr_userdb_g0db0/sharding/0
+/mgr-elasticjob/MGR-pr_userdb_g0db0/sharding/0/instance
+/mgr-elasticjob/MGR-pr_userdb_g0db1/config
+/mgr-elasticjob/MGR-pr_userdb_g0db1/instances
+/mgr-elasticjob/MGR-pr_userdb_g0db1/leader
+/mgr-elasticjob/MGR-pr_userdb_g0db1/servers
+/mgr-elasticjob/MGR-pr_userdb_g0db1/sharding
+/mgr-elasticjob/MGR-pr_userdb_g0db1/instances/192.168.0.101@-@51940
+/mgr-elasticjob/MGR-pr_userdb_g0db1/leader/election
+/mgr-elasticjob/MGR-pr_userdb_g0db1/leader/sharding
+/mgr-elasticjob/MGR-pr_userdb_g0db1/leader/election/instance
+/mgr-elasticjob/MGR-pr_userdb_g0db1/servers/192.168.0.101
+/mgr-elasticjob/MGR-pr_userdb_g0db1/sharding/0
+/mgr-elasticjob/MGR-pr_userdb_g0db1/sharding/0/instance
+/mgr-elasticjob/MGR-pr_userdb_g0db2/config
+/mgr-elasticjob/MGR-pr_userdb_g0db2/instances
+/mgr-elasticjob/MGR-pr_userdb_g0db2/leader
+/mgr-elasticjob/MGR-pr_userdb_g0db2/servers
+/mgr-elasticjob/MGR-pr_userdb_g0db2/sharding
+/mgr-elasticjob/MGR-pr_userdb_g0db2/instances/192.168.0.101@-@51940
+/mgr-elasticjob/MGR-pr_userdb_g0db2/leader/election
+/mgr-elasticjob/MGR-pr_userdb_g0db2/leader/sharding
+/mgr-elasticjob/MGR-pr_userdb_g0db2/leader/election/instance
+/mgr-elasticjob/MGR-pr_userdb_g0db2/servers/192.168.0.101
+/mgr-elasticjob/MGR-pr_userdb_g0db2/sharding/0
+/mgr-elasticjob/MGR-pr_userdb_g0db2/sharding/0/instance
+```
