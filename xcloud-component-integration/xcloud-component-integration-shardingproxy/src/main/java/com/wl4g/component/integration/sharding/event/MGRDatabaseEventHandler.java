@@ -15,10 +15,14 @@
  */
 package com.wl4g.component.integration.sharding.event;
 
+import static com.wl4g.component.common.log.SmartLoggerFactory.getLogger;
+import static com.wl4g.component.common.serialize.JacksonUtils.toJSONString;
+
 import org.apache.shardingsphere.infra.eventbus.ShardingSphereEventBus;
 import org.apache.shardingsphere.infra.rule.event.impl.PrimaryDataSourceChangedEvent;
 
 import com.google.common.eventbus.Subscribe;
+import com.wl4g.component.common.log.SmartLogger;
 
 /**
  * {@link MGRDatabaseEventHandler}
@@ -29,6 +33,7 @@ import com.google.common.eventbus.Subscribe;
  * @see {@link org.apache.shardingsphere.dbdiscovery.mgr.MGRDatabaseDiscoveryType#updatePrimaryDataSource()}
  */
 public class MGRDatabaseEventHandler {
+    protected final SmartLogger log = getLogger(getClass());
 
     public MGRDatabaseEventHandler() {
         ShardingSphereEventBus.getInstance().register(this);
@@ -36,8 +41,12 @@ public class MGRDatabaseEventHandler {
 
     @Subscribe
     public void onMGRPrimaryDataSourceChanged(PrimaryDataSourceChangedEvent event) {
+        log.warn("Processing event: ({}) {}", PrimaryDataSourceChangedEvent.class.getSimpleName(), toJSONString(event));
+
         // TODO
+
         // Add metrics ...
+
         // Notification ...
     }
 

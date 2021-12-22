@@ -19,6 +19,8 @@ package org.apache.shardingsphere.dbdiscovery.mgr;
 
 import static com.wl4g.component.common.serialize.JacksonUtils.toJSONString;
 import static java.util.Objects.isNull;
+import static org.apache.commons.lang3.StringUtils.equalsAnyIgnoreCase;
+import static org.apache.commons.lang3.StringUtils.isAnyBlank;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -170,6 +172,27 @@ public final class MGRDatabaseDiscoveryType implements DatabaseDiscoveryType {
     }
 
     private String findPrimaryDataSourceURL(final Map<String, DataSource> dataSourceMap) {
+        // String result = "";
+        // String sql = "SELECT MEMBER_HOST, MEMBER_PORT FROM
+        // performance_schema.replication_group_members WHERE MEMBER_ID = "
+        // + "(SELECT VARIABLE_VALUE FROM performance_schema.global_status WHERE
+        // VARIABLE_NAME = 'group_replication_primary_member')";
+        // for (DataSource each : dataSourceMap.values()) {
+        // try (Connection connection = each.getConnection();
+        // Statement statement = connection.createStatement();
+        // ResultSet resultSet = statement.executeQuery(sql)) {
+        // if (resultSet.next()) {
+        // return String.format("%s:%s", resultSet.getString("MEMBER_HOST"),
+        // resultSet.getString("MEMBER_PORT"));
+        // }
+        // } catch (final SQLException ex) {
+        // log.error("An exception occurred while find primary data source url",
+        // ex);
+        // }
+        // }
+        // return result;
+
+        // [for ADD check for MGR member(host/port)]
         String result = "";
         String sql = "SELECT MEMBER_HOST, MEMBER_PORT FROM performance_schema.replication_group_members WHERE MEMBER_ID = "
                 + "(SELECT VARIABLE_VALUE FROM performance_schema.global_status WHERE VARIABLE_NAME = 'group_replication_primary_member')";
@@ -178,7 +201,17 @@ public final class MGRDatabaseDiscoveryType implements DatabaseDiscoveryType {
                     Statement statement = connection.createStatement();
                     ResultSet resultSet = statement.executeQuery(sql)) {
                 if (resultSet.next()) {
-                    return String.format("%s:%s", resultSet.getString("MEMBER_HOST"), resultSet.getString("MEMBER_PORT"));
+                    // [FIX]: If the currently connected node, for example due
+                    // to the previous OS downtime, causes mysqld to restart,
+                    // and then has not had time to join the MGR (at this time
+                    // the main member has moved to other nodes), the number of
+                    // records returned by this SQL is 0 at this time, if not
+                    // check empty will lead to logical errors later.
+                    String host = resultSet.getString("MEMBER_HOST");
+                    String port = resultSet.getString("MEMBER_PORT");
+                    if (!(isAnyBlank(host, port) || equalsAnyIgnoreCase("null", host, port))) {
+                        return String.format("%s:%s", host, port);
+                    }
                 }
             } catch (final SQLException ex) {
                 log.error("An exception occurred while find primary data source url", ex);
