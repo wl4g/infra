@@ -17,6 +17,7 @@
 
 package org.apache.shardingsphere.dbdiscovery.mgr;
 
+import static com.wl4g.component.common.serialize.JacksonUtils.toJSONString;
 import static java.util.Objects.isNull;
 
 import java.sql.Connection;
@@ -44,6 +45,7 @@ import org.apache.shardingsphere.infra.eventbus.ShardingSphereEventBus;
 import org.apache.shardingsphere.infra.rule.event.impl.DataSourceDisabledEvent;
 import org.apache.shardingsphere.infra.rule.event.impl.PrimaryDataSourceChangedEvent;
 
+import com.wl4g.component.integration.sharding.dbdiscovery.NotFoundDiscoveryException;
 import com.wl4g.component.integration.sharding.dbdiscovery.mgr.ExtensionDiscoveryConfigHelper;
 import com.wl4g.component.integration.sharding.util.ConfigPropertySource;
 
@@ -202,7 +204,6 @@ public final class MGRDatabaseDiscoveryType implements DatabaseDiscoveryType {
         // return result;
 
         // [for ADD DataSource URL addresses mapping matches]
-        String result = "";
         for (Entry<String, DataSource> entry : dataSourceMap.entrySet()) {
             String url;
             try (Connection connection = entry.getValue().getConnection()) {
@@ -217,8 +218,10 @@ public final class MGRDatabaseDiscoveryType implements DatabaseDiscoveryType {
                 log.error("An exception occurred while find primary data source name", ex);
             }
         }
-        return result;
 
+        throw new NotFoundDiscoveryException(
+                "The datasource name is not matched when the database is discovered, please check whether the configuration of 'extensionDiscoveryConfigJson.memberHostMappings' is correct. - %s",
+                toJSONString(getExtDiscoveryConfig()));
     }
 
     @Override

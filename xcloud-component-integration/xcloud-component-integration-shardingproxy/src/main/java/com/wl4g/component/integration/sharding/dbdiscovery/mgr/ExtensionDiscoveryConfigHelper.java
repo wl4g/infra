@@ -18,6 +18,7 @@ package com.wl4g.component.integration.sharding.dbdiscovery.mgr;
 import static com.wl4g.component.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.component.common.serialize.JacksonUtils.parseJSON;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toList;
 
@@ -65,7 +66,7 @@ public class ExtensionDiscoveryConfigHelper {
         }
         HostAndPort memberAddress = HostAndPort.fromString(memberAddr);
         return safeList(config.getMemberHostMappings()).stream().filter(mapping -> mapping.containsKey(memberAddress.toString()))
-                .findFirst().get().values().stream().flatMap(addrs -> addrs.stream()).collect(toList());
+                .findFirst().orElse(emptyMap()).values().stream().flatMap(addrs -> addrs.stream()).collect(toList());
     }
 
     public static final String PROPS_KEY = "extensionDiscoveryConfigJson";

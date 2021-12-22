@@ -34,11 +34,11 @@ defaultDataSource:
 # Datasource configuration.
 dataSources:
   ds_userdb_g0db2_0:
-    url: 'jdbc:mysql://localhost:33060/userdb_g0db2?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8'
+    url: 'jdbc:mysql://n0.rds.local:3306/userdb_g0db2?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8'
   ds_userdb_g0db2_1:
-    url: 'jdbc:mysql://localhost:33061/userdb_g0db2?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8'
+    url: 'jdbc:mysql://n1.rds.local:3306/userdb_g0db2?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8'
   ds_userdb_g0db2_2:
-    url: 'jdbc:mysql://localhost:33062/userdb_g0db2?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8'
+    url: 'jdbc:mysql://n2.rds.local:3306/userdb_g0db2?serverTimezone=UTC&useSSL=false&allowMultiQueries=true&characterEncoding=utf-8'
 
 # Schema rules configuration.
 rules:
@@ -76,16 +76,16 @@ rules:
          extensionDiscoveryConfigJson: |-
            {
              "memberHostMappings": [{
-                 "n0.rds.local:3306": [
-                     "127.0.0.1:33060"
+                 "rds-mgr-0:3306": [
+                     "n0.rds.local:3306"
                  ]
              }, {
-                 "n1.rds.local:3306": [
-                     "127.0.0.1:33061"
+                 "rds-mgr-1:3306": [
+                     "n1.rds.local:3306"
                  ]
              }, {
-                 "n2.rds.local:3306": [
-                     "127.0.0.1:33062"
+                 "rds-mgr-2:3306": [
+                     "n2.rds.local:3306"
                  ]
              }]
            }

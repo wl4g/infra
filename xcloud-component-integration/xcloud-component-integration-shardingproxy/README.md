@@ -95,6 +95,8 @@ DELETE FROM userdb.t_user WHERE id=10000000;
 
 ### 3.1 for MySQL [MGR](https://dev.mysql.com/doc/refman/5.7/en/group-replication.html) failover
 
+- Reference docs
+
 - [https://dev.mysql.com/doc/refman/5.7/en/group-replication.html](https://dev.mysql.com/doc/refman/5.7/en/group-replication.html)
 
 - [org.apache.shardingsphere.dbdiscovery.mgr.MGRDatabaseDiscoveryType.java](https://github.com/apache/shardingsphere/blob/5.0.0/shardingsphere-features/shardingsphere-db-discovery/shardingsphere-db-discovery-provider/shardingsphere-db-discovery-mgr/src/main/java/org/apache/shardingsphere/dbdiscovery/mgr/MGRDatabaseDiscoveryType.java)
@@ -103,15 +105,15 @@ DELETE FROM userdb.t_user WHERE id=10000000;
 
 - [Adjust discovery api feature. #13902](https://github.com/apache/shardingsphere/issues/13902)
 
-- [基于 Docker 离线部署 MYSQL MGR 高可用生产集群](https://blogs.wl4g.com/archives/2477)
+#### 3.1.1 First you need an MGR cluster for testing
 
-- [基于 Host 离线部署 MYSQL MGR 高可用生产集群](https://blogs.wl4g.com/archives/650)
+- Refer docs to: [Deploy MGR high-availability production cluster based on Docker](https://blogs.wl4g.com/archives/2477)
 
-- The states of MGR primary and standby members
+- Assuming that the MGR cluster is now ready as follows:
 
 ```sql
 SELECT
-    rgm.CHANNEL_NAME AS channelName,
+    (SELECT gv.VARIABLE_VALUE FROM performance_schema.global_variables gv WHERE gv.VARIABLE_NAME='group_replication_group_name') AS GROUP_NAME,
     rgm.MEMBER_ID AS nodeId,
     rgm.MEMBER_HOST AS nodeHost,
     rgm.MEMBER_PORT AS nodePort,
@@ -126,10 +128,32 @@ SELECT
 FROM
     `performance_schema`.`replication_group_members` rgm;
 
-group_replication_applier  eb838b34-9deb-11eb-8677-c0b5d741e9d5  wanglsir-pro  13306 ONLINE  0  0  PRIMARY
-group_replication_applier  05e9eb4f-9dec-11eb-8b2e-c0b5d741e9d5  wanglsir-pro  13308 ONLINE  0  0  STANDBY
-group_replication_applier  3d4ed671-9dec-11eb-9723-c0b5d741e9d5  wanglsir-pro  13308 ONLINE  0  0  STANDBY
+GROUP_NAME                            NODE_ID                               NODE_HOST     NODE_PORT NODE_STATE  READ_ONLY  SUPER_READ_ONLY  NODE_ROLE
+5db40c3c-180c-11e9-afbf-005056ac6820  a7a2e5f2-60db-11ec-a680-0242ac08086f  n0.rds.local  3306      ONLINE      0          0                PRIMARY
+5db40c3c-180c-11e9-afbf-005056ac6820  a80be951-60db-11ec-b9a0-0242ac080870  n1.rds.local  3306      ONLINE      0          0                STANDBY
+5db40c3c-180c-11e9-afbf-005056ac6820  a88416b0-60db-11ec-939e-0242ac080871  n2.rds.local  3306      ONLINE      0          0                STANDBY
 ```
+
+#### 3.1.2 Add MGR static DNS
+
+```bash
+sudo cp /etc/hosts /etc/hosts.bak
+sudo cat <<EOF >/etc/hosts
+# for MGR testing
+172.8.8.111 n0.rds.local
+172.8.8.112 n1.rds.local
+172.8.8.113 n2.rds.local
+EOF
+```
+
+#### 3.1.3 Then need to modify the test configuration follows
+
+- Extension database discovery configuration refer to example: [config-sharding-readwrite-userdb.yaml](src/main/resources/example/sharding-readwrite/server.yaml), The prefix of the following key names is : `rules.discoveryTypes.<myDiscoveryName>.props.`
+
+| Attribute | Description |
+|-|-|
+| `extensionDiscoveryConfigJson.memberHostMappings.[0].<key>` | The access address of each dataSource correspond instance may be an external loadbalancing or proxy address (many-to-one) to internal address.(e.g: In the MGR cluster, the communication address of the member peer) |
+| `extensionDiscoveryConfigJson.memberHostMappings.[0].<key>.[0]` | The access address of each dataSource correspond instance may be an external loadbalancing or proxy address (one-to-many) to external addresses. |
 
 ### 3.2 for PostgreSQL Cluster failover
 
