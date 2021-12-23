@@ -13,29 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.component.integration.sharding.dbdiscovery;
-
-import org.apache.shardingsphere.infra.exception.ShardingSphereException;
+package com.wl4g.component.integration.sharding.dbdiscovery.exception;
 
 /**
- * {@link NotFoundDiscoveryException}
+ * {@link NoFoundPrimaryDataSourceException}
  * 
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version 2021-12-22 v1.0.0
  * @since v1.0.0
  */
-public class NotFoundDiscoveryException extends ShardingSphereException {
+public class NoFoundPrimaryDataSourceException extends DatabaseDiscoveryException {
     private static final long serialVersionUID = 1910658970797588397L;
 
-    public NotFoundDiscoveryException(Exception cause) {
+    public NoFoundPrimaryDataSourceException(Exception cause) {
         super(cause);
     }
 
-    public NotFoundDiscoveryException(String message, Exception cause) {
+    public NoFoundPrimaryDataSourceException(String message, Exception cause) {
         super(message, cause);
     }
 
-    public NotFoundDiscoveryException(String errorMessage, Object... args) {
+    public NoFoundPrimaryDataSourceException(String errorMessage, Object... args) {
         super(errorMessage, args);
     }
 

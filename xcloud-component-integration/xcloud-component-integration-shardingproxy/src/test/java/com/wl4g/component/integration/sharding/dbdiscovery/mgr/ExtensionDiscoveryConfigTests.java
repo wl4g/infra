@@ -15,6 +15,8 @@
  */
 package com.wl4g.component.integration.sharding.dbdiscovery.mgr;
 
+import com.wl4g.component.integration.sharding.dbdiscovery.ExtensionDiscoveryConfiguration;
+
 /**
  * {@link ExtensionDiscoveryConfigTests}
  * 
@@ -32,7 +34,7 @@ public class ExtensionDiscoveryConfigTests {
                 + "                     \"localhost:33063\"\n" + "                 ]\n" + "             }]\n" + "           }";
 
         System.out.println(json);
-        ExtensionDiscoveryConfigHelper config = ExtensionDiscoveryConfigHelper.build(json);
+        ExtensionDiscoveryConfiguration config = ExtensionDiscoveryConfiguration.Util.build(json);
         System.out.println(config.getMemberHostMappings().get(0));
     }
 

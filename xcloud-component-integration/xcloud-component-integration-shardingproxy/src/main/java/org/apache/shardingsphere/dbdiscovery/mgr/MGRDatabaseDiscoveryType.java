@@ -47,8 +47,8 @@ import org.apache.shardingsphere.infra.eventbus.ShardingSphereEventBus;
 import org.apache.shardingsphere.infra.rule.event.impl.DataSourceDisabledEvent;
 import org.apache.shardingsphere.infra.rule.event.impl.PrimaryDataSourceChangedEvent;
 
-import com.wl4g.component.integration.sharding.dbdiscovery.NotFoundDiscoveryException;
-import com.wl4g.component.integration.sharding.dbdiscovery.mgr.ExtensionDiscoveryConfigHelper;
+import com.wl4g.component.integration.sharding.dbdiscovery.ExtensionDiscoveryConfiguration;
+import com.wl4g.component.integration.sharding.dbdiscovery.exception.NoFoundPrimaryDataSourceException;
 import com.wl4g.component.integration.sharding.util.ConfigPropertySource;
 
 import lombok.Getter;
@@ -80,7 +80,7 @@ public final class MGRDatabaseDiscoveryType implements DatabaseDiscoveryType {
     private Properties props = new ConfigPropertySource();
 
     // [for ADD EXTENSION property]
-    private ExtensionDiscoveryConfigHelper extDiscoveryConfig;
+    private ExtensionDiscoveryConfiguration extDiscoveryConfig;
 
     @Override
     public void checkDatabaseDiscoveryConfiguration(final String schemaName, final Map<String, DataSource> dataSourceMap)
@@ -243,7 +243,7 @@ public final class MGRDatabaseDiscoveryType implements DatabaseDiscoveryType {
                 url = connection.getMetaData().getURL();
                 if (null != url) {
                     if (url.contains(primaryDataSourceURL)
-                            || ExtensionDiscoveryConfigHelper.matchs(getExtDiscoveryConfig(), url, primaryDataSourceURL)) {
+                            || ExtensionDiscoveryConfiguration.Util.matchs(getExtDiscoveryConfig(), url, primaryDataSourceURL)) {
                         return entry.getKey();
                     }
                 }
@@ -252,7 +252,7 @@ public final class MGRDatabaseDiscoveryType implements DatabaseDiscoveryType {
             }
         }
 
-        throw new NotFoundDiscoveryException(
+        throw new NoFoundPrimaryDataSourceException(
                 "The datasource name is not matched when the database is discovered, please check whether the configuration of 'extensionDiscoveryConfigJson.memberHostMappings' is correct. - %s",
                 toJSONString(getExtDiscoveryConfig()));
     }
@@ -382,12 +382,12 @@ public final class MGRDatabaseDiscoveryType implements DatabaseDiscoveryType {
     }
 
     // [for ADD EXTENSION property]
-    private ExtensionDiscoveryConfigHelper getExtDiscoveryConfig() {
+    private ExtensionDiscoveryConfiguration getExtDiscoveryConfig() {
         if (isNull(extDiscoveryConfig)) {
             synchronized (this) {
                 if (isNull(extDiscoveryConfig)) {
-                    this.extDiscoveryConfig = ExtensionDiscoveryConfigHelper
-                            .build(props.getProperty(ExtensionDiscoveryConfigHelper.PROPS_KEY));
+                    this.extDiscoveryConfig = ExtensionDiscoveryConfiguration.Util
+                            .build(props.getProperty(ExtensionDiscoveryConfiguration.PROPS_KEY));
                 }
             }
         }

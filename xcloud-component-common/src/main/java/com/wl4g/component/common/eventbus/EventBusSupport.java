@@ -51,16 +51,16 @@ public class EventBusSupport implements Closeable {
     }
 
     /**
-     * Gets or create singleton instance of {@link EventBusSupport}.
+     * Gets or create default singleton instance of {@link EventBusSupport}.
      * 
      * @param config
      * @return
      */
-    public static EventBusSupport getOrCreate(int eventThreads) {
+    public static EventBusSupport getDefault() {
         if (isNull(DEFAULT)) { // Single checked
             synchronized (EventBusSupport.class) {
                 if (isNull(DEFAULT)) { // Double checked
-                    DEFAULT = new EventBusSupport(eventThreads);
+                    DEFAULT = new EventBusSupport(1);
                 }
             }
         }

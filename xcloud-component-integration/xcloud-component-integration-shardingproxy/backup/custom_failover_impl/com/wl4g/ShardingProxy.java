@@ -41,8 +41,16 @@ public final class ShardingProxy {
     public static void main(final String[] args) throws IOException, SQLException {
         BootstrapArguments bootstrapArgs = new BootstrapArguments(args);
         YamlProxyConfiguration yamlConfig = ProxyConfigurationLoader2.load(bootstrapArgs.getConfigurationPath());
-        new BootstrapInitializer().init(yamlConfig, bootstrapArgs.getPort());
+        createBootstrapInitializer().init(yamlConfig, bootstrapArgs.getPort());
         new ShardingSphereProxy().start(bootstrapArgs.getPort());
+    }
+
+    private static BootstrapInitializer createBootstrapInitializer() {
+        return new BootstrapInitializer();
+        //
+        // ADD for failover.
+        //
+        // return new FailoverGovernanceBootstrapInitializer();
     }
 
 }

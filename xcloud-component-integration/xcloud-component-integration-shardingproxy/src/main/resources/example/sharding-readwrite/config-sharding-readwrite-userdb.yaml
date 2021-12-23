@@ -65,7 +65,7 @@ rules:
       tableStrategy:
         standard:
           shardingColumn: id
-          shardingAlgorithmName: group0_table_volume_range
+          shardingAlgorithmName: g0_table_volume_range
       keyGenerateStrategy:
         column: id
         keyGeneratorName: group0_snowflake1
@@ -74,7 +74,7 @@ rules:
   defaultDatabaseStrategy:
     standard:
       shardingColumn: id
-      shardingAlgorithmName: group0_database_inline
+      shardingAlgorithmName: g0_database_inline
       #shardingAlgorithmName: composite_smart_mod1
   defaultTableStrategy:
   shardingAlgorithms:
@@ -82,11 +82,11 @@ rules:
     #  type: SMART_MOD
     #  props:
     #    algorithm-expression: '_g0db0->0,1,2,3|_g0db1->4,5,6|_g0db2->7,8,9'
-    group0_database_inline:
+    g0_database_inline:
       type: INLINE
       props:
         algorithm-expression: rw_userdb_g0db${(id % 9) as int}
-    group0_table_volume_range: # see:org.apache.shardingsphere.sharding.algorithm.sharding.range.VolumeBasedRangeShardingAlgorithm
+    g0_table_volume_range: # see:org.apache.shardingsphere.sharding.algorithm.sharding.range.VolumeBasedRangeShardingAlgorithm
       type: VOLUME_RANGE2
       props: # Must use quotation marks(string) or you cannot get them.
         range-lower: '0'

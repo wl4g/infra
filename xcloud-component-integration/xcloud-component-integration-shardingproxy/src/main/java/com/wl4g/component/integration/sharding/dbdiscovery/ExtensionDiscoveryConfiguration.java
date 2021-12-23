@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.component.integration.sharding.dbdiscovery.mgr;
+package com.wl4g.component.integration.sharding.dbdiscovery;
 
 import static com.wl4g.component.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.component.common.serialize.JacksonUtils.parseJSON;
@@ -35,7 +35,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * {@link ExtensionDiscoveryConfigHelper}
+ * {@link ExtensionDiscoveryConfiguration}
  * 
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version 2021-07-26 v1.0.0
@@ -44,31 +44,34 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class ExtensionDiscoveryConfigHelper {
+public class ExtensionDiscoveryConfiguration {
+
+    public static final String PROPS_KEY = "extensionDiscoveryConfigJson";
 
     private List<Map<String, List<String>>> memberHostMappings;
 
-    public static ExtensionDiscoveryConfigHelper build(String json) {
-        return parseJSON(json, ExtensionDiscoveryConfigHelper.class);
-    }
-
-    public static boolean matchs(ExtensionDiscoveryConfigHelper config, String jdbcUrl, String memberAddr) {
-        JdbcInformation info = JdbcUtil.resolve(jdbcUrl);
-        return safeList(findMappingAddressesByMemberAddr(config, memberAddr)).stream().anyMatch(addr -> {
-            HostAndPort address = HostAndPort.fromString(addr);
-            return info.getPort() == address.getPort() && HostUtils.isSameHost(info.getHost(), address.getHost());
-        });
-    }
-
-    public static List<String> findMappingAddressesByMemberAddr(ExtensionDiscoveryConfigHelper config, String memberAddr) {
-        if (isNull(config) || isNull(memberAddr)) {
-            return emptyList();
+    public static final class Util {
+        public static ExtensionDiscoveryConfiguration build(String json) {
+            return parseJSON(json, ExtensionDiscoveryConfiguration.class);
         }
-        HostAndPort memberAddress = HostAndPort.fromString(memberAddr);
-        return safeList(config.getMemberHostMappings()).stream().filter(mapping -> mapping.containsKey(memberAddress.toString()))
-                .findFirst().orElse(emptyMap()).values().stream().flatMap(addrs -> addrs.stream()).collect(toList());
-    }
 
-    public static final String PROPS_KEY = "extensionDiscoveryConfigJson";
+        public static boolean matchs(ExtensionDiscoveryConfiguration config, String jdbcUrl, String memberAddr) {
+            JdbcInformation info = JdbcUtil.resolve(jdbcUrl);
+            return safeList(findMappingAddressesByMemberAddr(config, memberAddr)).stream().anyMatch(addr -> {
+                HostAndPort address = HostAndPort.fromString(addr);
+                return info.getPort() == address.getPort() && HostUtils.isSameHost(info.getHost(), address.getHost());
+            });
+        }
+
+        public static List<String> findMappingAddressesByMemberAddr(ExtensionDiscoveryConfiguration config, String memberAddr) {
+            if (isNull(config) || isNull(memberAddr)) {
+                return emptyList();
+            }
+            HostAndPort memberAddress = HostAndPort.fromString(memberAddr);
+            return safeList(config.getMemberHostMappings()).stream()
+                    .filter(mapping -> mapping.containsKey(memberAddress.toString())).findFirst().orElse(emptyMap()).values()
+                    .stream().flatMap(addrs -> addrs.stream()).collect(toList());
+        }
+    }
 
 }

@@ -25,29 +25,29 @@ import com.google.common.eventbus.Subscribe;
 import com.wl4g.component.common.log.SmartLogger;
 
 /**
- * {@link MGRDatabaseEventHandler}
+ * {@link DatabaseDiscoveryEventHandler}
  * 
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version 2021-12-19 v1.0.0
  * @since v1.0.0
  * @see {@link org.apache.shardingsphere.dbdiscovery.mgr.MGRDatabaseDiscoveryType#updatePrimaryDataSource()}
  */
-public class MGRDatabaseEventHandler {
+public class DatabaseDiscoveryEventHandler {
     protected final SmartLogger log = getLogger(getClass());
 
-    public MGRDatabaseEventHandler() {
+    public DatabaseDiscoveryEventHandler() {
         ShardingSphereEventBus.getInstance().register(this);
     }
 
     @Subscribe
-    public void onMGRPrimaryDataSourceChanged(PrimaryDataSourceChangedEvent event) {
+    public void onPrimaryDataSourceChanged(PrimaryDataSourceChangedEvent event) {
         log.warn("Processing event: ({}) {}", PrimaryDataSourceChangedEvent.class.getSimpleName(), toJSONString(event));
-
-        // TODO
 
         // Add metrics ...
 
         // Notification ...
+
+        // TODO
     }
 
 }
