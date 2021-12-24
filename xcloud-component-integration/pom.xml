@@ -68,7 +68,6 @@
 		<!--<module>xcloud-component-integration-nacos</module> -->
 		<!--<module>xcloud-component-integration-consul</module> -->
 		<!--<module>xcloud-component-integration-zookeeper</module> -->
-		<module>xcloud-component-integration-shardingproxy</module>
 		<module>xcloud-component-integration-turbine</module>
 	</modules>
 	<properties>
