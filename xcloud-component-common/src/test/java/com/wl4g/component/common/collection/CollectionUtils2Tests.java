@@ -20,9 +20,12 @@
 package com.wl4g.component.common.collection;
 
 import static com.wl4g.component.common.collection.CollectionUtils2.extractElement;
+import static com.wl4g.component.common.collection.CollectionUtils2.toFirstElement;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.junit.Test;
 
 /**
  * {@link CollectionUtils2Tests}
@@ -34,13 +37,25 @@ import java.util.List;
  */
 public class CollectionUtils2Tests {
 
-	public static void main(String[] args) {
-		List<String> list = new ArrayList<>();
-		list.add("Trump");
-		list.add("Biden");
-		list.add("Pelosi-West");
-		list.add("Obama-West");
-		System.out.println(extractElement(list, 0, null));
-	}
+    @Test
+    public void testExtractElement() {
+        List<String> list = new ArrayList<>();
+        list.add("Trump");
+        list.add("Biden");
+        list.add("Pelosi-West");
+        list.add("Obama-West");
+        System.out.println(extractElement(list, 0, null));
+    }
+
+    @Test
+    public void testToFirstElement() {
+        List<String> list = new ArrayList<>();
+        list.add("Trump");
+        list.add("Biden");
+        list.add("Pelosi-West");
+        list.add("Obama-West");
+        toFirstElement(list, s -> s.contains("West"));
+        System.out.println(list);
+    }
 
 }

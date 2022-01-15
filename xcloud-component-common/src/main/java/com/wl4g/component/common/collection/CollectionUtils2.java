@@ -16,6 +16,7 @@
 package com.wl4g.component.common.collection;
 
 import static com.wl4g.component.common.lang.Assert2.isTrue;
+import static com.wl4g.component.common.lang.Assert2.notNullOf;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -42,11 +43,13 @@ import java.util.Properties;
 import java.util.Set;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.EnumerationUtils;
 
 import com.wl4g.component.common.collection.multimap.MultiValueMap;
+import com.wl4g.component.common.function.ProcessFunction;
 import com.wl4g.component.common.lang.Assert2;
 import com.wl4g.component.common.lang.ObjectUtils2;
 
@@ -774,6 +777,32 @@ public abstract class CollectionUtils2 extends CollectionUtils {
         }
 
         return defaultValue;
+    }
+
+    /**
+     * Move the first matching element to the first position.
+     * 
+     * @return
+     */
+    @Nullable
+    public static <T> void toFirstElement(@Nullable List<T> list, @NotNull ProcessFunction<T, Boolean> processor) {
+        notNullOf(processor, "comparator");
+        if (isNull(list)) {
+            return;
+        }
+        for (int i = 0; i < list.size(); i++) {
+            try {
+                T curr = list.get(i);
+                if (processor.process(curr)) {
+                    T oldFirst = list.get(0);
+                    list.set(0, curr);
+                    list.set(i, oldFirst);
+                    break;
+                }
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
+            }
+        }
     }
 
 }
