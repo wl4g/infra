@@ -9,7 +9,7 @@
 #
 
 spring:
-  dopaas-infra:
+  infra:
     data:
       #mybatis-loader:
       #  enabled: false # Default by auto(currently running in JVM jdwp mode?)

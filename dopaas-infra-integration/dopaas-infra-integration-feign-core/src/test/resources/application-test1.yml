@@ -11,7 +11,7 @@
 # #### Environment(SpringBoot rpc feign core) configuration. ####
 #
 spring:
-  dopaas-infra:
+  infra:
     integration:
       feign:
         default-url: https://api.github.com

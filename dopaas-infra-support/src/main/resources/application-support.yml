@@ -12,7 +12,7 @@
 # #### Spring cloud devops support configuration. ####
 #
 spring:
-  dopaas-infra:
+  infra:
     #support:
     #  cli.enabled: false # Default by false
     #  jedis:

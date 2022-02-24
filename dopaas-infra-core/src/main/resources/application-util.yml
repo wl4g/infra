@@ -12,7 +12,7 @@
 # #### Spring common utility configuration. ####
 #
 spring:
-  dopaas-infra:
+  infra:
     core:
       remote: # RestTemplate configuration.
         read-timeout: 60_000

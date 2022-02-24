@@ -11,7 +11,7 @@
 # #### Environment configuration. ####
 #
 spring:
-  dopaas-infra:
+  infra:
     core:
       bootstrapping:
         enabled: false

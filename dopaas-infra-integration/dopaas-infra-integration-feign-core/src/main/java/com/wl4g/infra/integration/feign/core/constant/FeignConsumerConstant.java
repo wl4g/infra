@@ -31,7 +31,7 @@ import com.wl4g.infra.core.constant.BaseConstant;
  */
 public abstract class FeignConsumerConstant extends BaseConstant {
 
-    public static final String KEY_CONFIG_PREFIX = "spring.dopaas-infra.integration.feign";
+    public static final String KEY_CONFIG_PREFIX = "spring.infra.integration.feign";
 
     // Default by true.
     public static final String KEY_CONFIG_ENABLE = KEY_CONFIG_PREFIX + ".enabled";

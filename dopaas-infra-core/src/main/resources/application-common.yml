@@ -18,7 +18,7 @@ spring:
   banner:
     charset: UTF-8
     #location: classpath:default-banner.txt
-  #dopaas-infra:
+  #infra:
   #  core:
   #    bootstrapping:
   #      enabled: true # Default by true

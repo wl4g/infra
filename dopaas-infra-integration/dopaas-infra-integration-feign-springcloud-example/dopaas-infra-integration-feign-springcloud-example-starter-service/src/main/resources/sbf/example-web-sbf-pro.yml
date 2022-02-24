@@ -12,7 +12,7 @@
 #
 
 spring:
-  dopaas-infra:
+  infra:
     integration:
       feign:
         default-url: http://localhost:27002

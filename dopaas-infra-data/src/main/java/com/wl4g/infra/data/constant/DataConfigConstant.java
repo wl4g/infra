@@ -31,7 +31,7 @@ import com.wl4g.infra.core.constant.BaseConstant;
  */
 public abstract class DataConfigConstant extends BaseConstant {
 
-    public static final String KEY_PREFIX_MODULE_DATA = "spring.dopaas-infra.data.";
+    public static final String KEY_PREFIX_MODULE_DATA = "spring.infra.data.";
 
     public static final String KEY_MYBATIS_PREFIX = KEY_PREFIX_MODULE_DATA + "mybatis";
 
