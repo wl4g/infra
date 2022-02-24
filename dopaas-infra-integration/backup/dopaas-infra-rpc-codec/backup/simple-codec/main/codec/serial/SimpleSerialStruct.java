@@ -17,11 +17,11 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec.serial;
+package com.wl4g.infra.integration.codec.serial;
 
-import com.wl4g.component.integration.codec.type.OCClass;
-import com.wl4g.component.integration.codec.type.OCInt32;
-import com.wl4g.component.integration.codec.type.OCObject;
+import com.wl4g.infra.integration.codec.type.OCClass;
+import com.wl4g.infra.integration.codec.type.OCInt32;
+import com.wl4g.infra.integration.codec.type.OCObject;
 
 /**
  * Simple serial struct SimpleStruct.java

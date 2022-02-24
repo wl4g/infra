@@ -1,12 +1,12 @@
-package com.wl4g.component.integration.codec.cipher;
+package com.wl4g.infra.integration.codec.cipher;
 
-import com.wl4g.component.integration.codec.ObjectCoder;
-import com.wl4g.component.integration.codec.CodecConfig.EndianType;
-import com.wl4g.component.integration.codec.CodecConfig.TotalLengthType;
-import com.wl4g.component.integration.codec.helper.ByteHelper;
-import com.wl4g.component.integration.codec.type.OCInt16;
-import com.wl4g.component.integration.codec.wrap.CipherWrapper;
-import com.wl4g.component.integration.codec.wrap.IdentifyWrapper;
+import com.wl4g.infra.integration.codec.ObjectCoder;
+import com.wl4g.infra.integration.codec.CodecConfig.EndianType;
+import com.wl4g.infra.integration.codec.CodecConfig.TotalLengthType;
+import com.wl4g.infra.integration.codec.helper.ByteHelper;
+import com.wl4g.infra.integration.codec.type.OCInt16;
+import com.wl4g.infra.integration.codec.wrap.CipherWrapper;
+import com.wl4g.infra.integration.codec.wrap.IdentifyWrapper;
 
 public class CipherCoder {
 

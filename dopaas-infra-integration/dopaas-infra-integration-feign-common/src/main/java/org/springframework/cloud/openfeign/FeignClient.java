@@ -27,7 +27,7 @@ import org.springframework.core.annotation.AliasFor;
 
 /**
  * {@link FeignClient} and
- * {@link com.wl4g.component.integration.feign.core.annotation.FeignConsumer} mutual
+ * {@link com.wl4g.infra.integration.feign.core.annotation.FeignConsumer} mutual
  * equivalence. </br>
  * Annotation for interfaces declaring that a REST client with that interface
  * should be created (e.g. for autowiring into another component). If ribbon is

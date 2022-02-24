@@ -17,7 +17,7 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec.internal.cache;
+package com.wl4g.infra.integration.codec.internal.cache;
 
 import java.lang.ref.SoftReference;
 import java.lang.reflect.Field;

@@ -17,29 +17,29 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec.wrap;
+package com.wl4g.infra.integration.codec.wrap;
 
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
 
-import static com.wl4g.component.common.log.SmartLoggerFactory.getLogger;
-import com.wl4g.component.common.log.SmartLogger;
-import com.wl4g.component.integration.codec.CodecConfig;
-import com.wl4g.component.integration.codec.CodecParameter;
-import com.wl4g.component.integration.codec.Decoder;
-import com.wl4g.component.integration.codec.Encoder;
-import com.wl4g.component.integration.codec.CodecConfig.TotalLengthType;
-import com.wl4g.component.integration.codec.exception.VerifyException;
-import com.wl4g.component.integration.codec.helper.ByteHelper;
-import com.wl4g.component.integration.codec.helper.StringHelper;
-import com.wl4g.component.integration.codec.stream.BytesInputStream;
-import com.wl4g.component.integration.codec.stream.BytesOutputStream;
-import com.wl4g.component.integration.codec.wrap.verify.Adler32Verifier;
-import com.wl4g.component.integration.codec.wrap.verify.CRC16Verifier;
-import com.wl4g.component.integration.codec.wrap.verify.CRC32Verifier;
-import com.wl4g.component.integration.codec.wrap.verify.Verifier;
-import com.wl4g.component.integration.codec.wrap.verify.VerifyExtern;
+import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
+import com.wl4g.infra.common.log.SmartLogger;
+import com.wl4g.infra.integration.codec.CodecConfig;
+import com.wl4g.infra.integration.codec.CodecParameter;
+import com.wl4g.infra.integration.codec.Decoder;
+import com.wl4g.infra.integration.codec.Encoder;
+import com.wl4g.infra.integration.codec.CodecConfig.TotalLengthType;
+import com.wl4g.infra.integration.codec.exception.VerifyException;
+import com.wl4g.infra.integration.codec.helper.ByteHelper;
+import com.wl4g.infra.integration.codec.helper.StringHelper;
+import com.wl4g.infra.integration.codec.stream.BytesInputStream;
+import com.wl4g.infra.integration.codec.stream.BytesOutputStream;
+import com.wl4g.infra.integration.codec.wrap.verify.Adler32Verifier;
+import com.wl4g.infra.integration.codec.wrap.verify.CRC16Verifier;
+import com.wl4g.infra.integration.codec.wrap.verify.CRC32Verifier;
+import com.wl4g.infra.integration.codec.wrap.verify.Verifier;
+import com.wl4g.infra.integration.codec.wrap.verify.VerifyExtern;
 
 /**
  * Add verify code to bytes arrays. It support CRC16, CRC32 and adler32. It will

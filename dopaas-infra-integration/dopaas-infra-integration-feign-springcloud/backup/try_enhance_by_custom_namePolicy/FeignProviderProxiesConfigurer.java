@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.component.integration.feign.proxy;
+package com.wl4g.infra.integration.feign.proxy;
 
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -42,11 +42,11 @@ import org.springframework.core.type.filter.TypeFilter;
 import static org.springframework.util.ClassUtils.CGLIB_CLASS_SEPARATOR;
 import static org.springframework.util.Assert.notNull;
 
-import static com.wl4g.component.common.lang.Assert2.isTrue;
-import static com.wl4g.component.common.log.SmartLoggerFactory.getLogger;
-import static com.wl4g.component.integration.feign.proxy.FeignProxiesUtils.FEIGNPROXY_INTERFACE_CLASS_ATTRIBUTE;
-import static com.wl4g.component.integration.feign.proxy.FeignProxiesUtils.FEIGN_PROXY_ORDER;
-import static com.wl4g.component.integration.feign.proxy.FeignProxiesUtils.generateFeignProxyBeanName;
+import static com.wl4g.infra.common.lang.Assert2.isTrue;
+import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
+import static com.wl4g.infra.integration.feign.proxy.FeignProxiesUtils.FEIGNPROXY_INTERFACE_CLASS_ATTRIBUTE;
+import static com.wl4g.infra.integration.feign.proxy.FeignProxiesUtils.FEIGN_PROXY_ORDER;
+import static com.wl4g.infra.integration.feign.proxy.FeignProxiesUtils.generateFeignProxyBeanName;
 import static java.lang.String.format;
 
 /**
@@ -170,7 +170,7 @@ public class FeignProviderProxiesConfigurer
 	 * </br>
 	 * [Note]: Bean definition className must be a proxy class, refer to:
 	 * {@link com.alibaba.dubbo.config.spring.beans.factory.annotation.FeignClientToDubboProviderConfigurer#resolveServiceInterfaceClass()}
-	 * {@link com.wl4g.component.integration.springcloud.util.FeignDubboUtils.isFeignProxyBean()}
+	 * {@link com.wl4g.infra.integration.springcloud.util.FeignDubboUtils.isFeignProxyBean()}
 	 * 
 	 * @param registry
 	 * @param interfaceClass

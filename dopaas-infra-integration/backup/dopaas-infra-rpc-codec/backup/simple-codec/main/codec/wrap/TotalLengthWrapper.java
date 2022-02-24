@@ -17,17 +17,17 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec.wrap;
+package com.wl4g.infra.integration.codec.wrap;
 
 import java.nio.ByteBuffer;
 
-import static com.wl4g.component.common.log.SmartLoggerFactory.getLogger;
-import com.wl4g.component.common.log.SmartLogger;
-import com.wl4g.component.integration.codec.CodecConfig;
-import com.wl4g.component.integration.codec.CodecParameter;
-import com.wl4g.component.integration.codec.Encoder;
-import com.wl4g.component.integration.codec.CodecConfig.TotalLengthType;
-import com.wl4g.component.integration.codec.stream.BytesOutputStream;
+import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
+import com.wl4g.infra.common.log.SmartLogger;
+import com.wl4g.infra.integration.codec.CodecConfig;
+import com.wl4g.infra.integration.codec.CodecParameter;
+import com.wl4g.infra.integration.codec.Encoder;
+import com.wl4g.infra.integration.codec.CodecConfig.TotalLengthType;
+import com.wl4g.infra.integration.codec.stream.BytesOutputStream;
 
 /**
  * Calculate bytes total length in final encoding handle.

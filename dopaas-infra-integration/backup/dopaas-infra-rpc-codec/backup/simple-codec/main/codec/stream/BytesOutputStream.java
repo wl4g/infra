@@ -17,7 +17,7 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec.stream;
+package com.wl4g.infra.integration.codec.stream;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -25,9 +25,9 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.LinkedList;
 
-import com.wl4g.component.integration.codec.CodecConfig;
-import com.wl4g.component.integration.codec.CodecConfig.EndianType;
-import com.wl4g.component.integration.codec.helper.ByteHelper;
+import com.wl4g.infra.integration.codec.CodecConfig;
+import com.wl4g.infra.integration.codec.CodecConfig.EndianType;
+import com.wl4g.infra.integration.codec.helper.ByteHelper;
 
 /**
  * 

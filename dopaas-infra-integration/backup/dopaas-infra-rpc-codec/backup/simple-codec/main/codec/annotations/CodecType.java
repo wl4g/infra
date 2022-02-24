@@ -17,7 +17,7 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec.annotations;
+package com.wl4g.infra.integration.codec.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

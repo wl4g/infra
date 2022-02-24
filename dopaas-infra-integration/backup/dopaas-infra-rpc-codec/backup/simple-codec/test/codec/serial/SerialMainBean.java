@@ -1,4 +1,4 @@
-package com.wl4g.component.integration.codec.serial;
+package com.wl4g.infra.integration.codec.serial;
 
 public class SerialMainBean {
 	int id;

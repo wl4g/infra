@@ -17,14 +17,14 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec.wrap.cipher;
+package com.wl4g.infra.integration.codec.wrap.cipher;
 
 import java.security.Key;
 
 import javax.crypto.Cipher;
 
-import com.wl4g.component.integration.codec.CodecParameter;
-import com.wl4g.component.integration.codec.exception.CipherException;
+import com.wl4g.infra.integration.codec.CodecParameter;
+import com.wl4g.infra.integration.codec.exception.CipherException;
 
 /**
  * 

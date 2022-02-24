@@ -17,7 +17,7 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec.helper;
+package com.wl4g.infra.integration.codec.helper;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -29,12 +29,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.wl4g.component.common.log.SmartLoggerFactory.getLogger;
-import com.wl4g.component.common.log.SmartLogger;
-import com.wl4g.component.integration.codec.CodecParameter;
-import com.wl4g.component.integration.codec.annotations.CodecType;
-import com.wl4g.component.integration.codec.exception.ReflectException;
-import com.wl4g.component.integration.codec.type.OCType;
+import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
+import com.wl4g.infra.common.log.SmartLogger;
+import com.wl4g.infra.integration.codec.CodecParameter;
+import com.wl4g.infra.integration.codec.annotations.CodecType;
+import com.wl4g.infra.integration.codec.exception.ReflectException;
+import com.wl4g.infra.integration.codec.type.OCType;
 
 /**
  * 

@@ -17,7 +17,7 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec.helper;
+package com.wl4g.infra.integration.codec.helper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -27,8 +27,8 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 
-import static com.wl4g.component.common.log.SmartLoggerFactory.getLogger;
-import com.wl4g.component.common.log.SmartLogger;
+import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
+import com.wl4g.infra.common.log.SmartLogger;
 
 /**
  * 

@@ -17,10 +17,10 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec.wrap.verify;
+package com.wl4g.infra.integration.codec.wrap.verify;
 
-import com.wl4g.component.integration.codec.helper.ByteHelper;
-import com.wl4g.component.integration.codec.wrap.VerifyWrapper;
+import com.wl4g.infra.integration.codec.helper.ByteHelper;
+import com.wl4g.infra.integration.codec.wrap.VerifyWrapper;
 
 /**
  * CRC16 verify bytes arrays.

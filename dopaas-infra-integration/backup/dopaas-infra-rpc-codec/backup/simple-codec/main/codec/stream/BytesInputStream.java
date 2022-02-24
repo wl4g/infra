@@ -17,16 +17,16 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec.stream;
+package com.wl4g.infra.integration.codec.stream;
 
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.wl4g.component.integration.codec.CodecConfig;
-import com.wl4g.component.integration.codec.CodecConfig.EndianType;
-import com.wl4g.component.integration.codec.helper.ByteHelper;
-import com.wl4g.component.integration.codec.helper.StringHelper;
+import com.wl4g.infra.integration.codec.CodecConfig;
+import com.wl4g.infra.integration.codec.CodecConfig.EndianType;
+import com.wl4g.infra.integration.codec.helper.ByteHelper;
+import com.wl4g.infra.integration.codec.helper.StringHelper;
 
 /**
  * 

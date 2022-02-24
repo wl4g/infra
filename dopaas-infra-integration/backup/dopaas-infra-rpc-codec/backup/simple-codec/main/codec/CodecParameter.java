@@ -17,14 +17,14 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec;
+package com.wl4g.infra.integration.codec;
 
 import java.lang.reflect.Field;
 
-import com.wl4g.component.integration.codec.CodecConfig.EndianType;
-import com.wl4g.component.integration.codec.helper.StringHelper;
-import com.wl4g.component.integration.codec.internal.FinalEncodeQueue;
-import com.wl4g.component.integration.codec.internal.cache.Cache;
+import com.wl4g.infra.integration.codec.CodecConfig.EndianType;
+import com.wl4g.infra.integration.codec.helper.StringHelper;
+import com.wl4g.infra.integration.codec.internal.FinalEncodeQueue;
+import com.wl4g.infra.integration.codec.internal.cache.Cache;
 
 /**
  * Codec parameter. The parameter will be available in current flow. It's not
@@ -79,7 +79,7 @@ public class CodecParameter {
 
 	/**
 	 * Construct parameter through global
-	 * {@linkplain com.wl4g.component.integration.codec.CodecConfig CodecConfig}.
+	 * {@linkplain com.wl4g.infra.integration.codec.CodecConfig CodecConfig}.
 	 * 
 	 * @param codecConfig
 	 *            Global codec configuration.

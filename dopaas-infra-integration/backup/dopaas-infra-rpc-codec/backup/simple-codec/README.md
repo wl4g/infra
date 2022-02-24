@@ -126,7 +126,7 @@ You can see detail example codes in /test/java/com/wl4g/component/rpc/codec/auto
 
 Codec Type
 -------------
-Besides using JAVA type directly, developers can use codec type which is in package com.wl4g.component.integration.codec.type more flexibly to code.<br/>
+Besides using JAVA type directly, developers can use codec type which is in package com.wl4g.infra.integration.codec.type more flexibly to code.<br/>
 OCInt32 :   32-bits integer type which based on OCInteger.<br/>
 OCInt16 :   16-bits integer type which based on OCInteger.<br/>
 OCInt8  :   8-bits integer type which based on OCInteger.<br/>

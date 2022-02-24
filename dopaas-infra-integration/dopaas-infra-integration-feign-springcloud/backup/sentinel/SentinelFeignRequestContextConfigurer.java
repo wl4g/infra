@@ -17,9 +17,9 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.feign.context.sentinel;
+package com.wl4g.infra.integration.feign.context.sentinel;
 
-import static com.wl4g.component.common.log.SmartLoggerFactory.getLogger;
+import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,8 +35,8 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.alibaba.cloud.sentinel.custom.SentinelAutoConfiguration;
-import com.wl4g.component.common.log.SmartLogger;
-import com.wl4g.component.integration.feign.context.AbstractFeignRequestContextInterceptor;
+import com.wl4g.infra.common.log.SmartLogger;
+import com.wl4g.infra.integration.feign.context.AbstractFeignRequestContextInterceptor;
 
 import feign.RequestTemplate;
 

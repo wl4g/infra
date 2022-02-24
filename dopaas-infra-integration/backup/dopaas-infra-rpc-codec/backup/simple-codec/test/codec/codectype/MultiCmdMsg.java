@@ -1,7 +1,7 @@
-package com.wl4g.component.integration.codec.codectype;
+package com.wl4g.infra.integration.codec.codectype;
 
-import com.wl4g.component.integration.codec.type.OCInt32;
-import com.wl4g.component.integration.codec.type.OCString;
+import com.wl4g.infra.integration.codec.type.OCInt32;
+import com.wl4g.infra.integration.codec.type.OCString;
 
 public class MultiCmdMsg {
 	int id;

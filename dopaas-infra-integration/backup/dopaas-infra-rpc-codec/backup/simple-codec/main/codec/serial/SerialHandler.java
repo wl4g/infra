@@ -17,9 +17,9 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec.serial;
+package com.wl4g.infra.integration.codec.serial;
 
-import com.wl4g.component.integration.codec.ObjectCoder;
+import com.wl4g.infra.integration.codec.ObjectCoder;
 
 /**
  * Handle specify serial object.
@@ -35,7 +35,7 @@ public interface SerialHandler {
 	 * Serial object to bytes.
 	 * 
 	 * @param coder
-	 *            {@linkplain com.wl4g.component.integration.codec.ObjectCoder
+	 *            {@linkplain com.wl4g.infra.integration.codec.ObjectCoder
 	 *            ObjectCoder}
 	 * @param obj
 	 *            object
@@ -48,7 +48,7 @@ public interface SerialHandler {
 	 * Convert serial bytes to object
 	 * 
 	 * @param coder
-	 *            {@linkplain com.wl4g.component.integration.codec.ObjectCoder
+	 *            {@linkplain com.wl4g.infra.integration.codec.ObjectCoder
 	 *            ObjectCoder}
 	 * @param bytes
 	 *            Bytes array

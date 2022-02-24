@@ -17,14 +17,14 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec.internal;
+package com.wl4g.infra.integration.codec.internal;
 
 import java.util.LinkedList;
 
-import com.wl4g.component.integration.codec.CodecParameter;
-import com.wl4g.component.integration.codec.Encoder;
-import com.wl4g.component.integration.codec.stream.BytesOutputStream;
-import com.wl4g.component.integration.codec.wrap.Wrapper;
+import com.wl4g.infra.integration.codec.CodecParameter;
+import com.wl4g.infra.integration.codec.Encoder;
+import com.wl4g.infra.integration.codec.stream.BytesOutputStream;
+import com.wl4g.infra.integration.codec.wrap.Wrapper;
 
 /**
  * Final encode queue will be called in final encode handle.
@@ -42,7 +42,7 @@ public class FinalEncodeQueue {
 	 * Add final called wrapper.
 	 * 
 	 * @param wrap
-	 *            {@linkplain com.wl4g.component.integration.codec.wrap.Wrapper Wrapper}
+	 *            {@linkplain com.wl4g.infra.integration.codec.wrap.Wrapper Wrapper}
 	 *            object.
 	 * @param extern
 	 *            Additional data.
@@ -55,7 +55,7 @@ public class FinalEncodeQueue {
 	 * Call final wrapper to encoding final bytes.
 	 * 
 	 * @param encoder
-	 *            {@linkplain com.wl4g.component.integration.codec.Encoder Encoder}
+	 *            {@linkplain com.wl4g.infra.integration.codec.Encoder Encoder}
 	 *            object.
 	 * @param out
 	 *            Encoding IO stream

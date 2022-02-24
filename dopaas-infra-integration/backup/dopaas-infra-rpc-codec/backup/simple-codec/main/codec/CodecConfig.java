@@ -17,10 +17,10 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec;
+package com.wl4g.infra.integration.codec;
 
-import com.wl4g.component.integration.codec.wrap.WrapChain;
-import com.wl4g.component.integration.codec.wrap.Wrapper;
+import com.wl4g.infra.integration.codec.wrap.WrapChain;
+import com.wl4g.infra.integration.codec.wrap.Wrapper;
 
 /**
  * Codec configuration object.

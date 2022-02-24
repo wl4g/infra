@@ -17,7 +17,7 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec.type;
+package com.wl4g.infra.integration.codec.type;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
@@ -26,16 +26,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import com.wl4g.component.integration.codec.CodecParameter;
-import com.wl4g.component.integration.codec.Decoder;
-import com.wl4g.component.integration.codec.Encoder;
-import com.wl4g.component.integration.codec.annotations.CodecType;
-import com.wl4g.component.integration.codec.exception.DecodingException;
-import com.wl4g.component.integration.codec.exception.OCException;
-import com.wl4g.component.integration.codec.helper.ReflectHelper;
-import com.wl4g.component.integration.codec.helper.StringHelper;
-import com.wl4g.component.integration.codec.stream.BytesInputStream;
-import com.wl4g.component.integration.codec.stream.BytesOutputStream;
+import com.wl4g.infra.integration.codec.CodecParameter;
+import com.wl4g.infra.integration.codec.Decoder;
+import com.wl4g.infra.integration.codec.Encoder;
+import com.wl4g.infra.integration.codec.annotations.CodecType;
+import com.wl4g.infra.integration.codec.exception.DecodingException;
+import com.wl4g.infra.integration.codec.exception.OCException;
+import com.wl4g.infra.integration.codec.helper.ReflectHelper;
+import com.wl4g.infra.integration.codec.helper.StringHelper;
+import com.wl4g.infra.integration.codec.stream.BytesInputStream;
+import com.wl4g.infra.integration.codec.stream.BytesOutputStream;
 
 /**
  * Indicate the list collect object.

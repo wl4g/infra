@@ -1,6 +1,6 @@
 # Application Auto Configuration.
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.wl4g.component.support.cache.jedis.JedisClientAutoConfiguration,\
-com.wl4g.component.support.cache.locks.JedisLockAutoConfiguration,\
-com.wl4g.component.support.notification.NotificationAutoConfiguration,\
-com.wl4g.component.support.cli.CommandLineAutoConfiguration
+com.wl4g.infra.support.cache.jedis.JedisClientAutoConfiguration,\
+com.wl4g.infra.support.cache.locks.JedisLockAutoConfiguration,\
+com.wl4g.infra.support.notification.NotificationAutoConfiguration,\
+com.wl4g.infra.support.cli.CommandLineAutoConfiguration

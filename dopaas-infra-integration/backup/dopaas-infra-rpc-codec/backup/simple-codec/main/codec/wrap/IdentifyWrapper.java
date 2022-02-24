@@ -17,17 +17,17 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec.wrap;
+package com.wl4g.infra.integration.codec.wrap;
 
-import com.wl4g.component.integration.codec.CodecParameter;
-import com.wl4g.component.integration.codec.Decoder;
-import com.wl4g.component.integration.codec.Encoder;
-import com.wl4g.component.integration.codec.stream.BytesInputStream;
-import com.wl4g.component.integration.codec.stream.BytesOutputStream;
-import com.wl4g.component.integration.codec.type.OCInt16;
-import com.wl4g.component.integration.codec.type.OCInt32;
-import com.wl4g.component.integration.codec.type.OCInt8;
-import com.wl4g.component.integration.codec.type.OCInteger;
+import com.wl4g.infra.integration.codec.CodecParameter;
+import com.wl4g.infra.integration.codec.Decoder;
+import com.wl4g.infra.integration.codec.Encoder;
+import com.wl4g.infra.integration.codec.stream.BytesInputStream;
+import com.wl4g.infra.integration.codec.stream.BytesOutputStream;
+import com.wl4g.infra.integration.codec.type.OCInt16;
+import com.wl4g.infra.integration.codec.type.OCInt32;
+import com.wl4g.infra.integration.codec.type.OCInt8;
+import com.wl4g.infra.integration.codec.type.OCInteger;
 
 /**
  * Add head identify or tail identify for bytes arrays.

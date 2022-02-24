@@ -17,7 +17,7 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec.wrap.verify;
+package com.wl4g.infra.integration.codec.wrap.verify;
 
 /**
  * Verify bytes arrays before decoding.

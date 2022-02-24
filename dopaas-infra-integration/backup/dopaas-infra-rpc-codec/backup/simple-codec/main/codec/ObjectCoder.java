@@ -17,16 +17,16 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec;
+package com.wl4g.infra.integration.codec;
 
-import com.wl4g.component.integration.codec.internal.DefaultCodec;
-import com.wl4g.component.integration.codec.type.OCObject;
+import com.wl4g.infra.integration.codec.internal.DefaultCodec;
+import com.wl4g.infra.integration.codec.type.OCObject;
 
 /**
  * ObjectCoder is the main API class for developer. It uses
- * {@linkplain com.wl4g.component.integration.codec.internal.DefaultCodec DefaultCodec} as
+ * {@linkplain com.wl4g.infra.integration.codec.internal.DefaultCodec DefaultCodec} as
  * default codec. Developer can customize own codec for the coder. Developer can
- * use {@linkplain com.wl4g.component.integration.codec.CodecConfig CodecConfig} to
+ * use {@linkplain com.wl4g.infra.integration.codec.CodecConfig CodecConfig} to
  * configure codec parameters.<br>
  * 
  * Example:
@@ -65,7 +65,7 @@ public class ObjectCoder {
 
 	/**
 	 * Construct ObjectCoder by
-	 * {@linkplain com.wl4g.component.integration.codec.internal.DefaultCodec
+	 * {@linkplain com.wl4g.infra.integration.codec.internal.DefaultCodec
 	 * DefaultCodec}.
 	 */
 	public ObjectCoder() {
@@ -75,12 +75,12 @@ public class ObjectCoder {
 
 	/**
 	 * Construct ObjectCoder by
-	 * {@linkplain com.wl4g.component.integration.codec.internal.DefaultCodec
+	 * {@linkplain com.wl4g.infra.integration.codec.internal.DefaultCodec
 	 * DefaultCodec}.
 	 * 
 	 * @param codecConfig
 	 *            Codec configuration
-	 *            {@linkplain com.wl4g.component.integration.codec.CodecConfig
+	 *            {@linkplain com.wl4g.infra.integration.codec.CodecConfig
 	 *            CodecConfig}.
 	 */
 	public ObjectCoder(CodecConfig codecConfig) {
@@ -111,7 +111,7 @@ public class ObjectCoder {
 
 	/**
 	 * Encode message java object. Java object will construct the
-	 * {@linkplain com.wl4g.component.integration.codec.type.OCObject OCObject} to
+	 * {@linkplain com.wl4g.infra.integration.codec.type.OCObject OCObject} to
 	 * encode data really.
 	 * 
 	 * @param msg
@@ -132,11 +132,11 @@ public class ObjectCoder {
 	}
 
 	/**
-	 * Encode message {@linkplain com.wl4g.component.integration.codec.type.OCObject
+	 * Encode message {@linkplain com.wl4g.infra.integration.codec.type.OCObject
 	 * OCObject}.
 	 * 
 	 * @param msg
-	 *            Message {@linkplain com.wl4g.component.integration.codec.type.OCObject
+	 *            Message {@linkplain com.wl4g.infra.integration.codec.type.OCObject
 	 *            OCObject}.
 	 * @return If successful encoding, return bytes array. Otherwise return
 	 *         null. If runtime exception occurred when encoding, it will throw
@@ -155,7 +155,7 @@ public class ObjectCoder {
 
 	/**
 	 * Decode message java object. Java object will construct the
-	 * {@linkplain com.wl4g.component.integration.codec.type.OCObject OCObject} to
+	 * {@linkplain com.wl4g.infra.integration.codec.type.OCObject OCObject} to
 	 * decode data really.
 	 * 
 	 * @param bytes
@@ -163,7 +163,7 @@ public class ObjectCoder {
 	 * @param source
 	 *            Decode target java object.
 	 * @return If successful decoding, return
-	 *         {@linkplain com.wl4g.component.integration.codec.type.OCObject OCObject}.
+	 *         {@linkplain com.wl4g.infra.integration.codec.type.OCObject OCObject}.
 	 *         Otherwise return null. If runtime exception occurred when
 	 *         encoding, it will throw DecodingException, ReflectException and
 	 *         other wrapper's OCException.
@@ -178,17 +178,17 @@ public class ObjectCoder {
 	}
 
 	/**
-	 * Decode message {@linkplain com.wl4g.component.integration.codec.type.OCObject
+	 * Decode message {@linkplain com.wl4g.infra.integration.codec.type.OCObject
 	 * OCObject}.
 	 * 
 	 * @param bytes
 	 *            Message bytes array.
 	 * @param source
 	 *            Decode target
-	 *            {@linkplain com.wl4g.component.integration.codec.type.OCObject
+	 *            {@linkplain com.wl4g.infra.integration.codec.type.OCObject
 	 *            OCObject}.
 	 * @return If successful decoding, return
-	 *         {@linkplain com.wl4g.component.integration.codec.type.OCObject OCObject}.
+	 *         {@linkplain com.wl4g.infra.integration.codec.type.OCObject OCObject}.
 	 *         Otherwise return null. If runtime exception occurred when
 	 *         encoding, it will throw DecodingException, ReflectException and
 	 *         other wrapper's OCException.

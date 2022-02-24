@@ -22,7 +22,7 @@ package com.wl4g;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.wl4g.component.data.annotation.EnableComponentDataConfiguration;
+import com.wl4g.infra.data.annotation.EnableComponentDataConfiguration;
 
 /**
  * {@link RpcExampleService}
@@ -32,8 +32,8 @@ import com.wl4g.component.data.annotation.EnableComponentDataConfiguration;
  * @sine v1.0
  * @see
  */
-@EnableComponentDataConfiguration("com.wl4g.component.integration.example.dao")
-@SpringBootApplication(scanBasePackages = "com.wl4g.component.integration.example")
+@EnableComponentDataConfiguration("com.wl4g.infra.integration.example.dao")
+@SpringBootApplication(scanBasePackages = "com.wl4g.infra.integration.example")
 public class RpcExampleService {
 
 	public static void main(String[] args) {

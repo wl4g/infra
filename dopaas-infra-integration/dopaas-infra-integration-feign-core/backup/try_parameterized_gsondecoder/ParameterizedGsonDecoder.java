@@ -17,7 +17,7 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.springboot.feign.codec;
+package com.wl4g.infra.integration.springboot.feign.codec;
 
 import static feign.Util.UTF_8;
 import static feign.Util.ensureClosed;

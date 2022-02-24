@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.component.integration.springboot.feign.annotation;
+package com.wl4g.infra.integration.springboot.feign.annotation;
 
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
@@ -43,8 +43,8 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.wl4g.component.common.log.SmartLogger;
-import static com.wl4g.component.integration.springboot.feign.constant.SpringBootFeignConstant.KEY_CONFIG_ENABLE;
+import com.wl4g.infra.common.log.SmartLogger;
+import static com.wl4g.infra.integration.springboot.feign.constant.SpringBootFeignConstant.KEY_CONFIG_ENABLE;
 
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
@@ -53,11 +53,11 @@ import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.endsWithAny;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.springframework.util.StringUtils.hasText;
-import static com.wl4g.component.common.collection.CollectionUtils2.isEmptyArray;
-import static com.wl4g.component.common.lang.ClassUtils2.isPresent;
-import static com.wl4g.component.common.lang.TypeConverts.parseLongOrNull;
-import static com.wl4g.component.common.log.SmartLoggerFactory.getLogger;
-import static com.wl4g.component.integration.springboot.feign.annotation.EnableSpringBootFeignClients.*;
+import static com.wl4g.infra.common.collection.CollectionUtils2.isEmptyArray;
+import static com.wl4g.infra.common.lang.ClassUtils2.isPresent;
+import static com.wl4g.infra.common.lang.TypeConverts.parseLongOrNull;
+import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
+import static com.wl4g.infra.integration.springboot.feign.annotation.EnableSpringBootFeignClients.*;
 
 import java.io.IOException;
 import java.util.Arrays;

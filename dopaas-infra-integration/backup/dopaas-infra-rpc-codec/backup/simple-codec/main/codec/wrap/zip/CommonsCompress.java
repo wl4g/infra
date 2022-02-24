@@ -17,7 +17,7 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec.wrap.zip;
+package com.wl4g.infra.integration.codec.wrap.zip;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -27,7 +27,7 @@ import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 
-import com.wl4g.component.integration.codec.helper.IOHelper;
+import com.wl4g.infra.integration.codec.helper.IOHelper;
 
 /**
  * Common compress. It needs common-compress 1.x support.

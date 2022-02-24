@@ -17,14 +17,14 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.feign.context;
+package com.wl4g.infra.integration.feign.context;
 
-import static com.wl4g.component.common.collection.CollectionUtils2.safeMap;
-import static com.wl4g.component.common.lang.Assert2.hasTextOf;
-import static com.wl4g.component.common.lang.Assert2.notNullOf;
-import static com.wl4g.component.common.reflect.TypeUtils2.isSimpleType;
-import static com.wl4g.component.common.serialize.JacksonUtils.parseJSON;
-import static com.wl4g.component.common.serialize.JacksonUtils.toJSONString;
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.infra.common.reflect.TypeUtils2.isSimpleType;
+import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
+import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.util.Collections.synchronizedMap;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -39,7 +39,7 @@ import javax.validation.constraints.NotNull;
 
 import org.apache.commons.beanutils.ConvertUtilsBean;
 
-import com.wl4g.component.core.utils.context.SpringContextHolder;
+import com.wl4g.infra.core.utils.context.SpringContextHolder;
 
 /**
  * {@link RpcContextHolder}

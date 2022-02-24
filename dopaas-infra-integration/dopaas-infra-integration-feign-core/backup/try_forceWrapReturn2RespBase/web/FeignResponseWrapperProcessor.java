@@ -17,7 +17,7 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.springboot.feign.web;
+package com.wl4g.infra.integration.springboot.feign.web;
 
 import static java.util.Objects.nonNull;
 import static org.springframework.core.annotation.AnnotatedElementUtils.hasAnnotation;
@@ -30,9 +30,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 
-import com.wl4g.component.common.web.rest.RespBase;
-import com.wl4g.component.core.framework.proxy.SmartProxyProcessor;
-import com.wl4g.component.integration.springboot.feign.annotation.SpringBootFeignClient;
+import com.wl4g.infra.common.web.rest.RespBase;
+import com.wl4g.infra.core.framework.proxy.SmartProxyProcessor;
+import com.wl4g.infra.integration.springboot.feign.annotation.SpringBootFeignClient;
 
 /**
  * {@link FeignResponseWrapperProcessor}

@@ -1,13 +1,13 @@
-package com.wl4g.component.integration.codec.complex;
+package com.wl4g.infra.integration.codec.complex;
 
-import com.wl4g.component.integration.codec.type.OCBytes;
-import com.wl4g.component.integration.codec.type.OCInt16;
-import com.wl4g.component.integration.codec.type.OCInt32;
-import com.wl4g.component.integration.codec.type.OCInt8;
-import com.wl4g.component.integration.codec.type.OCInteger;
-import com.wl4g.component.integration.codec.type.OCMap;
-import com.wl4g.component.integration.codec.type.OCObject;
-import com.wl4g.component.integration.codec.type.OCString;
+import com.wl4g.infra.integration.codec.type.OCBytes;
+import com.wl4g.infra.integration.codec.type.OCInt16;
+import com.wl4g.infra.integration.codec.type.OCInt32;
+import com.wl4g.infra.integration.codec.type.OCInt8;
+import com.wl4g.infra.integration.codec.type.OCInteger;
+import com.wl4g.infra.integration.codec.type.OCMap;
+import com.wl4g.infra.integration.codec.type.OCObject;
+import com.wl4g.infra.integration.codec.type.OCString;
 
 public class ComplexMsg {
 	int id;

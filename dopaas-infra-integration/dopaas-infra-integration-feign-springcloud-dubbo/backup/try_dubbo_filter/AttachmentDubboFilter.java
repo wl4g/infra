@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.component.integration.feign.dubbo.context;
+package com.wl4g.infra.integration.feign.dubbo.context;
 
-import static com.wl4g.component.common.collection.CollectionUtils2.isEmpty;
-import static com.wl4g.component.common.log.SmartLoggerFactory.getLogger;
-import static com.wl4g.component.common.reflect.ReflectionUtils2.findMethod;
-import static com.wl4g.component.common.reflect.ReflectionUtils2.invokeMethod;
-import static com.wl4g.component.common.reflect.ReflectionUtils2.makeAccessible;
-import static com.wl4g.component.common.web.WebUtils2.getFirstParameters;
-import static com.wl4g.component.core.utils.web.WebUtils3.currentServletRequest;
+import static com.wl4g.infra.common.collection.CollectionUtils2.isEmpty;
+import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
+import static com.wl4g.infra.common.reflect.ReflectionUtils2.findMethod;
+import static com.wl4g.infra.common.reflect.ReflectionUtils2.invokeMethod;
+import static com.wl4g.infra.common.reflect.ReflectionUtils2.makeAccessible;
+import static com.wl4g.infra.common.web.WebUtils2.getFirstParameters;
+import static com.wl4g.infra.core.utils.web.WebUtils3.currentServletRequest;
 import static java.util.Objects.nonNull;
 
 import java.lang.reflect.Method;
@@ -35,8 +35,8 @@ import com.alibaba.dubbo.rpc.Invoker;
 import com.alibaba.dubbo.rpc.Result;
 import com.alibaba.dubbo.rpc.RpcContext;
 import com.alibaba.dubbo.rpc.RpcException;
-import com.wl4g.component.common.log.SmartLogger;
-import com.wl4g.component.integration.feign.context.RpcContextRegistry;
+import com.wl4g.infra.common.log.SmartLogger;
+import com.wl4g.infra.integration.feign.context.RpcContextRegistry;
 
 /**
  * {@link AttachmentDubboFilter}

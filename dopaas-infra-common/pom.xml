@@ -181,7 +181,7 @@
 		<dependency>
 			<groupId>com.hierynomus</groupId>
 			<artifactId>sshj</artifactId>
-			<!-- @see com.wl4g.component.common.cli.ssh2.SSH2Holders#getDefault() -->
+			<!-- @see com.wl4g.infra.common.cli.ssh2.SSH2Holders#getDefault() -->
 		</dependency>
 		<!-- Ethz SSH2 -->
 		<dependency>

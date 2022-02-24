@@ -17,9 +17,9 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.springboot.feign.web.method;
+package com.wl4g.infra.integration.springboot.feign.web.method;
 
-import static com.wl4g.component.common.reflect.TypeUtils2.isSimpleType;
+import static com.wl4g.infra.common.reflect.TypeUtils2.isSimpleType;
 import static java.util.Objects.nonNull;
 
 import java.lang.reflect.Method;
@@ -30,8 +30,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 
-import com.wl4g.component.common.web.rest.RespBase;
-import com.wl4g.component.core.web.method.HandlerMethodCustomizerInterceptor.HandlerProcessor;
+import com.wl4g.infra.common.web.rest.RespBase;
+import com.wl4g.infra.core.web.method.HandlerMethodCustomizerInterceptor.HandlerProcessor;
 
 /**
  * {@link FeignResponseWrapperProcessor}

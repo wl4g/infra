@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.component.integration.springboot.feign.annotation;
+package com.wl4g.infra.integration.springboot.feign.annotation;
 
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.cloud.openfeign.FeignClientsConfiguration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.AliasFor;
 
-import com.wl4g.component.integration.springboot.feign.config.SpringBootFeignAutoConfiguration;
+import com.wl4g.infra.integration.springboot.feign.config.SpringBootFeignAutoConfiguration;
 
 import feign.Logger;
 import feign.Retryer;

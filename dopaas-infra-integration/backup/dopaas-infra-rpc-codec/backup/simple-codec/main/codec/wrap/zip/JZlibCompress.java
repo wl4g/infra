@@ -17,14 +17,14 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec.wrap.zip;
+package com.wl4g.infra.integration.codec.wrap.zip;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 
 import com.jcraft.jzlib.GZIPInputStream;
 import com.jcraft.jzlib.GZIPOutputStream;
-import com.wl4g.component.integration.codec.helper.IOHelper;
+import com.wl4g.infra.integration.codec.helper.IOHelper;
 
 /**
  * JZlib compress,It needs jzlib-1.1-up support.

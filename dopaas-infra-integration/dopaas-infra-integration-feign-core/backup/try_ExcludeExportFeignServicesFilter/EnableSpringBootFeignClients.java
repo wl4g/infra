@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.component.integration.springboot.feign.annotation;
+package com.wl4g.infra.integration.springboot.feign.annotation;
 
 import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.AliasFor;
 
-import com.wl4g.component.core.web.mapping.annotation.EnableSmartMappingConfiguration;
-import com.wl4g.component.core.web.mapping.annotation.EnableSmartMappingConfiguration.DefaultMappingHandlerFilter;
+import com.wl4g.infra.core.web.mapping.annotation.EnableSmartMappingConfiguration;
+import com.wl4g.infra.core.web.mapping.annotation.EnableSmartMappingConfiguration.DefaultMappingHandlerFilter;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
-import static com.wl4g.component.common.lang.ClassUtils2.getPackageName;
-import static com.wl4g.component.integration.springboot.feign.annotation.EnableSpringBootFeignClients.ExcludeExportFeignServicesFilter;
+import static com.wl4g.infra.common.lang.ClassUtils2.getPackageName;
+import static com.wl4g.infra.integration.springboot.feign.annotation.EnableSpringBootFeignClients.ExcludeExportFeignServicesFilter;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.startsWithAny;
 

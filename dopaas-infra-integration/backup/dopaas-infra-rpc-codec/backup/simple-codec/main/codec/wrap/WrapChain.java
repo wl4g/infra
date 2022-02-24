@@ -17,13 +17,13 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec.wrap;
+package com.wl4g.infra.integration.codec.wrap;
 
-import com.wl4g.component.integration.codec.CodecParameter;
-import com.wl4g.component.integration.codec.Decoder;
-import com.wl4g.component.integration.codec.Encoder;
-import com.wl4g.component.integration.codec.stream.BytesInputStream;
-import com.wl4g.component.integration.codec.stream.BytesOutputStream;
+import com.wl4g.infra.integration.codec.CodecParameter;
+import com.wl4g.infra.integration.codec.Decoder;
+import com.wl4g.infra.integration.codec.Encoder;
+import com.wl4g.infra.integration.codec.stream.BytesInputStream;
+import com.wl4g.infra.integration.codec.stream.BytesOutputStream;
 
 /**
  * 
@@ -41,7 +41,7 @@ public class WrapChain {
 	 * Add wrapper to wrap chain
 	 * 
 	 * @param wrap
-	 *            {@linkplain com.wl4g.component.integration.codec.wrap.Wrapper Wrapper}
+	 *            {@linkplain com.wl4g.infra.integration.codec.wrap.Wrapper Wrapper}
 	 *            object.
 	 */
 	public void add(Wrapper wrap) {

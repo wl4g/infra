@@ -22,7 +22,7 @@ dubbo:
       port: 22224 # Default(22222)
       accept.foreign.ip: false # Default(false))
   scan:
-    basePackages: com.wl4g.component.integration.example
+    basePackages: com.wl4g.infra.integration.example
   protocol:
     #rmi.port: 9090
     name: dubbo

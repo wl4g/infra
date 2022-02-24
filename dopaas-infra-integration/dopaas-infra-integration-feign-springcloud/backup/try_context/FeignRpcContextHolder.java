@@ -17,7 +17,7 @@
 // * 
 // * Reference to website: http://wl4g.com
 // */
-//package com.wl4g.component.integration.feign.context;
+//package com.wl4g.infra.integration.feign.context;
 //
 //import java.util.HashMap;
 //import java.util.Map;

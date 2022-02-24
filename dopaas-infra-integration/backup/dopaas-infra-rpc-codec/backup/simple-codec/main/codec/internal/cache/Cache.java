@@ -17,16 +17,16 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec.internal.cache;
+package com.wl4g.infra.integration.codec.internal.cache;
 
 import java.lang.reflect.Field;
 
-import static com.wl4g.component.common.log.SmartLoggerFactory.getLogger;
-import com.wl4g.component.common.log.SmartLogger;
-import com.wl4g.component.integration.codec.CodecConfig;
-import com.wl4g.component.integration.codec.CodecConfig.CacheType;
-import com.wl4g.component.integration.codec.helper.EnvHelper;
-import com.wl4g.component.integration.codec.helper.StringHelper;
+import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
+import com.wl4g.infra.common.log.SmartLogger;
+import com.wl4g.infra.integration.codec.CodecConfig;
+import com.wl4g.infra.integration.codec.CodecConfig.CacheType;
+import com.wl4g.infra.integration.codec.helper.EnvHelper;
+import com.wl4g.infra.integration.codec.helper.StringHelper;
 
 /**
  * Indicate thar cache object fields and other data.

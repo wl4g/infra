@@ -17,15 +17,15 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec.basetype;
+package com.wl4g.infra.integration.codec.basetype;
 
 import java.io.IOException;
 
-import com.wl4g.component.integration.codec.CodecParameter;
-import com.wl4g.component.integration.codec.Decoder;
-import com.wl4g.component.integration.codec.Encoder;
-import com.wl4g.component.integration.codec.stream.BytesInputStream;
-import com.wl4g.component.integration.codec.stream.BytesOutputStream;
+import com.wl4g.infra.integration.codec.CodecParameter;
+import com.wl4g.infra.integration.codec.Decoder;
+import com.wl4g.infra.integration.codec.Encoder;
+import com.wl4g.infra.integration.codec.stream.BytesInputStream;
+import com.wl4g.infra.integration.codec.stream.BytesOutputStream;
 
 /**
  * Indicate the interface to coding base java type usch as String, int, short

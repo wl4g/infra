@@ -1,12 +1,12 @@
-package com.wl4g.component.integration.codec.verify;
+package com.wl4g.infra.integration.codec.verify;
 
-import com.wl4g.component.integration.codec.ObjectCoder;
-import com.wl4g.component.integration.codec.CodecConfig.EndianType;
-import com.wl4g.component.integration.codec.CodecConfig.TotalLengthType;
-import com.wl4g.component.integration.codec.helper.ByteHelper;
-import com.wl4g.component.integration.codec.type.OCInt16;
-import com.wl4g.component.integration.codec.wrap.IdentifyWrapper;
-import com.wl4g.component.integration.codec.wrap.VerifyWrapper;
+import com.wl4g.infra.integration.codec.ObjectCoder;
+import com.wl4g.infra.integration.codec.CodecConfig.EndianType;
+import com.wl4g.infra.integration.codec.CodecConfig.TotalLengthType;
+import com.wl4g.infra.integration.codec.helper.ByteHelper;
+import com.wl4g.infra.integration.codec.type.OCInt16;
+import com.wl4g.infra.integration.codec.wrap.IdentifyWrapper;
+import com.wl4g.infra.integration.codec.wrap.VerifyWrapper;
 
 public class VerifyCoder {
 

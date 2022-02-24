@@ -17,9 +17,9 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec.type;
+package com.wl4g.infra.integration.codec.type;
 
-import com.wl4g.component.integration.codec.annotations.CodecType;
+import com.wl4g.infra.integration.codec.annotations.CodecType;
 
 /**
  * 32-bits integer just like short type.

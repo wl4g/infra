@@ -19,7 +19,7 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import feign.Feign;
 import feign.Target;
 
-import static com.wl4g.component.common.reflect.ReflectionUtils2.findField;
+import static com.wl4g.infra.common.reflect.ReflectionUtils2.findField;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;

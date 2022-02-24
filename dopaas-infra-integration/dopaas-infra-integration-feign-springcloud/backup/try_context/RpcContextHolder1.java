@@ -17,13 +17,13 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.feign.context;
+package com.wl4g.infra.integration.feign.context;
 
-import static com.wl4g.component.common.lang.Assert2.hasTextOf;
-import static com.wl4g.component.common.lang.Assert2.notNullOf;
-import static com.wl4g.component.common.serialize.JacksonUtils.parseJSON;
-import static com.wl4g.component.common.serialize.JacksonUtils.toJSONString;
-import static com.wl4g.component.common.lang.Assert2.notNull;
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
+import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
+import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static java.util.Collections.synchronizedMap;
 import static java.util.Objects.isNull;
 

@@ -17,7 +17,7 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec.helper;
+package com.wl4g.infra.integration.codec.helper;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -28,7 +28,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 
-import com.wl4g.component.integration.codec.exception.OCException;
+import com.wl4g.infra.integration.codec.exception.OCException;
 
 /**
  * ByteHelper.java

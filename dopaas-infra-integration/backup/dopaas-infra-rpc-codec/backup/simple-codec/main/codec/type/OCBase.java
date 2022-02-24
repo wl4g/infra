@@ -17,17 +17,17 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec.type;
+package com.wl4g.infra.integration.codec.type;
 
-import com.wl4g.component.integration.codec.CodecParameter;
-import com.wl4g.component.integration.codec.Decoder;
-import com.wl4g.component.integration.codec.Encoder;
-import com.wl4g.component.integration.codec.annotations.CodecType;
-import com.wl4g.component.integration.codec.basetype.BaseType;
-import com.wl4g.component.integration.codec.basetype.BaseTypeFactory;
-import com.wl4g.component.integration.codec.helper.ReflectHelper;
-import com.wl4g.component.integration.codec.stream.BytesInputStream;
-import com.wl4g.component.integration.codec.stream.BytesOutputStream;
+import com.wl4g.infra.integration.codec.CodecParameter;
+import com.wl4g.infra.integration.codec.Decoder;
+import com.wl4g.infra.integration.codec.Encoder;
+import com.wl4g.infra.integration.codec.annotations.CodecType;
+import com.wl4g.infra.integration.codec.basetype.BaseType;
+import com.wl4g.infra.integration.codec.basetype.BaseTypeFactory;
+import com.wl4g.infra.integration.codec.helper.ReflectHelper;
+import com.wl4g.infra.integration.codec.stream.BytesInputStream;
+import com.wl4g.infra.integration.codec.stream.BytesOutputStream;
 
 /**
  * 

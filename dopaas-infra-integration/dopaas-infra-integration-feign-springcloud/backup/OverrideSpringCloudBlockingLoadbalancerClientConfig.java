@@ -17,7 +17,7 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.springcloud.feign.config;
+package com.wl4g.infra.integration.springcloud.feign.config;
 
 import java.net.URI;
 import java.util.HashMap;

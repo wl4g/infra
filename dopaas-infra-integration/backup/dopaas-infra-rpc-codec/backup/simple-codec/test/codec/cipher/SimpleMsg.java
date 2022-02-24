@@ -1,4 +1,4 @@
-package com.wl4g.component.integration.codec.cipher;
+package com.wl4g.infra.integration.codec.cipher;
 
 public class SimpleMsg {
 	int id;

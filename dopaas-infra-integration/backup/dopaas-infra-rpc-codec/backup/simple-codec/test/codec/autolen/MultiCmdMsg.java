@@ -1,4 +1,4 @@
-package com.wl4g.component.integration.codec.autolen;
+package com.wl4g.infra.integration.codec.autolen;
 
 public class MultiCmdMsg {
 	int id;

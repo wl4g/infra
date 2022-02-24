@@ -17,10 +17,10 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.feign.dubbo.context;
+package com.wl4g.infra.integration.feign.dubbo.context;
 
 import com.alibaba.dubbo.rpc.RpcContext;
-import com.wl4g.component.integration.feign.context.RpcContextRegistry;
+import com.wl4g.infra.integration.feign.context.RpcContextRegistry;
 
 /**
  * {@link DubboRpcContextHolder}

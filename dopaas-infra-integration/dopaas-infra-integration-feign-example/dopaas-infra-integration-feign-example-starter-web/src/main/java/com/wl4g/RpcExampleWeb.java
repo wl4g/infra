@@ -22,7 +22,7 @@ package com.wl4g;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.wl4g.component.integration.feign.core.annotation.EnableFeignConsumers;
+import com.wl4g.infra.integration.feign.core.annotation.EnableFeignConsumers;
 
 /**
  * {@link RpcExampleWeb}
@@ -32,9 +32,9 @@ import com.wl4g.component.integration.feign.core.annotation.EnableFeignConsumers
  * @sine v1.0
  * @see
  */
-// @EnableFeignClients("com.wl4g.component.integration.example.service")
-@EnableFeignConsumers("com.wl4g.component.integration.example.service")
-@SpringBootApplication(scanBasePackages = "com.wl4g.component.integration.example")
+// @EnableFeignClients("com.wl4g.infra.integration.example.service")
+@EnableFeignConsumers("com.wl4g.infra.integration.example.service")
+@SpringBootApplication(scanBasePackages = "com.wl4g.infra.integration.example")
 public class RpcExampleWeb {
 
 	public static void main(String[] args) {

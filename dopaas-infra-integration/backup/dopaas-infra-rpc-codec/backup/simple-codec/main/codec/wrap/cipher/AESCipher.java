@@ -17,7 +17,7 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec.wrap.cipher;
+package com.wl4g.infra.integration.codec.wrap.cipher;
 
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
@@ -27,8 +27,8 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-import com.wl4g.component.integration.codec.exception.CipherException;
-import com.wl4g.component.integration.codec.wrap.CipherWrapper;
+import com.wl4g.infra.integration.codec.exception.CipherException;
+import com.wl4g.infra.integration.codec.wrap.CipherWrapper;
 
 /**
  * AES cipher.

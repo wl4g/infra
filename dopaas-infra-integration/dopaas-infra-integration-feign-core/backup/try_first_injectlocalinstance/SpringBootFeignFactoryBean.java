@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.component.integration.springboot.feign.annotation;
+package com.wl4g.infra.integration.springboot.feign.annotation;
 
 import feign.Body;
 import feign.Client;
@@ -57,29 +57,29 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.io.CharStreams;
-import com.wl4g.component.common.annotation.Reserved;
-import com.wl4g.component.common.collection.CollectionUtils2;
-import com.wl4g.component.common.log.SmartLogger;
-import com.wl4g.component.common.web.rest.RespBase;
-import com.wl4g.component.integration.springboot.feign.annotation.mvc.SpringMvcContract;
-import com.wl4g.component.integration.springboot.feign.config.SpringBootFeignConfigurer;
-import com.wl4g.component.integration.springboot.feign.config.SpringBootFeignProperties;
-import com.wl4g.component.integration.springboot.feign.context.FeignContextBinders;
-import com.wl4g.component.integration.springboot.feign.context.RpcContextHolder;
+import com.wl4g.infra.common.annotation.Reserved;
+import com.wl4g.infra.common.collection.CollectionUtils2;
+import com.wl4g.infra.common.log.SmartLogger;
+import com.wl4g.infra.common.web.rest.RespBase;
+import com.wl4g.infra.integration.springboot.feign.annotation.mvc.SpringMvcContract;
+import com.wl4g.infra.integration.springboot.feign.config.SpringBootFeignConfigurer;
+import com.wl4g.infra.integration.springboot.feign.config.SpringBootFeignProperties;
+import com.wl4g.infra.integration.springboot.feign.context.FeignContextBinders;
+import com.wl4g.infra.integration.springboot.feign.context.RpcContextHolder;
 
-import static com.wl4g.component.common.collection.CollectionUtils2.isEmpty;
-import static com.wl4g.component.common.collection.CollectionUtils2.safeArrayToList;
-import static com.wl4g.component.common.collection.CollectionUtils2.safeList;
-import static com.wl4g.component.common.lang.Assert2.hasText;
-import static com.wl4g.component.common.lang.Assert2.isTrue;
-import static com.wl4g.component.common.lang.Assert2.notNullOf;
-import static com.wl4g.component.common.lang.ClassUtils2.resolveClassNameNullable;
-import static com.wl4g.component.common.log.SmartLoggerFactory.getLogger;
-import static com.wl4g.component.common.reflect.ReflectionUtils2.findMethod;
-import static com.wl4g.component.common.reflect.ReflectionUtils2.findMethodNullable;
-import static com.wl4g.component.common.reflect.ReflectionUtils2.invokeMethod;
-import static com.wl4g.component.integration.springboot.feign.config.SpringBootFeignConfigurer.BEAN_FEIGN_CLIENT;
-import static com.wl4g.component.integration.springboot.feign.constant.SpringBootFeignConstant.KEY_CONFIG_PREFIX;
+import static com.wl4g.infra.common.collection.CollectionUtils2.isEmpty;
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToList;
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
+import static com.wl4g.infra.common.lang.Assert2.hasText;
+import static com.wl4g.infra.common.lang.Assert2.isTrue;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.infra.common.lang.ClassUtils2.resolveClassNameNullable;
+import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
+import static com.wl4g.infra.common.reflect.ReflectionUtils2.findMethod;
+import static com.wl4g.infra.common.reflect.ReflectionUtils2.findMethodNullable;
+import static com.wl4g.infra.common.reflect.ReflectionUtils2.invokeMethod;
+import static com.wl4g.infra.integration.springboot.feign.config.SpringBootFeignConfigurer.BEAN_FEIGN_CLIENT;
+import static com.wl4g.infra.integration.springboot.feign.constant.SpringBootFeignConstant.KEY_CONFIG_PREFIX;
 import static feign.Util.UTF_8;
 import static feign.Util.toByteArray;
 import static feign.Util.valuesOrEmpty;

@@ -17,27 +17,27 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec.basetype;
+package com.wl4g.infra.integration.codec.basetype;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.wl4g.component.integration.codec.CodecParameter;
-import com.wl4g.component.integration.codec.basetype.BaseType.BaseTypeBox;
-import com.wl4g.component.integration.codec.basetype.impl.ByteType;
-import com.wl4g.component.integration.codec.basetype.impl.DoubleType;
-import com.wl4g.component.integration.codec.basetype.impl.FloatType;
-import com.wl4g.component.integration.codec.basetype.impl.IntegerType;
-import com.wl4g.component.integration.codec.basetype.impl.LongType;
-import com.wl4g.component.integration.codec.basetype.impl.ShortType;
-import com.wl4g.component.integration.codec.basetype.impl.StringType;
-import com.wl4g.component.integration.codec.basetype.impl.array.ByteArrayType;
-import com.wl4g.component.integration.codec.basetype.impl.array.DoubleArrayType;
-import com.wl4g.component.integration.codec.basetype.impl.array.FloatArrayType;
-import com.wl4g.component.integration.codec.basetype.impl.array.IntegerArrayType;
-import com.wl4g.component.integration.codec.basetype.impl.array.LongArrayType;
-import com.wl4g.component.integration.codec.basetype.impl.array.ObjectArrayType;
-import com.wl4g.component.integration.codec.basetype.impl.array.ShortArrayType;
-import com.wl4g.component.integration.codec.basetype.impl.array.StringArrayType;
+import com.wl4g.infra.integration.codec.CodecParameter;
+import com.wl4g.infra.integration.codec.basetype.BaseType.BaseTypeBox;
+import com.wl4g.infra.integration.codec.basetype.impl.ByteType;
+import com.wl4g.infra.integration.codec.basetype.impl.DoubleType;
+import com.wl4g.infra.integration.codec.basetype.impl.FloatType;
+import com.wl4g.infra.integration.codec.basetype.impl.IntegerType;
+import com.wl4g.infra.integration.codec.basetype.impl.LongType;
+import com.wl4g.infra.integration.codec.basetype.impl.ShortType;
+import com.wl4g.infra.integration.codec.basetype.impl.StringType;
+import com.wl4g.infra.integration.codec.basetype.impl.array.ByteArrayType;
+import com.wl4g.infra.integration.codec.basetype.impl.array.DoubleArrayType;
+import com.wl4g.infra.integration.codec.basetype.impl.array.FloatArrayType;
+import com.wl4g.infra.integration.codec.basetype.impl.array.IntegerArrayType;
+import com.wl4g.infra.integration.codec.basetype.impl.array.LongArrayType;
+import com.wl4g.infra.integration.codec.basetype.impl.array.ObjectArrayType;
+import com.wl4g.infra.integration.codec.basetype.impl.array.ShortArrayType;
+import com.wl4g.infra.integration.codec.basetype.impl.array.StringArrayType;
 
 /**
  * Mapping base type with base type coder.

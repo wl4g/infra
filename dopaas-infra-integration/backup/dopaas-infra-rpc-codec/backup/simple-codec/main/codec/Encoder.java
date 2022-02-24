@@ -17,9 +17,9 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec;
+package com.wl4g.infra.integration.codec;
 
-import com.wl4g.component.integration.codec.stream.BytesOutputStream;
+import com.wl4g.infra.integration.codec.stream.BytesOutputStream;
 
 /**
  * Encoder is the interface to encode message object in codec. Developer can

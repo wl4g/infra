@@ -13,7 +13,7 @@ Write [Feign](https://github.com/OpenFeign/feign) client with `annotation`, like
 On the basis of `@SpringBootApplication`:
 
 ```java
-@EnableFeignConsumers(basePackages = "com.wl4g.component.integration.feign.core")
+@EnableFeignConsumers(basePackages = "com.wl4g.infra.integration.feign.core")
 @SpringBootApplication
 public class SpringBootTests {
 

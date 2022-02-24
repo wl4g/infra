@@ -17,9 +17,9 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec;
+package com.wl4g.infra.integration.codec;
 
-import com.wl4g.component.integration.codec.type.OCObject;
+import com.wl4g.infra.integration.codec.type.OCObject;
 
 /**
  * Codec interface. Developers can implement it to customize codec.<br>
@@ -44,7 +44,7 @@ public abstract class Codec {
 	}
 
 	/**
-	 * Encode {@linkplain com.wl4g.component.integration.codec.type.OCObject OCObject}
+	 * Encode {@linkplain com.wl4g.infra.integration.codec.type.OCObject OCObject}
 	 * object.
 	 * 
 	 * @param msg
@@ -57,7 +57,7 @@ public abstract class Codec {
 	public abstract byte[] encode(OCObject msg) throws Exception;
 
 	/**
-	 * Decode {@linkplain com.wl4g.component.integration.codec.type.OCObject OCObject}
+	 * Decode {@linkplain com.wl4g.infra.integration.codec.type.OCObject OCObject}
 	 * object.
 	 * 
 	 * @param bytes
@@ -65,7 +65,7 @@ public abstract class Codec {
 	 * @param source
 	 *            Target decoding object.
 	 * @return If successful encoding, return
-	 *         {@linkplain com.wl4g.component.integration.codec.type.OCObject OCObject}
+	 *         {@linkplain com.wl4g.infra.integration.codec.type.OCObject OCObject}
 	 *         object. Otherwise return null.
 	 * @throws Exception
 	 */

@@ -17,26 +17,26 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec.internal;
+package com.wl4g.infra.integration.codec.internal;
 
-import static com.wl4g.component.common.log.SmartLoggerFactory.getLogger;
-import com.wl4g.component.common.log.SmartLogger;
-import com.wl4g.component.integration.codec.CodecParameter;
-import com.wl4g.component.integration.codec.Decoder;
-import com.wl4g.component.integration.codec.basetype.BaseType;
-import com.wl4g.component.integration.codec.basetype.BaseTypeFactory;
-import com.wl4g.component.integration.codec.exception.OCException;
-import com.wl4g.component.integration.codec.helper.ReflectHelper;
-import com.wl4g.component.integration.codec.helper.StringHelper;
-import com.wl4g.component.integration.codec.stream.BytesInputStream;
-import com.wl4g.component.integration.codec.type.OCInt32;
-import com.wl4g.component.integration.codec.type.OCInteger;
-import com.wl4g.component.integration.codec.type.OCObject;
-import com.wl4g.component.integration.codec.type.OCType;
+import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
+import com.wl4g.infra.common.log.SmartLogger;
+import com.wl4g.infra.integration.codec.CodecParameter;
+import com.wl4g.infra.integration.codec.Decoder;
+import com.wl4g.infra.integration.codec.basetype.BaseType;
+import com.wl4g.infra.integration.codec.basetype.BaseTypeFactory;
+import com.wl4g.infra.integration.codec.exception.OCException;
+import com.wl4g.infra.integration.codec.helper.ReflectHelper;
+import com.wl4g.infra.integration.codec.helper.StringHelper;
+import com.wl4g.infra.integration.codec.stream.BytesInputStream;
+import com.wl4g.infra.integration.codec.type.OCInt32;
+import com.wl4g.infra.integration.codec.type.OCInteger;
+import com.wl4g.infra.integration.codec.type.OCObject;
+import com.wl4g.infra.integration.codec.type.OCType;
 
 /**
  * Default decoder in
- * {@linkplain com.wl4g.component.integration.codec.internal.DefaultCodec DefaultCodec}.
+ * {@linkplain com.wl4g.infra.integration.codec.internal.DefaultCodec DefaultCodec}.
  * 
  * DefaultDecoder.java
  * 

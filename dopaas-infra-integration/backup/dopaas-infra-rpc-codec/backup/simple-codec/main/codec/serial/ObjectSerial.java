@@ -17,9 +17,9 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec.serial;
+package com.wl4g.infra.integration.codec.serial;
 
-import com.wl4g.component.integration.codec.ObjectCoder;
+import com.wl4g.infra.integration.codec.ObjectCoder;
 
 /**
  * Serial JAVA object through simple protocol.

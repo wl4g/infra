@@ -17,7 +17,7 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec.helper;
+package com.wl4g.infra.integration.codec.helper;
 
 /**
  * 

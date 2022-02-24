@@ -1,4 +1,4 @@
-package com.wl4g.component.integration.codec.verify;
+package com.wl4g.infra.integration.codec.verify;
 
 public class SimpleMsg {
 	int id;

@@ -17,9 +17,9 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.component.integration.codec.wrap.cipher;
+package com.wl4g.infra.integration.codec.wrap.cipher;
 
-import com.wl4g.component.integration.codec.CodecParameter;
+import com.wl4g.infra.integration.codec.CodecParameter;
 
 /**
  * Customize cipher interface.

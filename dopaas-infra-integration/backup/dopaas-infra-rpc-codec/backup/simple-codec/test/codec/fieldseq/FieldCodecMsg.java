@@ -1,7 +1,7 @@
-package com.wl4g.component.integration.codec.fieldseq;
+package com.wl4g.infra.integration.codec.fieldseq;
 
-import com.wl4g.component.integration.codec.type.OCObject;
-import com.wl4g.component.integration.codec.type.OCString;
+import com.wl4g.infra.integration.codec.type.OCObject;
+import com.wl4g.infra.integration.codec.type.OCString;
 
 public class FieldCodecMsg extends OCObject {
 	public FieldCodecMsg() {
