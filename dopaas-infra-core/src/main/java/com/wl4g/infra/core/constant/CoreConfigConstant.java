@@ -29,7 +29,7 @@ package com.wl4g.infra.core.constant;
  */
 public abstract class CoreConfigConstant extends BaseConstant {
 
-    public static final String KEY_PREFIX_MODULE_CORE = "spring.infra.dopaas.component.core.";
+    public static final String KEY_PREFIX_MODULE_CORE = "spring.dopaas-infra.core.";
 
     public static final String KEY_BOOTSTRAPPING = KEY_PREFIX_MODULE_CORE + "bootstrapping";
 
@@ -44,5 +44,7 @@ public abstract class CoreConfigConstant extends BaseConstant {
     public static final String KEY_WEB_GLOBAL_ERROR = KEY_PREFIX_MODULE_CORE + "web.global-error";
 
     public static final String KEY_WEB_EMBEDDED_WEBAPP = KEY_PREFIX_MODULE_CORE + "web.embedded-webapps";
+
+    public static final String KEY_REMOTE_CLIENT = KEY_PREFIX_MODULE_CORE + "remote";
 
 }

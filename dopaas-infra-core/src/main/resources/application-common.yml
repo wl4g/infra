@@ -18,36 +18,35 @@ spring:
   banner:
     charset: UTF-8
     #location: classpath:default-banner.txt
-  xcloud:
-    #component:
-    #  core:
-    #    bootstrapping:
-    #      enabled: true # Default by true
-    #    naming-beanfactory:
-    #      enabled: true # Default by true
-    #    generic-operator:
-    #      enabled: true # Default by true
-    #    smart-proxies:
-    #      enabled: true # Default by true
-    #      base-packages: # Default by '*'
-    #    web:
-    #      human-date-converter:
-    #        enabled: true # Default by true
-    #      embedded-webapps:
-    #        enabled: false # Default by false
-    #        base-uri: /default-view
-    #        webapp-location: classpath*:/default-webapps
-    #      global-error:
-    #        enabled: true # Default by true
-    #        base-path: /default-error-view/
-    #        # Default for empty, The default is to intercept the domain name of the browser address bar.
-    #        home-uri: 'javascript:location.href=location.origin'
-    #        # Rendering template path or redirect URI on exception,
-    #        # for example: redirect:http://domain.com/404.html or /404.tpl.html
-    #        rendering-mapping:
-    #           403: 403.tpl.html
-    #           404: 404.tpl.html
-    #           500: 50x.tpl.html
-    #           501: 50x.tpl.html
-    #           502: 50x.tpl.html
-    #           503: 50x.tpl.html
+  #dopaas-infra:
+  #  core:
+  #    bootstrapping:
+  #      enabled: true # Default by true
+  #    naming-beanfactory:
+  #      enabled: true # Default by true
+  #    generic-operator:
+  #      enabled: true # Default by true
+  #    smart-proxies:
+  #      enabled: true # Default by true
+  #      base-packages: # Default by '*'
+  #    web:
+  #      human-date-converter:
+  #        enabled: true # Default by true
+  #      embedded-webapps:
+  #        enabled: false # Default by false
+  #        base-uri: /default-view
+  #        webapp-location: classpath*:/default-webapps
+  #      global-error:
+  #        enabled: true # Default by true
+  #        base-path: /default-error-view/
+  #        # Default for empty, The default is to intercept the domain name of the browser address bar.
+  #        home-uri: 'javascript:location.href=location.origin'
+  #        # Rendering template path or redirect URI on exception,
+  #        # for example: redirect:http://domain.com/404.html or /404.tpl.html
+  #        rendering-mapping:
+  #           403: 403.tpl.html
+  #           404: 404.tpl.html
+  #           500: 50x.tpl.html
+  #           501: 50x.tpl.html
+  #           502: 50x.tpl.html
+  #           503: 50x.tpl.html

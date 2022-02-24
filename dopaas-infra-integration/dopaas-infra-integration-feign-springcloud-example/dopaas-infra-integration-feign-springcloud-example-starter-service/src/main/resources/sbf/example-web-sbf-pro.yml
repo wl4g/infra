@@ -8,10 +8,16 @@
 # limitations under the License.
 #
 
+# #### Environment(SpringBoot Feign for Pro) configuration. ####
+#
+
 spring:
   dopaas-infra:
-    data:
-      #mybatis-loader:
-      #  enabled: false # Default by auto(currently running in JVM jdwp mode?)
-      #  fastFail: false # Default by false
-      #  monitorLoaderIntervalMs: 1000 # Default by 1000ms
+    integration:
+      feign:
+        default-url: http://localhost:27002
+        default-log-level: BASIC # NONE|BASIC|HEADERS|FULL
+        client-provider: okhttp3 # http2Client|okhttp3, default to okhttp3
+        max-idle-connections: 520
+        connect-timeout: 11000
+        read-timeout: 12000

@@ -31,7 +31,7 @@ import com.wl4g.infra.core.constant.BaseConstant;
  */
 public abstract class SupportConfigConstant extends BaseConstant {
 
-    public static final String KEY_PREFIX_MODULE_SUPPORT = "spring.infra.dopaas.component.support.";
+    public static final String KEY_PREFIX_MODULE_SUPPORT = "spring.dopaas-infra.support.";
 
     public static final String KEY_SUPPORT_CLI_PREFIX = KEY_PREFIX_MODULE_SUPPORT + "cli";
 

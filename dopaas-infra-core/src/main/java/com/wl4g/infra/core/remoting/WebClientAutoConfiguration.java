@@ -31,6 +31,8 @@ import org.springframework.http.client.reactive.ClientHttpConnector;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.http.client.reactive.ReactorResourceFactory;
 
+import com.wl4g.infra.core.constant.CoreConfigConstant;
+
 import static com.wl4g.infra.common.lang.TypeConverts.safeLongToInt;
 import static io.netty.channel.ChannelOption.*;
 import io.netty.handler.timeout.ReadTimeoutHandler;
@@ -49,118 +51,119 @@ import reactor.netty.tcp.TcpClient;
 @ConditionalOnWebApplication(type = Type.REACTIVE)
 public class WebClientAutoConfiguration {
 
-	@Bean
-	@ConfigurationProperties(prefix = "spring.web.remote")
-	public ClientHttpProperties remoteProperties() {
-		return new ClientHttpProperties();
-	}
+    @Bean
+    @ConfigurationProperties(prefix = CoreConfigConstant.KEY_REMOTE_CLIENT)
+    public ClientHttpProperties remoteProperties() {
+        return new ClientHttpProperties();
+    }
 
-	@Bean
-	@ConditionalOnMissingBean
-	public ClientHttpConnector clientHttpConnector(ClientHttpProperties config, ReactorResourceFactory reactorFactory) {
-		TcpClient client = TcpClient.create(reactorFactory.getConnectionProvider()).runOn(reactorFactory.getLoopResources())
-				.option(CONNECT_TIMEOUT_MILLIS, safeLongToInt(SECONDS.toMillis(config.getConnectTimeout())))
-				.doOnConnected(conn -> conn.addHandlerLast(new ReadTimeoutHandler(config.getReadTimeout())));
-		return new ReactorClientHttpConnector(HttpClient.from(client));
-	}
+    @Bean
+    @ConditionalOnMissingBean
+    public ClientHttpConnector clientHttpConnector(ClientHttpProperties config, ReactorResourceFactory reactorFactory) {
+        TcpClient client = TcpClient.create(reactorFactory.getConnectionProvider())
+                .runOn(reactorFactory.getLoopResources())
+                .option(CONNECT_TIMEOUT_MILLIS, safeLongToInt(SECONDS.toMillis(config.getConnectTimeout())))
+                .doOnConnected(conn -> conn.addHandlerLast(new ReadTimeoutHandler(config.getReadTimeout())));
+        return new ReactorClientHttpConnector(HttpClient.from(client));
+    }
 
-	/**
-	 * Remote rest template properties
-	 * 
-	 * @author Wangl.sir <983708408@qq.com>
-	 * @version v1.0
-	 * @date 2018年11月20日
-	 * @since
-	 */
-	public static class ClientHttpProperties {
+    /**
+     * Remote rest template properties
+     * 
+     * @author Wangl.sir <983708408@qq.com>
+     * @version v1.0
+     * @date 2018年11月20日
+     * @since
+     */
+    public static class ClientHttpProperties {
 
-		private int readTimeout = 60_000;
-		private int connectTimeout = 10_000;
-		private int maxResponseSize = 1024 * 1024 * 10;
-		private SslProperties sslProperties = new SslProperties();
+        private int readTimeout = 60_000;
+        private int connectTimeout = 10_000;
+        private int maxResponseSize = 1024 * 1024 * 10;
+        private SslProperties sslProperties = new SslProperties();
 
-		public Integer getReadTimeout() {
-			return readTimeout;
-		}
+        public Integer getReadTimeout() {
+            return readTimeout;
+        }
 
-		public void setReadTimeout(int readTimeout) {
-			this.readTimeout = readTimeout;
-		}
+        public void setReadTimeout(int readTimeout) {
+            this.readTimeout = readTimeout;
+        }
 
-		public int getConnectTimeout() {
-			return connectTimeout;
-		}
+        public int getConnectTimeout() {
+            return connectTimeout;
+        }
 
-		public void setConnectTimeout(int connectTimeout) {
-			this.connectTimeout = connectTimeout;
-		}
+        public void setConnectTimeout(int connectTimeout) {
+            this.connectTimeout = connectTimeout;
+        }
 
-		public int getMaxResponseSize() {
-			return maxResponseSize;
-		}
+        public int getMaxResponseSize() {
+            return maxResponseSize;
+        }
 
-		public void setMaxResponseSize(int maxResponseSize) {
-			this.maxResponseSize = maxResponseSize;
-		}
+        public void setMaxResponseSize(int maxResponseSize) {
+            this.maxResponseSize = maxResponseSize;
+        }
 
-		public SslProperties getSslProperties() {
-			return sslProperties;
-		}
+        public SslProperties getSslProperties() {
+            return sslProperties;
+        }
 
-		public void setSslProperties(SslProperties sslProperties) {
-			this.sslProperties = sslProperties;
-		}
+        public void setSslProperties(SslProperties sslProperties) {
+            this.sslProperties = sslProperties;
+        }
 
-	}
+    }
 
-	/**
-	 * Remote SSL context properties.
-	 * 
-	 * @author Wangl.sir <983708408@qq.com>
-	 * @version v1.0
-	 * @date 2018年11月21日
-	 * @since
-	 */
-	public static class SslProperties {
-		/*
-		 * Make sure to sync this list with JdkSslEngineFactory.
-		 */
-		final public static List<String> DEFAULT_CIPHERS = Collections.unmodifiableList(Arrays.asList(
-				new String[] { "ECDHE-RSA-AES128-SHA", "ECDHE-RSA-AES256-SHA", "AES128-SHA", "AES256-SHA", "DES-CBC3-SHA" }));
+    /**
+     * Remote SSL context properties.
+     * 
+     * @author Wangl.sir <983708408@qq.com>
+     * @version v1.0
+     * @date 2018年11月21日
+     * @since
+     */
+    public static class SslProperties {
+        /*
+         * Make sure to sync this list with JdkSslEngineFactory.
+         */
+        final public static List<String> DEFAULT_CIPHERS = Collections.unmodifiableList(Arrays.asList(
+                new String[] { "ECDHE-RSA-AES128-SHA", "ECDHE-RSA-AES256-SHA", "AES128-SHA", "AES256-SHA", "DES-CBC3-SHA" }));
 
-		private String keyCertChainFile;
-		private String keyFile;
-		/**
-		 * Clearly specify OpenSSL, because jdk8 may have performance problems,
-		 * See: https://www.cnblogs.com/wade-luffy/p/6019743.html#_label1
-		 * {@link io.netty.handler.ssl.ReferenceCountedOpenSslContext
-		 * ReferenceCountedOpenSslContext}
-		 */
-		private List<String> ciphers;
+        private String keyCertChainFile;
+        private String keyFile;
+        /**
+         * Clearly specify OpenSSL, because jdk8 may have performance problems,
+         * See: https://www.cnblogs.com/wade-luffy/p/6019743.html#_label1
+         * {@link io.netty.handler.ssl.ReferenceCountedOpenSslContext
+         * ReferenceCountedOpenSslContext}
+         */
+        private List<String> ciphers;
 
-		public String getKeyCertChainFile() {
-			return keyCertChainFile;
-		}
+        public String getKeyCertChainFile() {
+            return keyCertChainFile;
+        }
 
-		public void setKeyCertChainFile(String keyCertChainFile) {
-			this.keyCertChainFile = keyCertChainFile;
-		}
+        public void setKeyCertChainFile(String keyCertChainFile) {
+            this.keyCertChainFile = keyCertChainFile;
+        }
 
-		public String getKeyFile() {
-			return keyFile;
-		}
+        public String getKeyFile() {
+            return keyFile;
+        }
 
-		public void setKeyFile(String keyFile) {
-			this.keyFile = keyFile;
-		}
+        public void setKeyFile(String keyFile) {
+            this.keyFile = keyFile;
+        }
 
-		public List<String> getCiphers() {
-			return this.ciphers;
-		}
+        public List<String> getCiphers() {
+            return this.ciphers;
+        }
 
-		public void setCiphers(List<String> ciphers) {
-			this.ciphers = ciphers;
-		}
-	}
+        public void setCiphers(List<String> ciphers) {
+            this.ciphers = ciphers;
+        }
+    }
 
 }

@@ -12,17 +12,18 @@
 # #### Spring common utility configuration. ####
 #
 spring:
-  web:
-    remote: # RestTemplate configuration.
-      read-timeout: 60_000
-      connect-timeout: 10_000
-      max-response-size: 10485760
-      sslProperties: # SSL configuration.
-        key-cert-chain-file: 
-        key-file: 
-        ciphers: # Supported algorithms(Make sure to sync this list with JdkSslEngineFactory)
-          - ECDHE-RSA-AES128-SHA
-          - ECDHE-RSA-AES256-SHA
-          - AES128-SHA
-          - AES256-SHA
-          - DES-CBC3-SHA
+  dopaas-infra:
+    core:
+      remote: # RestTemplate configuration.
+        read-timeout: 60_000
+        connect-timeout: 10_000
+        max-response-size: 10485760
+        sslProperties: # SSL configuration.
+          key-cert-chain-file: 
+          key-file: 
+          ciphers: # Supported algorithms(Make sure to sync this list with JdkSslEngineFactory)
+            - ECDHE-RSA-AES128-SHA
+            - ECDHE-RSA-AES256-SHA
+            - AES128-SHA
+            - AES256-SHA
+            - DES-CBC3-SHA

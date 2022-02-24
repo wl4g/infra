@@ -1,3 +1,4 @@
+package com.wl4g;
 /*
  * Copyright (C) 2017 ~ 2025 the original author or authors.
  * <Wanglsir@gmail.com, 983708408@qq.com> Technology CO.LTD.
@@ -17,24 +18,27 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.infra.data.constant;
 
-import com.wl4g.infra.core.constant.BaseConstant;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import com.wl4g.infra.integration.feign.core.annotation.EnableFeignConsumers;
 
 /**
- * {@link DataConfigConstant}
+ * {@link FeginSpringCloudExampleWeb}
  * 
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
- * @version v1.0 2021-01-20
+ * @version v1.0 2021-03-18
  * @sine v1.0
  * @see
  */
-public abstract class DataConfigConstant extends BaseConstant {
+// @EnableFeignClients("com.wl4g.infra.integration.example.service")
+@EnableFeignConsumers("com.wl4g.infra.integration.example.service")
+@SpringBootApplication(scanBasePackages = "com.wl4g.infra.integration.example")
+public class FeginSpringCloudExampleWeb {
 
-    public static final String KEY_PREFIX_MODULE_DATA = "spring.dopaas-infra.data.";
-
-    public static final String KEY_MYBATIS_PREFIX = KEY_PREFIX_MODULE_DATA + "mybatis";
-
-    public static final String KEY_HOTSPOT_LOADER_PREFIX = KEY_PREFIX_MODULE_DATA + "mybatis-loader";
+	public static void main(String[] args) {
+		SpringApplication.run(FeginSpringCloudExampleWeb.class, args);
+	}
 
 }

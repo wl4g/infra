@@ -11,21 +11,20 @@
 # #### Environment configuration. ####
 #
 spring:
-  xcloud:
-    component:
-      core:
-        bootstrapping:
+  dopaas-infra:
+    core:
+      bootstrapping:
+        enabled: false
+      naming-beanfactory:
+        enabled: false
+      generic-operator:
+        enabled: false
+      smart-proxies:
+        enabled: false
+      web:
+        embedded-webapps:
           enabled: false
-        naming-beanfactory:
+        human-date-converter:
           enabled: false
-        generic-operator:
+        global-error:
           enabled: false
-        smart-proxies:
-          enabled: false
-        web:
-          embedded-webapps:
-            enabled: false
-          human-date-converter:
-            enabled: false
-          global-error:
-            enabled: false
