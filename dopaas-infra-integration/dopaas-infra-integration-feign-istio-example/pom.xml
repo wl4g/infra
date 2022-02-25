@@ -2,11 +2,11 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>dopaas-infra-integration-feign-springcloud-example-interface</artifactId>
-	<packaging>jar</packaging>
-	<name>DoPaaS Infra Integration Example Interface</name>
+	<artifactId>dopaas-infra-integration-feign-istio-example</artifactId>
+	<packaging>pom</packaging>
+	<name>DoPaaS Infra Integration Example</name>
 	<url>http://infra.dopaas.wl4g.com</url>
-	<description>A DoPaaS Infra Integration Examples Interface.</description>
+	<description>DoPaaS infra integration istio examples projects.</description>
 	<organization>
 		<name>wl4g</name>
 		<url>https://infra.dopaas.wl4g.com</url>
@@ -53,39 +53,29 @@
 	</developers>
 	<parent>
 		<groupId>com.wl4g</groupId>
-		<artifactId>dopaas-infra-integration-feign-springcloud-example</artifactId>
+		<artifactId>dopaas-infra-integration</artifactId>
 		<version>3.0.0</version>
 	</parent>
+	<modules>
+		<module>dopaas-infra-integration-feign-istio-example-interface</module>
+		<module>dopaas-infra-integration-feign-istio-example-starter-service</module>
+		<module>dopaas-infra-integration-feign-istio-example-starter-web</module>
+	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
 	</properties>
-	<dependencies>
-		<!-- Here are 3 different replaceable distributed architectures:(It can 
-			only be one of them) -->
-
-		<!-- ①[SpringBoot + Feign + Istio] When turned on comments and @SpringBootFeignClients 
-			is used on the boot class, it is automatically configured. -->
-		<!-- <dependency> -->
-		<!-- <groupId>com.wl4g</groupId> -->
-		<!-- <artifactId>dopaas-infra-integration-feign-core</artifactId> -->
-		<!-- </dependency> -->
-
-		<!-- ②[SpringCloud + Feign + Netflix] When turned on comments and @FeignClients 
-			is used on the boot class, it is automatically configured. -->
-		<dependency>
-			<groupId>com.wl4g</groupId>
-			<artifactId>dopaas-infra-integration-feign-springcloud</artifactId>
-		</dependency>
-
-		<!-- ③[SpringCloud + (Feign)Dubbo] When turned on comments and @FeignClients 
-			is used on the boot class, it is automatically configured. Notes: Only relying 
-			on feign's interface annotation. -->
-		<!-- <dependency> -->
-		<!-- <groupId>com.wl4g</groupId> -->
-		<!-- <artifactId>dopaas-infra-integration-feign-springcloud-dubbo</artifactId> -->
-		<!-- </dependency> -->
-	</dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.wl4g</groupId>
+				<artifactId>dopaas-infra-bom</artifactId>
+				<version>${project.parent.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 	<build>
 		<resources>
 			<resource>

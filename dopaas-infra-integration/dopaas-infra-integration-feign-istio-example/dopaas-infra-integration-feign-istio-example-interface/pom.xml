@@ -2,11 +2,11 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>dopaas-infra-integration-feign-springcloud-example-interface</artifactId>
+	<artifactId>dopaas-infra-integration-feign-istio-example-interface</artifactId>
 	<packaging>jar</packaging>
 	<name>DoPaaS Infra Integration Example Interface</name>
 	<url>http://infra.dopaas.wl4g.com</url>
-	<description>A DoPaaS Infra Integration Examples Interface.</description>
+	<description>DoPaaS infra integration istio examples interface.</description>
 	<organization>
 		<name>wl4g</name>
 		<url>https://infra.dopaas.wl4g.com</url>
@@ -53,7 +53,7 @@
 	</developers>
 	<parent>
 		<groupId>com.wl4g</groupId>
-		<artifactId>dopaas-infra-integration-feign-springcloud-example</artifactId>
+		<artifactId>dopaas-infra-integration-feign-istio-example</artifactId>
 		<version>3.0.0</version>
 	</parent>
 	<properties>

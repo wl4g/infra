@@ -52,7 +52,7 @@
 	</developers>
 	<parent>
 		<groupId>com.wl4g</groupId>
-		<artifactId>dopaas-infra-integration-feign-example</artifactId>
+		<artifactId>dopaas-infra-integration-feign-springcloud-example</artifactId>
 		<version>3.0.0</version>
 	</parent>
 	<properties>
