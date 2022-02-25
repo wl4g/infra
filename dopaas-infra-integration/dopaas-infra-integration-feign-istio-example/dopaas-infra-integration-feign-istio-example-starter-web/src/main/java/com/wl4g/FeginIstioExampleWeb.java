@@ -1,3 +1,4 @@
+package com.wl4g;
 /*
  * Copyright (C) 2017 ~ 2025 the original author or authors.
  * <Wanglsir@gmail.com, 983708408@qq.com> Technology CO.LTD.
@@ -17,31 +18,27 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.infra.integration.feign.core.extension;
 
-import java.lang.reflect.Type;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import javax.validation.constraints.NotNull;
-
-import com.wl4g.infra.core.page.PageHolder;
-import com.wl4g.infra.integration.feign.core.context.internal.FeignContextCoprocessor;
-
-import feign.Response;
+import com.wl4g.infra.integration.feign.core.annotation.EnableFeignConsumers;
 
 /**
- * {@link PageBindingCoprocessor}
+ * {@link FeginIstioExampleWeb}
  * 
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
- * @version v1.0 2021-04-27
+ * @version v1.0 2021-03-18
  * @sine v1.0
  * @see
  */
-public class PageBindingCoprocessor implements FeignContextCoprocessor {
+// @EnableFeignClients("com.wl4g.infra.integration.example.service")
+@EnableFeignConsumers("com.wl4g.infra.integration.example.service")
+@SpringBootApplication(scanBasePackages = "com.wl4g.infra.integration.example")
+public class FeginIstioExampleWeb {
 
-	@Override
-	public void afterConsumerExecution(@NotNull Response response, Type type) {
-		// Update current executed paging info.
-		PageHolder.InternalUtil.update();
+	public static void main(String[] args) {
+		SpringApplication.run(FeginIstioExampleWeb.class, args);
 	}
 
 }

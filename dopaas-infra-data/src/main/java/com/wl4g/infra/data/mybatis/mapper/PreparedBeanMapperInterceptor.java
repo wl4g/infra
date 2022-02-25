@@ -66,283 +66,283 @@ import com.wl4g.infra.core.page.PageHolder;
  * @see https://cloud.tencent.com/developer/article/1170370
  */
 @Intercepts({ @Signature(type = Executor.class, method = "update", args = { MappedStatement.class, Object.class }),
-		@Signature(type = Executor.class, method = "query", args = { MappedStatement.class, Object.class, RowBounds.class,
-				ResultHandler.class }) })
+        @Signature(type = Executor.class, method = "query", args = { MappedStatement.class, Object.class, RowBounds.class,
+                ResultHandler.class }) })
 public class PreparedBeanMapperInterceptor implements Interceptor {
 
-	protected final SmartLogger log = getLogger(getClass());
+    protected final SmartLogger log = getLogger(getClass());
 
-	@Autowired
-	private IdGenerator idGenerator;
+    @Autowired
+    private IdGenerator idGenerator;
 
-	/**
-	 * Intercepting executor only
-	 *
-	 * @param target
-	 * @return
-	 */
-	@Override
-	public Object plugin(Object target) {
-		if (target instanceof Executor) {
-			return Plugin.wrap(target, this);
-		} else {
-			return target;
-		}
-	}
+    /**
+     * Intercepting executor only
+     *
+     * @param target
+     * @return
+     */
+    @Override
+    public Object plugin(Object target) {
+        if (target instanceof Executor) {
+            return Plugin.wrap(target, this);
+        } else {
+            return target;
+        }
+    }
 
-	@Override
-	public void setProperties(Properties properties) {
-	}
+    @Override
+    public void setProperties(Properties properties) {
+    }
 
-	@Override
-	public Object intercept(Invocation invoc) throws Throwable {
-		if (isNull(invoc.getArgs())) {
-			return invoc.proceed();
-		}
-		MappedStatement statement = (MappedStatement) invoc.getArgs()[0];
-		SqlCommandType command = statement.getSqlCommandType();
+    @Override
+    public Object intercept(Invocation invoc) throws Throwable {
+        if (isNull(invoc.getArgs())) {
+            return invoc.proceed();
+        }
+        MappedStatement statement = (MappedStatement) invoc.getArgs()[0];
+        SqlCommandType command = statement.getSqlCommandType();
 
-		// Prepared properties.
-		preProcess(invoc, command);
+        // Prepared properties.
+        preProcess(invoc, command);
 
-		// Invoke mapper process
-		final Object result = invoc.proceed();
+        // Invoke mapper process
+        final Object result = invoc.proceed();
 
-		// Post properties.
-		return postProcess(invoc, command, result);
-	}
+        // Post properties.
+        return postProcess(invoc, command, result);
+    }
 
-	/**
-	 * Prepared process.
-	 * 
-	 * @param invoc
-	 * @param command
-	 */
-	private void preProcess(Invocation invoc, SqlCommandType command) {
-		switch (command) {
-		case SELECT:
-			preQuery(invoc);
-			break;
-		case UPDATE:
-			preUpdate(invoc);
-			break;
-		case INSERT:
-			preInsert(invoc);
-			break;
-		default: // Ignore
-		}
-	}
+    /**
+     * Prepared process.
+     * 
+     * @param invoc
+     * @param command
+     */
+    private void preProcess(Invocation invoc, SqlCommandType command) {
+        switch (command) {
+        case SELECT:
+            preQuery(invoc);
+            break;
+        case UPDATE:
+            preUpdate(invoc);
+            break;
+        case INSERT:
+            preInsert(invoc);
+            break;
+        default: // Ignore
+        }
+    }
 
-	/**
-	 * Post process.
-	 * 
-	 * @param invoc
-	 * @param command
-	 * @param result
-	 */
-	private Object postProcess(Invocation invoc, SqlCommandType command, Object result) {
-		switch (command) {
-		case SELECT:
-			return postQuery(invoc, result);
-		case UPDATE:
-			return postUpdate(invoc, result);
-		case INSERT:
-			return postInsert(invoc, result);
-		default: // Ignore
-			return result;
-		}
-	}
+    /**
+     * Post process.
+     * 
+     * @param invoc
+     * @param command
+     * @param result
+     */
+    private Object postProcess(Invocation invoc, SqlCommandType command, Object result) {
+        switch (command) {
+        case SELECT:
+            return postQuery(invoc, result);
+        case UPDATE:
+            return postUpdate(invoc, result);
+        case INSERT:
+            return postInsert(invoc, result);
+        default: // Ignore
+            return result;
+        }
+    }
 
-	// --- Prepare SQL processing. ---
+    // --- Prepare SQL processing. ---
 
-	/**
-	 * Pre query properties set. (if necessary)
-	 * 
-	 * @param invoc
-	 * @param command
-	 */
-	protected void preQuery(Invocation invoc) {
-		/*
-		 * Note: In order to be compatible with the distributed microservice
-		 * architecture, it is not the best solution to convert the bean time
-		 * returned by Dao layer here. Because Dao layer may not be able to
-		 * obtain the I18N language of the current user, it is finally decided
-		 * to migrate to the web layer.
-		 */
-		if (isNull(SqlUtil.getLocalPage())) { // Not paging
-			// Obtain page from rpc context.
-			com.wl4g.infra.core.page.PageHolder.Page<?> page = PageHolder.InternalUtil.current(false);
-			if (nonNull(page)) {
-				log.debug("Begin current paging of: {}", page);
-				PageHelper.startPage(page.getPageNum(), page.getPageSize(), page.isCount());
-			}
-		}
-	}
+    /**
+     * Pre query properties set. (if necessary)
+     * 
+     * @param invoc
+     * @param command
+     */
+    protected void preQuery(Invocation invoc) {
+        /*
+         * Note: In order to be compatible with the distributed microservice
+         * architecture, it is not the best solution to convert the bean time
+         * returned by Dao layer here. Because Dao layer may not be able to
+         * obtain the I18N language of the current user, it is finally decided
+         * to migrate to the web layer.
+         */
+        if (isNull(SqlUtil.getLocalPage())) { // Not paging
+            // Obtain page from rpc context.
+            com.wl4g.infra.core.page.PageHolder.Page<?> page = PageHolder.Util.current(false);
+            if (nonNull(page)) {
+                log.debug("Begin current paging of: {}", page);
+                PageHelper.startPage(page.getPageNum(), page.getPageSize(), page.isCount());
+            }
+        }
+    }
 
-	/**
-	 * Pre updation properties set.(if necessary)
-	 * 
-	 * @param invoc
-	 * @param command
-	 */
-	protected void preUpdate(Invocation invoc) {
-		for (int i = 1; i < invoc.getArgs().length; i++) {
-			Object arg = invoc.getArgs()[i];
-			if (BaseBean.class.isAssignableFrom(arg.getClass())) {
-				BaseBean bean = (BaseBean) arg;
-				if (isUpdateSettable(bean)) {
-					bean.preUpdate();
-					bean.setUpdateBy(getCurrentPrincipalId());
-				}
-				break;
-			}
-		}
-	}
+    /**
+     * Pre updation properties set.(if necessary)
+     * 
+     * @param invoc
+     * @param command
+     */
+    protected void preUpdate(Invocation invoc) {
+        for (int i = 1; i < invoc.getArgs().length; i++) {
+            Object arg = invoc.getArgs()[i];
+            if (BaseBean.class.isAssignableFrom(arg.getClass())) {
+                BaseBean bean = (BaseBean) arg;
+                if (isUpdateSettable(bean)) {
+                    bean.preUpdate();
+                    bean.setUpdateBy(getCurrentPrincipalId());
+                }
+                break;
+            }
+        }
+    }
 
-	/**
-	 * Pre insertion properties set.(if necessary)
-	 * 
-	 * @param invoc
-	 */
-	@SuppressWarnings("rawtypes")
-	protected void preInsert(Invocation invoc) {
-		// Sets insert properties
-		for (int i = 1; i < invoc.getArgs().length; i++) {
-			Object arg = invoc.getArgs()[i];
-			if (BaseBean.class.isAssignableFrom(arg.getClass())) {
-				doPreInsert(invoc, (BaseBean) arg);
-			}
-			// e.g: UserDao#insertBatch(List<User>)
-			else if (Iterable.class.isAssignableFrom(arg.getClass())) {
-				Iterator it = ((Iterable) arg).iterator();
-				while (it.hasNext()) {
-					Object value = it.next();
-					if (BaseBean.class.isAssignableFrom(value.getClass())) {
-						doPreInsert(invoc, (BaseBean) arg);
-					}
-				}
-			}
-		}
-	}
+    /**
+     * Pre insertion properties set.(if necessary)
+     * 
+     * @param invoc
+     */
+    @SuppressWarnings("rawtypes")
+    protected void preInsert(Invocation invoc) {
+        // Sets insert properties
+        for (int i = 1; i < invoc.getArgs().length; i++) {
+            Object arg = invoc.getArgs()[i];
+            if (BaseBean.class.isAssignableFrom(arg.getClass())) {
+                doPreInsert(invoc, (BaseBean) arg);
+            }
+            // e.g: UserDao#insertBatch(List<User>)
+            else if (Iterable.class.isAssignableFrom(arg.getClass())) {
+                Iterator it = ((Iterable) arg).iterator();
+                while (it.hasNext()) {
+                    Object value = it.next();
+                    if (BaseBean.class.isAssignableFrom(value.getClass())) {
+                        doPreInsert(invoc, (BaseBean) arg);
+                    }
+                }
+            }
+        }
+    }
 
-	protected void doPreInsert(Invocation invoc, BaseBean bean) {
-		// Assign sets primary key ID.
-		if (!isNull(bean) && isNull(bean.getId())) {
-			bean.setId(idGenerator.nextId(bean));
-			log.debug("Dynamic assigned primary key ID for: {}, method: {}", bean.getId(), invoc.getMethod());
-		}
-		if (isInsertSettable(bean)) {
-			bean.preInsert();
-			Long currentPrincipalId = getCurrentPrincipalId();
-			bean.setCreateBy(isNull(currentPrincipalId) ? BaseBean.UNKNOWN_USER_ID : currentPrincipalId);
-			bean.setUpdateBy(bean.getCreateBy());
-		}
-	}
+    protected void doPreInsert(Invocation invoc, BaseBean bean) {
+        // Assign sets primary key ID.
+        if (!isNull(bean) && isNull(bean.getId())) {
+            bean.setId(idGenerator.nextId(bean));
+            log.debug("Dynamic assigned primary key ID for: {}, method: {}", bean.getId(), invoc.getMethod());
+        }
+        if (isInsertSettable(bean)) {
+            bean.preInsert();
+            Long currentPrincipalId = getCurrentPrincipalId();
+            bean.setCreateBy(isNull(currentPrincipalId) ? BaseBean.UNKNOWN_USER_ID : currentPrincipalId);
+            bean.setUpdateBy(bean.getCreateBy());
+        }
+    }
 
-	// --- Post SQL processing. ---
+    // --- Post SQL processing. ---
 
-	/**
-	 * Post query properties set. (if necessary)
-	 * 
-	 * @param invoc
-	 * @param result
-	 * @return
-	 */
-	protected Object postQuery(Invocation invoc, Object result) {
-		if (isNull(result)) {
-			return null;
-		}
-		// Update executed paging info to rpc server context.
-		if (result instanceof Page) {
-			com.github.pagehelper.Page<?> helperPage = (com.github.pagehelper.Page<?>) result;
-			com.wl4g.infra.core.page.PageHolder.Page<?> currentPage = PageHolder.InternalUtil.current(false);
-			if (nonNull(currentPage)) {
-				copyProperties(helperPage, currentPage);
-				// Rebind executed page information to rpc server context,
-				// Ensure that the information that has been paged can be
-				// obtained on the consumer service side.
-				PageHolder.InternalUtil.bind(true, currentPage);
+    /**
+     * Post query properties set. (if necessary)
+     * 
+     * @param invoc
+     * @param result
+     * @return
+     */
+    protected Object postQuery(Invocation invoc, Object result) {
+        if (isNull(result)) {
+            return null;
+        }
+        // Update executed paging info to rpc server context.
+        if (result instanceof Page) {
+            com.github.pagehelper.Page<?> helperPage = (com.github.pagehelper.Page<?>) result;
+            com.wl4g.infra.core.page.PageHolder.Page<?> currentPage = PageHolder.Util.current(false);
+            if (nonNull(currentPage)) {
+                copyProperties(helperPage, currentPage);
+                // Re-bind executed page information to rpc server context,
+                // Ensure that the information that has been paged can be
+                // obtained on the consumer service side.
+                PageHolder.Util.bind(true, currentPage);
 
-				// Update current executed paging info.
-				PageHolder.InternalUtil.update();
-				log.debug("End current paging of: {}", currentPage);
-			}
-		}
-		return result;
-	}
+                // Update current executed paging info.
+                PageHolder.Util.update();
+                log.debug("End current paging of: {}", currentPage);
+            }
+        }
+        return result;
+    }
 
-	/**
-	 * Post updation properties set.(if necessary)
-	 * 
-	 * @param invoc
-	 * @param result
-	 * @return
-	 */
-	protected Object postUpdate(Invocation invoc, Object result) {
-		return result;
-	}
+    /**
+     * Post updation properties set.(if necessary)
+     * 
+     * @param invoc
+     * @param result
+     * @return
+     */
+    protected Object postUpdate(Invocation invoc, Object result) {
+        return result;
+    }
 
-	/**
-	 * Post insertion properties set.(if necessary)
-	 * 
-	 * @param invoc
-	 * @param result
-	 */
-	protected Object postInsert(Invocation invoc, Object result) {
-		if (isNull(result)) {
-			return null;
-		}
-		// Sets the primary key value generated by inserted SQL to return to the
-		// caller.
-		for (int i = 1; i < invoc.getArgs().length; i++) {
-			Object arg = invoc.getArgs()[i];
-			if (BaseBean.class.isAssignableFrom(arg.getClass())) {
-				BaseBean bean = (BaseBean) arg;
-				if (RpcContextHolderBridges.hasRpcContextHolderClass()) { // Distributed(cluster)?
-					RpcContextHolderBridges.invokeSet(true, BaseBean.InternalUtil.CURRENT_BEANID_KEY, bean.getId());
-				}
-			}
-		}
-		return result;
-	}
+    /**
+     * Post insertion properties set.(if necessary)
+     * 
+     * @param invoc
+     * @param result
+     */
+    protected Object postInsert(Invocation invoc, Object result) {
+        if (isNull(result)) {
+            return null;
+        }
+        // Sets the primary key value generated by inserted SQL to return to the
+        // caller.
+        for (int i = 1; i < invoc.getArgs().length; i++) {
+            Object arg = invoc.getArgs()[i];
+            if (BaseBean.class.isAssignableFrom(arg.getClass())) {
+                BaseBean bean = (BaseBean) arg;
+                if (RpcContextHolderBridges.hasRpcContextHolderClass()) { // Distributed-mode?
+                    RpcContextHolderBridges.invokeSet(true, BaseBean.Util.CURRENT_BEANID_KEY, bean.getId());
+                }
+            }
+        }
+        return result;
+    }
 
-	/**
-	 * Check whether parameter properties need to be set when insertion.
-	 * 
-	 * @param bean
-	 * @return
-	 */
-	protected boolean isInsertSettable(BaseBean bean) {
-		return isNull(bean.getCreateDate()) || isNull(bean.getCreateBy());
-	}
+    /**
+     * Check whether parameter properties need to be set when insertion.
+     * 
+     * @param bean
+     * @return
+     */
+    protected boolean isInsertSettable(BaseBean bean) {
+        return isNull(bean.getCreateDate()) || isNull(bean.getCreateBy());
+    }
 
-	/**
-	 * Check whether parameter properties need to be set when updating.
-	 * 
-	 * @param bean
-	 * @return
-	 */
-	protected boolean isUpdateSettable(BaseBean bean) {
-		return isNull(bean.getUpdateDate()) || isNull(bean.getUpdateBy());
-	}
+    /**
+     * Check whether parameter properties need to be set when updating.
+     * 
+     * @param bean
+     * @return
+     */
+    protected boolean isUpdateSettable(BaseBean bean) {
+        return isNull(bean.getUpdateDate()) || isNull(bean.getUpdateBy());
+    }
 
-	/**
-	 * Gets current login principalId.
-	 * 
-	 * @return
-	 */
-	protected Long getCurrentPrincipalId() {
-		if (RpcContextIamSecurityBridges.hasRpcContextIamSecurityUtilsClass()) {
-			try {
-				// TODO remove parse, direct use string principalId.
-				return parseLongOrNull(RpcContextIamSecurityBridges.currentIamPrincipalId());
-			} catch (Exception e) {
-				log.warn("Cannot get currentIamPrincipalId. - {}", e.getMessage());
-			}
-		} else {
-			log.warn("Saving unable to set currentIamPrincipalId! Please check if 'xcloud-iam-common' dependency exists!");
-		}
-		return BaseBean.UNKNOWN_USER_ID;
-	}
+    /**
+     * Gets current login principalId.
+     * 
+     * @return
+     */
+    protected Long getCurrentPrincipalId() {
+        if (RpcContextIamSecurityBridges.hasRpcContextIamSecurityUtilsClass()) {
+            try {
+                // TODO remove parse, direct use string principalId.
+                return parseLongOrNull(RpcContextIamSecurityBridges.currentIamPrincipalId());
+            } catch (Exception e) {
+                log.warn("Cannot get currentIamPrincipalId. - {}", e.getMessage());
+            }
+        } else {
+            log.warn("Saving unable to set currentIamPrincipalId! Please check if 'dopaas-iam-common' dependency exists!");
+        }
+        return BaseBean.UNKNOWN_USER_ID;
+    }
 
 }

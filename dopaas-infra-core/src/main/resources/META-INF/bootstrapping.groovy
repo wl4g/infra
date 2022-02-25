@@ -44,20 +44,19 @@ class DefaultIBootstrappingConfigurer implements IBootstrappingConfigurer {
 		def defaultProperties = new Properties()
 		// Preset spring.config.name
 		// for example: spring auto load for 'application-dev.yml/application-data-dev.yml'
-		defaultProperties.put(CONFIG_NAME_PROPERTY,
-				"""
-application,
-application-data,
-application-service,
-application-web,
-""")
+        def configName = new StringBuffer("application,iam-web,iam-web-etc")
+        configName.append("application")
+        configName.append(",application-data")
+        configName.append(",application-service")
+        configName.append(",application-web")
+		defaultProperties.put(CONFIG_NAME_PROPERTY, configName.toString())
 
 		// Preset spring.config.location
 		// for example: spring auto load for 'classpath:/application-data-dev.yml'
 		def location = new StringBuffer("classpath:/")
 		if (isPresent("org.springframework.cloud.openfeign.FeignClient") && isPresent("org.springframework.cloud.openfeign.FeignAutoConfiguration")) {
 			location.append(",classpath:/scf/")
-		} else if (isPresent("com.wl4g.infra.rpc.springboot.feign.annotation.SpringBootFeignClient")) {
+		} else if (isPresent("com.wl4g.infra.integration.feign.core.annotation.FeignConsumer")) {
 			location.append(",classpath:/sbf/")
 		}
 		defaultProperties.put(CONFIG_ADDITIONAL_LOCATION_PROPERTY, location.toString())

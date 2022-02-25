@@ -60,135 +60,135 @@ import com.wl4g.infra.integration.feign.core.context.RpcContextHolder;
 @AutoConfigureBefore(DefaultFeignContextAutoConfiguration.class)
 public class SpringCloudHystrixFeignContextAutoConfiguration {
 
-	@Bean
-	public RpcContextHolder springCloudHystrixFeignContextHolder() {
-		return new SpringCloudHystrixFeignRpcContextHolder();
-	}
+    @Bean
+    public RpcContextHolder springCloudHystrixFeignContextHolder() {
+        return new SpringCloudHystrixFeignRpcContextHolder();
+    }
 
-	@Bean
-	public HytrixFeignContextServletInterceptor hytrixFeignContextServletInterceptor() {
-		return new HytrixFeignContextServletInterceptor();
-	}
+    @Bean
+    public HytrixFeignContextServletInterceptor hytrixFeignContextServletInterceptor() {
+        return new HytrixFeignContextServletInterceptor();
+    }
 
-	@Bean
-	public HytrixFeignContextWebMvcConfigurer hytrixFeignContextWebMvcConfigurer(
-			HytrixFeignContextServletInterceptor interceptor) {
-		return new HytrixFeignContextWebMvcConfigurer(interceptor);
-	}
+    @Bean
+    public HytrixFeignContextWebMvcConfigurer hytrixFeignContextWebMvcConfigurer(
+            HytrixFeignContextServletInterceptor interceptor) {
+        return new HytrixFeignContextWebMvcConfigurer(interceptor);
+    }
 
-	static class HytrixFeignContextWebMvcConfigurer implements WebMvcConfigurer {
-		private final HytrixFeignContextServletInterceptor interceptor;
+    static class HytrixFeignContextWebMvcConfigurer implements WebMvcConfigurer {
+        private final HytrixFeignContextServletInterceptor interceptor;
 
-		public HytrixFeignContextWebMvcConfigurer(HytrixFeignContextServletInterceptor interceptor) {
-			this.interceptor = notNullOf(interceptor, "interceptor");
-		}
+        public HytrixFeignContextWebMvcConfigurer(HytrixFeignContextServletInterceptor interceptor) {
+            this.interceptor = notNullOf(interceptor, "interceptor");
+        }
 
-		@Override
-		public void addInterceptors(InterceptorRegistry registry) {
-			registry.addInterceptor(interceptor).addPathPatterns("/**");
-		}
-	}
+        @Override
+        public void addInterceptors(InterceptorRegistry registry) {
+            registry.addInterceptor(interceptor).addPathPatterns("/**");
+        }
+    }
 
-	/**
-	 * Hytrix Servlet request context parameters interceptor. </br>
-	 * Refer to <a href=
-	 * "https://blog.csdn.net/luliuliu1234/article/details/96472893">HystrixInterceptor</a>
-	 */
-	static class HytrixFeignContextServletInterceptor implements HandlerInterceptor {
-		@Override
-		public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-			// RpcContextHolder holder = RpcContextHolder.get();
-			// isInstanceOf(HytrixFeignRpcContextHolder.class, holder);
-			return true;
-		}
+    /**
+     * Hytrix servlet request context parameters interceptor. </br>
+     * Refer to <a href=
+     * "https://blog.csdn.net/luliuliu1234/article/details/96472893">HystrixInterceptor</a>
+     */
+    static class HytrixFeignContextServletInterceptor implements HandlerInterceptor {
+        @Override
+        public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+            // RpcContextHolder holder = RpcContextHolder.get();
+            // isInstanceOf(HytrixFeignRpcContextHolder.class, holder);
+            return true;
+        }
 
-		@Override
-		public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
-				throws Exception {
-			RpcContextHolder.getContext().clearAttachments();
-			RpcContextHolder.getServerContext().clearAttachments();
-			((SpringCloudHystrixFeignRpcContextHolder) RpcContextHolder.getContext()).close();
-			((SpringCloudHystrixFeignRpcContextHolder) RpcContextHolder.getServerContext()).close();
-		}
-	}
+        @Override
+        public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
+                throws Exception {
+            RpcContextHolder.getContext().clearAttachments();
+            RpcContextHolder.getServerContext().clearAttachments();
+            ((SpringCloudHystrixFeignRpcContextHolder) RpcContextHolder.getContext()).close();
+            ((SpringCloudHystrixFeignRpcContextHolder) RpcContextHolder.getServerContext()).close();
+        }
+    }
 
-	static class SpringCloudHystrixFeignRpcContextHolder extends RpcContextHolder implements Closeable {
-		private static final HystrixRequestVariableDefault<SpringCloudHystrixFeignRpcContextHolder> LOCAL = new HystrixRequestVariableDefault<>();
-		private static final HystrixRequestVariableDefault<SpringCloudHystrixFeignRpcContextHolder> SERVER_LOCAL = new HystrixRequestVariableDefault<>();
+    static class SpringCloudHystrixFeignRpcContextHolder extends RpcContextHolder implements Closeable {
+        private static final HystrixRequestVariableDefault<SpringCloudHystrixFeignRpcContextHolder> LOCAL = new HystrixRequestVariableDefault<>();
+        private static final HystrixRequestVariableDefault<SpringCloudHystrixFeignRpcContextHolder> SERVER_LOCAL = new HystrixRequestVariableDefault<>();
 
-		// Notes: Since feignclient ignores case when setting header, it should
-		// be unified here.
-		/** Feign request context attachments store. */
-		private final Map<String, String> attachments = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        // Notes: Since feignclient ignores case when setting header, it should
+        // be unified here.
+        /** Feign request context attachments store. */
+        private final Map<String, String> attachments = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
-		@Override
-		public String getAttachment(String key) {
-			return attachments.get(key);
-		}
+        @Override
+        public String getAttachment(String key) {
+            return attachments.get(key);
+        }
 
-		@Override
-		public Map<String, String> getAttachments() {
-			return attachments;
-		}
+        @Override
+        public Map<String, String> getAttachments() {
+            return attachments;
+        }
 
-		@Override
-		public void setAttachment(String key, String value) {
-			attachments.put(key, value);
-		}
+        @Override
+        public void setAttachment(String key, String value) {
+            attachments.put(key, value);
+        }
 
-		@Override
-		public void removeAttachment(String key) {
-			attachments.remove(key);
-		}
+        @Override
+        public void removeAttachment(String key) {
+            attachments.remove(key);
+        }
 
-		@Override
-		public void clearAttachments() {
-			attachments.clear();
-		}
+        @Override
+        public void clearAttachments() {
+            attachments.clear();
+        }
 
-		@Override
-		public void close() throws IOException {
-			if (HystrixRequestContext.isCurrentThreadInitialized()) {
-				// Destroy current thread
-				HystrixRequestContext.getContextForCurrentThread().shutdown();
-			}
-		}
+        @Override
+        public void close() throws IOException {
+            if (HystrixRequestContext.isCurrentThreadInitialized()) {
+                // Destroy current thread
+                HystrixRequestContext.getContextForCurrentThread().shutdown();
+            }
+        }
 
-		@Override
-		protected RpcContextHolder getContext0() {
-			if (!HystrixRequestContext.isCurrentThreadInitialized()) {
-				HystrixRequestContext.initializeContext();
-			}
-			SpringCloudHystrixFeignRpcContextHolder current = LOCAL.get();
-			// Initializes hystrix request context in the current thread.
-			if (isNull(current)) {
-				LOCAL.set(current = new SpringCloudHystrixFeignRpcContextHolder());
-			}
-			return current;
-		}
+        @Override
+        protected RpcContextHolder getContext0() {
+            if (!HystrixRequestContext.isCurrentThreadInitialized()) {
+                HystrixRequestContext.initializeContext();
+            }
+            SpringCloudHystrixFeignRpcContextHolder current = LOCAL.get();
+            // Initializes hystrix request context in the current thread.
+            if (isNull(current)) {
+                LOCAL.set(current = new SpringCloudHystrixFeignRpcContextHolder());
+            }
+            return current;
+        }
 
-		@Override
-		protected RpcContextHolder getServerContext0() {
-			if (!HystrixRequestContext.isCurrentThreadInitialized()) {
-				HystrixRequestContext.initializeContext();
-			}
-			SpringCloudHystrixFeignRpcContextHolder current = SERVER_LOCAL.get();
-			// Initializes hystrix request context in the current thread.
-			if (isNull(current)) {
-				SERVER_LOCAL.set(current = new SpringCloudHystrixFeignRpcContextHolder());
-			}
-			return current;
-		}
+        @Override
+        protected RpcContextHolder getServerContext0() {
+            if (!HystrixRequestContext.isCurrentThreadInitialized()) {
+                HystrixRequestContext.initializeContext();
+            }
+            SpringCloudHystrixFeignRpcContextHolder current = SERVER_LOCAL.get();
+            // Initializes hystrix request context in the current thread.
+            if (isNull(current)) {
+                SERVER_LOCAL.set(current = new SpringCloudHystrixFeignRpcContextHolder());
+            }
+            return current;
+        }
 
-		@Override
-		protected void removeContext0() {
-			LOCAL.remove();
-		}
+        @Override
+        protected void removeContext0() {
+            LOCAL.remove();
+        }
 
-		@Override
-		protected void removeServerContext0() {
-			SERVER_LOCAL.remove();
-		}
-	}
+        @Override
+        protected void removeServerContext0() {
+            SERVER_LOCAL.remove();
+        }
+    }
 
 }

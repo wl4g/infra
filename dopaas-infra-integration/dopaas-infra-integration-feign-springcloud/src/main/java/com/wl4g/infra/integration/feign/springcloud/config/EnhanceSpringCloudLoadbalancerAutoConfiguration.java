@@ -84,260 +84,260 @@ import reactor.core.publisher.Mono;
 @ConditionalOnDiscoveryEnabled
 public class EnhanceSpringCloudLoadbalancerAutoConfiguration {
 
-	// [FIXED] Override default LoadBalancerClientFactory.
-	/**
-	 * {@link org.springframework.cloud.loadbalancer.config.LoadBalancerAutoConfiguration#loadBalancerClientFactory}
-	 */
-	@Bean
-	@Primary
-	@ConditionalOnMissingBean
-	public LoadBalancerClientFactory extensionLoadBalancerClientFactory(
-			ObjectProvider<List<LoadBalancerClientSpecification>> configurations) {
-		LoadBalancerClientFactory clientFactory = new ExtensionLoadBalancerClientFactory();
-		clientFactory.setConfigurations(configurations.getIfAvailable(Collections::emptyList));
-		return clientFactory;
-	}
+    // [FIXED] Override default LoadBalancerClientFactory.
+    /**
+     * {@link org.springframework.cloud.loadbalancer.config.LoadBalancerAutoConfiguration#loadBalancerClientFactory}
+     */
+    @Bean
+    @Primary
+    @ConditionalOnMissingBean
+    public LoadBalancerClientFactory extensionLoadBalancerClientFactory(
+            ObjectProvider<List<LoadBalancerClientSpecification>> configurations) {
+        LoadBalancerClientFactory clientFactory = new ExtensionLoadBalancerClientFactory();
+        clientFactory.setConfigurations(configurations.getIfAvailable(Collections::emptyList));
+        return clientFactory;
+    }
 
-	/**
-	 * {@link org.springframework.cloud.loadbalancer.blocking.client.BlockingLoadBalancerClient#choose}
-	 */
-	@Bean
-	@ConditionalOnProperty(name = KEY_LOADBALANCER_RANDOM + ".enabled", matchIfMissing = false)
-	@ConditionalOnMissingClass("org.springframework.cloud.loadbalancer.core.RandomLoadBalancer") // spring-cloud-loadbalancer-3.0.0.jar
-	public RandomLoadBalancer randomReactorServiceInstanceLoadBalancer(Environment environment,
-			LoadBalancerClientFactory loadBalancerClientFactory) {
-		String name = environment.getProperty(LoadBalancerClientFactory.PROPERTY_NAME);
-		return new RandomLoadBalancer(loadBalancerClientFactory.getLazyProvider(name, ServiceInstanceListSupplier.class), name);
-	}
+    /**
+     * {@link org.springframework.cloud.loadbalancer.blocking.client.BlockingLoadBalancerClient#choose}
+     */
+    @Bean
+    @ConditionalOnProperty(name = KEY_LOADBALANCER_RANDOM + ".enabled", matchIfMissing = false)
+    @ConditionalOnMissingClass("org.springframework.cloud.loadbalancer.core.RandomLoadBalancer") // spring-cloud-loadbalancer-3.0.0.jar
+    public RandomLoadBalancer randomReactorServiceInstanceLoadBalancer(Environment environment,
+            LoadBalancerClientFactory loadBalancerClientFactory) {
+        String name = environment.getProperty(LoadBalancerClientFactory.PROPERTY_NAME);
+        return new RandomLoadBalancer(loadBalancerClientFactory.getLazyProvider(name, ServiceInstanceListSupplier.class), name);
+    }
 
-	/**
-	 * {@link org.springframework.cloud.loadbalancer.blocking.client.BlockingLoadBalancerClient#choose}
-	 */
-	@Bean
-	@ConditionalOnMissingBean({ RandomLoadBalancer.class })
-	@ConditionalOnProperty(name = KEY_LOADBALANCER_GRAY + ".enabled", matchIfMissing = false)
-	public GrayLoadBalancer grayReactorServiceInstanceLoadBalancer(Environment environment,
-			LoadBalancerClientFactory loadBalancerClientFactory) {
-		String name = environment.getProperty(LoadBalancerClientFactory.PROPERTY_NAME);
-		String chooseExpression = environment.getProperty(KEY_LOADBALANCER_GRAY + ".chooseExpression", "");
-		chooseExpression = isBlank(chooseExpression) ? "#{true}" : chooseExpression; // by-default
-		return new GrayLoadBalancer(loadBalancerClientFactory.getLazyProvider(name, ServiceInstanceListSupplier.class), name,
-				chooseExpression);
-	}
+    /**
+     * {@link org.springframework.cloud.loadbalancer.blocking.client.BlockingLoadBalancerClient#choose}
+     */
+    @Bean
+    @ConditionalOnMissingBean({ RandomLoadBalancer.class })
+    @ConditionalOnProperty(name = KEY_LOADBALANCER_GRAY + ".enabled", matchIfMissing = false)
+    public GrayLoadBalancer grayReactorServiceInstanceLoadBalancer(Environment environment,
+            LoadBalancerClientFactory loadBalancerClientFactory) {
+        String name = environment.getProperty(LoadBalancerClientFactory.PROPERTY_NAME);
+        String chooseExpression = environment.getProperty(KEY_LOADBALANCER_GRAY + ".chooseExpression", "");
+        chooseExpression = isBlank(chooseExpression) ? "#{true}" : chooseExpression; // by-default
+        return new GrayLoadBalancer(loadBalancerClientFactory.getLazyProvider(name, ServiceInstanceListSupplier.class), name,
+                chooseExpression);
+    }
 
-	/**
-	 * {@link org.springframework.cloud.loadbalancer.annotation.LoadBalancerClientConfiguration#reactorServiceInstanceLoadBalancer}
-	 */
-	@Bean
-	@ConditionalOnMissingBean({ GrayLoadBalancer.class, RandomLoadBalancer.class })
-	public RoundRobinLoadBalancer reactorServiceInstanceLoadBalancer(Environment environment,
-			LoadBalancerClientFactory loadBalancerClientFactory) {
-		String name = environment.getProperty(LoadBalancerClientFactory.PROPERTY_NAME);
-		return new RoundRobinLoadBalancer(loadBalancerClientFactory.getLazyProvider(name, ServiceInstanceListSupplier.class),
-				name);
-	}
+    /**
+     * {@link org.springframework.cloud.loadbalancer.annotation.LoadBalancerClientConfiguration#reactorServiceInstanceLoadBalancer}
+     */
+    @Bean
+    @ConditionalOnMissingBean({ GrayLoadBalancer.class, RandomLoadBalancer.class })
+    public RoundRobinLoadBalancer reactorServiceInstanceLoadBalancer(Environment environment,
+            LoadBalancerClientFactory loadBalancerClientFactory) {
+        String name = environment.getProperty(LoadBalancerClientFactory.PROPERTY_NAME);
+        return new RoundRobinLoadBalancer(loadBalancerClientFactory.getLazyProvider(name, ServiceInstanceListSupplier.class),
+                name);
+    }
 
-	public static class ExtensionLoadBalancerClientFactory extends LoadBalancerClientFactory {
-		public ExtensionLoadBalancerClientFactory() {
-			super();
-			// [FIXED] Override default config type.
-			Field defaultConfigTypeField = findField(getClass(), "defaultConfigType", Class.class);
-			setField(defaultConfigTypeField, this, EnhanceSpringCloudLoadbalancerAutoConfiguration.class, true);
-		}
-	}
+    public static class ExtensionLoadBalancerClientFactory extends LoadBalancerClientFactory {
+        public ExtensionLoadBalancerClientFactory() {
+            super();
+            // [FIXED] Override default config type.
+            Field defaultConfigTypeField = findField(getClass(), "defaultConfigType", Class.class);
+            setField(defaultConfigTypeField, this, EnhanceSpringCloudLoadbalancerAutoConfiguration.class, true);
+        }
+    }
 
-	/**
-	 * Random load balancer.
-	 * 
-	 * @see {@link org.springframework.cloud.loadbalancer.core.RoundRobinLoadBalancer.RoundRobinLoadBalancer}
-	 */
-	public static class RandomLoadBalancer implements ReactorServiceInstanceLoadBalancer {
-		protected final SmartLogger log = getLogger(getClass());
-		protected final Random random = new Random();
+    /**
+     * Random load balancer.
+     * 
+     * @see {@link org.springframework.cloud.loadbalancer.core.RoundRobinLoadBalancer.RoundRobinLoadBalancer}
+     */
+    public static class RandomLoadBalancer implements ReactorServiceInstanceLoadBalancer {
+        protected final SmartLogger log = getLogger(getClass());
+        protected final Random random = new Random();
 
-		private final String serviceId;
-		private ObjectProvider<ServiceInstanceListSupplier> serviceInstanceListSupplierProvider;
+        private final String serviceId;
+        private ObjectProvider<ServiceInstanceListSupplier> serviceInstanceListSupplierProvider;
 
-		/**
-		 * @param serviceInstanceListSupplierProvider
-		 *            a provider of {@link ServiceInstanceListSupplier} that
-		 *            will be used to get available instances
-		 * @param serviceId
-		 *            id of the service for which to choose an instance
-		 * @param seedPosition
-		 *            Round Robin element position marker
-		 */
-		public RandomLoadBalancer(ObjectProvider<ServiceInstanceListSupplier> serviceInstanceListSupplierProvider,
-				String serviceId) {
-			this.serviceId = serviceId;
-			this.serviceInstanceListSupplierProvider = serviceInstanceListSupplierProvider;
-		}
+        /**
+         * @param serviceInstanceListSupplierProvider
+         *            a provider of {@link ServiceInstanceListSupplier} that
+         *            will be used to get available instances
+         * @param serviceId
+         *            id of the service for which to choose an instance
+         * @param seedPosition
+         *            Round Robin element position marker
+         */
+        public RandomLoadBalancer(ObjectProvider<ServiceInstanceListSupplier> serviceInstanceListSupplierProvider,
+                String serviceId) {
+            this.serviceId = serviceId;
+            this.serviceInstanceListSupplierProvider = serviceInstanceListSupplierProvider;
+        }
 
-		@SuppressWarnings({ "rawtypes" })
-		@Override
-		public Mono<Response<ServiceInstance>> choose(Request request) {
-			if (serviceInstanceListSupplierProvider != null) {
-				ServiceInstanceListSupplier supplier = serviceInstanceListSupplierProvider
-						.getIfAvailable(NoopServiceInstanceListSupplier::new);
-				return supplier.get().next().map(this::getInstanceResponse);
-			}
-			return Mono.empty();
-		}
+        @SuppressWarnings({ "rawtypes" })
+        @Override
+        public Mono<Response<ServiceInstance>> choose(Request request) {
+            if (serviceInstanceListSupplierProvider != null) {
+                ServiceInstanceListSupplier supplier = serviceInstanceListSupplierProvider
+                        .getIfAvailable(NoopServiceInstanceListSupplier::new);
+                return supplier.get().next().map(this::getInstanceResponse);
+            }
+            return Mono.empty();
+        }
 
-		private Response<ServiceInstance> getInstanceResponse(List<ServiceInstance> instances) {
-			if (instances.isEmpty()) {
-				log.warn("No servers available for service: {}", this.serviceId);
-				return new EmptyResponse();
-			}
-			ServiceInstance instance = instances.get(current().nextInt(0, instances.size()));
-			return new DefaultResponse(instance);
-		}
-	}
+        private Response<ServiceInstance> getInstanceResponse(List<ServiceInstance> instances) {
+            if (instances.isEmpty()) {
+                log.warn("No servers available for service: {}", this.serviceId);
+                return new EmptyResponse();
+            }
+            ServiceInstance instance = instances.get(current().nextInt(0, instances.size()));
+            return new DefaultResponse(instance);
+        }
+    }
 
-	/**
-	 * Gray load balancer.
-	 */
-	public static class GrayLoadBalancer implements ReactorServiceInstanceLoadBalancer {
-		protected final SmartLogger log = getLogger(getClass());
+    /**
+     * Gray load balancer.
+     */
+    public static class GrayLoadBalancer implements ReactorServiceInstanceLoadBalancer {
+        protected final SmartLogger log = getLogger(getClass());
 
-		private final String serviceId;
-		private final String chooseExpression;
-		private ObjectProvider<ServiceInstanceListSupplier> serviceInstanceListSupplierProvider;
+        private final String serviceId;
+        private final String chooseExpression;
+        private ObjectProvider<ServiceInstanceListSupplier> serviceInstanceListSupplierProvider;
 
-		public GrayLoadBalancer(ObjectProvider<ServiceInstanceListSupplier> serviceInstanceListSupplierProvider, String serviceId,
-				String chooseExpression) {
-			this.serviceInstanceListSupplierProvider = serviceInstanceListSupplierProvider;
-			this.serviceId = serviceId;
-			this.chooseExpression = chooseExpression;
-		}
+        public GrayLoadBalancer(ObjectProvider<ServiceInstanceListSupplier> serviceInstanceListSupplierProvider, String serviceId,
+                String chooseExpression) {
+            this.serviceInstanceListSupplierProvider = serviceInstanceListSupplierProvider;
+            this.serviceId = serviceId;
+            this.chooseExpression = chooseExpression;
+        }
 
-		@SuppressWarnings({ "rawtypes" })
-		@Override
-		public Mono<Response<ServiceInstance>> choose(Request request) {
-			if (serviceInstanceListSupplierProvider != null) {
-				ServiceInstanceListSupplier supplier = serviceInstanceListSupplierProvider
-						.getIfAvailable(NoopServiceInstanceListSupplier::new);
-				return supplier.get().next().map(serviceInstances -> getInstanceResponse(serviceInstances, request));
-			}
-			return Mono.empty();
-		}
+        @SuppressWarnings({ "rawtypes" })
+        @Override
+        public Mono<Response<ServiceInstance>> choose(Request request) {
+            if (serviceInstanceListSupplierProvider != null) {
+                ServiceInstanceListSupplier supplier = serviceInstanceListSupplierProvider
+                        .getIfAvailable(NoopServiceInstanceListSupplier::new);
+                return supplier.get().next().map(serviceInstances -> getInstanceResponse(serviceInstances, request));
+            }
+            return Mono.empty();
+        }
 
-		@SuppressWarnings("rawtypes")
-		private Response<ServiceInstance> getInstanceResponse(List<ServiceInstance> instances, Request request) {
-			if (instances.isEmpty()) {
-				log.warn("No servers available for service: {}", this.serviceId);
-				return new EmptyResponse();
-			}
+        @SuppressWarnings("rawtypes")
+        private Response<ServiceInstance> getInstanceResponse(List<ServiceInstance> instances, Request request) {
+            if (instances.isEmpty()) {
+                log.warn("No servers available for service: {}", this.serviceId);
+                return new EmptyResponse();
+            }
 
-			// TODO
-			request.getContext();// get http request is null???
-			for (ServiceInstance instance : instances) {
-				Map<String, Object> model = new HashMap<>();
-				model.put("request", null); // TODO
-				model.put("instance", instance);
-				if ((Boolean) defaultSpel.resolve(chooseExpression, model)) {
-					return new DefaultResponse(instance);
-				}
-			}
-			return new EmptyResponse();
-		}
-	}
+            // TODO
+            request.getContext();// get http request is null???
+            for (ServiceInstance instance : instances) {
+                Map<String, Object> model = new HashMap<>();
+                model.put("request", null); // TODO
+                model.put("instance", instance);
+                if ((Boolean) defaultSpel.resolve(chooseExpression, model)) {
+                    return new DefaultResponse(instance);
+                }
+            }
+            return new EmptyResponse();
+        }
+    }
 
-	@ConditionalOnReactiveDiscoveryEnabled
-	@Order(REACTIVE_SERVICE_INSTANCE_SUPPLIER_ORDER)
-	public static class ReactiveSupportConfiguration {
+    @ConditionalOnReactiveDiscoveryEnabled
+    @Order(REACTIVE_SERVICE_INSTANCE_SUPPLIER_ORDER)
+    public static class ReactiveSupportConfiguration {
 
-		@Bean
-		@ConditionalOnBean(ReactiveDiscoveryClient.class)
-		@ConditionalOnMissingBean
-		@ConditionalOnProperty(value = "spring.cloud.loadbalancer.configurations", havingValue = "default", matchIfMissing = true)
-		public ServiceInstanceListSupplier discoveryClientServiceInstanceListSupplier(ConfigurableApplicationContext context) {
-			return ServiceInstanceListSupplier.builder().withDiscoveryClient().withCaching().build(context);
-		}
+        @Bean
+        @ConditionalOnBean(ReactiveDiscoveryClient.class)
+        @ConditionalOnMissingBean
+        @ConditionalOnProperty(value = "spring.cloud.loadbalancer.configurations", havingValue = "default", matchIfMissing = true)
+        public ServiceInstanceListSupplier discoveryClientServiceInstanceListSupplier(ConfigurableApplicationContext context) {
+            return ServiceInstanceListSupplier.builder().withDiscoveryClient().withCaching().build(context);
+        }
 
-		@Bean
-		@ConditionalOnBean(ReactiveDiscoveryClient.class)
-		@ConditionalOnMissingBean
-		@ConditionalOnProperty(value = "spring.cloud.loadbalancer.configurations", havingValue = "zone-preference")
-		public ServiceInstanceListSupplier zonePreferenceDiscoveryClientServiceInstanceListSupplier(
-				ConfigurableApplicationContext context) {
-			return ServiceInstanceListSupplier.builder().withDiscoveryClient().withZonePreference().withCaching().build(context);
-		}
+        @Bean
+        @ConditionalOnBean(ReactiveDiscoveryClient.class)
+        @ConditionalOnMissingBean
+        @ConditionalOnProperty(value = "spring.cloud.loadbalancer.configurations", havingValue = "zone-preference")
+        public ServiceInstanceListSupplier zonePreferenceDiscoveryClientServiceInstanceListSupplier(
+                ConfigurableApplicationContext context) {
+            return ServiceInstanceListSupplier.builder().withDiscoveryClient().withZonePreference().withCaching().build(context);
+        }
 
-		@Bean
-		@ConditionalOnBean(ReactiveDiscoveryClient.class)
-		@ConditionalOnMissingBean
-		@ConditionalOnProperty(value = "spring.cloud.loadbalancer.configurations", havingValue = "health-check")
-		public ServiceInstanceListSupplier healthCheckDiscoveryClientServiceInstanceListSupplier(
-				ConfigurableApplicationContext context) {
-			return ServiceInstanceListSupplier.builder().withDiscoveryClient().withHealthChecks().withCaching().build(context);
-		}
+        @Bean
+        @ConditionalOnBean(ReactiveDiscoveryClient.class)
+        @ConditionalOnMissingBean
+        @ConditionalOnProperty(value = "spring.cloud.loadbalancer.configurations", havingValue = "health-check")
+        public ServiceInstanceListSupplier healthCheckDiscoveryClientServiceInstanceListSupplier(
+                ConfigurableApplicationContext context) {
+            return ServiceInstanceListSupplier.builder().withDiscoveryClient().withHealthChecks().withCaching().build(context);
+        }
 
-		@Bean
-		@ConditionalOnBean(ReactiveDiscoveryClient.class)
-		@ConditionalOnMissingBean
-		public ServiceInstanceSupplier discoveryClientServiceInstanceSupplier(ReactiveDiscoveryClient discoveryClient,
-				Environment env, ApplicationContext context) {
-			DiscoveryClientServiceInstanceSupplier delegate = new DiscoveryClientServiceInstanceSupplier(discoveryClient, env);
-			ObjectProvider<LoadBalancerCacheManager> cacheManagerProvider = context
-					.getBeanProvider(LoadBalancerCacheManager.class);
-			if (cacheManagerProvider.getIfAvailable() != null) {
-				return new CachingServiceInstanceSupplier(delegate, cacheManagerProvider.getIfAvailable());
-			}
-			return delegate;
-		}
+        @Bean
+        @ConditionalOnBean(ReactiveDiscoveryClient.class)
+        @ConditionalOnMissingBean
+        public ServiceInstanceSupplier discoveryClientServiceInstanceSupplier(ReactiveDiscoveryClient discoveryClient,
+                Environment env, ApplicationContext context) {
+            DiscoveryClientServiceInstanceSupplier delegate = new DiscoveryClientServiceInstanceSupplier(discoveryClient, env);
+            ObjectProvider<LoadBalancerCacheManager> cacheManagerProvider = context
+                    .getBeanProvider(LoadBalancerCacheManager.class);
+            if (cacheManagerProvider.getIfAvailable() != null) {
+                return new CachingServiceInstanceSupplier(delegate, cacheManagerProvider.getIfAvailable());
+            }
+            return delegate;
+        }
 
-	}
+    }
 
-	@ConditionalOnBlockingDiscoveryEnabled
-	@Order(REACTIVE_SERVICE_INSTANCE_SUPPLIER_ORDER + 1)
-	public static class BlockingSupportConfiguration {
+    @ConditionalOnBlockingDiscoveryEnabled
+    @Order(REACTIVE_SERVICE_INSTANCE_SUPPLIER_ORDER + 1)
+    public static class BlockingSupportConfiguration {
 
-		@Bean
-		@ConditionalOnBean(DiscoveryClient.class)
-		@ConditionalOnMissingBean
-		@ConditionalOnProperty(value = "spring.cloud.loadbalancer.configurations", havingValue = "default", matchIfMissing = true)
-		public ServiceInstanceListSupplier discoveryClientServiceInstanceListSupplier(ConfigurableApplicationContext context) {
-			return ServiceInstanceListSupplier.builder().withBlockingDiscoveryClient().withCaching().build(context);
-		}
+        @Bean
+        @ConditionalOnBean(DiscoveryClient.class)
+        @ConditionalOnMissingBean
+        @ConditionalOnProperty(value = "spring.cloud.loadbalancer.configurations", havingValue = "default", matchIfMissing = true)
+        public ServiceInstanceListSupplier discoveryClientServiceInstanceListSupplier(ConfigurableApplicationContext context) {
+            return ServiceInstanceListSupplier.builder().withBlockingDiscoveryClient().withCaching().build(context);
+        }
 
-		@Bean
-		@ConditionalOnBean(DiscoveryClient.class)
-		@ConditionalOnMissingBean
-		@ConditionalOnProperty(value = "spring.cloud.loadbalancer.configurations", havingValue = "zone-preference")
-		public ServiceInstanceListSupplier zonePreferenceDiscoveryClientServiceInstanceListSupplier(
-				ConfigurableApplicationContext context) {
-			return ServiceInstanceListSupplier.builder().withBlockingDiscoveryClient().withZonePreference().withCaching()
-					.build(context);
-		}
+        @Bean
+        @ConditionalOnBean(DiscoveryClient.class)
+        @ConditionalOnMissingBean
+        @ConditionalOnProperty(value = "spring.cloud.loadbalancer.configurations", havingValue = "zone-preference")
+        public ServiceInstanceListSupplier zonePreferenceDiscoveryClientServiceInstanceListSupplier(
+                ConfigurableApplicationContext context) {
+            return ServiceInstanceListSupplier.builder().withBlockingDiscoveryClient().withZonePreference().withCaching().build(
+                    context);
+        }
 
-		@Bean
-		@ConditionalOnBean(DiscoveryClient.class)
-		@ConditionalOnMissingBean
-		@ConditionalOnProperty(value = "spring.cloud.loadbalancer.configurations", havingValue = "health-check")
-		public ServiceInstanceListSupplier healthCheckDiscoveryClientServiceInstanceListSupplier(
-				ConfigurableApplicationContext context) {
-			return ServiceInstanceListSupplier.builder().withBlockingDiscoveryClient().withHealthChecks().withCaching()
-					.build(context);
-		}
+        @Bean
+        @ConditionalOnBean(DiscoveryClient.class)
+        @ConditionalOnMissingBean
+        @ConditionalOnProperty(value = "spring.cloud.loadbalancer.configurations", havingValue = "health-check")
+        public ServiceInstanceListSupplier healthCheckDiscoveryClientServiceInstanceListSupplier(
+                ConfigurableApplicationContext context) {
+            return ServiceInstanceListSupplier.builder().withBlockingDiscoveryClient().withHealthChecks().withCaching().build(
+                    context);
+        }
 
-		@Bean
-		@ConditionalOnBean(DiscoveryClient.class)
-		@ConditionalOnMissingBean
-		public ServiceInstanceSupplier discoveryClientServiceInstanceSupplier(DiscoveryClient discoveryClient, Environment env,
-				ApplicationContext context) {
-			DiscoveryClientServiceInstanceSupplier delegate = new DiscoveryClientServiceInstanceSupplier(discoveryClient, env);
-			ObjectProvider<LoadBalancerCacheManager> cacheManagerProvider = context
-					.getBeanProvider(LoadBalancerCacheManager.class);
-			if (cacheManagerProvider.getIfAvailable() != null) {
-				return new CachingServiceInstanceSupplier(delegate, cacheManagerProvider.getIfAvailable());
-			}
-			return delegate;
-		}
+        @Bean
+        @ConditionalOnBean(DiscoveryClient.class)
+        @ConditionalOnMissingBean
+        public ServiceInstanceSupplier discoveryClientServiceInstanceSupplier(DiscoveryClient discoveryClient, Environment env,
+                ApplicationContext context) {
+            DiscoveryClientServiceInstanceSupplier delegate = new DiscoveryClientServiceInstanceSupplier(discoveryClient, env);
+            ObjectProvider<LoadBalancerCacheManager> cacheManagerProvider = context
+                    .getBeanProvider(LoadBalancerCacheManager.class);
+            if (cacheManagerProvider.getIfAvailable() != null) {
+                return new CachingServiceInstanceSupplier(delegate, cacheManagerProvider.getIfAvailable());
+            }
+            return delegate;
+        }
 
-	}
+    }
 
-	private static final int REACTIVE_SERVICE_INSTANCE_SUPPLIER_ORDER = 193827465;
-	private static final SpelExpressions defaultSpel = SpelExpressions.create();
+    private static final int REACTIVE_SERVICE_INSTANCE_SUPPLIER_ORDER = 193827465;
+    private static final SpelExpressions defaultSpel = SpelExpressions.create();
 
 }

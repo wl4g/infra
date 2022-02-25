@@ -19,12 +19,19 @@
  */
 package com.wl4g.infra.integration.feign.istio.context;
 
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.wl4g.infra.integration.feign.core.context.DefaultFeignContextAutoConfiguration.DefaultFeignRpcContextHolder;
 import com.wl4g.infra.integration.feign.core.context.RpcContextHolder;
-
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 
 /**
  * Istio SpringBoot feign {@link RpcContextHolder} auto configuration. (Both the
@@ -37,13 +44,50 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
  */
 public class IstioFeignContextAutoConfiguration {
 
-	@Bean
-	@ConditionalOnMissingBean // Lower priority
-	public RpcContextHolder istioSpringBootFeignRpcContextHolder() {
-		return new IstioSpringBootFeignRpcContextHolder();
-	}
+    @Bean
+    @ConditionalOnMissingBean // Lower priority
+    public RpcContextHolder istioSpringBootFeignRpcContextHolder() {
+        return new IstioSpringBootFeignRpcContextHolder();
+    }
 
-	static class IstioSpringBootFeignRpcContextHolder extends DefaultFeignRpcContextHolder {
-	}
+    @Bean
+    public IstioFeignContextServletInterceptor istioFeignContextServletInterceptor() {
+        return new IstioFeignContextServletInterceptor();
+    }
+
+    @Bean
+    public IstioFeignContextWebMvcConfigurer istioFeignContextWebMvcConfigurer(IstioFeignContextServletInterceptor interceptor) {
+        return new IstioFeignContextWebMvcConfigurer(interceptor);
+    }
+
+    static class IstioFeignContextWebMvcConfigurer implements WebMvcConfigurer {
+        private final IstioFeignContextServletInterceptor interceptor;
+
+        public IstioFeignContextWebMvcConfigurer(IstioFeignContextServletInterceptor interceptor) {
+            this.interceptor = notNullOf(interceptor, "interceptor");
+        }
+
+        @Override
+        public void addInterceptors(InterceptorRegistry registry) {
+            registry.addInterceptor(interceptor).addPathPatterns("/**");
+        }
+    }
+
+    static class IstioFeignContextServletInterceptor implements HandlerInterceptor {
+        @Override
+        public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+            return true;
+        }
+
+        @Override
+        public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
+                throws Exception {
+            RpcContextHolder.getContext().clearAttachments();
+            RpcContextHolder.getServerContext().clearAttachments();
+        }
+    }
+
+    static class IstioSpringBootFeignRpcContextHolder extends DefaultFeignRpcContextHolder {
+    }
 
 }

@@ -19,33 +19,28 @@
  */
 package com.wl4g.infra.integration.feign.core.extension;
 
-import static com.wl4g.infra.common.web.WebUtils2.PARAM_STACKTRACE;
-import static com.wl4g.infra.common.web.WebUtils2.isStacktraceRequest;
+import java.lang.reflect.Type;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 
-import com.wl4g.infra.integration.feign.core.context.RpcContextHolder;
+import com.wl4g.infra.core.page.PageHolder;
 import com.wl4g.infra.integration.feign.core.context.internal.FeignContextCoprocessor;
 
-import feign.RequestTemplate;
+import feign.Response;
 
 /**
- * {@link SimpleLogTraceCoprocessor}
+ * {@link PageBindingContextCoprocessor}
  * 
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version v1.0 2021-04-27
  * @sine v1.0
  * @see
  */
-public class SimpleLogTraceCoprocessor implements FeignContextCoprocessor {
+public class PageBindingContextCoprocessor implements FeignContextCoprocessor {
 
-	@Override
-	public void prepareConsumerExecution(@NotNull RequestTemplate template, HttpServletRequest request) {
-		// Pass 'stacktrace' parameter through to the next service.
-		if (isStacktraceRequest(request)) {
-			template.header(PARAM_STACKTRACE, RpcContextHolder.getContext().getAttachment(PARAM_STACKTRACE));
-		}
-	}
+    @Override
+    public void afterConsumerExecution(@NotNull Response response, Type type) {
+        PageHolder.Util.update();
+    }
 
 }

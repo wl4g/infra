@@ -1332,10 +1332,9 @@ public abstract class WebUtils2 {
             "mp3", "amr", "mp4", "aiff", "rar", "tar.gz", "tar", "zip", "gzip", "ipa", "plist", "apk", "7-zip" };
 
     /**
-     * Controlling enabled unified exception handling stacktrace information.
+     * Unified exception handling stack trace parameter name.
      */
-    public static final String PARAM_STACKTRACE = getenv().getOrDefault("XCLOUD_COMPONENT_REQUEST_STACKTRACE_PARAM",
-            "x-stacktrace");
+    public static final String PARAM_STACKTRACE = getenv().getOrDefault("DOPAAS_INFRA_REQUEST_STACKTRACE_PARAM", "x-stacktrace");
 
     private static final Predicate<String> defaultStringAnyFilter = name -> true;
 

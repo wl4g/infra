@@ -34,21 +34,21 @@ import com.wl4g.infra.integration.feign.core.context.internal.FeignContextCoproc
 import feign.Response;
 
 /**
- * {@link InsertBeanBindingCoprocessor}
+ * {@link InsertBeanBindingContextCoprocessor}
  * 
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version v1.0 2021-05-20
  * @sine v1.0
  * @see
  */
-public class InsertBeanBindingCoprocessor implements FeignContextCoprocessor {
+public class InsertBeanBindingContextCoprocessor implements FeignContextCoprocessor {
 
 	@Override
 	public void beforeConsumerExecution(@NotNull Object proxy, @NotNull Method method, @Nullable Object[] args) {
 		if (!isEmptyArray(args)) {
 			for (Object arg : args) {
 				if (nonNull(arg) && BaseBean.class.isAssignableFrom(arg.getClass())) {
-					BaseBean.InternalUtil.bind((BaseBean) arg);
+					BaseBean.Util.bind((BaseBean) arg);
 					break;
 				}
 			}
@@ -58,7 +58,7 @@ public class InsertBeanBindingCoprocessor implements FeignContextCoprocessor {
 	@Override
 	public void afterConsumerExecution(@NotNull Response response, Type type) {
 		// Update current inserted bean id.
-		BaseBean.InternalUtil.update();
+		BaseBean.Util.update();
 	}
 
 }

@@ -28,6 +28,7 @@ import static java.lang.String.valueOf;
 import static java.lang.System.currentTimeMillis;
 import static org.apache.commons.lang3.StringUtils.contains;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.startsWithIgnoreCase;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static com.wl4g.infra.core.logging.TraceLoggingMDCFilter.TraceMDCDefinition.*;
@@ -71,217 +72,215 @@ red>[%X{_H_:X-Request-ID}] [%X{_H_:X-Request-Seq}] [%X{_C_:${spring.infra.dopaas
  */
 public abstract class TraceLoggingMDCFilter implements Filter {
 
-	public static final long DEFAULT_CACHE_REFRESH_MS = 500L;
-	public static final String HEADER_REQUEST_ID = "X-Request-ID";
-	public static final String HEADER_REQUEST_SEQ = "X-Request-Seq";
+    public static final long DEFAULT_CACHE_REFRESH_MS = 1_000L;
+    public static final String HEADER_REQUEST_ID = "X-Request-ID";
+    public static final String HEADER_REQUEST_SEQ = "X-Request-Seq";
 
-	final protected Logger log = getLogger(getClass());
+    protected final Logger log = getLogger(getClass());
 
-	/**
-	 * Spring application context.
-	 */
-	final protected ApplicationContext context;
+    /**
+     * Spring application context.
+     */
+    protected final ApplicationContext context;
 
-	/**
-	 * Cache refresh timestamp.
-	 */
-	final private AtomicLong cacheRefreshLastTime = new AtomicLong(0);
+    /**
+     * Cache refresh timestamp.
+     */
+    private final AtomicLong cacheRefreshLastTime = new AtomicLong(0);
 
-	/**
-	 * Whether to enable the headers mapping. for example:
-	 * <b>%X{_C_:JSESSIONID}</b></br>
-	 */
-	protected boolean enableMappedCookies;
+    /**
+     * Whether to enable the headers mapping. for example:
+     * <b>%X{_C_:JSESSIONID}</b></br>
+     */
+    protected boolean enableMappedCookies;
 
-	/**
-	 * Whether to enable the headers mapping. for example:
-	 * <b>%X{_H_:X-Forwarded-For}</b></br>
-	 */
-	protected boolean enableMappedHeaders;
+    /**
+     * Whether to enable the headers mapping. for example:
+     * <b>%X{_H_:X-Forwarded-For}</b></br>
+     */
+    protected boolean enableMappedHeaders;
 
-	/**
-	 * Whether to enable the headers mapping. for example:
-	 * <b>%X{_P_:userId}</b></br>
-	 */
-	protected boolean enableMappedParameters;
+    /**
+     * Whether to enable the headers mapping. for example:
+     * <b>%X{_P_:userId}</b></br>
+     */
+    protected boolean enableMappedParameters;
 
-	public TraceLoggingMDCFilter(ApplicationContext context) {
-		notNullOf(context, "applicationContext");
-		this.context = context;
+    public TraceLoggingMDCFilter(ApplicationContext context) {
+        notNullOf(context, "applicationContext");
+        this.context = context;
+        // Initial mapped MDC configuration
+        refreshMDCMapped();
+    }
 
-		// Initializing mapped MDC configuration
-		refreshMappedConfigIfNecessary();
-	}
+    @Override
+    public void init(FilterConfig config) throws ServletException {
+    }
 
-	public boolean isEnableMappedCookies() {
-		return enableMappedCookies;
-	}
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
+        HttpServletRequest req = (HttpServletRequest) request;
 
-	public boolean isEnableMappedHeaders() {
-		return enableMappedHeaders;
-	}
+        try {
+            // Refreshing MDC mapped(If necessary).
+            refreshMDCMapped();
 
-	public boolean isEnableMappedParameters() {
-		return enableMappedParameters;
-	}
+            setupLoggingMDC(req);
+        } catch (Exception e) {
+            log.error(format("Could't set logging MDC. uri: %s", req.getRequestURI()), e);
+        }
 
-	@Override
-	public void init(FilterConfig config) throws ServletException {
-	}
+        try {
+            chain.doFilter(request, response);
+        } finally {
+            MDC.clear(); // must
+        }
 
-	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-			throws IOException, ServletException {
-		HttpServletRequest req = (HttpServletRequest) request;
+    }
 
-		try {
-			// Refreshing MDC mapped(If necessary).
-			refreshMappedConfigIfNecessary();
+    @Override
+    public void destroy() {
+    }
 
-			// Set logging MDC
-			setLoggingMDC(req);
-		} catch (Exception e) {
-			log.error(format("Could't set logging MDC. uri: %s", req.getRequestURI()), e);
-		}
+    /**
+     * Automatically setup trace logging paremters to MDC
+     * 
+     * @param req
+     */
+    protected void setupLoggingMDC(HttpServletRequest req) {
+        // Sets basic to MDC
+        MDC.put(KEY_REQUEST_ID, req.getHeader(HEADER_REQUEST_ID));
+        String requestSeq = req.getHeader(HEADER_REQUEST_SEQ);
+        MDC.put(KEY_REQUEST_SEQ, requestSeq);
+        if (!isBlank(requestSeq)) {
+            // seq will be like:000, real seq is the number of "0"
+            String nextSeq = requestSeq + "0";
+            MDC.put(KEY_NEXT_REQUEST_SEQ, nextSeq);
+        } else {
+            MDC.put(KEY_NEXT_REQUEST_SEQ, "0");
+        }
+        MDC.put(KEY_TIMESTAMP, valueOf(currentTimeMillis()));
+        MDC.put(KEY_URI, req.getRequestURI());
 
-		try {
-			chain.doFilter(request, response);
-		} finally {
-			MDC.clear(); // must
-		}
+        // Sets headers to MDC
+        if (enableMappedHeaders) {
+            Enumeration<String> e = req.getHeaderNames();
+            if (e != null) {
+                while (e.hasMoreElements()) {
+                    String name = e.nextElement();
+                    if (isMDCParameter(name)) {
+                        MDC.put(KEY_PREFIX_HEADER.concat(name), req.getHeader(name));
+                    }
+                }
+            }
+        }
 
-	}
+        // Sets cookies to MDC
+        if (enableMappedCookies) {
+            Cookie[] cookies = req.getCookies();
+            if (cookies != null && cookies.length > 0) {
+                for (Cookie cookie : cookies) {
+                    String name = cookie.getName();
+                    if (isMDCParameter(name)) {
+                        MDC.put(KEY_PREFIX_COOKIE.concat(name), cookie.getValue());
+                    }
+                }
+            }
+        }
 
-	@Override
-	public void destroy() {
-	}
+        // Sets parameters to MDC
+        if (enableMappedParameters) {
+            Enumeration<String> e = req.getParameterNames();
+            if (e != null) {
+                while (e.hasMoreElements()) {
+                    String name = e.nextElement();
+                    if (isMDCParameter(name)) {
+                        MDC.put(KEY_PREFIX_PARAMETER.concat(name), req.getParameter(name));
+                    }
+                }
+            }
+        }
 
-	/**
-	 * Automatically set trace log MDC
-	 * 
-	 * @param req
-	 */
-	protected void setLoggingMDC(HttpServletRequest req) {
-		// Set basic MDC
-		MDC.put(KEY_REQUEST_ID, req.getHeader(HEADER_REQUEST_ID));
-		String requestSeq = req.getHeader(HEADER_REQUEST_SEQ);
-		MDC.put(KEY_REQUEST_SEQ, requestSeq);
-		if (!isBlank(requestSeq)) {
-			// seq will be like:000, real seq is the number of "0"
-			String nextSeq = requestSeq + "0";
-			MDC.put(KEY_NEXT_REQUEST_SEQ, nextSeq);
-		} else {
-			MDC.put(KEY_NEXT_REQUEST_SEQ, "0");
-		}
-		MDC.put(KEY_TIMESTAMP, valueOf(currentTimeMillis()));
-		MDC.put(KEY_URI, req.getRequestURI());
+    }
 
-		// Set headers MDC
-		if (isEnableMappedCookies()) {
-			Enumeration<String> e = req.getHeaderNames();
-			if (e != null) {
-				while (e.hasMoreElements()) {
-					String header = e.nextElement();
-					String value = req.getHeader(header);
-					MDC.put(KEY_PREFIX_HEADER + header, value);
-				}
-			}
-		}
+    /**
+     * Refreshing MDC mapped via patterns, When the logging configuration is
+     * modified, it can be updated in time
+     * 
+     * @return
+     */
+    protected boolean refreshMDCMapped() {
+        long now = currentTimeMillis();
+        if ((now - cacheRefreshLastTime.get()) < DEFAULT_CACHE_REFRESH_MS) {
+            return false;
+        }
+        String consolePattern = context.getEnvironment().getProperty("logging.pattern.console");
+        String filePattern = context.getEnvironment().getProperty("logging.pattern.file");
+        this.enableMappedCookies = isMappedMDCField(consolePattern, filePattern, KEY_PREFIX_COOKIE);
+        this.enableMappedHeaders = isMappedMDCField(consolePattern, filePattern, KEY_PREFIX_HEADER);
+        this.enableMappedParameters = isMappedMDCField(consolePattern, filePattern, KEY_PREFIX_PARAMETER);
+        cacheRefreshLastTime.set(now);
+        return true;
+    }
 
-		// Set cookies MDC
-		if (isEnableMappedCookies()) {
-			Cookie[] cookies = req.getCookies();
-			if (cookies != null && cookies.length > 0) {
-				for (Cookie cookie : cookies) {
-					String name = cookie.getName();
-					String value = cookie.getValue();
-					MDC.put(KEY_PREFIX_COOKIE + name, value);
-				}
-			}
-		}
+    /**
+     * Check if binding to MDC parameter is required.
+     * 
+     * @param name
+     * @return
+     */
+    protected boolean isMDCParameter(String name) {
+        return startsWithIgnoreCase(name, "x-");
+    }
 
-		// Set parameters MDC
-		if (isEnableMappedParameters()) {
-			Enumeration<String> e = req.getParameterNames();
-			if (e != null) {
-				while (e.hasMoreElements()) {
-					String key = e.nextElement();
-					String value = req.getParameter(key);
-					MDC.put(KEY_PREFIX_PARAMETER + key, value);
-				}
-			}
-		}
+    /**
+     * 
+     * Check if MDC field is enabled.
+     * 
+     * @param consolePattern
+     * @param filePattern
+     * @param mdcField
+     * @return
+     */
+    protected boolean isMappedMDCField(String consolePattern, String filePattern, String mdcField) {
+        // for example: %X{_C_:JSESSIONID} => %X{_C_:
+        String mdcFieldFull = "%X{" + mdcField;
+        return contains(consolePattern, mdcFieldFull) || contains(filePattern, mdcFieldFull);
+    }
 
-	}
+    /**
+     * Tracking log dyeing MDC constants.
+     * 
+     * @author Wangl.sir <wanglsir@gmail.com, 983708408@qq.com>
+     * @version v1.0 2020年2月26日
+     * @since
+     */
+    public static class TraceMDCDefinition {
 
-	/**
-	 * Refreshing MDC mapped by patterns, When the logging configuration is
-	 * modified, it can be updated in time
-	 * 
-	 * @return
-	 */
-	protected boolean refreshMappedConfigIfNecessary() {
-		long now = currentTimeMillis();
-		if ((now - cacheRefreshLastTime.get()) < DEFAULT_CACHE_REFRESH_MS) {
-			return false;
-		}
+        public static final String KEY_REQUEST_ID = "requestId";
 
-		String consolePattern = context.getEnvironment().getProperty("logging.pattern.console");
-		String filePattern = context.getEnvironment().getProperty("logging.pattern.file");
-		this.enableMappedCookies = isMappedMDCField(consolePattern, filePattern, KEY_PREFIX_COOKIE);
-		this.enableMappedHeaders = isMappedMDCField(consolePattern, filePattern, KEY_PREFIX_HEADER);
-		this.enableMappedParameters = isMappedMDCField(consolePattern, filePattern, KEY_PREFIX_PARAMETER);
-		cacheRefreshLastTime.set(now);
-		return true;
-	}
+        public static final String KEY_REQUEST_SEQ = "requestSeq";
 
-	/**
-	 * 
-	 * Check if MDC field is enabled.
-	 * 
-	 * @param consolePattern
-	 * @param filePattern
-	 * @param mdcField
-	 * @return
-	 */
-	private boolean isMappedMDCField(String consolePattern, String filePattern, String mdcField) {
-		// for example: %X{_C_:JSESSIONID} => %X{_C_:
-		String mdcFieldFull = "%X{" + mdcField;
-		return contains(consolePattern, mdcFieldFull) || contains(filePattern, mdcFieldFull);
-	}
+        /**
+         * When the tracking chain is distributed, the used SEQ is generated by
+         * filter, and usually the developer does not need to modify it.
+         */
+        public static final String KEY_NEXT_REQUEST_SEQ = "nextRequestSeq";
 
-	/**
-	 * Tracking log dyeing MDC constants.
-	 * 
-	 * @author Wangl.sir <wanglsir@gmail.com, 983708408@qq.com>
-	 * @version v1.0 2020年2月26日
-	 * @since
-	 */
-	public static class TraceMDCDefinition {
+        public static final String KEY_URI = "_uri_";
 
-		public static final String KEY_REQUEST_ID = "requestId";
+        /**
+         * Timestamp when the request enters the filter
+         */
+        public static final String KEY_TIMESTAMP = "_timestamp_";
 
-		public static final String KEY_REQUEST_SEQ = "requestSeq";
+        public static final String KEY_PREFIX_COOKIE = "_C_:";
 
-		/**
-		 * When the tracking chain is distributed, the used SEQ is generated by
-		 * filter, and usually the developer does not need to modify it.
-		 */
-		public static final String KEY_NEXT_REQUEST_SEQ = "nextRequestSeq";
+        public static final String KEY_PREFIX_HEADER = "_H_:";
 
-		public static final String KEY_URI = "_uri_";
+        public static final String KEY_PREFIX_PARAMETER = "_P_:";
 
-		/**
-		 * Timestamp when the request enters the filter
-		 */
-		public static final String KEY_TIMESTAMP = "_timestamp_";
-
-		public static final String KEY_PREFIX_COOKIE = "_C_:";
-
-		public static final String KEY_PREFIX_HEADER = "_H_:";
-
-		public static final String KEY_PREFIX_PARAMETER = "_P_:";
-
-	}
+    }
 
 }

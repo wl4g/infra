@@ -34,15 +34,15 @@ import com.netflix.hystrix.contrib.metrics.eventstream.HystrixMetricsStreamServl
  */
 public class EnableHystrixStreamAutoConfiguration {
 
-	@Bean
-	public ServletRegistrationBean<HystrixMetricsStreamServlet> hystrixMetricsStreamServlet() {
-		HystrixMetricsStreamServlet hystrixStreamServlet = new HystrixMetricsStreamServlet();
-		ServletRegistrationBean<HystrixMetricsStreamServlet> registrationBean = new ServletRegistrationBean<>(
-				hystrixStreamServlet);
-		registrationBean.setLoadOnStartup(1);
-		registrationBean.addUrlMappings("/hystrix.stream");
-		registrationBean.setName(HystrixMetricsStreamServlet.class.getSimpleName());
-		return registrationBean;
-	}
+    @Bean
+    public ServletRegistrationBean<HystrixMetricsStreamServlet> hystrixMetricsStreamServlet() {
+        HystrixMetricsStreamServlet hystrixStreamServlet = new HystrixMetricsStreamServlet();
+        ServletRegistrationBean<HystrixMetricsStreamServlet> registrationBean = new ServletRegistrationBean<>(
+                hystrixStreamServlet);
+        registrationBean.setLoadOnStartup(1);
+        registrationBean.addUrlMappings("/hystrix.stream");
+        registrationBean.setName(HystrixMetricsStreamServlet.class.getSimpleName());
+        return registrationBean;
+    }
 
 }

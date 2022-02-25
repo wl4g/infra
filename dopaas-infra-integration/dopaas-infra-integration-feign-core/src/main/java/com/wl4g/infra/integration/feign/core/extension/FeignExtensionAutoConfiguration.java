@@ -21,6 +21,8 @@ package com.wl4g.infra.integration.feign.core.extension;
 
 import org.springframework.context.annotation.Bean;
 
+import com.wl4g.infra.integration.feign.core.config.FeignConsumerProperties;
+
 /**
  * {@link FeignExtensionAutoConfiguration}
  * 
@@ -31,19 +33,19 @@ import org.springframework.context.annotation.Bean;
  */
 public class FeignExtensionAutoConfiguration {
 
-	@Bean
-	public PageBindingCoprocessor pageBindingFeignContextCoprocessor() {
-		return new PageBindingCoprocessor();
-	}
+    @Bean
+    public PageBindingContextCoprocessor pageBindingFeignContextCoprocessor() {
+        return new PageBindingContextCoprocessor();
+    }
 
-	@Bean
-	public SimpleLogTraceCoprocessor simpleLogTraceFeignContextCoprocessor() {
-		return new SimpleLogTraceCoprocessor();
-	}
+    @Bean
+    public InsertBeanBindingContextCoprocessor insertBeanBindingFeignContextCoprocessor() {
+        return new InsertBeanBindingContextCoprocessor();
+    }
 
-	@Bean
-	public InsertBeanBindingCoprocessor insertBeanBindingFeignContextCoprocessor() {
-		return new InsertBeanBindingCoprocessor();
-	}
+    @Bean
+    public TracingContextCoprocessor traceFeignContextCoprocessor(FeignConsumerProperties config) {
+        return new TracingContextCoprocessor(config);
+    }
 
 }

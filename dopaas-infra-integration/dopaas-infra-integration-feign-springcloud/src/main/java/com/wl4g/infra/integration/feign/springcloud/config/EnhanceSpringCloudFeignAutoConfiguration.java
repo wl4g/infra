@@ -34,14 +34,14 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
  */
 public class EnhanceSpringCloudFeignAutoConfiguration {
 
-	@Bean
-	public HttpMessageConverter<?> jacksonHttpMessageConverter() {
-		return new MappingJackson2HttpMessageConverter();
-	}
+    @Bean
+    public HttpMessageConverter<?> jacksonHttpMessageConverter() {
+        return new MappingJackson2HttpMessageConverter();
+    }
 
-	@Bean
-	public HttpMessageConverter<?> springFromHttpMessageConverter() {
-		return new FormHttpMessageConverter();
-	}
+    @Bean
+    public HttpMessageConverter<?> springFromHttpMessageConverter() {
+        return new FormHttpMessageConverter();
+    }
 
 }

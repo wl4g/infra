@@ -16,10 +16,10 @@
 	       <result column="del_flag" property="delFlag" jdbcType="INTEGER" />
 	   </resultMap>
 	   <select id="list" resultMap="BaseResultMap">
-	       select * from t_example_order t
+	       select * from t_order t
 	   </select>
 	   <insert id="insertSelective" parameterType="com.wl4g.infra.integration.example.bean.OrderInfo" useGeneratedKeys="true" keyProperty="id">
-        insert into t_example_order
+        insert into t_order
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">
                 id,

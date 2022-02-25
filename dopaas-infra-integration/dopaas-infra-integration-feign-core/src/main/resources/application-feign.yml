@@ -10,22 +10,13 @@
 
 # #### Environment configuration. ####
 #
-spring:
-  infra:
-    core:
-      bootstrapping:
-        enabled: false
-      naming-beanfactory:
-        enabled: false
-      generic-operator:
-        enabled: false
-      smart-proxies:
-        enabled: false
-      web:
-        embedded-webapps:
-          enabled: false
-        human-date-converter:
-          enabled: false
-        global-error:
-          enabled: false
-
+#spring:
+#  infra:
+#    integration:
+#      fegin:
+#        tracing:
+#          prefix-http-headers:
+#            - 'X-Forwarded-'
+#            - 'X-Request-'
+#            - 'X-B3-'
+#            - 'X-Envoy-'
