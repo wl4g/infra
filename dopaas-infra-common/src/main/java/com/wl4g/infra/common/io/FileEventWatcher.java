@@ -56,7 +56,7 @@ public class FileEventWatcher implements Runnable, Closeable {
     private final EventBusSupport eventbus;
 
     private final AtomicBoolean running = new AtomicBoolean(false);
-    private Thread scanner;
+    private Thread wacher;
 
     public FileEventWatcher(File targetdir) {
         this(targetdir, 1);
@@ -87,15 +87,15 @@ public class FileEventWatcher implements Runnable, Closeable {
         if (running.compareAndSet(false, true)) {
             eventbus.register(listeners.toArray());
 
-            scanner = new Thread(() -> {
+            wacher = new Thread(() -> {
                 try {
-                    WatchService watcher = FileSystems.getDefault().newWatchService();
-                    targetdir.toPath().register(watcher, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
-                    while (!scanner.isInterrupted()) {
-                        WatchKey key = watcher.take();
+                    WatchService ws = FileSystems.getDefault().newWatchService();
+                    targetdir.toPath().register(ws, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
+                    while (!wacher.isInterrupted()) {
+                        WatchKey key = ws.take();
                         for (WatchEvent<?> event : key.pollEvents()) {
                             log.debug("event kind: {}, context: {}", event.kind(), event.context());
-                            eventbus.getBus().post(new FileChangedEvent((Kind<Path>) event.kind(), event.context()));
+                            eventbus.post(new FileChangedEvent((Kind<Path>) event.kind(), event.context()));
                         }
                         key.reset();
                     }
@@ -103,14 +103,14 @@ public class FileEventWatcher implements Runnable, Closeable {
                     log.error(format("Failed to watching process. - %s", targetdir), e);
                 }
             });
-            scanner.setDaemon(true);
-            scanner.start();
+            wacher.setDaemon(true);
+            wacher.start();
         }
     }
 
     @Override
     public void close() throws IOException {
-        scanner.interrupt();
+        wacher.interrupt();
     }
 
     public static class FileChangedEvent extends EventObject {

@@ -46,7 +46,7 @@ public class FileEventWatcherTests {
                     System.out.println(format("Started testing updater ..."));
                     for (int i = 0; i < 10; i++) {
                         String content = "name: 'Im is jack " + i + "'";
-                        System.out.println(format("write {%s} => %s", content, targetfile1));
+                        System.out.println(format("%s => %s", content, targetfile1));
                         FileIOUtils.writeFile(targetfile1, content);
                         Thread.sleep(2000L);
                     }
@@ -57,9 +57,6 @@ public class FileEventWatcherTests {
 
             updater.start();
             updater.join();
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
     }
