@@ -19,13 +19,9 @@
  */
 package com.wl4g.infra.integration.feign.core.extension;
 
-import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.web.WebUtils2.PARAM_STACKTRACE;
 import static com.wl4g.infra.common.web.WebUtils2.isStacktraceRequest;
-import static org.apache.commons.lang3.StringUtils.startsWithIgnoreCase;
-
-import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
@@ -37,48 +33,28 @@ import com.wl4g.infra.integration.feign.core.context.internal.FeignContextCoproc
 import feign.RequestTemplate;
 
 /**
- * {@link TracingContextCoprocessor}
+ * {@link SimpleStacktraceContextCoprocessor}
  * 
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version v1.0 2021-04-27
  * @sine v1.0
  * @see
  */
-public class TracingContextCoprocessor implements FeignContextCoprocessor {
+public class SimpleStacktraceContextCoprocessor implements FeignContextCoprocessor {
 
+    @SuppressWarnings("unused")
     private FeignConsumerProperties config;
 
-    public TracingContextCoprocessor(FeignConsumerProperties config) {
+    public SimpleStacktraceContextCoprocessor(FeignConsumerProperties config) {
         this.config = notNullOf(config, "config");
     }
 
-    // Notice:https://blog.csdn.net/caoyi1207/article/details/92775211
     @Override
     public void prepareConsumerExecution(@NotNull RequestTemplate template, HttpServletRequest request) {
         // Default print stack parameter pass through to the next service.
         if (isStacktraceRequest(request)) {
             template.header(PARAM_STACKTRACE, RpcContextHolder.getContext().getAttachment(PARAM_STACKTRACE));
         }
-
-        // More(eg:Jaeger+Istio) tracing parameter through to the next service.
-        Enumeration<String> e = request.getHeaderNames();
-        if (e != null) {
-            while (e.hasMoreElements()) {
-                String name = e.nextElement();
-                if (isTracingHeaders(name)) {
-                    template.header(PARAM_STACKTRACE, request.getHeader(name));
-                }
-            }
-        }
-    }
-
-    private boolean isTracingHeaders(String name) {
-        for (String prefix : safeList(config.getTracing().getPrefixHttpHeaders())) {
-            if (startsWithIgnoreCase(name, prefix)) {
-                return true;
-            }
-        }
-        return false;
     }
 
 }

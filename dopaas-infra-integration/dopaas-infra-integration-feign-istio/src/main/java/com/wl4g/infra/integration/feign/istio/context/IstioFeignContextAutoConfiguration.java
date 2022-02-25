@@ -30,6 +30,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import com.wl4g.infra.integration.feign.core.config.FeignConsumerProperties;
 import com.wl4g.infra.integration.feign.core.context.DefaultFeignContextAutoConfiguration.DefaultFeignRpcContextHolder;
 import com.wl4g.infra.integration.feign.core.context.RpcContextHolder;
 
@@ -43,6 +44,11 @@ import com.wl4g.infra.integration.feign.core.context.RpcContextHolder;
  * @see
  */
 public class IstioFeignContextAutoConfiguration {
+
+    @Bean
+    public TracingContextCoprocessor tracingContextCoprocessor(FeignConsumerProperties config) {
+        return new TracingContextCoprocessor(config);
+    }
 
     @Bean
     @ConditionalOnMissingBean // Lower priority
