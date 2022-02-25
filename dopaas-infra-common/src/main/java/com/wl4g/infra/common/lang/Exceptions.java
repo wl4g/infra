@@ -35,120 +35,120 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
  */
 public abstract class Exceptions extends ExceptionUtils {
 
-	/**
-	 * Convert CheckedException to UncheckedException.
-	 * 
-	 * @param e
-	 * @return
-	 */
-	public static RuntimeException unchecked(Exception e) {
-		if (e instanceof RuntimeException) {
-			return (RuntimeException) e;
-		} else {
-			return new RuntimeException(e);
-		}
-	}
+    /**
+     * Convert CheckedException to UncheckedException.
+     * 
+     * @param e
+     * @return
+     */
+    public static RuntimeException unchecked(Exception e) {
+        if (e instanceof RuntimeException) {
+            return (RuntimeException) e;
+        } else {
+            return new RuntimeException(e);
+        }
+    }
 
-	/**
-	 * Convert ErrorStack to String.
-	 * 
-	 * @param e
-	 * @return
-	 */
-	public static String getStackTraceAsString(Throwable e) {
-		if (e == null) {
-			return "";
-		}
-		StringWriter stringWriter = new StringWriter();
-		e.printStackTrace(new PrintWriter(stringWriter));
-		return stringWriter.toString();
-	}
+    /**
+     * Convert ErrorStack to String.
+     * 
+     * @param e
+     * @return
+     */
+    public static String getStackTraceAsString(Throwable e) {
+        if (e == null) {
+            return "";
+        }
+        StringWriter stringWriter = new StringWriter();
+        e.printStackTrace(new PrintWriter(stringWriter));
+        return stringWriter.toString();
+    }
 
-	/**
-	 * Degradation acquisition and abnormal causes
-	 * 
-	 * @param thw
-	 * @return
-	 */
-	public static Throwable getRootCauses(Throwable thw) {
-		if (thw == null) {
-			return null;
-		}
-		Throwable root = getRootCause(thw);
-		return root == null ? thw : root;
-	}
+    /**
+     * Degradation acquisition and abnormal causes
+     * 
+     * @param thw
+     * @return
+     */
+    public static Throwable getRootCauses(Throwable thw) {
+        if (thw == null) {
+            return null;
+        }
+        Throwable root = getRootCause(thw);
+        return root == null ? thw : root;
+    }
 
-	/**
-	 * Determine whether anomalies are caused by some underlying anomalies.
-	 * 
-	 * @param ex
-	 * @param causeExceptionClasses
-	 * @return
-	 */
-	@SafeVarargs
-	public static boolean isCausedBy(Exception ex, Class<? extends Exception>... causeExceptionClasses) {
-		Throwable cause = ex.getCause();
-		while (cause != null) {
-			for (Class<? extends Exception> causeClass : causeExceptionClasses) {
-				if (causeClass.isInstance(cause)) {
-					return true;
-				}
-			}
-			cause = cause.getCause();
-		}
-		return false;
-	}
+    /**
+     * Determine whether anomalies are caused by some underlying anomalies.
+     * 
+     * @param ex
+     * @param causeExceptionClasses
+     * @return
+     */
+    @SafeVarargs
+    public static boolean isCausedBy(Exception ex, Class<? extends Exception>... causeExceptionClasses) {
+        Throwable cause = ex.getCause();
+        while (cause != null) {
+            for (Class<? extends Exception> causeClass : causeExceptionClasses) {
+                if (causeClass.isInstance(cause)) {
+                    return true;
+                }
+            }
+            cause = cause.getCause();
+        }
+        return false;
+    }
 
-	/**
-	 * Getting exception classes in request
-	 * 
-	 * @param request
-	 * @return
-	 */
-	public static Throwable getThrowable(HttpServletRequest request) {
-		Throwable ex = null;
-		if (request.getAttribute("exception") != null) {
-			ex = (Throwable) request.getAttribute("exception");
-		} else if (request.getAttribute("javax.servlet.error.exception") != null) {
-			ex = (Throwable) request.getAttribute("javax.servlet.error.exception");
-		}
-		return ex;
-	}
+    /**
+     * Getting exception classes in request
+     * 
+     * @param request
+     * @return
+     */
+    public static Throwable getThrowable(HttpServletRequest request) {
+        Throwable ex = null;
+        if (request.getAttribute("exception") != null) {
+            ex = (Throwable) request.getAttribute("exception");
+        } else if (request.getAttribute("javax.servlet.error.exception") != null) {
+            ex = (Throwable) request.getAttribute("javax.servlet.error.exception");
+        }
+        return ex;
+    }
 
-	/**
-	 * Getting root causes string message
-	 * 
-	 * @param th
-	 * @return
-	 */
-	public static String getRootCausesString(Throwable th) {
-		return getRootCausesString(th, true);
-	}
+    /**
+     * Getting root causes string message
+     * 
+     * @param th
+     * @return
+     */
+    public static String getRootCausesString(Throwable th) {
+        return getRootCausesString(th, true);
+    }
 
-	/**
-	 * Getting root causes string message
-	 * 
-	 * @param th
-	 * @param extract
-	 *            Whether to extract the root cause of anomalies
-	 * @return
-	 */
-	public static String getRootCausesString(Throwable th, boolean extract) {
-		if (Objects.isNull(th)) {
-			return null;
-		}
-		String causes = getRootCauseMessage(th);
-		String errmsg = isEmpty(causes) ? getMessage(th) : causes;
-		if (extract) {
-			int index = errmsg.indexOf(DEFAULT_CAUSE_EX_SEPARATE_SUFFIX);
-			if (index > 0) {
-				errmsg = errmsg.substring(index + DEFAULT_CAUSE_EX_SEPARATE_SUFFIX_LENGTH);
-			}
-		}
-		return trim(errmsg);
-	}
+    /**
+     * Getting root causes string message
+     * 
+     * @param th
+     * @param extract
+     *            Whether to extract the root cause of anomalies
+     * @return
+     */
+    public static String getRootCausesString(Throwable th, boolean extract) {
+        if (Objects.isNull(th)) {
+            return null;
+        }
+        String causes = getRootCauseMessage(th);
+        String errmsg = isEmpty(causes) ? getMessage(th) : causes;
+        if (extract) {
+            int index = errmsg.indexOf(DEFAULT_CAUSE_EX_SEPARATE_SUFFIX);
+            if (index > 0) {
+                errmsg = errmsg.substring(index + DEFAULT_CAUSE_EX_SEPARATE_SUFFIX_LENGTH);
+            }
+        }
+        return trim(errmsg);
+    }
 
-	final public static String DEFAULT_CAUSE_EX_SEPARATE_SUFFIX = "Exception: ";
-	final public static int DEFAULT_CAUSE_EX_SEPARATE_SUFFIX_LENGTH = DEFAULT_CAUSE_EX_SEPARATE_SUFFIX.length();
+    final public static String DEFAULT_CAUSE_EX_SEPARATE_SUFFIX = "Exception: ";
+    final public static int DEFAULT_CAUSE_EX_SEPARATE_SUFFIX_LENGTH = DEFAULT_CAUSE_EX_SEPARATE_SUFFIX.length();
 
 }

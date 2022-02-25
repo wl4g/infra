@@ -40,102 +40,102 @@ import com.wl4g.infra.common.remoting.standard.HttpMediaType;
  */
 public class HttpMessageParserExtractor<T> implements ResponseProcessor<T> {
 
-	private final Type responseType;
+    private final Type responseType;
 
-	@Nullable
-	private final Class<T> responseClass;
+    @Nullable
+    private final Class<T> responseClass;
 
-	private final List<HttpMessageParser<?>> messageParsers;
+    private final List<HttpMessageParser<?>> messageParsers;
 
-	private final Log log;
+    private final Log log;
 
-	/**
-	 * Create a new instance of the {@code HttpMessageParserExtractor} with the
-	 * given response type and message converters. The given converters must
-	 * support the response type.
-	 */
-	public HttpMessageParserExtractor(Class<T> responseType, List<HttpMessageParser<?>> messageConverters) {
-		this((Type) responseType, messageConverters);
-	}
+    /**
+     * Create a new instance of the {@code HttpMessageParserExtractor} with the
+     * given response type and message converters. The given converters must
+     * support the response type.
+     */
+    public HttpMessageParserExtractor(Class<T> responseType, List<HttpMessageParser<?>> messageConverters) {
+        this((Type) responseType, messageConverters);
+    }
 
-	/**
-	 * Creates a new instance of the {@code HttpMessageParserExtractor} with the
-	 * given response type and message converters. The given converters must
-	 * support the response type.
-	 */
-	public HttpMessageParserExtractor(Type responseType, List<HttpMessageParser<?>> messageConverters) {
-		this(responseType, messageConverters, LogFactory.getLog(HttpMessageParserExtractor.class));
-	}
+    /**
+     * Creates a new instance of the {@code HttpMessageParserExtractor} with the
+     * given response type and message converters. The given converters must
+     * support the response type.
+     */
+    public HttpMessageParserExtractor(Type responseType, List<HttpMessageParser<?>> messageConverters) {
+        this(responseType, messageConverters, LogFactory.getLog(HttpMessageParserExtractor.class));
+    }
 
-	@SuppressWarnings("unchecked")
-	public HttpMessageParserExtractor(Type responseType, List<HttpMessageParser<?>> messageConverters, Log logger) {
-		Assert2.notNull(responseType, "'responseType' must not be null");
-		Assert2.notEmpty(messageConverters, "'messageConverters' must not be empty");
-		this.responseType = responseType;
-		this.responseClass = (responseType instanceof Class ? (Class<T>) responseType : null);
-		this.messageParsers = messageConverters;
-		this.log = logger;
-	}
+    @SuppressWarnings("unchecked")
+    public HttpMessageParserExtractor(Type responseType, List<HttpMessageParser<?>> messageConverters, Log logger) {
+        Assert2.notNull(responseType, "'responseType' must not be null");
+        Assert2.notEmpty(messageConverters, "'messageConverters' must not be empty");
+        this.responseType = responseType;
+        this.responseClass = (responseType instanceof Class ? (Class<T>) responseType : null);
+        this.messageParsers = messageConverters;
+        this.log = logger;
+    }
 
-	@Override
-	@SuppressWarnings({ "unchecked", "rawtypes", "resource" })
-	public T extractData(ClientHttpResponse response) throws IOException {
-		MessageBodyClientHttpResponseWrapper wrapper = new MessageBodyClientHttpResponseWrapper(response);
-		if (!wrapper.hasMessageBody() || wrapper.hasEmptyMessageBody()) {
-			return null;
-		}
-		HttpMediaType contentType = getContentType(wrapper);
+    @Override
+    @SuppressWarnings({ "unchecked", "rawtypes", "resource" })
+    public T extractData(ClientHttpResponse response) throws IOException {
+        MessageBodyClientHttpResponseWrapper wrapper = new MessageBodyClientHttpResponseWrapper(response);
+        if (!wrapper.hasMessageBody() || wrapper.hasEmptyMessageBody()) {
+            return null;
+        }
+        HttpMediaType contentType = getContentType(wrapper);
 
-		try {
-			for (HttpMessageParser<?> parser : messageParsers) {
-				if (parser instanceof GenericHttpMessageParser) {
-					GenericHttpMessageParser<?> genericMessageConverter = (GenericHttpMessageParser<?>) parser;
-					if (genericMessageConverter.canRead(responseType, null, contentType)) {
-						if (log.isDebugEnabled()) {
-							ResolvableType type = ResolvableType.forType(responseType);
-							log.debug("Reading to [" + type + "]");
-						}
-						return (T) genericMessageConverter.read(responseType, null, wrapper);
-					}
-				}
-				if (responseClass != null) {
-					if (parser.canRead(responseClass, contentType)) {
-						if (log.isDebugEnabled()) {
-							String className = responseClass.getName();
-							log.debug("Reading to [" + className + "] as \"" + contentType + "\"");
-						}
-						return (T) parser.read((Class) responseClass, wrapper);
-					}
-				}
-			}
-		} catch (IOException | HttpMessageNotReadableException ex) {
-			throw new RestClientException(
-					"Error while extracting response for type [" + responseType + "] and content type [" + contentType + "]", ex);
-		}
+        try {
+            for (HttpMessageParser<?> parser : messageParsers) {
+                if (parser instanceof GenericHttpMessageParser) {
+                    GenericHttpMessageParser<?> genericMessageConverter = (GenericHttpMessageParser<?>) parser;
+                    if (genericMessageConverter.canRead(responseType, null, contentType)) {
+                        if (log.isDebugEnabled()) {
+                            ResolvableType type = ResolvableType.forType(responseType);
+                            log.debug("Reading to [" + type + "]");
+                        }
+                        return (T) genericMessageConverter.read(responseType, null, wrapper);
+                    }
+                }
+                if (responseClass != null) {
+                    if (parser.canRead(responseClass, contentType)) {
+                        if (log.isDebugEnabled()) {
+                            String className = responseClass.getName();
+                            log.debug("Reading to [" + className + "] as \"" + contentType + "\"");
+                        }
+                        return (T) parser.read((Class) responseClass, wrapper);
+                    }
+                }
+            }
+        } catch (IOException | HttpMessageNotReadableException ex) {
+            throw new RestClientException(
+                    "Error while extracting response for type [" + responseType + "] and content type [" + contentType + "]", ex);
+        }
 
-		throw new RestClientException("Could not extract response: no suitable HttpMessageParser found " + "for response type ["
-				+ responseType + "] and content type [" + contentType + "]");
-	}
+        throw new RestClientException("Could not extract response: no suitable HttpMessageParser found " + "for response type ["
+                + responseType + "] and content type [" + contentType + "]");
+    }
 
-	/**
-	 * Determine the Content-Type of the response based on the "Content-Type"
-	 * header or otherwise default to
-	 * {@link HttpMediaType#APPLICATION_OCTET_STREAM}.
-	 * 
-	 * @param response
-	 *            the response
-	 * @return the HttpMediaType, possibly {@code null}.
-	 */
-	@Nullable
-	protected HttpMediaType getContentType(MessageBodyClientHttpResponseWrapper response) {
-		HttpMediaType contentType = response.getHeaders().getContentType();
-		if (contentType == null) {
-			if (log.isTraceEnabled()) {
-				log.trace("No content-type, using 'application/octet-stream'");
-			}
-			contentType = HttpMediaType.APPLICATION_OCTET_STREAM;
-		}
-		return contentType;
-	}
+    /**
+     * Determine the Content-Type of the response based on the "Content-Type"
+     * header or otherwise default to
+     * {@link HttpMediaType#APPLICATION_OCTET_STREAM}.
+     * 
+     * @param response
+     *            the response
+     * @return the HttpMediaType, possibly {@code null}.
+     */
+    @Nullable
+    protected HttpMediaType getContentType(MessageBodyClientHttpResponseWrapper response) {
+        HttpMediaType contentType = response.getHeaders().getContentType();
+        if (contentType == null) {
+            if (log.isTraceEnabled()) {
+                log.trace("No content-type, using 'application/octet-stream'");
+            }
+            contentType = HttpMediaType.APPLICATION_OCTET_STREAM;
+        }
+        return contentType;
+    }
 
 }

@@ -34,25 +34,26 @@ import java.util.List;
  */
 public abstract class QuartzCronUtils {
 
-	/**
-	 * Check the expression is Valid
-	 */
-	public static boolean isValidExpression(String expression) {
-		return CronExpression.isValidExpression(expression);
-	}
+    /**
+     * Check the expression is Valid
+     */
+    public static boolean isValidExpression(String expression) {
+        return CronExpression.isValidExpression(expression);
+    }
 
-	/**
-	 * Get the expression next numTimes -- run time
-	 */
-	public static List<String> getNextExecTime(String expression, Integer numTimes) {
-		CronTriggerImpl cronTriggerImpl = new CronTriggerImpl();
-		try {
-			cronTriggerImpl.setCronExpression(expression);
-		} catch (ParseException e) {
-			throw new IllegalArgumentException(e);
-		}
-		return safeList(computeFireTimes(cronTriggerImpl, null, numTimes)).stream().map(d -> formatDate(d, "yyyy-MM-dd HH:mm:ss"))
-				.collect(toList());
-	}
+    /**
+     * Get the expression next numTimes -- run time
+     */
+    public static List<String> getNextExecTime(String expression, Integer numTimes) {
+        CronTriggerImpl cronTriggerImpl = new CronTriggerImpl();
+        try {
+            cronTriggerImpl.setCronExpression(expression);
+        } catch (ParseException e) {
+            throw new IllegalArgumentException(e);
+        }
+        return safeList(computeFireTimes(cronTriggerImpl, null, numTimes)).stream()
+                .map(d -> formatDate(d, "yyyy-MM-dd HH:mm:ss"))
+                .collect(toList());
+    }
 
 }

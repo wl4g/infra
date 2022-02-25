@@ -21,8 +21,8 @@ import static org.apache.commons.codec.digest.HmacUtils.*;
 
 public class HmacUtilsTests {
 
-	public static void main(String[] args) {
-		System.out.println(hmacSha256Hex("123".getBytes(UTF_8), "abc".getBytes(UTF_8)));
-	}
+    public static void main(String[] args) {
+        System.out.println(hmacSha256Hex("123".getBytes(UTF_8), "abc".getBytes(UTF_8)));
+    }
 
 }

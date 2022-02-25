@@ -22,25 +22,25 @@ import com.wl4g.infra.common.crypto.asymmetric.spec.KeyPairSpec;
 
 public class RSACryptorTests {
 
-	public static void main(String[] args) throws Exception {
-		// Gets algorithm instance
-		AsymmetricCryptor cryptor = new RSACryptor();
+    public static void main(String[] args) throws Exception {
+        // Gets algorithm instance
+        AsymmetricCryptor cryptor = new RSACryptor();
 
-		// Create keyPairSpec
-		KeyPairSpec keyPair = cryptor.generateKeyPair();
-		System.out.println("Generated keyPair:\t" + keyPair);
+        // Create keyPairSpec
+        KeyPairSpec keyPair = cryptor.generateKeyPair();
+        System.out.println("Generated keyPair:\t" + keyPair);
 
-		CodecSource plainSource0 = new CodecSource("abcdefghijkrmnopqrstuvwxyz");
-		System.out.println("Plain text:\t" + plainSource0.toString());
+        CodecSource plainSource0 = new CodecSource("abcdefghijkrmnopqrstuvwxyz");
+        System.out.println("Plain text:\t" + plainSource0.toString());
 
-		// Encryption
-		CodecSource cipherSource = cryptor.encrypt(keyPair.getPubKeySpec(), plainSource0);
-		System.out.println("Encrypted result:\t" + cipherSource.toBase64());
+        // Encryption
+        CodecSource cipherSource = cryptor.encrypt(keyPair.getPubKeySpec(), plainSource0);
+        System.out.println("Encrypted result:\t" + cipherSource.toBase64());
 
-		// Decryption
-		CodecSource plainSource = cryptor.decrypt(keyPair.getKeySpec(), cipherSource);
-		System.out.println("Decrypted result:\t" + plainSource.toString());
+        // Decryption
+        CodecSource plainSource = cryptor.decrypt(keyPair.getKeySpec(), cipherSource);
+        System.out.println("Decrypted result:\t" + plainSource.toString());
 
-	}
+    }
 
 }

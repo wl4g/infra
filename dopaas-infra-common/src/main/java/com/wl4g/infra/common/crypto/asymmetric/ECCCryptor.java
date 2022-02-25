@@ -31,37 +31,37 @@ import com.wl4g.infra.common.crypto.asymmetric.spec.ECCKeyPairSpec;
  */
 public class ECCCryptor extends AbstractAsymmetricCryptor {
 
-	public ECCCryptor() {
-		super(1024);
-	}
+    public ECCCryptor() {
+        super(1024);
+    }
 
-	public ECCCryptor(int keysize) {
-		super(keysize);
-	}
+    public ECCCryptor(int keysize) {
+        super(keysize);
+    }
 
-	@Override
-	public String getAlgorithmPrimary() {
-		return "ECC";
-	}
+    @Override
+    public String getAlgorithmPrimary() {
+        return "ECC";
+    }
 
-	@Override
-	public String getPadAlgorithm() {
-		return "ECC/ECB/PKCS1Padding";
-	}
+    @Override
+    public String getPadAlgorithm() {
+        return "ECC/ECB/PKCS1Padding";
+    }
 
-	@Override
-	protected Class<? extends KeySpec> getPublicKeySpecClass() {
-		return ECPublicKeySpec.class;
-	}
+    @Override
+    protected Class<? extends KeySpec> getPublicKeySpecClass() {
+        return ECPublicKeySpec.class;
+    }
 
-	@Override
-	protected Class<? extends KeySpec> getPrivateKeySpecClass() {
-		return ECPrivateKeySpec.class;
-	}
+    @Override
+    protected Class<? extends KeySpec> getPrivateKeySpecClass() {
+        return ECPrivateKeySpec.class;
+    }
 
-	@Override
-	protected ECCKeyPairSpec newKeySpec(String algorithm, KeySpec pubKeySpec, KeySpec keySpec) {
-		return new ECCKeyPairSpec(algorithm, pubKeySpec, keySpec);
-	}
+    @Override
+    protected ECCKeyPairSpec newKeySpec(String algorithm, KeySpec pubKeySpec, KeySpec keySpec) {
+        return new ECCKeyPairSpec(algorithm, pubKeySpec, keySpec);
+    }
 
 }

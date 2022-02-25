@@ -31,75 +31,75 @@ import com.wl4g.infra.common.crypto.asymmetric.spec.KeyPairSpec;
  */
 public interface AsymmetricCryptor {
 
-	/**
-	 * Generate KeyPairSpec
-	 *
-	 * @return
-	 */
-	KeyPairSpec generateKeyPair();
+    /**
+     * Generate KeyPairSpec
+     *
+     * @return
+     */
+    KeyPairSpec generateKeyPair();
 
-	/**
-	 * Generate KeyPairSpec.
-	 * 
-	 * @param publicKey
-	 * @param privateKey
-	 * @return
-	 */
-	KeyPairSpec generateKeyPair(byte[] publicKey, byte[] privateKey);
+    /**
+     * Generate KeyPairSpec.
+     * 
+     * @param publicKey
+     * @param privateKey
+     * @return
+     */
+    KeyPairSpec generateKeyPair(byte[] publicKey, byte[] privateKey);
 
-	/**
-	 * Deserialization generate private KeySpec.
-	 * 
-	 * @param publicKey
-	 * @return
-	 */
-	KeySpec generatePubKeySpec(byte[] publicKey);
+    /**
+     * Deserialization generate private KeySpec.
+     * 
+     * @param publicKey
+     * @return
+     */
+    KeySpec generatePubKeySpec(byte[] publicKey);
 
-	/**
-	 * Deserialization generate private KeySpec.
-	 * 
-	 * @param privateKey
-	 * @return
-	 */
-	KeySpec generateKeySpec(byte[] privateKey);
+    /**
+     * Deserialization generate private KeySpec.
+     * 
+     * @param privateKey
+     * @return
+     */
+    KeySpec generateKeySpec(byte[] privateKey);
 
-	/**
-	 * Encrypt plain text based on the built key pair
-	 *
-	 * @param keySpec
-	 * @param plainSource
-	 * @return
-	 */
-	CodecSource encrypt(final KeySpec keySpec, final CodecSource plainSource);
+    /**
+     * Encrypt plain text based on the built key pair
+     *
+     * @param keySpec
+     * @param plainSource
+     * @return
+     */
+    CodecSource encrypt(final KeySpec keySpec, final CodecSource plainSource);
 
-	/**
-	 * Decryption the hex ciphertext based on the constructed key pair
-	 *
-	 * @param keySpec
-	 * @param cipherSource
-	 * @return
-	 */
-	CodecSource decrypt(final KeySpec keySpec, final CodecSource cipherSource);
+    /**
+     * Decryption the hex ciphertext based on the constructed key pair
+     *
+     * @param keySpec
+     * @param cipherSource
+     * @return
+     */
+    CodecSource decrypt(final KeySpec keySpec, final CodecSource cipherSource);
 
-	/**
-	 * Gets algorithm name
-	 *
-	 * @return
-	 */
-	String getAlgorithmPrimary();
+    /**
+     * Gets algorithm name
+     *
+     * @return
+     */
+    String getAlgorithmPrimary();
 
-	/**
-	 * Gets algorithm paddings name
-	 *
-	 * @return
-	 */
-	String getPadAlgorithm();
+    /**
+     * Gets algorithm paddings name
+     *
+     * @return
+     */
+    String getPadAlgorithm();
 
-	/**
-	 * Gets asymmetric key digits
-	 *
-	 * @return
-	 */
-	int getKeysize();
+    /**
+     * Gets asymmetric key digits
+     *
+     * @return
+     */
+    int getKeysize();
 
 }

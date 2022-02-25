@@ -19,14 +19,14 @@ import static com.wl4g.infra.common.lang.Assert2.*;
 
 public class AssertTests {
 
-	public static void main(String[] args) {
-		// isTrue(false, IllegalArgumentException.class, "Failed to for aa=%s",
-		// "11");
-		// notNull(null, IllegalArgumentException.class, "Must be not null");
-		// hasText(null, IllegalArgumentException.class, "Must be not empty");
-		// isInstanceOf(String.class, new Object(), "Must be not empty");
-		isAssignable(int.class, String.class, "Incompatible types");
+    public static void main(String[] args) {
+        // isTrue(false, IllegalArgumentException.class, "Failed to for aa=%s",
+        // "11");
+        // notNull(null, IllegalArgumentException.class, "Must be not null");
+        // hasText(null, IllegalArgumentException.class, "Must be not empty");
+        // isInstanceOf(String.class, new Object(), "Must be not empty");
+        isAssignable(int.class, String.class, "Incompatible types");
 
-	}
+    }
 
 }

@@ -24,10 +24,10 @@ import com.wl4g.infra.common.lang.TypeConverts;
 
 public class ChechSumsTests {
 
-	public static void main(String[] args) {
-		// out.println(TypeConverts.safeLongToInt(crc32String(UUID.randomUUID().toString())));
-		out.println(Math.abs((int) crc32String(UUID.randomUUID().toString())));
-		out.println(TypeConverts.safeLongToInt(crc16String(UUID.randomUUID().toString())));
-	}
+    public static void main(String[] args) {
+        // out.println(TypeConverts.safeLongToInt(crc32String(UUID.randomUUID().toString())));
+        out.println(Math.abs((int) crc32String(UUID.randomUUID().toString())));
+        out.println(TypeConverts.safeLongToInt(crc16String(UUID.randomUUID().toString())));
+    }
 
 }

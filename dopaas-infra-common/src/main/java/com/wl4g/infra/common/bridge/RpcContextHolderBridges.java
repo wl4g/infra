@@ -47,170 +47,170 @@ import javax.validation.constraints.NotNull;
  */
 public abstract class RpcContextHolderBridges {
 
-	// BASIC(static)
+    // BASIC(static)
 
-	public static Object getContext(boolean useServerContext) {
-		return useServerContext ? invokeGetServerContext() : invokeGetContext();
-	}
+    public static Object getContext(boolean useServerContext) {
+        return useServerContext ? invokeGetServerContext() : invokeGetContext();
+    }
 
-	public static Object invokeGetContext() {
-		if (nonNull(getContextMethod)) {
-			makeAccessible(getContextMethod);
-			return notNullOf(invokeMethod(getContextMethod, null), "currentRpcContext");
-		}
-		return null;
-	}
+    public static Object invokeGetContext() {
+        if (nonNull(getContextMethod)) {
+            makeAccessible(getContextMethod);
+            return notNullOf(invokeMethod(getContextMethod, null), "currentRpcContext");
+        }
+        return null;
+    }
 
-	public static Object invokeGetServerContext() {
-		if (nonNull(getServerContextMethod)) {
-			makeAccessible(getServerContextMethod);
-			return notNullOf(invokeMethod(getServerContextMethod, null), "currentServerRpcContext");
-		}
-		return null;
-	}
+    public static Object invokeGetServerContext() {
+        if (nonNull(getServerContextMethod)) {
+            makeAccessible(getServerContextMethod);
+            return notNullOf(invokeMethod(getServerContextMethod, null), "currentServerRpcContext");
+        }
+        return null;
+    }
 
-	public static void invokeRemoveContext() {
-		if (nonNull(removeContextMethod)) {
-			makeAccessible(removeContextMethod);
-			invokeMethod(removeContextMethod, null);
-		}
-	}
+    public static void invokeRemoveContext() {
+        if (nonNull(removeContextMethod)) {
+            makeAccessible(removeContextMethod);
+            invokeMethod(removeContextMethod, null);
+        }
+    }
 
-	public static void invokeRemoveServerContext() {
-		if (nonNull(removeServerContextMethod)) {
-			makeAccessible(removeServerContextMethod);
-			invokeMethod(removeServerContextMethod, null);
-		}
-	}
+    public static void invokeRemoveServerContext() {
+        if (nonNull(removeServerContextMethod)) {
+            makeAccessible(removeServerContextMethod);
+            invokeMethod(removeServerContextMethod, null);
+        }
+    }
 
-	// get/set
+    // get/set
 
-	@SuppressWarnings("unchecked")
-	public static <T> T invokeGet(boolean useServerContext, @NotBlank String key, @NotNull Class<T> valueType) {
-		if (nonNull(getMethod)) {
-			makeAccessible(getMethod);
-			return (T) invokeMethod(getMethod, getContext(useServerContext), new Object[] { key, valueType });
-		}
-		return null;
-	}
+    @SuppressWarnings("unchecked")
+    public static <T> T invokeGet(boolean useServerContext, @NotBlank String key, @NotNull Class<T> valueType) {
+        if (nonNull(getMethod)) {
+            makeAccessible(getMethod);
+            return (T) invokeMethod(getMethod, getContext(useServerContext), new Object[] { key, valueType });
+        }
+        return null;
+    }
 
-	public static void invokeSet(boolean useServerContext, @NotBlank String key, @Nullable Object value) {
-		if (nonNull(setMethod)) {
-			makeAccessible(setMethod);
-			invokeMethod(setMethod, getContext(useServerContext), new Object[] { key, value });
-		}
-	}
+    public static void invokeSet(boolean useServerContext, @NotBlank String key, @Nullable Object value) {
+        if (nonNull(setMethod)) {
+            makeAccessible(setMethod);
+            invokeMethod(setMethod, getContext(useServerContext), new Object[] { key, value });
+        }
+    }
 
-	// getAttachment/setAttachment/getAttachments/removeAttachment/clearAttachments
+    // getAttachment/setAttachment/getAttachments/removeAttachment/clearAttachments
 
-	public static String invokeGetAttachment(boolean useServerContext, @NotNull String key) {
-		if (nonNull(getAttachmentMethod)) {
-			makeAccessible(getAttachmentMethod);
-			return (String) invokeMethod(getAttachmentMethod, getContext(useServerContext), new Object[] { key });
-		}
-		return null;
-	}
+    public static String invokeGetAttachment(boolean useServerContext, @NotNull String key) {
+        if (nonNull(getAttachmentMethod)) {
+            makeAccessible(getAttachmentMethod);
+            return (String) invokeMethod(getAttachmentMethod, getContext(useServerContext), new Object[] { key });
+        }
+        return null;
+    }
 
-	public static void invokeSetAttachment(boolean useServerContext, @NotNull String key, @Nullable String value) {
-		if (nonNull(setAttachmentMethod)) {
-			makeAccessible(setAttachmentMethod);
-			invokeMethod(setAttachmentMethod, getContext(useServerContext), new Object[] { key, value });
-		}
-	}
+    public static void invokeSetAttachment(boolean useServerContext, @NotNull String key, @Nullable String value) {
+        if (nonNull(setAttachmentMethod)) {
+            makeAccessible(setAttachmentMethod);
+            invokeMethod(setAttachmentMethod, getContext(useServerContext), new Object[] { key, value });
+        }
+    }
 
-	@SuppressWarnings("unchecked")
-	public static Map<String, String> invokeGetAttachments(boolean useServerContext, @NotNull String key) {
-		if (nonNull(getAttachmentsMethod)) {
-			makeAccessible(getAttachmentsMethod);
-			return (Map<String, String>) invokeMethod(getAttachmentsMethod, getContext(useServerContext), new Object[] { key });
-		}
-		return null;
-	}
+    @SuppressWarnings("unchecked")
+    public static Map<String, String> invokeGetAttachments(boolean useServerContext, @NotNull String key) {
+        if (nonNull(getAttachmentsMethod)) {
+            makeAccessible(getAttachmentsMethod);
+            return (Map<String, String>) invokeMethod(getAttachmentsMethod, getContext(useServerContext), new Object[] { key });
+        }
+        return null;
+    }
 
-	public static void invokeRemoveAttachment(boolean useServerContext, @NotNull String key) {
-		if (nonNull(removeAttachmentMethod)) {
-			makeAccessible(removeAttachmentMethod);
-			invokeMethod(removeAttachmentMethod, getContext(useServerContext), new Object[] { key });
-		}
-	}
+    public static void invokeRemoveAttachment(boolean useServerContext, @NotNull String key) {
+        if (nonNull(removeAttachmentMethod)) {
+            makeAccessible(removeAttachmentMethod);
+            invokeMethod(removeAttachmentMethod, getContext(useServerContext), new Object[] { key });
+        }
+    }
 
-	public static void invokeClearAttachments() {
-		if (nonNull(clearAttachmentsMethod)) {
-			Object currentRpcContext = invokeGetContext();
-			makeAccessible(clearAttachmentsMethod);
-			invokeMethod(clearAttachmentsMethod, currentRpcContext);
-		}
-	}
+    public static void invokeClearAttachments() {
+        if (nonNull(clearAttachmentsMethod)) {
+            Object currentRpcContext = invokeGetContext();
+            makeAccessible(clearAttachmentsMethod);
+            invokeMethod(clearAttachmentsMethod, currentRpcContext);
+        }
+    }
 
-	// (Reference) get/set
+    // (Reference) get/set
 
-	@SuppressWarnings("unchecked")
-	public static <T> T invokeGetRef(boolean useServerContext, @NotNull String key, @NotNull Class<T> valueType) {
-		if (nonNull(getReferenceMethod) && nonNull(referenceKeyClass)) {
-			try {
-				Constructor<?> constructor = referenceKeyClass.getConstructor(String.class);
-				makeAccessible(constructor);
-				Object referenceKey = constructor.newInstance(key);
-				makeAccessible(getReferenceMethod);
-				return (T) invokeMethod(getReferenceMethod, getContext(useServerContext),
-						new Object[] { referenceKey, valueType });
-			} catch (Exception e) {
-				throw new IllegalStateException(e);
-			}
-		}
-		return null;
-	}
+    @SuppressWarnings("unchecked")
+    public static <T> T invokeGetRef(boolean useServerContext, @NotNull String key, @NotNull Class<T> valueType) {
+        if (nonNull(getReferenceMethod) && nonNull(referenceKeyClass)) {
+            try {
+                Constructor<?> constructor = referenceKeyClass.getConstructor(String.class);
+                makeAccessible(constructor);
+                Object referenceKey = constructor.newInstance(key);
+                makeAccessible(getReferenceMethod);
+                return (T) invokeMethod(getReferenceMethod, getContext(useServerContext),
+                        new Object[] { referenceKey, valueType });
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
+            }
+        }
+        return null;
+    }
 
-	public static void invokeSetRef(boolean useServerContext, @NotNull String key, @Nullable Object value) {
-		if (nonNull(setReferenceMethod) && nonNull(referenceKeyClass)) {
-			try {
-				Constructor<?> constructor = referenceKeyClass.getConstructor(String.class);
-				makeAccessible(constructor);
-				Object referenceKey = constructor.newInstance(key);
-				makeAccessible(setReferenceMethod);
-				invokeMethod(setReferenceMethod, getContext(useServerContext), new Object[] { referenceKey, value });
-			} catch (Exception e) {
-				throw new IllegalStateException(e);
-			}
-		}
-	}
+    public static void invokeSetRef(boolean useServerContext, @NotNull String key, @Nullable Object value) {
+        if (nonNull(setReferenceMethod) && nonNull(referenceKeyClass)) {
+            try {
+                Constructor<?> constructor = referenceKeyClass.getConstructor(String.class);
+                makeAccessible(constructor);
+                Object referenceKey = constructor.newInstance(key);
+                makeAccessible(setReferenceMethod);
+                invokeMethod(setReferenceMethod, getContext(useServerContext), new Object[] { referenceKey, value });
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
+            }
+        }
+    }
 
-	// Helper methods.
+    // Helper methods.
 
-	/**
-	 * Check current runtime has {@link RpcContextHolder} class
-	 * 
-	 * @return
-	 */
-	public static boolean hasRpcContextHolderClass() {
-		return nonNull(rpcContextHolderClass);
-	}
+    /**
+     * Check current runtime has {@link RpcContextHolder} class
+     * 
+     * @return
+     */
+    public static boolean hasRpcContextHolderClass() {
+        return nonNull(rpcContextHolderClass);
+    }
 
-	public static final String rpcContextHolderClassName = "com.wl4g.infra.integration.feign.core.context.RpcContextHolder";
-	public static final String rpcContextHolderReferenceKeyClassName = "com.wl4g.infra.integration.feign.core.context.RpcContextHolder.ReferenceKey";
+    public static final String rpcContextHolderClassName = "com.wl4g.infra.integration.feign.core.context.RpcContextHolder";
+    public static final String rpcContextHolderReferenceKeyClassName = "com.wl4g.infra.integration.feign.core.context.RpcContextHolder.ReferenceKey";
 
-	private static final Class<?> rpcContextHolderClass = resolveClassNameNullable(rpcContextHolderClassName);
-	private static final Class<?> referenceKeyClass = resolveClassNameNullable(rpcContextHolderReferenceKeyClassName);
+    private static final Class<?> rpcContextHolderClass = resolveClassNameNullable(rpcContextHolderClassName);
+    private static final Class<?> referenceKeyClass = resolveClassNameNullable(rpcContextHolderReferenceKeyClassName);
 
-	private static final Method getContextMethod = findMethodNullable(rpcContextHolderClass, "getContext");
-	private static final Method getServerContextMethod = findMethodNullable(rpcContextHolderClass, "getServerContext");
-	private static final Method removeContextMethod = findMethodNullable(rpcContextHolderClass, "removeContext");
-	private static final Method removeServerContextMethod = findMethodNullable(rpcContextHolderClass, "removeServerContext");
+    private static final Method getContextMethod = findMethodNullable(rpcContextHolderClass, "getContext");
+    private static final Method getServerContextMethod = findMethodNullable(rpcContextHolderClass, "getServerContext");
+    private static final Method removeContextMethod = findMethodNullable(rpcContextHolderClass, "removeContext");
+    private static final Method removeServerContextMethod = findMethodNullable(rpcContextHolderClass, "removeServerContext");
 
-	private static final Method getMethod = findMethodNullable(rpcContextHolderClass, "get", String.class, Class.class);
-	private static final Method setMethod = findMethodNullable(rpcContextHolderClass, "set", String.class, Object.class);
+    private static final Method getMethod = findMethodNullable(rpcContextHolderClass, "get", String.class, Class.class);
+    private static final Method setMethod = findMethodNullable(rpcContextHolderClass, "set", String.class, Object.class);
 
-	private static final Method getAttachmentMethod = findMethodNullable(rpcContextHolderClass, "getAttachment", String.class);
-	private static final Method setAttachmentMethod = findMethodNullable(rpcContextHolderClass, "setAttachment", String.class,
-			String.class);
-	private static final Method getAttachmentsMethod = findMethodNullable(rpcContextHolderClass, "getAttachments");
-	private static final Method removeAttachmentMethod = findMethodNullable(rpcContextHolderClass, "removeAttachment",
-			String.class);
-	private static final Method clearAttachmentsMethod = findMethodNullable(rpcContextHolderClass, "clearAttachments");
+    private static final Method getAttachmentMethod = findMethodNullable(rpcContextHolderClass, "getAttachment", String.class);
+    private static final Method setAttachmentMethod = findMethodNullable(rpcContextHolderClass, "setAttachment", String.class,
+            String.class);
+    private static final Method getAttachmentsMethod = findMethodNullable(rpcContextHolderClass, "getAttachments");
+    private static final Method removeAttachmentMethod = findMethodNullable(rpcContextHolderClass, "removeAttachment",
+            String.class);
+    private static final Method clearAttachmentsMethod = findMethodNullable(rpcContextHolderClass, "clearAttachments");
 
-	private static final Method getReferenceMethod = findMethodNullable(rpcContextHolderClass, "get", referenceKeyClass,
-			Class.class);
-	private static final Method setReferenceMethod = findMethodNullable(rpcContextHolderClass, "set", referenceKeyClass,
-			Object.class);
+    private static final Method getReferenceMethod = findMethodNullable(rpcContextHolderClass, "get", referenceKeyClass,
+            Class.class);
+    private static final Method setReferenceMethod = findMethodNullable(rpcContextHolderClass, "set", referenceKeyClass,
+            Object.class);
 
 }

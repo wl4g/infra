@@ -26,6 +26,6 @@ import com.sun.jna.Library;
  */
 public interface LibSample1 extends Library {
 
-	int Sum(int a, int b);
+    int Sum(int a, int b);
 
 }

@@ -24,8 +24,8 @@ package com.wl4g.infra.common.crypto.symmetric;
  */
 abstract class BouncycastleCryptorSupport extends SymmetricCryptorSupport {
 
-	protected BouncycastleCryptorSupport(AlgorithmSpec config) {
-		super(config);
-	}
+    protected BouncycastleCryptorSupport(AlgorithmSpec config) {
+        super(config);
+    }
 
 }

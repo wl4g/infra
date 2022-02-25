@@ -24,8 +24,8 @@ package com.wl4g.infra.common.crypto.symmetric;
  */
 public class DESede168ECBPKCS5 extends JdkCryptorSupport {
 
-	public DESede168ECBPKCS5() {
-		super(new AlgorithmSpec("DESede", "DESede/ECB/PKCS5Padding", false, 168, 24, 24)); // 112bits/168bits
-	}
+    public DESede168ECBPKCS5() {
+        super(new AlgorithmSpec("DESede", "DESede/ECB/PKCS5Padding", false, 168, 24, 24)); // 112bits/168bits
+    }
 
 }

@@ -31,10 +31,10 @@ import org.junit.Test;
  */
 public class EncodesTests {
 
-	@Test
-	public void case1() {
-		String s = "737A723930310003003C90200184012D06000100010006040D499D8AAB040E00000000040F48C7E0B30410437DB3330411499D8AAB041248C8006AF2";
-		System.out.println(Encodes.decodeHex(s));
-	}
+    @Test
+    public void case1() {
+        String s = "737A723930310003003C90200184012D06000100010006040D499D8AAB040E00000000040F48C7E0B30410437DB3330411499D8AAB041248C8006AF2";
+        System.out.println(Encodes.decodeHex(s));
+    }
 
 }

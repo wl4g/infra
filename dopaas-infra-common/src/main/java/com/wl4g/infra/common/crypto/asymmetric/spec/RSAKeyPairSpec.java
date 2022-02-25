@@ -26,14 +26,14 @@ import java.security.spec.KeySpec;
  */
 public final class RSAKeyPairSpec extends GenericKeyPairSpec {
 
-	final private static long serialVersionUID = -6748188131119785684L;
+    final private static long serialVersionUID = -6748188131119785684L;
 
-	public RSAKeyPairSpec(String algorithm, KeySpec pubKeySpec, KeySpec keySpec) {
-		super(algorithm, pubKeySpec, keySpec);
-	}
+    public RSAKeyPairSpec(String algorithm, KeySpec pubKeySpec, KeySpec keySpec) {
+        super(algorithm, pubKeySpec, keySpec);
+    }
 
-	public RSAKeyPairSpec(String keySpecId, String algorithm, KeySpec pubKeySpec, KeySpec keySpec) {
-		super(keySpecId, algorithm, pubKeySpec, keySpec);
-	}
+    public RSAKeyPairSpec(String keySpecId, String algorithm, KeySpec pubKeySpec, KeySpec keySpec) {
+        super(keySpecId, algorithm, pubKeySpec, keySpec);
+    }
 
 }

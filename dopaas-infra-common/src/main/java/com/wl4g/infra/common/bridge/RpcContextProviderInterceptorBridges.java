@@ -40,44 +40,44 @@ import java.lang.reflect.Method;
  */
 public abstract class RpcContextProviderInterceptorBridges {
 
-	public static int invokeFieldOrder() {
-		if (nonNull(ORDER_FIELD)) {
-			return (int) getField(ORDER_FIELD, null, true);
-		}
-		return 0;
-	}
+    public static int invokeFieldOrder() {
+        if (nonNull(ORDER_FIELD)) {
+            return (int) getField(ORDER_FIELD, null, true);
+        }
+        return 0;
+    }
 
-	public static boolean invokeCheckSupportTypeProxy(Object target, Class<?> actualOriginalTargetClass) {
-		if (nonNull(checkSupportTypeProxyMethod)) {
-			makeAccessible(checkSupportTypeProxyMethod);
-			return (boolean) invokeMethod(checkSupportTypeProxyMethod, null, new Object[] { target, actualOriginalTargetClass });
-		}
-		return false;
-	}
+    public static boolean invokeCheckSupportTypeProxy(Object target, Class<?> actualOriginalTargetClass) {
+        if (nonNull(checkSupportTypeProxyMethod)) {
+            makeAccessible(checkSupportTypeProxyMethod);
+            return (boolean) invokeMethod(checkSupportTypeProxyMethod, null, new Object[] { target, actualOriginalTargetClass });
+        }
+        return false;
+    }
 
-	public static boolean invokeCheckSupportMethodProxy(Object target, Method method, Class<?> actualOriginalTargetClass,
-			Object... args) {
-		if (nonNull(checkSupportMethodProxyMethod)) {
-			makeAccessible(checkSupportMethodProxyMethod);
-			return (boolean) invokeMethod(checkSupportMethodProxyMethod, null,
-					new Object[] { target, method, actualOriginalTargetClass, args });
-		}
-		return false;
-	}
+    public static boolean invokeCheckSupportMethodProxy(Object target, Method method, Class<?> actualOriginalTargetClass,
+            Object... args) {
+        if (nonNull(checkSupportMethodProxyMethod)) {
+            makeAccessible(checkSupportMethodProxyMethod);
+            return (boolean) invokeMethod(checkSupportMethodProxyMethod, null,
+                    new Object[] { target, method, actualOriginalTargetClass, args });
+        }
+        return false;
+    }
 
-	public static boolean hasFeignRpcContextProcessorClass() {
-		return nonNull(rpcContextProviderProxyInterceptorClass);
-	}
+    public static boolean hasFeignRpcContextProcessorClass() {
+        return nonNull(rpcContextProviderProxyInterceptorClass);
+    }
 
-	public static final String rpcContextProviderProxyInterceptorClassName = "com.wl4g.infra.integration.feign.core.context.interceptor.RpcContextProviderProxyInterceptor";
-	private static final Class<?> rpcContextProviderProxyInterceptorClass = resolveClassNameNullable(
-			rpcContextProviderProxyInterceptorClassName);
+    public static final String rpcContextProviderProxyInterceptorClassName = "com.wl4g.infra.integration.feign.core.context.interceptor.RpcContextProviderProxyInterceptor";
+    private static final Class<?> rpcContextProviderProxyInterceptorClass = resolveClassNameNullable(
+            rpcContextProviderProxyInterceptorClassName);
 
-	private static final Method checkSupportTypeProxyMethod = findMethodNullable(rpcContextProviderProxyInterceptorClass,
-			"checkSupportTypeProxy", Object.class, Class.class);
-	private static final Method checkSupportMethodProxyMethod = findMethodNullable(rpcContextProviderProxyInterceptorClass,
-			"checkSupportMethodProxy", Object.class, Method.class, Class.class, Object[].class);
+    private static final Method checkSupportTypeProxyMethod = findMethodNullable(rpcContextProviderProxyInterceptorClass,
+            "checkSupportTypeProxy", Object.class, Class.class);
+    private static final Method checkSupportMethodProxyMethod = findMethodNullable(rpcContextProviderProxyInterceptorClass,
+            "checkSupportMethodProxy", Object.class, Method.class, Class.class, Object[].class);
 
-	private static final Field ORDER_FIELD = findFieldNullable(rpcContextProviderProxyInterceptorClass, "ORDER", int.class);
+    private static final Field ORDER_FIELD = findFieldNullable(rpcContextProviderProxyInterceptorClass, "ORDER", int.class);
 
 }

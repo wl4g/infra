@@ -31,63 +31,61 @@ import java.io.File;
 import java.io.RandomAccessFile;
 
 import org.apache.commons.lang3.SystemUtils;
+import org.junit.Test;
 
 import com.wl4g.infra.common.io.FileIOUtils.ReadTailFrame;
 
 public class FileIOUtilsTests {
 
-	static String filename = USER_DIR + "/src/test/java/"
-			+ FileIOUtilsTests.class.getName().replaceAll("\\.", "/").replace(FileIOUtilsTests.class.getSimpleName(), "")
-			+ "/randomAccessFileTests.log";
+    private static String filename = USER_DIR + "/src/test/java/"
+            + FileIOUtilsTests.class.getName().replaceAll("\\.", "/").replace(FileIOUtilsTests.class.getSimpleName(), "")
+            + "/randomAccessFileTests.log";
 
-	public static void main(String[] args) {
-		// seekReadTest1();
-		// ensureFileTest2();
-		// randomAccessFilePointerTest3();
-		deserializeReadTailFrameTest4();
-	}
+    @Test
+    public void seekReadTest1() {
+        out.println(SystemUtils.LINE_SEPARATOR);
+        out.println(readLines("C:\\Users\\Administrator\\Desktop\\aaa.txt", 2, 12));
+        out.println("--------------------");
+        out.println(seekReadString("C:\\Users\\Administrator\\Desktop\\aaa.txt", 3L, 12));
+        out.println("--------------------");
+        out.println(seekReadLines("C:\\Users\\Administrator\\Desktop\\aaa.txt", 13L, 6, line -> {
+            return line.equalsIgnoreCase("EOF"); // End if 'EOF'
+        }));
+    }
 
-	public static void seekReadTest1() {
-		out.println(SystemUtils.LINE_SEPARATOR);
-		out.println(readLines("C:\\Users\\Administrator\\Desktop\\aaa.txt", 2, 12));
-		out.println("--------------------");
-		out.println(seekReadString("C:\\Users\\Administrator\\Desktop\\aaa.txt", 3L, 12));
-		out.println("--------------------");
-		out.println(seekReadLines("C:\\Users\\Administrator\\Desktop\\aaa.txt", 13L, 6, line -> {
-			return line.equalsIgnoreCase("EOF"); // End if 'EOF'
-		}));
-	}
+    @Test
+    public void ensureFileTest2() {
+        ensureFile(new File("c:\\mydir1\\a.txt"));
+    }
 
-	public static void ensureFileTest2() {
-		ensureFile(new File("c:\\mydir1\\a.txt"));
-	}
+    @Test
+    public void randomAccessFilePointerTest3() {
+        int startPos = 1;
+        int aboutLimit = 100;
 
-	public static void randomAccessFilePointerTest3() {
-		int startPos = 1;
-		int aboutLimit = 100;
+        try (RandomAccessFile raf = new RandomAccessFile(filename, "r")) {
+            raf.seek(startPos);
+            long c = 0, lastPos = -1, endPos = (startPos + aboutLimit);
+            while (raf.getFilePointer() > lastPos && (lastPos = raf.getFilePointer()) < endPos && ++c < 100_000) {
+                String line = raf.readLine();
+                if (nonNull(line)) {
+                    line = new String(line.getBytes(ISO_8859_1), UTF_8);
+                    out.println(String.format("startPos=%s, length=%s, pointer=%s, line=%s", startPos, raf.length(),
+                            raf.getFilePointer(), line));
+                } else {
+                    out.println(format("startPos=%s, length=%s, pointer=%s", startPos, raf.length(), raf.getFilePointer()));
+                    break;
+                }
+            }
+        } catch (Throwable ex) {
+            throw new IllegalStateException(ex);
+        }
+    }
 
-		try (RandomAccessFile raf = new RandomAccessFile(filename, "r")) {
-			raf.seek(startPos);
-			long c = 0, lastPos = -1, endPos = (startPos + aboutLimit);
-			while (raf.getFilePointer() > lastPos && (lastPos = raf.getFilePointer()) < endPos && ++c < 100_000) {
-				String line = raf.readLine();
-				if (nonNull(line)) {
-					line = new String(line.getBytes(ISO_8859_1), UTF_8);
-					out.println(String.format("startPos=%s, length=%s, pointer=%s, line=%s", startPos, raf.length(),
-							raf.getFilePointer(), line));
-				} else {
-					out.println(format("startPos=%s, length=%s, pointer=%s", startPos, raf.length(), raf.getFilePointer()));
-					break;
-				}
-			}
-		} catch (Throwable ex) {
-			throw new IllegalStateException(ex);
-		}
-	}
-
-	public static void deserializeReadTailFrameTest4() {
-		String s = "{\"startPos\":1,\"endPos\":2,\"length\":4,\"lines\":[\"aa\"],\"hasNext\":true}";
-		out.println(parseJSON(s, ReadTailFrame.class));
-	}
+    @Test
+    public void deserializeReadTailFrameTest4() {
+        String s = "{\"startPos\":1,\"endPos\":2,\"length\":4,\"lines\":[\"aa\"],\"hasNext\":true}";
+        out.println(parseJSON(s, ReadTailFrame.class));
+    }
 
 }

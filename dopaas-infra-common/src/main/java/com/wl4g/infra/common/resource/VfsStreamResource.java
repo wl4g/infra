@@ -61,92 +61,92 @@ import com.wl4g.infra.common.lang.Assert2;
  */
 public class VfsStreamResource extends AbstractStreamResource {
 
-	private final Object resource;
+    private final Object resource;
 
-	public VfsStreamResource(Object resource) {
-		Assert2.notNull(resource, "VirtualFile must not be null");
-		this.resource = resource;
-	}
+    public VfsStreamResource(Object resource) {
+        Assert2.notNull(resource, "VirtualFile must not be null");
+        this.resource = resource;
+    }
 
-	@Override
-	public InputStream getInputStream() throws IOException {
-		return VfsUtils2.getInputStream(this.resource);
-	}
+    @Override
+    public InputStream getInputStream() throws IOException {
+        return VfsUtils2.getInputStream(this.resource);
+    }
 
-	@Override
-	public boolean exists() {
-		return VfsUtils2.exists(this.resource);
-	}
+    @Override
+    public boolean exists() {
+        return VfsUtils2.exists(this.resource);
+    }
 
-	@Override
-	public boolean isReadable() {
-		return VfsUtils2.isReadable(this.resource);
-	}
+    @Override
+    public boolean isReadable() {
+        return VfsUtils2.isReadable(this.resource);
+    }
 
-	@Override
-	public URL getURL() throws IOException {
-		try {
-			return VfsUtils2.getURL(this.resource);
-		} catch (Exception ex) {
-			throw new IllegalArgumentException("Failed to obtain URL for file " + this.resource, ex);
-		}
-	}
+    @Override
+    public URL getURL() throws IOException {
+        try {
+            return VfsUtils2.getURL(this.resource);
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("Failed to obtain URL for file " + this.resource, ex);
+        }
+    }
 
-	@Override
-	public URI getURI() throws IOException {
-		try {
-			return VfsUtils2.getURI(this.resource);
-		} catch (Exception ex) {
-			throw new IllegalArgumentException("Failed to obtain URI for " + this.resource, ex);
-		}
-	}
+    @Override
+    public URI getURI() throws IOException {
+        try {
+            return VfsUtils2.getURI(this.resource);
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("Failed to obtain URI for " + this.resource, ex);
+        }
+    }
 
-	@Override
-	public File getFile() throws IOException {
-		return VfsUtils2.getFile(this.resource);
-	}
+    @Override
+    public File getFile() throws IOException {
+        return VfsUtils2.getFile(this.resource);
+    }
 
-	@Override
-	public long contentLength() throws IOException {
-		return VfsUtils2.getSize(this.resource);
-	}
+    @Override
+    public long contentLength() throws IOException {
+        return VfsUtils2.getSize(this.resource);
+    }
 
-	@Override
-	public long lastModified() throws IOException {
-		return VfsUtils2.getLastModified(this.resource);
-	}
+    @Override
+    public long lastModified() throws IOException {
+        return VfsUtils2.getLastModified(this.resource);
+    }
 
-	@Override
-	public StreamResource createRelative(String relativePath) throws IOException {
-		if (!relativePath.startsWith(".") && relativePath.contains("/")) {
-			try {
-				return new VfsStreamResource(VfsUtils2.getChild(this.resource, relativePath));
-			} catch (IOException ex) {
-				// fall back to getRelative
-			}
-		}
+    @Override
+    public StreamResource createRelative(String relativePath) throws IOException {
+        if (!relativePath.startsWith(".") && relativePath.contains("/")) {
+            try {
+                return new VfsStreamResource(VfsUtils2.getChild(this.resource, relativePath));
+            } catch (IOException ex) {
+                // fall back to getRelative
+            }
+        }
 
-		return new VfsStreamResource(VfsUtils2.getRelative(new URL(getURL(), relativePath)));
-	}
+        return new VfsStreamResource(VfsUtils2.getRelative(new URL(getURL(), relativePath)));
+    }
 
-	@Override
-	public String getFilename() {
-		return VfsUtils2.getName(this.resource);
-	}
+    @Override
+    public String getFilename() {
+        return VfsUtils2.getName(this.resource);
+    }
 
-	@Override
-	public String getDescription() {
-		return "VFS resource [" + this.resource + "]";
-	}
+    @Override
+    public String getDescription() {
+        return "VFS resource [" + this.resource + "]";
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		return (obj == this || (obj instanceof VfsStreamResource && this.resource.equals(((VfsStreamResource) obj).resource)));
-	}
+    @Override
+    public boolean equals(Object obj) {
+        return (obj == this || (obj instanceof VfsStreamResource && this.resource.equals(((VfsStreamResource) obj).resource)));
+    }
 
-	@Override
-	public int hashCode() {
-		return this.resource.hashCode();
-	}
+    @Override
+    public int hashCode() {
+        return this.resource.hashCode();
+    }
 
 }

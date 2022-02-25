@@ -24,8 +24,8 @@ package com.wl4g.infra.common.crypto.symmetric;
  */
 public class AES128CBCPKCS5 extends JdkCryptorSupport {
 
-	public AES128CBCPKCS5() {
-		super(new AlgorithmSpec("AES", "AES/CBC/PKCS5Padding", true, 128, 16, 16, 16));
-	}
+    public AES128CBCPKCS5() {
+        super(new AlgorithmSpec("AES", "AES/CBC/PKCS5Padding", true, 128, 16, 16, 16));
+    }
 
 }

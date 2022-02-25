@@ -369,8 +369,12 @@ public abstract class WebUtils2 {
         if (isNull(params)) {
             return null;
         }
-        return params.entrySet().stream().filter(e -> equalsIgnoreCase(e.getKey(), name))
-                .map(e -> CollectionUtils2.isEmpty(e.getValue()) ? e.getValue().get(0) : null).filter(e -> !isNull(e)).findFirst()
+        return params.entrySet()
+                .stream()
+                .filter(e -> equalsIgnoreCase(e.getKey(), name))
+                .map(e -> CollectionUtils2.isEmpty(e.getValue()) ? e.getValue().get(0) : null)
+                .filter(e -> !isNull(e))
+                .findFirst()
                 .orElse(null);
     }
 
@@ -404,8 +408,8 @@ public abstract class WebUtils2 {
      * @return
      */
     public static Map<String, String> getFirstParameters(@Nullable ServletRequest request) {
-        return nonNull(request) ? safeMap(request.getParameterMap()).entrySet().stream()
-                .collect(toMap(e -> e.getKey(), e -> isEmptyArray(e.getValue()) ? null : e.getValue()[0])) : emptyMap();
+        return nonNull(request) ? safeMap(request.getParameterMap()).entrySet().stream().collect(
+                toMap(e -> e.getKey(), e -> isEmptyArray(e.getValue()) ? null : e.getValue()[0])) : emptyMap();
     }
 
     /**
@@ -483,8 +487,11 @@ public abstract class WebUtils2 {
         notNullOf(request, "request");
         filter = isNull(filter) ? defaultStringAnyFilter : filter;
         List<String> headerNames = EnumerationUtils.toList(request.getHeaderNames());
-        return headerNames.stream().filter(filter).map(name -> singletonMap(name, request.getHeader((String) name)))
-                .flatMap(e -> e.entrySet().stream()).collect(toMap(e -> e.getKey(), e -> e.getValue()));
+        return headerNames.stream()
+                .filter(filter)
+                .map(name -> singletonMap(name, request.getHeader((String) name)))
+                .flatMap(e -> e.entrySet().stream())
+                .collect(toMap(e -> e.getKey(), e -> e.getValue()));
     }
 
     /**

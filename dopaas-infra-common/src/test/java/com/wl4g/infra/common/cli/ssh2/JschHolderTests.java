@@ -29,11 +29,11 @@ import com.wl4g.infra.common.cli.ssh2.SSH2Holders.Ssh2KeyPair;
  */
 public class JschHolderTests {
 
-	public static void main(String[] args) throws Exception {
-		JschHolder jh = new JschHolder();
-		Ssh2KeyPair keypair = jh.generateKeypair(AlgorithmType.RSA, "Auto-generate-by-test");
-		System.out.println(keypair.getPublicKey());
-		System.out.println(keypair.getPrivateKey());
-	}
+    public static void main(String[] args) throws Exception {
+        JschHolder jh = new JschHolder();
+        Ssh2KeyPair keypair = jh.generateKeypair(AlgorithmType.RSA, "Auto-generate-by-test");
+        System.out.println(keypair.getPublicKey());
+        System.out.println(keypair.getPrivateKey());
+    }
 
 }

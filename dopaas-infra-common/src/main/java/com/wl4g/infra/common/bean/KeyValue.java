@@ -27,49 +27,49 @@ import java.io.Serializable;
  */
 public class KeyValue implements Serializable {
 
-	private static final long serialVersionUID = -6651344183217701756L;
+    private static final long serialVersionUID = -6651344183217701756L;
 
-	/**
-	 * Object key.
-	 */
-	private Object key;
+    /**
+     * Object key.
+     */
+    private Object key;
 
-	/**
-	 * Object value.
-	 */
-	private Object value;
+    /**
+     * Object value.
+     */
+    private Object value;
 
-	public KeyValue() {
-	}
+    public KeyValue() {
+    }
 
-	public KeyValue(Object key, Object value) {
-		setKey(key);
-		setValue(value);
-	}
+    public KeyValue(Object key, Object value) {
+        setKey(key);
+        setValue(value);
+    }
 
-	@SuppressWarnings("unchecked")
-	public <K> K getKey() {
-		return (K) key;
-	}
+    @SuppressWarnings("unchecked")
+    public <K> K getKey() {
+        return (K) key;
+    }
 
-	public <K> KeyValue setKey(K key) {
-		this.key = key;
-		return this;
-	}
+    public <K> KeyValue setKey(K key) {
+        this.key = key;
+        return this;
+    }
 
-	@SuppressWarnings("unchecked")
-	public <V> V getValue() {
-		return (V) value;
-	}
+    @SuppressWarnings("unchecked")
+    public <V> V getValue() {
+        return (V) value;
+    }
 
-	public <V> KeyValue setValue(V value) {
-		this.value = value;
-		return this;
-	}
+    public <V> KeyValue setValue(V value) {
+        this.value = value;
+        return this;
+    }
 
-	@Override
-	public String toString() {
-		return "KeyValue [key=" + key + ", value=" + value + "]";
-	}
+    @Override
+    public String toString() {
+        return "KeyValue [key=" + key + ", value=" + value + "]";
+    }
 
 }

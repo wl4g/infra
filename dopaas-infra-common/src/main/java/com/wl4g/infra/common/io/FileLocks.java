@@ -27,7 +27,7 @@ import java.nio.channels.FileLock;
 import javax.validation.constraints.NotNull;
 
 /**
- * {@link FileLockUtils}
+ * {@link FileLocks}
  * 
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @author vjay
@@ -35,26 +35,26 @@ import javax.validation.constraints.NotNull;
  * @sine v1.0.0
  * @see
  */
-public abstract class FileLockUtils {
+public abstract class FileLocks {
 
-	/**
-	 * Try file lock.
-	 * 
-	 * @param file
-	 * @param processor
-	 * @param <R>
-	 * @return
-	 */
-	public static <R> R doTryLock(@NotNull File file, @NotNull ProcessFunction<FileLock, R> processor) {
-		notNullOf(file, "file");
-		notNullOf(processor, "processor");
-		try (RandomAccessFile raf = new RandomAccessFile(file, "rw");
-				FileChannel fileChannel = raf.getChannel();
-				FileLock lock = fileChannel.tryLock();) {
-			return processor.process(lock);
-		} catch (Exception e) {
-			throw new IllegalStateException(e);
-		}
-	}
+    /**
+     * Try file lock.
+     * 
+     * @param file
+     * @param processor
+     * @param <R>
+     * @return
+     */
+    public static <R> R doTryLock(@NotNull File file, @NotNull ProcessFunction<FileLock, R> processor) {
+        notNullOf(file, "file");
+        notNullOf(processor, "processor");
+        try (RandomAccessFile raf = new RandomAccessFile(file, "rw");
+                FileChannel fileChannel = raf.getChannel();
+                FileLock lock = fileChannel.tryLock();) {
+            return processor.process(lock);
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
 }

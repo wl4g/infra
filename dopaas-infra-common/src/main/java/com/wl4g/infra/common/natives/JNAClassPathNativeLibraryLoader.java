@@ -34,42 +34,42 @@ import com.sun.jna.Native;
  */
 public class JNAClassPathNativeLibraryLoader extends ClassPathNativeLibraryLoader {
 
-	/**
-	 * Load gets JNA interfaceClass instance.
-	 * 
-	 * @param interfaceClass
-	 * @return
-	 */
-	public <T extends Library> T loadInstance(Class<T> interfaceClass) {
-		return loadInstance(interfaceClass, emptyMap());
-	}
+    /**
+     * Load gets JNA interfaceClass instance.
+     * 
+     * @param interfaceClass
+     * @return
+     */
+    public <T extends Library> T loadInstance(Class<T> interfaceClass) {
+        return loadInstance(interfaceClass, emptyMap());
+    }
 
-	/**
-	 * Load gets JNA interfaceClass instance.
-	 * 
-	 * @param interfaceClass
-	 * @param options
-	 * @return
-	 */
-	public <T extends Library> T loadInstance(Class<T> interfaceClass, Map<String, ?> options) {
-		for (File f : getLibTmpFiles()) {
-			try {
-				return Native.load(f.getCanonicalPath(), interfaceClass, options);
-			} catch (UnsatisfiedLinkError e) {
-				// Ignore
-			} catch (IOException e) {
-				throw new IllegalStateException(e);
-			}
-		}
-		throw new UnsatisfiedLinkError("No satisfactory link library was found!");
-	}
+    /**
+     * Load gets JNA interfaceClass instance.
+     * 
+     * @param interfaceClass
+     * @param options
+     * @return
+     */
+    public <T extends Library> T loadInstance(Class<T> interfaceClass, Map<String, ?> options) {
+        for (File f : getLibTmpFiles()) {
+            try {
+                return Native.load(f.getCanonicalPath(), interfaceClass, options);
+            } catch (UnsatisfiedLinkError e) {
+                // Ignore
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+        throw new UnsatisfiedLinkError("No satisfactory link library was found!");
+    }
 
-	/**
-	 * Ignore</br>
-	 * Used to {@link #loadInstance(Class)}, {@link #loadInstance(Class, Map)}
-	 */
-	@Override
-	protected void loadNativeLibrary(File tmpLibFile) {
-	}
+    /**
+     * Ignore</br>
+     * Used to {@link #loadInstance(Class)}, {@link #loadInstance(Class, Map)}
+     */
+    @Override
+    protected void loadNativeLibrary(File tmpLibFile) {
+    }
 
 }

@@ -36,61 +36,61 @@ import java.util.Map;
  */
 public class JodaPeriodFormatter extends PeriodFormatter {
 
-	@Override
-	public String formatHumanDate(long startTime, long endTime) {
-		Period period = new Period(new DateTime(endTime), new DateTime(startTime));
-		String elapsed = getPeriodFormatter(CANADA).print(period);
-		return cleanupDateEmptyString(elapsed.concat(getLocalizedMessage("period.formatter.ago")));
-	}
+    @Override
+    public String formatHumanDate(long startTime, long endTime) {
+        Period period = new Period(new DateTime(endTime), new DateTime(startTime));
+        String elapsed = getPeriodFormatter(CANADA).print(period);
+        return cleanupDateEmptyString(elapsed.concat(getLocalizedMessage("period.formatter.ago")));
+    }
 
-	/**
-	 * Gets create period {@link PeriodFormatter} instances.
-	 * 
-	 * @param locale
-	 * @return
-	 */
-	private org.joda.time.format.PeriodFormatter getPeriodFormatter(Locale locale) {
-		notNullOf(locale, "locale");
+    /**
+     * Gets create period {@link PeriodFormatter} instances.
+     * 
+     * @param locale
+     * @return
+     */
+    private org.joda.time.format.PeriodFormatter getPeriodFormatter(Locale locale) {
+        notNullOf(locale, "locale");
 
-		org.joda.time.format.PeriodFormatter formatter = localizedPeriodFormatters.get(locale);
-		if (isNull(formatter)) {
-			synchronized (localizedPeriodFormatters) {
-				formatter = localizedPeriodFormatters.get(locale);
-				if (isNull(formatter)) {
-					PeriodFormatterBuilder builder = new PeriodFormatterBuilder();
-					builder.appendYears().appendSuffix(" ".concat(getLocalizedMessage("period.formatter.year")).concat(" "),
-							" ".concat(getLocalizedMessage("period.formatter.years").concat(" ")));
+        org.joda.time.format.PeriodFormatter formatter = localizedPeriodFormatters.get(locale);
+        if (isNull(formatter)) {
+            synchronized (localizedPeriodFormatters) {
+                formatter = localizedPeriodFormatters.get(locale);
+                if (isNull(formatter)) {
+                    PeriodFormatterBuilder builder = new PeriodFormatterBuilder();
+                    builder.appendYears().appendSuffix(" ".concat(getLocalizedMessage("period.formatter.year")).concat(" "),
+                            " ".concat(getLocalizedMessage("period.formatter.years").concat(" ")));
 
-					builder.appendMonths().appendSuffix(" ".concat(getLocalizedMessage("period.formatter.month")).concat(" "),
-							" ".concat(getLocalizedMessage("period.formatter.months").concat(" ")));
+                    builder.appendMonths().appendSuffix(" ".concat(getLocalizedMessage("period.formatter.month")).concat(" "),
+                            " ".concat(getLocalizedMessage("period.formatter.months").concat(" ")));
 
-					builder.appendWeeks().appendSuffix(" ".concat(getLocalizedMessage("period.formatter.week")).concat(" "),
-							" ".concat(getLocalizedMessage("period.formatter.weeks").concat(" ")));
+                    builder.appendWeeks().appendSuffix(" ".concat(getLocalizedMessage("period.formatter.week")).concat(" "),
+                            " ".concat(getLocalizedMessage("period.formatter.weeks").concat(" ")));
 
-					builder.appendDays().appendSuffix(" ".concat(getLocalizedMessage("period.formatter.day")).concat(" "),
-							" ".concat(getLocalizedMessage("period.formatter.days").concat(" ")));
+                    builder.appendDays().appendSuffix(" ".concat(getLocalizedMessage("period.formatter.day")).concat(" "),
+                            " ".concat(getLocalizedMessage("period.formatter.days").concat(" ")));
 
-					builder.appendHours().appendSuffix(" ".concat(getLocalizedMessage("period.formatter.hour")).concat(" "),
-							" ".concat(getLocalizedMessage("period.formatter.hours").concat(" ")));
+                    builder.appendHours().appendSuffix(" ".concat(getLocalizedMessage("period.formatter.hour")).concat(" "),
+                            " ".concat(getLocalizedMessage("period.formatter.hours").concat(" ")));
 
-					builder.appendMinutes().appendSuffix(" ".concat(getLocalizedMessage("period.formatter.minute")).concat(" "),
-							" ".concat(getLocalizedMessage("period.formatter.minutes").concat(" ")));
+                    builder.appendMinutes().appendSuffix(" ".concat(getLocalizedMessage("period.formatter.minute")).concat(" "),
+                            " ".concat(getLocalizedMessage("period.formatter.minutes").concat(" ")));
 
-					builder.appendSeconds().appendSuffix(" ".concat(getLocalizedMessage("period.formatter.second")).concat(" "),
-							" ".concat(getLocalizedMessage("period.formatter.seconds").concat(" ")));
+                    builder.appendSeconds().appendSuffix(" ".concat(getLocalizedMessage("period.formatter.second")).concat(" "),
+                            " ".concat(getLocalizedMessage("period.formatter.seconds").concat(" ")));
 
-					formatter = builder.printZeroNever().toFormatter();
-					localizedPeriodFormatters.put(locale, formatter);
-				}
-			}
-		}
+                    formatter = builder.printZeroNever().toFormatter();
+                    localizedPeriodFormatters.put(locale, formatter);
+                }
+            }
+        }
 
-		return formatter;
-	}
+        return formatter;
+    }
 
-	/**
-	 * Default {@link PeriodFormatter} instances.
-	 */
-	final private static Map<Locale, org.joda.time.format.PeriodFormatter> localizedPeriodFormatters = new HashMap<>(4);
+    /**
+     * Default {@link PeriodFormatter} instances.
+     */
+    final private static Map<Locale, org.joda.time.format.PeriodFormatter> localizedPeriodFormatters = new HashMap<>(4);
 
 }

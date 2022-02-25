@@ -37,51 +37,51 @@ import static com.wl4g.infra.common.view.Freemarkers.renderingTemplateToString;
  */
 public class FreemarkersTests {
 
-	@Test
-	public void mapRenderingCase() throws Exception {
-		String templateString = "${name}";
+    @Test
+    public void mapRenderingCase() throws Exception {
+        String templateString = "${name}";
 
-		Map<String, Object> model = new HashMap<>();
-		model.put("name", "Mia");
-		model.put("age", 25);
-		Map<String, Object> attributes = new HashMap<>();
-		attributes.put("workyear", 1);
-		attributes.put("income", 20000);
-		model.put("attributes", attributes);
+        Map<String, Object> model = new HashMap<>();
+        model.put("name", "Mia");
+        model.put("age", 25);
+        Map<String, Object> attributes = new HashMap<>();
+        attributes.put("workyear", 1);
+        attributes.put("income", 20000);
+        model.put("attributes", attributes);
 
-		System.out.println(renderingTemplateToString("mapRenderingCase", templateString, model));
-	}
+        System.out.println(renderingTemplateToString("mapRenderingCase", templateString, model));
+    }
 
-	@Test
-	public void stringMethodSpelCase() throws IOException, TemplateException {
-		String templateString = "${'Hi, everybody'.contains('Hi')}";
-		System.out.println("contains: " + renderingTemplateToString("stringMethodSpelCase", templateString, null));
-	}
+    @Test
+    public void stringMethodSpelCase() throws IOException, TemplateException {
+        String templateString = "${'Hi, everybody'.contains('Hi')}";
+        System.out.println("contains: " + renderingTemplateToString("stringMethodSpelCase", templateString, null));
+    }
 
-	@Test
-	public void modelCallObjectMethodRenderingCase() throws IOException, TemplateException {
-		String templateString = "${joinUtil.join(name)}";
-		Map<String, Object> model = new HashMap<>();
-		model.put("name", "Mia");
-		model.put("joinUtil", new JoinHolder());
+    @Test
+    public void modelCallObjectMethodRenderingCase() throws IOException, TemplateException {
+        String templateString = "${joinUtil.join(name)}";
+        Map<String, Object> model = new HashMap<>();
+        model.put("name", "Mia");
+        model.put("joinUtil", new JoinHolder());
 
-		System.out.println("result: " + renderingTemplateToString("modelCallObjectMethodRenderingCase", templateString, model));
-	}
+        System.out.println("result: " + renderingTemplateToString("modelCallObjectMethodRenderingCase", templateString, model));
+    }
 
-	@Test
-	public void modelCallMethodRenderingCase_with_error() throws IOException, TemplateException {
-		String templateString = "${JoinUtil.join(name)}";
-		Map<String, Object> model = new HashMap<>();
-		model.put("name", "Mia");
-		model.put("JoinUtil", JoinHolder.class);
+    @Test
+    public void modelCallMethodRenderingCase_with_error() throws IOException, TemplateException {
+        String templateString = "${JoinUtil.join(name)}";
+        Map<String, Object> model = new HashMap<>();
+        model.put("name", "Mia");
+        model.put("JoinUtil", JoinHolder.class);
 
-		System.out.println("result: " + renderingTemplateToString("modelCallMethodRenderingCase", templateString, model));
-	}
+        System.out.println("result: " + renderingTemplateToString("modelCallMethodRenderingCase", templateString, model));
+    }
 
-	public static class JoinHolder {
-		public static String join(String str) {
-			return format("%s nationality is America", str);
-		}
-	}
+    public static class JoinHolder {
+        public static String join(String str) {
+            return format("%s nationality is America", str);
+        }
+    }
 
 }

@@ -63,313 +63,313 @@ import com.wl4g.infra.common.resource.resolver.ClassPathResourcePatternResolver;
  */
 public class ClassPathNativeLibraryLoader extends PlatformInfo {
 
-	final protected SmartLogger log = getLogger(getClass());
+    final protected SmartLogger log = getLogger(getClass());
 
-	/**
-	 * Loaded state flag.
-	 */
-	final private AtomicBoolean loadedState = new AtomicBoolean(false);
+    /**
+     * Loaded state flag.
+     */
+    final private AtomicBoolean loadedState = new AtomicBoolean(false);
 
-	/**
-	 * Native library classLoader.
-	 */
-	final private ClassLoader classLoader;
+    /**
+     * Native library classLoader.
+     */
+    final private ClassLoader classLoader;
 
-	/**
-	 * Current OS arch share lib folder path part(lowerCase).</br>
-	 * e.g. Windows/x86, Windows/x86_64, Linux/x86, Linux/x86_64,
-	 */
-	final private String archShareLibFolderPathLowerCase;
+    /**
+     * Current OS arch share lib folder path part(lowerCase).</br>
+     * e.g. Windows/x86, Windows/x86_64, Linux/x86, Linux/x86_64,
+     */
+    final private String archShareLibFolderPathLowerCase;
 
-	/**
-	 * Matched load native library file resources.
-	 */
-	final private List<File> loadLibFiles = new ArrayList<>(8);
+    /**
+     * Matched load native library file resources.
+     */
+    final private List<File> loadLibFiles = new ArrayList<>(8);
 
-	public ClassPathNativeLibraryLoader() {
-		this(getDefaultClassLoader());
-	}
+    public ClassPathNativeLibraryLoader() {
+        this(getDefaultClassLoader());
+    }
 
-	/**
-	 * For example:
-	 * 
-	 * <pre>
-	 * new {@link ClassPathNativeLibraryLoader}("/opencv/native/××/×.×");
-	 * </pre>
-	 * 
-	 * <font color=red>Note: Because of the Java multiline annotation problem,
-	 * the "*" is replaced by "×"</font>
-	 * 
-	 * @param classLoader,
-	 * @param archShareMapping
-	 * @param libLocationPattern
-	 */
-	public ClassPathNativeLibraryLoader(ClassLoader classLoader) {
-		notNull(classLoader, "Native library classLoader can't null.");
-		this.classLoader = classLoader;
-		this.archShareLibFolderPathLowerCase = getNativeLibFolderPathForCurrentOS().toLowerCase(US);
-	}
+    /**
+     * For example:
+     * 
+     * <pre>
+     * new {@link ClassPathNativeLibraryLoader}("/opencv/native/××/×.×");
+     * </pre>
+     * 
+     * <font color=red>Note: Because of the Java multiline annotation problem,
+     * the "*" is replaced by "×"</font>
+     * 
+     * @param classLoader,
+     * @param archShareMapping
+     * @param libLocationPattern
+     */
+    public ClassPathNativeLibraryLoader(ClassLoader classLoader) {
+        notNull(classLoader, "Native library classLoader can't null.");
+        this.classLoader = classLoader;
+        this.archShareLibFolderPathLowerCase = getNativeLibFolderPathForCurrentOS().toLowerCase(US);
+    }
 
-	/**
-	 * Check current {@link ClassPathNativeLibraryLoader} loaded?
-	 * 
-	 * @return
-	 */
-	public boolean isLoaded() {
-		return loadedState.get();
-	}
+    /**
+     * Check current {@link ClassPathNativeLibraryLoader} loaded?
+     * 
+     * @return
+     */
+    public boolean isLoaded() {
+        return loadedState.get();
+    }
 
-	/**
-	 * Gets generated library tmp files.
-	 * 
-	 * @return
-	 */
-	public List<File> getLibTmpFiles() {
-		return unmodifiableList(loadLibFiles);
-	}
+    /**
+     * Gets generated library tmp files.
+     * 
+     * @return
+     */
+    public List<File> getLibTmpFiles() {
+        return unmodifiableList(loadLibFiles);
+    }
 
-	/**
-	 * The file from JAR(CLASSPATH) is copied into system temporary directory
-	 * and then loaded. The temporary file is deleted after exiting. Method uses
-	 * String as filename because the pathname is "abstract", not
-	 * system-dependent.
-	 * 
-	 * @param libLocationPatterns
-	 *            lib Location patterns
-	 * @throws IOException
-	 *             Dynamic library read write error
-	 * @throws LoadNativeLibraryError
-	 *             The specified file was not found in the jar package.
-	 * @return {@link ClassPathNativeLibraryLoader}
-	 */
-	@SuppressWarnings("unchecked")
-	public final <T extends ClassPathNativeLibraryLoader> T loadLibrarys(String... libLocationPatterns)
-			throws IOException, LoadNativeLibraryError {
+    /**
+     * The file from JAR(CLASSPATH) is copied into system temporary directory
+     * and then loaded. The temporary file is deleted after exiting. Method uses
+     * String as filename because the pathname is "abstract", not
+     * system-dependent.
+     * 
+     * @param libLocationPatterns
+     *            lib Location patterns
+     * @throws IOException
+     *             Dynamic library read write error
+     * @throws LoadNativeLibraryError
+     *             The specified file was not found in the jar package.
+     * @return {@link ClassPathNativeLibraryLoader}
+     */
+    @SuppressWarnings("unchecked")
+    public final <T extends ClassPathNativeLibraryLoader> T loadLibrarys(String... libLocationPatterns)
+            throws IOException, LoadNativeLibraryError {
 
-		// Loaded?
-		if (!loadedState.compareAndSet(false, true)) {
-			return (T) this;
-		}
+        // Loaded?
+        if (!loadedState.compareAndSet(false, true)) {
+            return (T) this;
+        }
 
-		assertLibLocationPatterns(libLocationPatterns);
+        assertLibLocationPatterns(libLocationPatterns);
 
-		// Scanning native library resources.
-		ClassPathResourcePatternResolver resolver = new ClassPathResourcePatternResolver(classLoader);
-		Set<StreamResource> resources = resolver.getResources(libLocationPatterns);
-		// Sort resources url by ASCII dict.
-		List<StreamResource> rss = asList(resources.toArray(new StreamResource[] {}));
-		sort(rss, ASC_COMPARATOR);
+        // Scanning native library resources.
+        ClassPathResourcePatternResolver resolver = new ClassPathResourcePatternResolver(classLoader);
+        Set<StreamResource> resources = resolver.getResources(libLocationPatterns);
+        // Sort resources url by ASCII dict.
+        List<StreamResource> rss = asList(resources.toArray(new StreamResource[] {}));
+        sort(rss, ASC_COMPARATOR);
 
-		// Matching native library by current os arch.
-		for (StreamResource r : rss) {
-			if (!r.exists() || r.isOpen() || !r.isReadable()) {
-				log.warn("Cannot to load native library: {}", r.getURL().toString());
-				continue;
-			}
-			if (!matchArchWithRequiresCandidate(r.getURL()) || !matchArchWithCurrentOS(r.getURL())) {
-				continue;
-			}
+        // Matching native library by current os arch.
+        for (StreamResource r : rss) {
+            if (!r.exists() || r.isOpen() || !r.isReadable()) {
+                log.warn("Cannot to load native library: {}", r.getURL().toString());
+                continue;
+            }
+            if (!matchArchWithRequiresCandidate(r.getURL()) || !matchArchWithCurrentOS(r.getURL())) {
+                continue;
+            }
 
-			File tmpLibFile = null; // Native library temporary file.
-			try (InputStream in = r.getInputStream()) {
-				tmpLibFile = new File(libNativeTmpDir, r.getFilename());
-				loadLibFiles.add(tmpLibFile);
+            File tmpLibFile = null; // Native library temporary file.
+            try (InputStream in = r.getInputStream()) {
+                tmpLibFile = new File(libNativeTmpDir, r.getFilename());
+                loadLibFiles.add(tmpLibFile);
 
-				// Copy match nativelib to temporary directory.
-				Files.copy(in, tmpLibFile.toPath(), REPLACE_EXISTING);
+                // Copy match nativelib to temporary directory.
+                Files.copy(in, tmpLibFile.toPath(), REPLACE_EXISTING);
 
-				// Load to JVM.
-				loadNativeLibrary(tmpLibFile);
-				log.debug("Loaded native library: {}", r.getURL().toString());
+                // Load to JVM.
+                loadNativeLibrary(tmpLibFile);
+                log.debug("Loaded native library: {}", r.getURL().toString());
 
-			} catch (IOException e) {
-				if (nonNull(tmpLibFile))
-					tmpLibFile.delete();
-				throw e;
-			} catch (NullPointerException e) {
-				if (nonNull(tmpLibFile))
-					tmpLibFile.delete();
-				throw new FileNotFoundException("Library file [" + r.getURL() + "] was not found.");
-			}
-		}
+            } catch (IOException e) {
+                if (nonNull(tmpLibFile))
+                    tmpLibFile.delete();
+                throw e;
+            } catch (NullPointerException e) {
+                if (nonNull(tmpLibFile))
+                    tmpLibFile.delete();
+                throw new FileNotFoundException("Library file [" + r.getURL() + "] was not found.");
+            }
+        }
 
-		// Any loaded library?
-		if (loadLibFiles.isEmpty()) {
-			throw new LoadNativeLibraryError("No match native library, there is no shared library file of current os/arch: '"
-					+ OS_NAME + "/" + OS_ARCH + "' or the path does not meet the specification?"
-					+ "\nRefer to os arch name transformation mapping: " + archMapping + "\nScan matching patterns: "
-					+ asList(libLocationPatterns) + "\nAll was found native library resources: " + rss);
-		}
+        // Any loaded library?
+        if (loadLibFiles.isEmpty()) {
+            throw new LoadNativeLibraryError("No match native library, there is no shared library file of current os/arch: '"
+                    + OS_NAME + "/" + OS_ARCH + "' or the path does not meet the specification?"
+                    + "\nRefer to os arch name transformation mapping: " + archMapping + "\nScan matching patterns: "
+                    + asList(libLocationPatterns) + "\nAll was found native library resources: " + rss);
+        }
 
-		// Cleanup nativelib temporary files.
-		cleanupTmpNativeLibs();
+        // Cleanup nativelib temporary files.
+        cleanupTmpNativeLibs();
 
-		return (T) this;
-	}
+        return (T) this;
+    }
 
-	/**
-	 * Do load library
-	 * 
-	 * @param tmpLibFile
-	 */
-	protected void loadNativeLibrary(File tmpLibFile) {
-		load(tmpLibFile.getAbsolutePath());
-	}
+    /**
+     * Do load library
+     * 
+     * @param tmpLibFile
+     */
+    protected void loadNativeLibrary(File tmpLibFile) {
+        load(tmpLibFile.getAbsolutePath());
+    }
 
-	/**
-	 * Match possible requires candidate suffixes for multiple platforms
-	 * 
-	 * @return
-	 */
-	protected boolean matchArchWithRequiresCandidate(URL path) {
-		String pathURL = path.toString().toLowerCase(US);
-		for (String suffix : SUPPORTED_PLATFORM) {
-			if (pathURL.endsWith(suffix)) {
-				return true;
-			}
-		}
-		return false;
-	}
+    /**
+     * Match possible requires candidate suffixes for multiple platforms
+     * 
+     * @return
+     */
+    protected boolean matchArchWithRequiresCandidate(URL path) {
+        String pathURL = path.toString().toLowerCase(US);
+        for (String suffix : SUPPORTED_PLATFORM) {
+            if (pathURL.endsWith(suffix)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	/**
-	 * Automatically match the current os type and architecture.
-	 * 
-	 * @return
-	 */
-	protected boolean matchArchWithCurrentOS(URL path) {
-		return path.toString().toLowerCase(US).contains(archShareLibFolderPathLowerCase);
-	}
+    /**
+     * Automatically match the current os type and architecture.
+     * 
+     * @return
+     */
+    protected boolean matchArchWithCurrentOS(URL path) {
+        return path.toString().toLowerCase(US).contains(archShareLibFolderPathLowerCase);
+    }
 
-	/**
-	 * Cleanup temporary nativelib files.
-	 * 
-	 * It has been proved that when the tmpFile.deleteOnExit() method is called,
-	 * the dynamic library file cannot be deleted after the system exits,
-	 * because the program is occupied, so if you want to unload the dynamic
-	 * library file when the program exits, you can only use hook (calling
-	 * private properties and private methods through reflection)
-	 */
-	private void cleanupTmpNativeLibs() {
-		getRuntime().addShutdownHook(new Thread() {
-			@Override
-			public void run() {
-				for (File loadFile : loadLibFiles) {
-					try {
-						unloadNativeLibrary(loadFile);
-					} catch (Throwable th) {
-						log.warn(format("Failed to unload native library tmpfile: %", valueOf(loadFile.toString())), th);
-					}
-				}
-			}
-		});
-	}
+    /**
+     * Cleanup temporary nativelib files.
+     * 
+     * It has been proved that when the tmpFile.deleteOnExit() method is called,
+     * the dynamic library file cannot be deleted after the system exits,
+     * because the program is occupied, so if you want to unload the dynamic
+     * library file when the program exits, you can only use hook (calling
+     * private properties and private methods through reflection)
+     */
+    private void cleanupTmpNativeLibs() {
+        getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                for (File loadFile : loadLibFiles) {
+                    try {
+                        unloadNativeLibrary(loadFile);
+                    } catch (Throwable th) {
+                        log.warn(format("Failed to unload native library tmpfile: %", valueOf(loadFile.toString())), th);
+                    }
+                }
+            }
+        });
+    }
 
-	/**
-	 * Unload native library tmpFile.
-	 * 
-	 * @param tmpLibFile
-	 * @throws Exception
-	 * @see <a href="http://peiyuxin.blog.sohu.com/300313528.html">JVM takes up
-	 *      local library file reference</a>
-	 */
-	@SuppressWarnings("unchecked")
-	private final synchronized void unloadNativeLibrary(File tmpLibFile) throws Exception {
-		Field field = ClassLoader.class.getDeclaredField("nativeLibraries");
-		field.setAccessible(true);
-		Vector<Object> libs = (Vector<Object>) field.get(classLoader);
-		Iterator<Object> it = libs.iterator();
-		while (it.hasNext()) {
-			Object object = it.next();
-			Field[] fs = object.getClass().getDeclaredFields();
-			for (int k = 0; k < fs.length; k++) {
-				if (fs[k].getName().equals("name")) {
-					fs[k].setAccessible(true);
-					String libPath = fs[k].get(object).toString();
-					/**
-					 * Use the canonical path, otherwise:
-					 * 
-					 * <pre>
-					 * C:\Users\ADMINI~1\AppData\Local\Temp\javanativelibs_Administrator\6480-1577085319527\snappyjava.dll
-					 * </pre>
-					 */
-					if (new File(libPath).getCanonicalPath().equals(tmpLibFile.getCanonicalPath())) {
-						Method finalize = object.getClass().getDeclaredMethod("finalize");
-						finalize.setAccessible(true);
-						finalize.invoke(object);
-						if (!tmpLibFile.delete()) {
-							log.warn("Failed to cleanup tmp library file of: {}", tmpLibFile);
-						}
-					}
-				}
-			}
-		}
-	}
+    /**
+     * Unload native library tmpFile.
+     * 
+     * @param tmpLibFile
+     * @throws Exception
+     * @see <a href="http://peiyuxin.blog.sohu.com/300313528.html">JVM takes up
+     *      local library file reference</a>
+     */
+    @SuppressWarnings("unchecked")
+    private final synchronized void unloadNativeLibrary(File tmpLibFile) throws Exception {
+        Field field = ClassLoader.class.getDeclaredField("nativeLibraries");
+        field.setAccessible(true);
+        Vector<Object> libs = (Vector<Object>) field.get(classLoader);
+        Iterator<Object> it = libs.iterator();
+        while (it.hasNext()) {
+            Object object = it.next();
+            Field[] fs = object.getClass().getDeclaredFields();
+            for (int k = 0; k < fs.length; k++) {
+                if (fs[k].getName().equals("name")) {
+                    fs[k].setAccessible(true);
+                    String libPath = fs[k].get(object).toString();
+                    /**
+                     * Use the canonical path, otherwise:
+                     * 
+                     * <pre>
+                     * C:\Users\ADMINI~1\AppData\Local\Temp\javanativelibs_Administrator\6480-1577085319527\snappyjava.dll
+                     * </pre>
+                     */
+                    if (new File(libPath).getCanonicalPath().equals(tmpLibFile.getCanonicalPath())) {
+                        Method finalize = object.getClass().getDeclaredMethod("finalize");
+                        finalize.setAccessible(true);
+                        finalize.invoke(object);
+                        if (!tmpLibFile.delete()) {
+                            log.warn("Failed to cleanup tmp library file of: {}", tmpLibFile);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
-	/**
-	 * Assertion share native library location patterns. patterns and pattern
-	 * cannot be null or empty
-	 * 
-	 * @param libLocationPatterns
-	 */
-	private void assertLibLocationPatterns(String... libLocationPatterns) {
-		// Check location pattern.
-		notNull(libLocationPatterns, "Native library location patterns can't null.");
+    /**
+     * Assertion share native library location patterns. patterns and pattern
+     * cannot be null or empty
+     * 
+     * @param libLocationPatterns
+     */
+    private void assertLibLocationPatterns(String... libLocationPatterns) {
+        // Check location pattern.
+        notNull(libLocationPatterns, "Native library location patterns can't null.");
 
-		for (String pattern : libLocationPatterns) {
-			notNull(pattern,
-					format("Native library location pattern can't null, libLocationPatterns: %s", asList(libLocationPatterns)));
+        for (String pattern : libLocationPatterns) {
+            notNull(pattern,
+                    format("Native library location pattern can't null, libLocationPatterns: %s", asList(libLocationPatterns)));
 
-			// Check filename deep hierarchy is okay?
-			int libPathDeep = pattern.split("/").length;
-			if (libPathDeep < NATIVE_LIBS_PATH_LEN_MIN) {
-				throw new IllegalArgumentException(
-						"The filename has to be at least " + NATIVE_LIBS_PATH_LEN_MIN + " characters long.");
-			}
-		}
+            // Check filename deep hierarchy is okay?
+            int libPathDeep = pattern.split("/").length;
+            if (libPathDeep < NATIVE_LIBS_PATH_LEN_MIN) {
+                throw new IllegalArgumentException(
+                        "The filename has to be at least " + NATIVE_LIBS_PATH_LEN_MIN + " characters long.");
+            }
+        }
 
-	}
+    }
 
-	/**
-	 * Create or make a temporary folder under the system temporary folder
-	 * 
-	 * @param path
-	 * @return
-	 * @throws IOException
-	 */
-	private final synchronized static File createlibsTmpDirectory0(String path) {
-		File libsTmpDir = new File(JAVA_IO_TMPDIR, path);
-		if (!libsTmpDir.exists()) {
-			state(libsTmpDir.mkdirs(), "Failed to create tmp directory [" + libsTmpDir.getName() + "]");
-		}
-		return libsTmpDir;
-	}
+    /**
+     * Create or make a temporary folder under the system temporary folder
+     * 
+     * @param path
+     * @return
+     * @throws IOException
+     */
+    private final synchronized static File createlibsTmpDirectory0(String path) {
+        File libsTmpDir = new File(JAVA_IO_TMPDIR, path);
+        if (!libsTmpDir.exists()) {
+            state(libsTmpDir.mkdirs(), "Failed to create tmp directory [" + libsTmpDir.getName() + "]");
+        }
+        return libsTmpDir;
+    }
 
-	/**
-	 * The minimum length a prefix for a file has to have according to
-	 * {@link File#createTempFile(String, String)}}.
-	 */
-	final public static int NATIVE_LIBS_PATH_LEN_MIN = 3;
+    /**
+     * The minimum length a prefix for a file has to have according to
+     * {@link File#createTempFile(String, String)}}.
+     */
+    final public static int NATIVE_LIBS_PATH_LEN_MIN = 3;
 
-	/**
-	 * Java dynamic link native libraries temporary base directory path.
-	 */
-	final public static File libNativeTmpDir = createlibsTmpDirectory0(
-			File.separator + "javanativelibs_" + USER_NAME + File.separator + LOCAL_PROCESS_ID + "-" + currentTimeMillis());
+    /**
+     * Java dynamic link native libraries temporary base directory path.
+     */
+    final public static File libNativeTmpDir = createlibsTmpDirectory0(
+            File.separator + "javanativelibs_" + USER_NAME + File.separator + LOCAL_PROCESS_ID + "-" + currentTimeMillis());
 
-	/**
-	 * {@link StreamResource} URL path ASC comparator.
-	 */
-	final public static Comparator<StreamResource> ASC_COMPARATOR = (r1, r2) -> {
-		try {
-			return r1.getURL().toString().compareTo(r2.getURL().toString());
-		} catch (IOException e1) {
-			throw new IllegalStateException(e1);
-		}
-	};
+    /**
+     * {@link StreamResource} URL path ASC comparator.
+     */
+    final public static Comparator<StreamResource> ASC_COMPARATOR = (r1, r2) -> {
+        try {
+            return r1.getURL().toString().compareTo(r2.getURL().toString());
+        } catch (IOException e1) {
+            throw new IllegalStateException(e1);
+        }
+    };
 
-	/**
-	 * Match possible requires candidate suffixes for multiple platforms.
-	 */
-	final public static List<String> SUPPORTED_PLATFORM = asList(new String[] { ".so", ".dll", ".a", ".dylib" });
+    /**
+     * Match possible requires candidate suffixes for multiple platforms.
+     */
+    final public static List<String> SUPPORTED_PLATFORM = asList(new String[] { ".so", ".dll", ".a", ".dylib" });
 
 }

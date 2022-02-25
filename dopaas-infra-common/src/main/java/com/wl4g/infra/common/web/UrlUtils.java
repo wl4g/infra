@@ -30,17 +30,17 @@ import java.util.regex.Pattern;
  */
 public abstract class UrlUtils extends WebUtils2 {
 
-	/**
-	 * Decides if a URL is absolute based on whether it contains a valid scheme
-	 * name, as defined in RFC 1738.
-	 */
-	public static boolean isAbsoluteUrl(String url) {
-		if (url == null) {
-			return false;
-		}
-		return ABSOLUTE_URL.matcher(url).matches();
-	}
+    /**
+     * Decides if a URL is absolute based on whether it contains a valid scheme
+     * name, as defined in RFC 1738.
+     */
+    public static boolean isAbsoluteUrl(String url) {
+        if (url == null) {
+            return false;
+        }
+        return ABSOLUTE_URL.matcher(url).matches();
+    }
 
-	private static final Pattern ABSOLUTE_URL = Pattern.compile("\\A[a-z0-9.+-]+://.*", Pattern.CASE_INSENSITIVE);
+    private static final Pattern ABSOLUTE_URL = Pattern.compile("\\A[a-z0-9.+-]+://.*", Pattern.CASE_INSENSITIVE);
 
 }

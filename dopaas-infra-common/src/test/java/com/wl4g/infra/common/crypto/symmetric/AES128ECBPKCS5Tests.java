@@ -37,35 +37,35 @@ import com.wl4g.infra.common.crypto.symmetric.AES128ECBPKCS5;
  */
 public class AES128ECBPKCS5Tests {
 
-	public static void main(String[] args) throws Exception {
-		AES128ECBPKCS5 aes = new AES128ECBPKCS5();
-		CodecSource genKey = aes.generateKey();
-		out.println("new generateKey => (" + genKey.toBase64() + ")" + genKey.getBytes().length + "bytes");
+    public static void main(String[] args) throws Exception {
+        AES128ECBPKCS5 aes = new AES128ECBPKCS5();
+        CodecSource genKey = aes.generateKey();
+        out.println("new generateKey => (" + genKey.toBase64() + ")" + genKey.getBytes().length + "bytes");
 
-		String plainText = "abcdefghijklmnopqrstuvwxyz";
-		CodecSource key = new CodecSource("1234567812345678"); // must 16bytes
-		CodecSource cipherText = aes.encrypt(key.getBytes(), new CodecSource(plainText));
-		out.println("plainText => " + plainText);
-		out.println("key => " + key);
-		out.println("encrypt => " + cipherText.toBase64());
-		out.println("decrypt => " + aes.decrypt(key.getBytes(), cipherText).toString());
+        String plainText = "abcdefghijklmnopqrstuvwxyz";
+        CodecSource key = new CodecSource("1234567812345678"); // must 16bytes
+        CodecSource cipherText = aes.encrypt(key.getBytes(), new CodecSource(plainText));
+        out.println("plainText => " + plainText);
+        out.println("key => " + key);
+        out.println("encrypt => " + cipherText.toBase64());
+        out.println("decrypt => " + aes.decrypt(key.getBytes(), cipherText).toString());
 
-		System.out.println("-------------------");
-		generatePasswdCase();
-	}
+        System.out.println("-------------------");
+        generatePasswdCase();
+    }
 
-	public static void generatePasswdCase() {
-		AES128ECBPKCS5 aes = new AES128ECBPKCS5();
-		// CodecSource genKey = aes.generateKey();
-		CodecSource genKey = new CodecSource("ba718f87b49d489c6c37aa9214e908ff");
-		out.println("genKey=" + genKey.toHex());
-		out.println("genKey=" + genKey.toString());
+    public static void generatePasswdCase() {
+        AES128ECBPKCS5 aes = new AES128ECBPKCS5();
+        // CodecSource genKey = aes.generateKey();
+        CodecSource genKey = new CodecSource("ba718f87b49d489c6c37aa9214e908ff");
+        out.println("genKey=" + genKey.toHex());
+        out.println("genKey=" + genKey.toString());
 
-		CodecSource encrypted = aes.encrypt(genKey.getBytes(), new CodecSource("gzsm123"));
-		// CodecSource encrypted =
-		// CodecSource.fromHex("DFDDD7F502E694F3E40D750FEEAE423D");
-		out.println("encrypted=" + encrypted.toHex());
-		out.println("decrypted=" + aes.decrypt(genKey.getBytes(), encrypted));
-	}
+        CodecSource encrypted = aes.encrypt(genKey.getBytes(), new CodecSource("gzsm123"));
+        // CodecSource encrypted =
+        // CodecSource.fromHex("DFDDD7F502E694F3E40D750FEEAE423D");
+        out.println("encrypted=" + encrypted.toHex());
+        out.println("decrypted=" + aes.decrypt(genKey.getBytes(), encrypted));
+    }
 
 }

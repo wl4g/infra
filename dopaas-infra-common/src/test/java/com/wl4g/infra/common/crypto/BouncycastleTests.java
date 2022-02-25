@@ -23,43 +23,43 @@ import com.wl4g.infra.common.codec.CodecSource;
 
 public class BouncycastleTests {
 
-	public static void main(String[] args) throws Exception {
-		des8Test();
-		desedeTest();
-	}
+    public static void main(String[] args) throws Exception {
+        des8Test();
+        desedeTest();
+    }
 
-	public static void des8Test() {
-		byte[] key = new CodecSource("12345678").getBytes();
-		byte[] input = new CodecSource("12345678").getBytes();
-		byte[] out = new byte[8];
+    public static void des8Test() {
+        byte[] key = new CodecSource("12345678").getBytes();
+        byte[] input = new CodecSource("12345678").getBytes();
+        byte[] out = new byte[8];
 
-		// 使用DESEngine进行加密
-		DESEngine desEngine = new DESEngine();
-		desEngine.init(true, new KeyParameter(key));
-		desEngine.processBlock(input, 0, out, 0);
-		System.out.println("des encrypt=" + new CodecSource(out).toBase64());
+        // 使用DESEngine进行加密
+        DESEngine desEngine = new DESEngine();
+        desEngine.init(true, new KeyParameter(key));
+        desEngine.processBlock(input, 0, out, 0);
+        System.out.println("des encrypt=" + new CodecSource(out).toBase64());
 
-		// 使用DESEngine进行解密
-		desEngine.init(false, new KeyParameter(key));
-		desEngine.processBlock(input, 0, out, 0);
-		System.out.println("des decrypt=" + new CodecSource(out).toBase64());
-	}
+        // 使用DESEngine进行解密
+        desEngine.init(false, new KeyParameter(key));
+        desEngine.processBlock(input, 0, out, 0);
+        System.out.println("des decrypt=" + new CodecSource(out).toBase64());
+    }
 
-	public static void desedeTest() {
-		byte[] key = CodecSource.fromHex("010203040506070801020304050607080102030405060708").getBytes();
-		byte[] input = new CodecSource("12345678").getBytes();
-		byte[] out = new byte[input.length];
-		DESedeEngine desEdeEngine = new DESedeEngine();
+    public static void desedeTest() {
+        byte[] key = CodecSource.fromHex("010203040506070801020304050607080102030405060708").getBytes();
+        byte[] input = new CodecSource("12345678").getBytes();
+        byte[] out = new byte[input.length];
+        DESedeEngine desEdeEngine = new DESedeEngine();
 
-		// 使用DESedeEngine进行加密
-		desEdeEngine.init(true, new KeyParameter(key));
-		desEdeEngine.processBlock(input, 0, out, 0);
-		System.out.println("des ede encrypt=" + new CodecSource(out).toBase64());
+        // 使用DESedeEngine进行加密
+        desEdeEngine.init(true, new KeyParameter(key));
+        desEdeEngine.processBlock(input, 0, out, 0);
+        System.out.println("des ede encrypt=" + new CodecSource(out).toBase64());
 
-		// 使用DESedeEngine进行解密
-		desEdeEngine.init(false, new KeyParameter(key));
-		desEdeEngine.processBlock(input, 0, out, 0);
-		System.out.println("des ede decrypt=" + new CodecSource(out).toBase64());
-	}
+        // 使用DESedeEngine进行解密
+        desEdeEngine.init(false, new KeyParameter(key));
+        desEdeEngine.processBlock(input, 0, out, 0);
+        System.out.println("des ede decrypt=" + new CodecSource(out).toBase64());
+    }
 
 }

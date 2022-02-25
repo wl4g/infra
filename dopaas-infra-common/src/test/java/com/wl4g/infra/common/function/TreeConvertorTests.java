@@ -37,89 +37,89 @@ import lombok.Setter;
  */
 public class TreeConvertorTests {
 
-	public static void main(String[] args) {
-		// 创建树结构转换器
-		TreeConvertor<MyTree> convert = new TreeConvertor<>();
+    public static void main(String[] args) {
+        // 创建树结构转换器
+        TreeConvertor<MyTree> convert = new TreeConvertor<>();
 
-		// 将平面树转为children树
-		List<MyTree> childrenTree = convert.formatToChildren(testFlatTree, false);
-		String jsonStr = toJSONString(childrenTree);
-		out.println("----------------");
-		out.println(jsonStr);
+        // 将平面树转为children树
+        List<MyTree> childrenTree = convert.formatToChildren(testFlatTree, false);
+        String jsonStr = toJSONString(childrenTree);
+        out.println("----------------");
+        out.println(jsonStr);
 
-		List<MyTree> someChildrenTree = parseJSON(jsonStr, new TypeReference<List<MyTree>>() {
-		});
-		// 获取父节点下所有子孙节点（包括本身）
-		out.println("----------------");
-		out.println(toJSONString(convert.subChildrens(someChildrenTree, "1")));
+        List<MyTree> someChildrenTree = parseJSON(jsonStr, new TypeReference<List<MyTree>>() {
+        });
+        // 获取父节点下所有子孙节点（包括本身）
+        out.println("----------------");
+        out.println(toJSONString(convert.subChildrens(someChildrenTree, "1")));
 
-		// 将children树转为平面树
-		out.println("----------------");
-		out.println(toJSONString(convert.parseChildren(childrenTree)));
-	}
+        // 将children树转为平面树
+        out.println("----------------");
+        out.println(toJSONString(convert.parseChildren(childrenTree)));
+    }
 
-	@Getter
-	@Setter
-	public static class MyTree implements TreeNode<MyTree> {
-		private static final long serialVersionUID = 3429949759108637800L;
+    @Getter
+    @Setter
+    public static class MyTree implements TreeNode<MyTree> {
+        private static final long serialVersionUID = 3429949759108637800L;
 
-		// --- Tree node basic. ---
+        // --- Tree node basic. ---
 
-		private String id;
-		private String name;
-		private String parentId;
-		private int level;
-		private List<MyTree> childrens;
+        private String id;
+        private String name;
+        private String parentId;
+        private int level;
+        private List<MyTree> childrens;
 
-		// --- Node statistics. ---
+        // --- Node statistics. ---
 
-		private int count;
-		private Double sum;
-		private Double value;
+        private int count;
+        private Double sum;
+        private Double value;
 
-		public MyTree() {
-			super();
-		}
+        public MyTree() {
+            super();
+        }
 
-		public MyTree(String id, String parentId, String name) {
-			super();
-			this.id = id;
-			this.parentId = parentId;
-			this.name = name;
-		}
+        public MyTree(String id, String parentId, String name) {
+            super();
+            this.id = id;
+            this.parentId = parentId;
+            this.name = name;
+        }
 
-		public MyTree(String id, String parentId, String name, Double value) {
-			super();
-			this.id = id;
-			this.parentId = parentId;
-			this.name = name;
-			this.value = value;
-		}
+        public MyTree(String id, String parentId, String name, Double value) {
+            super();
+            this.id = id;
+            this.parentId = parentId;
+            this.name = name;
+            this.value = value;
+        }
 
-	}
+    }
 
-	@SuppressWarnings("serial")
-	static List<MyTree> testFlatTree = new ArrayList<MyTree>() {
-		{
-			MyTree n0 = new MyTree("0", null, "顶点", 0.11d);
-			MyTree n02 = new MyTree("02", null, "顶点2", 0.22d);
-			MyTree n1 = new MyTree("1", "0", "节点1", 1.11d);
-			MyTree n2 = new MyTree("2", "0", "节点2", 2.11d);
-			MyTree n3 = new MyTree("3", "1", "节点3", 3.11d);
-			MyTree n4 = new MyTree("4", "1", "节点4", 4.11d);
-			MyTree n5 = new MyTree("5", "1", "节点5", 5.11d);
-			MyTree n6 = new MyTree("6", "2", "节点6", 6.11d);
-			MyTree n7 = new MyTree("7", "3", "节点7", 7.11d);
-			add(n2);
-			add(n0);
-			add(n1);
-			add(n02);
-			add(n3);
-			add(n4);
-			add(n5);
-			add(n6);
-			add(n7);
-		}
-	};
+    @SuppressWarnings("serial")
+    static List<MyTree> testFlatTree = new ArrayList<MyTree>() {
+        {
+            MyTree n0 = new MyTree("0", null, "顶点", 0.11d);
+            MyTree n02 = new MyTree("02", null, "顶点2", 0.22d);
+            MyTree n1 = new MyTree("1", "0", "节点1", 1.11d);
+            MyTree n2 = new MyTree("2", "0", "节点2", 2.11d);
+            MyTree n3 = new MyTree("3", "1", "节点3", 3.11d);
+            MyTree n4 = new MyTree("4", "1", "节点4", 4.11d);
+            MyTree n5 = new MyTree("5", "1", "节点5", 5.11d);
+            MyTree n6 = new MyTree("6", "2", "节点6", 6.11d);
+            MyTree n7 = new MyTree("7", "3", "节点7", 7.11d);
+            add(n2);
+            add(n0);
+            add(n1);
+            add(n02);
+            add(n3);
+            add(n4);
+            add(n5);
+            add(n6);
+            add(n7);
+        }
+    };
 
 }

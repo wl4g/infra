@@ -24,26 +24,26 @@ import com.wl4g.infra.common.resource.resolver.ClassPathResourcePatternResolver;
 
 public class ClassPathResourcePatternResolverTests {
 
-	public static void main(String[] args) throws Exception {
-		getPatternResourcesTests();
-	}
+    public static void main(String[] args) throws Exception {
+        getPatternResourcesTests();
+    }
 
-	public static void getPatternResourcesTests() throws Exception {
-		ClassPathResourcePatternResolver resolver = new ClassPathResourcePatternResolver();
-		System.out.println("start scanning ...");
-		Set<StreamResource> ress = resolver.getResources(locationPattern);
-		for (StreamResource r : ress) {
-			System.out.println(r);
-		}
-		System.out.println(format("Scanned: '%s' size of: %s", locationPattern, ress.size()));
-	}
+    public static void getPatternResourcesTests() throws Exception {
+        ClassPathResourcePatternResolver resolver = new ClassPathResourcePatternResolver();
+        System.out.println("start scanning ...");
+        Set<StreamResource> ress = resolver.getResources(locationPattern);
+        for (StreamResource r : ress) {
+            System.out.println(r);
+        }
+        System.out.println(format("Scanned: '%s' size of: %s", locationPattern, ress.size()));
+    }
 
-	private static final String locationPattern;
+    private static final String locationPattern;
 
-	static {
-		String location = ClassPathResourcePatternResolverTests.class.getName().replace(".", "/")
-				.replace(ClassPathResourcePatternResolverTests.class.getSimpleName(), "");
-		locationPattern = "classpath*:/" + location.concat("**/*.*");
-	}
+    static {
+        String location = ClassPathResourcePatternResolverTests.class.getName().replace(".", "/").replace(
+                ClassPathResourcePatternResolverTests.class.getSimpleName(), "");
+        locationPattern = "classpath*:/" + location.concat("**/*.*");
+    }
 
 }

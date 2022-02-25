@@ -40,214 +40,214 @@ import java.util.ListIterator;
  */
 public class UniqueList<E> implements List<E> {
 
-	/**
-	 * Origin list object.
-	 */
-	final private List<E> orig;
+    /**
+     * Origin list object.
+     */
+    final private List<E> orig;
 
-	/**
-	 * Skip or overwrite when adding duplicate elements, default: false
-	 */
-	final private boolean overlay;
+    /**
+     * Skip or overwrite when adding duplicate elements, default: false
+     */
+    final private boolean overlay;
 
-	public UniqueList(List<E> orig) {
-		this(orig, false);
-	}
+    public UniqueList(List<E> orig) {
+        this(orig, false);
+    }
 
-	public UniqueList(List<E> orig, boolean overlay) {
-		notNullOf(orig, "origList");
-		this.orig = synchronizedList(orig);
-		this.overlay = overlay;
-	}
+    public UniqueList(List<E> orig, boolean overlay) {
+        notNullOf(orig, "origList");
+        this.orig = synchronizedList(orig);
+        this.overlay = overlay;
+    }
 
-	@Override
-	public int size() {
-		return orig.size();
-	}
+    @Override
+    public int size() {
+        return orig.size();
+    }
 
-	@Override
-	public boolean isEmpty() {
-		return orig.isEmpty();
-	}
+    @Override
+    public boolean isEmpty() {
+        return orig.isEmpty();
+    }
 
-	@Override
-	public boolean contains(Object o) {
-		return orig.contains(o);
-	}
+    @Override
+    public boolean contains(Object o) {
+        return orig.contains(o);
+    }
 
-	@Override
-	public Iterator<E> iterator() {
-		return orig.iterator();
-	}
+    @Override
+    public Iterator<E> iterator() {
+        return orig.iterator();
+    }
 
-	@Override
-	public Object[] toArray() {
-		return orig.toArray();
-	}
+    @Override
+    public Object[] toArray() {
+        return orig.toArray();
+    }
 
-	@Override
-	public <T> T[] toArray(T[] a) {
-		return orig.toArray(a);
-	}
+    @Override
+    public <T> T[] toArray(T[] a) {
+        return orig.toArray(a);
+    }
 
-	@Override
-	public boolean add(E e) {
-		if (isNull(e))
-			return false;
+    @Override
+    public boolean add(E e) {
+        if (isNull(e))
+            return false;
 
-		if (orig.contains(e)) {
-			if (overlay) {
-				if (!orig.remove(e)) { // Remove failed?
-					if (!orig.isEmpty()) // Attempt remove by last index.
-						orig.remove(orig.size() - 1);
-				}
-				return orig.add(e);
-			}
-			// Skip add
-			return true;
-		}
-		return orig.add(e);
-	}
+        if (orig.contains(e)) {
+            if (overlay) {
+                if (!orig.remove(e)) { // Remove failed?
+                    if (!orig.isEmpty()) // Attempt remove by last index.
+                        orig.remove(orig.size() - 1);
+                }
+                return orig.add(e);
+            }
+            // Skip add
+            return true;
+        }
+        return orig.add(e);
+    }
 
-	@Override
-	public boolean remove(Object o) {
-		notNullOf(o, "removeElementValue");
-		return orig.remove(o);
-	}
+    @Override
+    public boolean remove(Object o) {
+        notNullOf(o, "removeElementValue");
+        return orig.remove(o);
+    }
 
-	@Override
-	public boolean containsAll(Collection<?> c) {
-		return orig.containsAll(c);
-	}
+    @Override
+    public boolean containsAll(Collection<?> c) {
+        return orig.containsAll(c);
+    }
 
-	@Override
-	public boolean addAll(Collection<? extends E> c) {
-		notNullOf(c, "addElementValues");
-		boolean modified = false;
-		for (E e : c) {
-			add(e);
-			modified = true;
-		}
-		return modified;
-	}
+    @Override
+    public boolean addAll(Collection<? extends E> c) {
+        notNullOf(c, "addElementValues");
+        boolean modified = false;
+        for (E e : c) {
+            add(e);
+            modified = true;
+        }
+        return modified;
+    }
 
-	@Override
-	public boolean addAll(int index, Collection<? extends E> c) {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public boolean addAll(int index, Collection<? extends E> c) {
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public boolean removeAll(Collection<?> c) {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public boolean retainAll(Collection<?> c) {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public void clear() {
-		orig.clear();
-	}
+    @Override
+    public void clear() {
+        orig.clear();
+    }
 
-	@Override
-	public E get(int index) {
-		return orig.get(index);
-	}
+    @Override
+    public E get(int index) {
+        return orig.get(index);
+    }
 
-	@Override
-	public E set(int index, E element) {
-		if (isNull(element))
-			return null;
+    @Override
+    public E set(int index, E element) {
+        if (isNull(element))
+            return null;
 
-		if (orig.contains(element)) {
-			if (overlay) {
-				orig.remove((Object) element); // Remove duplicate
-			}
-			// Skip set
-			return element;
-		}
+        if (orig.contains(element)) {
+            if (overlay) {
+                orig.remove((Object) element); // Remove duplicate
+            }
+            // Skip set
+            return element;
+        }
 
-		// if (index < orig.size()) {
-		// // Tail sub list
-		// List<E> tailSubList = new ArrayList<>();
-		// for (int i = 0; i < orig.size(); i++) {
-		// if (i >= index) {
-		// tailSubList.add(orig.get(i));
-		// }
-		// }
-		// // Sets insert element
-		// E result = orig.set(index, element);
-		// // Cover tail subList append to origList
-		// int startCoverIndex = index + 1;
-		// for (int i = 0; i < tailSubList.size(); i++) {
-		// int coverIndex = startCoverIndex + i;
-		// if (coverIndex >= orig.size()) {
-		// orig.add(tailSubList.get(i));
-		// } else {
-		// orig.set(coverIndex, tailSubList.get(i));
-		// }
-		// }
-		// return result;
-		// }
-		//
-		// return orig.set(index, element);
+        // if (index < orig.size()) {
+        // // Tail sub list
+        // List<E> tailSubList = new ArrayList<>();
+        // for (int i = 0; i < orig.size(); i++) {
+        // if (i >= index) {
+        // tailSubList.add(orig.get(i));
+        // }
+        // }
+        // // Sets insert element
+        // E result = orig.set(index, element);
+        // // Cover tail subList append to origList
+        // int startCoverIndex = index + 1;
+        // for (int i = 0; i < tailSubList.size(); i++) {
+        // int coverIndex = startCoverIndex + i;
+        // if (coverIndex >= orig.size()) {
+        // orig.add(tailSubList.get(i));
+        // } else {
+        // orig.set(coverIndex, tailSubList.get(i));
+        // }
+        // }
+        // return result;
+        // }
+        //
+        // return orig.set(index, element);
 
-		return orig.add(element) ? element : null;
-	}
+        return orig.add(element) ? element : null;
+    }
 
-	@Override
-	public void add(int index, E element) {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public void add(int index, E element) {
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public E remove(int index) {
-		notNullOf(index, "removeElementIndex");
-		return orig.remove(index);
-	}
+    @Override
+    public E remove(int index) {
+        notNullOf(index, "removeElementIndex");
+        return orig.remove(index);
+    }
 
-	@Override
-	public int indexOf(Object o) {
-		return orig.indexOf(o);
-	}
+    @Override
+    public int indexOf(Object o) {
+        return orig.indexOf(o);
+    }
 
-	@Override
-	public int lastIndexOf(Object o) {
-		return orig.lastIndexOf(o);
-	}
+    @Override
+    public int lastIndexOf(Object o) {
+        return orig.lastIndexOf(o);
+    }
 
-	@Override
-	public ListIterator<E> listIterator() {
-		return orig.listIterator();
-	}
+    @Override
+    public ListIterator<E> listIterator() {
+        return orig.listIterator();
+    }
 
-	@Override
-	public ListIterator<E> listIterator(int index) {
-		return orig.listIterator(index);
-	}
+    @Override
+    public ListIterator<E> listIterator(int index) {
+        return orig.listIterator(index);
+    }
 
-	@Override
-	public List<E> subList(int fromIndex, int toIndex) {
-		return orig.subList(fromIndex, toIndex);
-	}
+    @Override
+    public List<E> subList(int fromIndex, int toIndex) {
+        return orig.subList(fromIndex, toIndex);
+    }
 
-	@Override
-	public String toString() {
-		Iterator<E> it = iterator();
-		if (!it.hasNext())
-			return "[]";
+    @Override
+    public String toString() {
+        Iterator<E> it = iterator();
+        if (!it.hasNext())
+            return "[]";
 
-		StringBuilder sb = new StringBuilder();
-		sb.append('[');
-		for (;;) {
-			E e = it.next();
-			sb.append(e == this ? "(this Collection)" : e);
-			if (!it.hasNext())
-				return sb.append(']').toString();
-			sb.append(',').append(' ');
-		}
-	}
+        StringBuilder sb = new StringBuilder();
+        sb.append('[');
+        for (;;) {
+            E e = it.next();
+            sb.append(e == this ? "(this Collection)" : e);
+            if (!it.hasNext())
+                return sb.append(']').toString();
+            sb.append(',').append(' ');
+        }
+    }
 
 }

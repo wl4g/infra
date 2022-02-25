@@ -38,18 +38,18 @@ import com.wl4g.infra.common.crypto.symmetric.DESede168ECBPKCS5;
  */
 public class DESede168ECBPKCS5Tests {
 
-	public static void main(String[] args) throws Exception {
-		DESede168ECBPKCS5 des3 = new DESede168ECBPKCS5();
-		CodecSource genKey = des3.generateKey();
-		out.println("new generateKey => (" + genKey.toBase64() + ")" + genKey.getBytes().length + "bytes");
+    public static void main(String[] args) throws Exception {
+        DESede168ECBPKCS5 des3 = new DESede168ECBPKCS5();
+        CodecSource genKey = des3.generateKey();
+        out.println("new generateKey => (" + genKey.toBase64() + ")" + genKey.getBytes().length + "bytes");
 
-		String plainText = "abcdefghijklmnopqrstuvwxyz";
-		CodecSource key = new CodecSource("1234abcd1234abcd1234abcd"); // 24bytes
-		CodecSource cipherText = des3.encrypt(key.getBytes(), new CodecSource(plainText));
-		out.println("plainText => " + plainText);
-		out.println("key => " + key);
-		out.println("encrypt => " + cipherText.toBase64());
-		out.println("decrypt => " + des3.decrypt(key.getBytes(), cipherText).toString());
-	}
+        String plainText = "abcdefghijklmnopqrstuvwxyz";
+        CodecSource key = new CodecSource("1234abcd1234abcd1234abcd"); // 24bytes
+        CodecSource cipherText = des3.encrypt(key.getBytes(), new CodecSource(plainText));
+        out.println("plainText => " + plainText);
+        out.println("key => " + key);
+        out.println("encrypt => " + cipherText.toBase64());
+        out.println("decrypt => " + des3.decrypt(key.getBytes(), cipherText).toString());
+    }
 
 }

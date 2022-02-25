@@ -27,9 +27,9 @@ import com.google.common.annotations.Beta;
 @Beta
 public class Blowfish128CBC extends JdkCryptorSupport {
 
-	public Blowfish128CBC() {
-		// blocksize 4-56bytes
-		super(new AlgorithmSpec("Blowfish", "Blowfish/CBC/PKCS5Padding", true, 128, 16, 16, 8));
-	}
+    public Blowfish128CBC() {
+        // blocksize 4-56bytes
+        super(new AlgorithmSpec("Blowfish", "Blowfish/CBC/PKCS5Padding", true, 128, 16, 16, 8));
+    }
 
 }

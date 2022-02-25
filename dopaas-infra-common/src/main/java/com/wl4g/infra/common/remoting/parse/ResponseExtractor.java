@@ -39,16 +39,16 @@ import com.wl4g.infra.common.remoting.ClientHttpResponse;
 @FunctionalInterface
 public interface ResponseExtractor<T> {
 
-	/**
-	 * Extract data from the given {@code ClientHttpResponse} and return it.
-	 * 
-	 * @param response
-	 *            the HTTP response
-	 * @return the extracted data
-	 * @throws IOException
-	 *             in case of I/O errors
-	 */
-	@Nullable
-	T extractData(ClientHttpResponse response) throws IOException;
+    /**
+     * Extract data from the given {@code ClientHttpResponse} and return it.
+     * 
+     * @param response
+     *            the HTTP response
+     * @return the extracted data
+     * @throws IOException
+     *             in case of I/O errors
+     */
+    @Nullable
+    T extractData(ClientHttpResponse response) throws IOException;
 
 }

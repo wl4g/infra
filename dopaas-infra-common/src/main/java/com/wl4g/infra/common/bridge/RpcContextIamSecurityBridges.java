@@ -37,39 +37,39 @@ import java.lang.reflect.Method;
  */
 public abstract class RpcContextIamSecurityBridges {
 
-	@SuppressWarnings("unchecked")
-	public static <T> T currentIamPrincipal() {
-		makeAccessible(currentIamPrincipalMethod);
-		return (T) invokeMethod(currentIamPrincipalMethod, null);
-	}
+    @SuppressWarnings("unchecked")
+    public static <T> T currentIamPrincipal() {
+        makeAccessible(currentIamPrincipalMethod);
+        return (T) invokeMethod(currentIamPrincipalMethod, null);
+    }
 
-	public static String currentIamPrincipalId() {
-		makeAccessible(currentIamPrincipalIdMethod);
-		return (String) invokeMethod(currentIamPrincipalIdMethod, null);
-	}
+    public static String currentIamPrincipalId() {
+        makeAccessible(currentIamPrincipalIdMethod);
+        return (String) invokeMethod(currentIamPrincipalIdMethod, null);
+    }
 
-	public static String currentIamPrincipalName() {
-		makeAccessible(currentIamPrincipalNameMethod);
-		return (String) invokeMethod(currentIamPrincipalNameMethod, null);
-	}
+    public static String currentIamPrincipalName() {
+        makeAccessible(currentIamPrincipalNameMethod);
+        return (String) invokeMethod(currentIamPrincipalNameMethod, null);
+    }
 
-	/**
-	 * Check current runtime has {@link RpcContextSecurityUtils} class
-	 * 
-	 * @return
-	 */
-	public static boolean hasRpcContextIamSecurityUtilsClass() {
-		return nonNull(rpcContextIamSecurityUtilsClass);
-	}
+    /**
+     * Check current runtime has {@link RpcContextSecurityUtils} class
+     * 
+     * @return
+     */
+    public static boolean hasRpcContextIamSecurityUtilsClass() {
+        return nonNull(rpcContextIamSecurityUtilsClass);
+    }
 
-	public static final String rpcContextIamSecurityUtilsClassName = "com.wl4g.iam.common.utils.RpcContextIamSecurityUtils";
-	private static final Class<?> rpcContextIamSecurityUtilsClass = resolveClassNameNullable(rpcContextIamSecurityUtilsClassName);
+    public static final String rpcContextIamSecurityUtilsClassName = "com.wl4g.iam.common.utils.RpcContextIamSecurityUtils";
+    private static final Class<?> rpcContextIamSecurityUtilsClass = resolveClassNameNullable(rpcContextIamSecurityUtilsClassName);
 
-	private static final Method currentIamPrincipalMethod = findMethodNullable(rpcContextIamSecurityUtilsClass,
-			"currentIamPrincipal");
-	private static final Method currentIamPrincipalIdMethod = findMethodNullable(rpcContextIamSecurityUtilsClass,
-			"currentIamPrincipalId");
-	private static final Method currentIamPrincipalNameMethod = findMethodNullable(rpcContextIamSecurityUtilsClass,
-			"currentIamPrincipalName");
+    private static final Method currentIamPrincipalMethod = findMethodNullable(rpcContextIamSecurityUtilsClass,
+            "currentIamPrincipal");
+    private static final Method currentIamPrincipalIdMethod = findMethodNullable(rpcContextIamSecurityUtilsClass,
+            "currentIamPrincipalId");
+    private static final Method currentIamPrincipalNameMethod = findMethodNullable(rpcContextIamSecurityUtilsClass,
+            "currentIamPrincipalName");
 
 }

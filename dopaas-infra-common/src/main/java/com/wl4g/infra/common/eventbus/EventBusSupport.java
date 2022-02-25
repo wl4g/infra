@@ -114,7 +114,9 @@ public class EventBusSupport implements Closeable {
      */
     public void post(Object... events) {
         if (isActive()) {
-            getBus().post(events);
+            for (Object event : events) {
+                getBus().post(event);
+            }
         }
     }
 
@@ -142,15 +144,14 @@ public class EventBusSupport implements Closeable {
      */
     private final EventBus initEventBus(int eventThreads) {
         final AtomicInteger incr = new AtomicInteger(0);
-        ThreadPoolExecutor executor = new ThreadPoolExecutor(eventThreads, eventThreads, 0, MILLISECONDS,
-                new LinkedBlockingQueue<>(), r -> {
-                    Thread t = new Thread(r, "scm-event-".concat(valueOf(incr.getAndIncrement())));
-                    if (t.isDaemon())
-                        t.setDaemon(false);
-                    if (t.getPriority() != Thread.NORM_PRIORITY)
-                        t.setPriority(Thread.NORM_PRIORITY);
-                    return t;
-                });
+        this.executor = new ThreadPoolExecutor(eventThreads, eventThreads, 0, MILLISECONDS, new LinkedBlockingQueue<>(), r -> {
+            Thread t = new Thread(r, "scm-event-".concat(valueOf(incr.getAndIncrement())));
+            if (t.isDaemon())
+                t.setDaemon(false);
+            if (t.getPriority() != Thread.NORM_PRIORITY)
+                t.setPriority(Thread.NORM_PRIORITY);
+            return t;
+        });
         return new AsyncEventBus(getClass().getSimpleName(), executor);
     }
 

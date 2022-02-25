@@ -26,14 +26,14 @@ import java.security.spec.KeySpec;
  */
 public final class ECCKeyPairSpec extends GenericKeyPairSpec {
 
-	final private static long serialVersionUID = -6748188131119785684L;
+    final private static long serialVersionUID = -6748188131119785684L;
 
-	public ECCKeyPairSpec(String algorithm, KeySpec pubKeySpec, KeySpec keySpec) {
-		super(algorithm, pubKeySpec, keySpec);
-	}
+    public ECCKeyPairSpec(String algorithm, KeySpec pubKeySpec, KeySpec keySpec) {
+        super(algorithm, pubKeySpec, keySpec);
+    }
 
-	public ECCKeyPairSpec(String keySpecId, String algorithm, KeySpec pubKeySpec, KeySpec keySpec) {
-		super(keySpecId, algorithm, pubKeySpec, keySpec);
-	}
+    public ECCKeyPairSpec(String keySpecId, String algorithm, KeySpec pubKeySpec, KeySpec keySpec) {
+        super(keySpecId, algorithm, pubKeySpec, keySpec);
+    }
 
 }

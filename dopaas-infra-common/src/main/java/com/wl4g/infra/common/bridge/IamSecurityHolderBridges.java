@@ -37,55 +37,55 @@ import java.lang.reflect.Method;
  */
 public abstract class IamSecurityHolderBridges {
 
-	public static Object invokeGetPrincipalInfo() {
-		if (nonNull(getPrincipalInfoMethod)) {
-			makeAccessible(getPrincipalInfoMethod);
-			return invokeMethod(getPrincipalInfoMethod, null);
-		}
-		return null;
-	}
+    public static Object invokeGetPrincipalInfo() {
+        if (nonNull(getPrincipalInfoMethod)) {
+            makeAccessible(getPrincipalInfoMethod);
+            return invokeMethod(getPrincipalInfoMethod, null);
+        }
+        return null;
+    }
 
-	public static Object invokeGetBindValue(Object sessionKey) {
-		if (nonNull(getBindValueMethod)) {
-			makeAccessible(getBindValueMethod);
-			return invokeMethod(getBindValueMethod, null, new Object[] { sessionKey });
-		}
-		return null;
-	}
+    public static Object invokeGetBindValue(Object sessionKey) {
+        if (nonNull(getBindValueMethod)) {
+            makeAccessible(getBindValueMethod);
+            return invokeMethod(getBindValueMethod, null, new Object[] { sessionKey });
+        }
+        return null;
+    }
 
-	@SuppressWarnings("unchecked")
-	public static <T> T invokeBind(Object sessionKey, T value) {
-		if (nonNull(bindMethod)) {
-			makeAccessible(bindMethod);
-			return (T) invokeMethod(bindMethod, null, new Object[] { sessionKey, value });
-		}
-		return null;
-	}
+    @SuppressWarnings("unchecked")
+    public static <T> T invokeBind(Object sessionKey, T value) {
+        if (nonNull(bindMethod)) {
+            makeAccessible(bindMethod);
+            return (T) invokeMethod(bindMethod, null, new Object[] { sessionKey, value });
+        }
+        return null;
+    }
 
-	public static boolean invokeUnbind(Object sessionKey) {
-		if (nonNull(unBindMethod)) {
-			makeAccessible(unBindMethod);
-			return (boolean) invokeMethod(unBindMethod, null, new Object[] { sessionKey });
-		}
-		return false;
-	}
+    public static boolean invokeUnbind(Object sessionKey) {
+        if (nonNull(unBindMethod)) {
+            makeAccessible(unBindMethod);
+            return (boolean) invokeMethod(unBindMethod, null, new Object[] { sessionKey });
+        }
+        return false;
+    }
 
-	/**
-	 * Check current runtime has {@link IamSecurityHolder} class
-	 * 
-	 * @return
-	 */
-	public static boolean hasIamSecurityHolderClass() {
-		return nonNull(iamSecurityHolderClass);
-	}
+    /**
+     * Check current runtime has {@link IamSecurityHolder} class
+     * 
+     * @return
+     */
+    public static boolean hasIamSecurityHolderClass() {
+        return nonNull(iamSecurityHolderClass);
+    }
 
-	public static final String iamSecurityHolderClassName = "com.wl4g.iam.core.utils.IamSecurityHolder";
-	private static final Class<?> iamSecurityHolderClass = resolveClassNameNullable(iamSecurityHolderClassName);
+    public static final String iamSecurityHolderClassName = "com.wl4g.iam.core.utils.IamSecurityHolder";
+    private static final Class<?> iamSecurityHolderClass = resolveClassNameNullable(iamSecurityHolderClassName);
 
-	private static final Method getPrincipalInfoMethod = findMethodNullable(iamSecurityHolderClass, "getPrincipalInfo");
-	private static final Method getBindValueMethod = findMethodNullable(iamSecurityHolderClass, "getBindValue", Object.class);
-	private static final Method bindMethod = findMethodNullable(iamSecurityHolderClass, "bind",
-			new Class[] { Object.class, Object.class });
-	private static final Method unBindMethod = findMethodNullable(iamSecurityHolderClass, "bind", Object.class);
+    private static final Method getPrincipalInfoMethod = findMethodNullable(iamSecurityHolderClass, "getPrincipalInfo");
+    private static final Method getBindValueMethod = findMethodNullable(iamSecurityHolderClass, "getBindValue", Object.class);
+    private static final Method bindMethod = findMethodNullable(iamSecurityHolderClass, "bind",
+            new Class[] { Object.class, Object.class });
+    private static final Method unBindMethod = findMethodNullable(iamSecurityHolderClass, "bind", Object.class);
 
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * {@link package-info} 
+ * {@link package-info}
  *
  * @author Wangl.sir <wanglsir@gmail.com, 983708408@qq.com>
  * @version v1.0 2020-08-21

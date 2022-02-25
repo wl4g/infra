@@ -30,26 +30,26 @@ import java.util.Locale;
  */
 public abstract class JvmRuntimeKit {
 
-	/**
-	 * Current runtime in debugging.
-	 */
-	final public static boolean isJVMDebugging = isJvmDebugg0();
+    /**
+     * Current runtime in debugging.
+     */
+    final public static boolean isJVMDebugging = isJvmDebugg0();
 
-	/**
-	 * Check current JVM runtime debug status. See: <a href=
-	 * "http://hg.openjdk.java.net/jdk8u/jdk8u/jdk/file/c30db4c968f6/src/share/classes/com/sun/tools/jdi/SunCommandLineLauncher.java#l216">OpenJDK8
-	 * source</a>
-	 * 
-	 * @return
-	 */
-	private static boolean isJvmDebugg0() {
-		List<String> arguments = ManagementFactory.getRuntimeMXBean().getInputArguments();
-		for (String str : arguments) {
-			if (startsWithAny(str.toLowerCase(Locale.US), "-agentlib", "-Xrunjdwp", "-Xdebug")) {
-				return true;
-			}
-		}
-		return false;
-	}
+    /**
+     * Check current JVM runtime debug status. See: <a href=
+     * "http://hg.openjdk.java.net/jdk8u/jdk8u/jdk/file/c30db4c968f6/src/share/classes/com/sun/tools/jdi/SunCommandLineLauncher.java#l216">OpenJDK8
+     * source</a>
+     * 
+     * @return
+     */
+    private static boolean isJvmDebugg0() {
+        List<String> arguments = ManagementFactory.getRuntimeMXBean().getInputArguments();
+        for (String str : arguments) {
+            if (startsWithAny(str.toLowerCase(Locale.US), "-agentlib", "-Xrunjdwp", "-Xdebug")) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 }

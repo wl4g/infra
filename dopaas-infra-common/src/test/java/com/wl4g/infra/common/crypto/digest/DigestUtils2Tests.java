@@ -24,28 +24,28 @@ import org.apache.commons.codec.binary.Hex;
 
 public class DigestUtils2Tests {
 
-	public static void main(String[] args) throws Exception {
-		// sha1Test1();
-		md5Test2();
-	}
+    public static void main(String[] args) throws Exception {
+        // sha1Test1();
+        md5Test2();
+    }
 
-	public static void sha1Test1() throws Exception {
-		byte[] salt = Hex.decodeHex("697db6018316b39c".toCharArray());
-		MessageDigest digest = MessageDigest.getInstance("SHA-1");
-		if (salt != null) {
-			digest.update(salt);
-		}
-		byte[] result = digest.digest("123456".getBytes());
-		for (int i = 1; i < 1024; i++) {
-			digest.reset();
-			result = digest.digest(result);
-		}
-		System.out.println(Hex.encodeHexString(result));
-	}
+    public static void sha1Test1() throws Exception {
+        byte[] salt = Hex.decodeHex("697db6018316b39c".toCharArray());
+        MessageDigest digest = MessageDigest.getInstance("SHA-1");
+        if (salt != null) {
+            digest.update(salt);
+        }
+        byte[] result = digest.digest("123456".getBytes());
+        for (int i = 1; i < 1024; i++) {
+            digest.reset();
+            result = digest.digest(result);
+        }
+        System.out.println(Hex.encodeHexString(result));
+    }
 
-	public static void md5Test2() throws Exception {
-		byte[] res = getDigest("MD5").digest("abcd".getBytes(UTF_8));
-		System.out.println(Hex.encodeHexString(res));
-	}
+    public static void md5Test2() throws Exception {
+        byte[] res = getDigest("MD5").digest("abcd".getBytes(UTF_8));
+        System.out.println(Hex.encodeHexString(res));
+    }
 
 }

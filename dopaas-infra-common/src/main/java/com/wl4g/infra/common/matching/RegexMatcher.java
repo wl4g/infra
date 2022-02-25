@@ -35,71 +35,71 @@ import java.util.regex.Pattern;
  * @see
  */
 public class RegexMatcher {
-	private transient final Map<String, Pattern> cache = new ConcurrentHashMap<>(16);
-	private final boolean sensitive;
-	private final String[] regexs;
+    private transient final Map<String, Pattern> cache = new ConcurrentHashMap<>(16);
+    private final boolean sensitive;
+    private final String[] regexs;
 
-	public RegexMatcher(String... regexs) {
-		this(true, regexs);
-	}
+    public RegexMatcher(String... regexs) {
+        this(true, regexs);
+    }
 
-	public RegexMatcher(boolean sensitive, String... regexs) {
-		this.sensitive = sensitive;
-		this.regexs = notNullOf(regexs, "regexs");
-	}
+    public RegexMatcher(boolean sensitive, String... regexs) {
+        this.sensitive = sensitive;
+        this.regexs = notNullOf(regexs, "regexs");
+    }
 
-	public boolean isSensitive() {
-		return sensitive;
-	}
+    public boolean isSensitive() {
+        return sensitive;
+    }
 
-	public String[] getRegexs() {
-		return regexs;
-	}
+    public String[] getRegexs() {
+        return regexs;
+    }
 
-	public boolean matches(String input) {
-		for (String r : regexs) {
-			if (getCachePattern(r).matcher(input).matches()) {
-				return true;
-			}
-		}
-		return false;
-	}
+    public boolean matches(String input) {
+        for (String r : regexs) {
+            if (getCachePattern(r).matcher(input).matches()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	public boolean matchesAny(String... inputs) {
-		for (String input : inputs) {
-			if (matches(input)) {
-				return true;
-			}
-		}
-		return false;
-	}
+    public boolean matchesAny(String... inputs) {
+        for (String input : inputs) {
+            if (matches(input)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	public boolean matchesAll(String... inputs) {
-		for (String input : inputs) {
-			if (!matches(input)) {
-				return false;
-			}
-		}
-		return true;
-	}
+    public boolean matchesAll(String... inputs) {
+        for (String input : inputs) {
+            if (!matches(input)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
-	private final Pattern getCachePattern(String regex) {
-		Pattern pattern = cache.get(regex);
-		if (isNull(pattern)) {
-			synchronized (this) {
-				pattern = cache.get(regex);
-				if (isNull(pattern)) {
-					Pattern p = null;
-					if (sensitive) {
-						p = Pattern.compile(regex);
-					}
-					p = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
-					cache.put(regex, p);
-					return p;
-				}
-			}
-		}
-		return pattern;
-	}
+    private final Pattern getCachePattern(String regex) {
+        Pattern pattern = cache.get(regex);
+        if (isNull(pattern)) {
+            synchronized (this) {
+                pattern = cache.get(regex);
+                if (isNull(pattern)) {
+                    Pattern p = null;
+                    if (sensitive) {
+                        p = Pattern.compile(regex);
+                    }
+                    p = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+                    cache.put(regex, p);
+                    return p;
+                }
+            }
+        }
+        return pattern;
+    }
 
 }

@@ -35,64 +35,64 @@ import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombi
  */
 public abstract class PingyUtils {
 
-	/**
-	 * Gets Chinese spelling
-	 * 
-	 * @param cnStrring
-	 *            Target Chinese string
-	 * @return
-	 */
-	public static List<String> getPingyin(String cnStrring) {
-		List<String> pingys = null;
-		try {
-			char[] chArr = cnStrring.toCharArray();
-			String[] strArr = new String[chArr.length];
+    /**
+     * Gets Chinese spelling
+     * 
+     * @param cnStrring
+     *            Target Chinese string
+     * @return
+     */
+    public static List<String> getPingyin(String cnStrring) {
+        List<String> pingys = null;
+        try {
+            char[] chArr = cnStrring.toCharArray();
+            String[] strArr = new String[chArr.length];
 
-			HanyuPinyinOutputFormat t3 = new HanyuPinyinOutputFormat();
-			t3.setCaseType(HanyuPinyinCaseType.LOWERCASE);
-			t3.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
-			t3.setVCharType(HanyuPinyinVCharType.WITH_V);
+            HanyuPinyinOutputFormat t3 = new HanyuPinyinOutputFormat();
+            t3.setCaseType(HanyuPinyinCaseType.LOWERCASE);
+            t3.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
+            t3.setVCharType(HanyuPinyinVCharType.WITH_V);
 
-			pingys = new ArrayList<String>(chArr.length);
-			for (int i = 0; i < chArr.length; i++) {
-				// 判断是否为汉字字符
-				if (java.lang.Character.toString(chArr[i]).matches("[\\u4E00-\\u9FA5]+")) {
-					strArr = PinyinHelper.toHanyuPinyinStringArray(chArr[i], t3);
-					pingys.add(strArr[0]);
-				} else {
-					pingys.add(Character.toString(chArr[i]));
-				}
-			}
+            pingys = new ArrayList<String>(chArr.length);
+            for (int i = 0; i < chArr.length; i++) {
+                // 判断是否为汉字字符
+                if (java.lang.Character.toString(chArr[i]).matches("[\\u4E00-\\u9FA5]+")) {
+                    strArr = PinyinHelper.toHanyuPinyinStringArray(chArr[i], t3);
+                    pingys.add(strArr[0]);
+                } else {
+                    pingys.add(Character.toString(chArr[i]));
+                }
+            }
 
-			return pingys;
-		} catch (BadHanyuPinyinOutputFormatCombination e1) {
-			e1.printStackTrace();
-		}
+            return pingys;
+        } catch (BadHanyuPinyinOutputFormatCombination e1) {
+            e1.printStackTrace();
+        }
 
-		return pingys;
-	}
+        return pingys;
+    }
 
-	/**
-	 * Gets Chinese initials
-	 * 
-	 * @param cnStrring
-	 *            Target Chinese string
-	 * @return
-	 */
-	public static List<Character> getPinyinHeadChar(String cnStrring) {
-		List<Character> pingys = new ArrayList<>(cnStrring.length());
+    /**
+     * Gets Chinese initials
+     * 
+     * @param cnStrring
+     *            Target Chinese string
+     * @return
+     */
+    public static List<Character> getPinyinHeadChar(String cnStrring) {
+        List<Character> pingys = new ArrayList<>(cnStrring.length());
 
-		for (int j = 0; j < cnStrring.length(); j++) {
-			char word = cnStrring.charAt(j);
-			String[] pinyArr = PinyinHelper.toHanyuPinyinStringArray(word);
-			if (pinyArr != null) {
-				pingys.add(pinyArr[0].charAt(0));
-			} else {
-				pingys.add(word);
-			}
-		}
+        for (int j = 0; j < cnStrring.length(); j++) {
+            char word = cnStrring.charAt(j);
+            String[] pinyArr = PinyinHelper.toHanyuPinyinStringArray(word);
+            if (pinyArr != null) {
+                pingys.add(pinyArr[0].charAt(0));
+            } else {
+                pingys.add(word);
+            }
+        }
 
-		return pingys;
-	}
+        return pingys;
+    }
 
 }

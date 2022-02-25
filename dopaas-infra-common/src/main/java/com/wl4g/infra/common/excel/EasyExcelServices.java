@@ -46,68 +46,68 @@ import com.wl4g.infra.common.reflect.ResolvableType;
  */
 public abstract class EasyExcelServices {
 
-	protected final SmartLogger log = getLogger(getClass());
+    protected final SmartLogger log = getLogger(getClass());
 
-	private EasyExcelServices() {
-	}
+    private EasyExcelServices() {
+    }
 
-	/**
-	 * Create {@link EasyExcelServices} instance with default settings.
-	 * 
-	 * @return
-	 */
-	public static EasyExcelServices createDefault() {
-		EasyExcelServices instance = new EasyExcelServices() {
-		};
-		return instance;
-	}
+    /**
+     * Create {@link EasyExcelServices} instance with default settings.
+     * 
+     * @return
+     */
+    public static EasyExcelServices createDefault() {
+        EasyExcelServices instance = new EasyExcelServices() {
+        };
+        return instance;
+    }
 
-	/**
-	 * Read dataset from excel file with default configuration.
-	 * 
-	 * @param readfile
-	 * @param listener
-	 * @return
-	 */
-	public <T> ExcelReader read(File readfile, ReadListener<T> listener) {
-		try (InputStream in = new FileInputStream(readfile);) {
-			ExcelReader reader = EasyExcelFactory.read(in, listener).build();
+    /**
+     * Read dataset from excel file with default configuration.
+     * 
+     * @param readfile
+     * @param listener
+     * @return
+     */
+    public <T> ExcelReader read(File readfile, ReadListener<T> listener) {
+        try (InputStream in = new FileInputStream(readfile);) {
+            ExcelReader reader = EasyExcelFactory.read(in, listener).build();
 
-			ReadSheet sheet = new ReadSheet(1, "Sheet1");
-			Class<?> beanClass = ResolvableType.forClass(listener.getClass()).getSuperType().getGeneric(0).resolve();
-			sheet.setClazz(beanClass);
-			sheet.setAutoTrim(true);
-			sheet.setLocale(Locale.getDefault());
-			sheet.setHeadRowNumber(1); // Default
-			// sheet.setCustomConverterList(null);
+            ReadSheet sheet = new ReadSheet(1, "Sheet1");
+            Class<?> beanClass = ResolvableType.forClass(listener.getClass()).getSuperType().getGeneric(0).resolve();
+            sheet.setClazz(beanClass);
+            sheet.setAutoTrim(true);
+            sheet.setLocale(Locale.getDefault());
+            sheet.setHeadRowNumber(1); // Default
+            // sheet.setCustomConverterList(null);
 
-			return reader.read(sheet);
-		} catch (Exception e) {
-			throw new IllegalStateException(e);
-		}
-	}
+            return reader.read(sheet);
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
-	/**
-	 * Writing dataset to excel file with default configuration.
-	 * 
-	 * @param writefile
-	 * @param dataset
-	 */
-	public <T> void write(File writefile, List<T> dataset, CellWriteHandler handler) {
-		try (OutputStream out = new FileOutputStream(writefile);) {
+    /**
+     * Writing dataset to excel file with default configuration.
+     * 
+     * @param writefile
+     * @param dataset
+     */
+    public <T> void write(File writefile, List<T> dataset, CellWriteHandler handler) {
+        try (OutputStream out = new FileOutputStream(writefile);) {
 
-			Class<?> beanClass = dataset.get(0).getClass();
-			ExcelWriter writer = EasyExcelFactory.write(out).autoTrim(true).registerWriteHandler(handler).head(beanClass).build();
+            Class<?> beanClass = dataset.get(0).getClass();
+            ExcelWriter writer = EasyExcelFactory.write(out).autoTrim(true).registerWriteHandler(handler).head(beanClass).build();
 
-			// 2代表sheetNo,不可以重复,如果两个sheet的sheetNo相同则输出时只会有一个sheet
-			WriteSheet sheet1 = new WriteSheet();
-			sheet1.setSheetName("Sheet1");
+            // 2代表sheetNo,不可以重复,如果两个sheet的sheetNo相同则输出时只会有一个sheet
+            WriteSheet sheet1 = new WriteSheet();
+            sheet1.setSheetName("Sheet1");
 
-			writer.write(asList(dataset), sheet1);
-			writer.finish();
-		} catch (IOException e) {
-			throw new IllegalStateException(e);
-		}
-	}
+            writer.write(asList(dataset), sheet1);
+            writer.finish();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
 }

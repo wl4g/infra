@@ -32,28 +32,28 @@ import io.netty.handler.codec.http.HttpMethod;
  */
 public class InterceptingClientHttpRequestFactory extends AbstractClientHttpRequestFactoryWrapper {
 
-	private final List<ClientHttpRequestInterceptor> interceptors;
+    private final List<ClientHttpRequestInterceptor> interceptors;
 
-	/**
-	 * Create a new instance of the {@code InterceptingClientHttpRequestFactory}
-	 * with the given parameters.
-	 * 
-	 * @param requestFactory
-	 *            the request factory to wrap
-	 * @param interceptors
-	 *            the interceptors that are to be applied (can be {@code null})
-	 */
-	public InterceptingClientHttpRequestFactory(ClientHttpRequestFactory requestFactory,
-			List<ClientHttpRequestInterceptor> interceptors) {
+    /**
+     * Create a new instance of the {@code InterceptingClientHttpRequestFactory}
+     * with the given parameters.
+     * 
+     * @param requestFactory
+     *            the request factory to wrap
+     * @param interceptors
+     *            the interceptors that are to be applied (can be {@code null})
+     */
+    public InterceptingClientHttpRequestFactory(ClientHttpRequestFactory requestFactory,
+            List<ClientHttpRequestInterceptor> interceptors) {
 
-		super(requestFactory);
-		this.interceptors = (interceptors != null ? interceptors : Collections.<ClientHttpRequestInterceptor> emptyList());
-	}
+        super(requestFactory);
+        this.interceptors = (interceptors != null ? interceptors : Collections.<ClientHttpRequestInterceptor> emptyList());
+    }
 
-	@Override
-	protected ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod, ClientHttpRequestFactory requestFactory,
-			HttpHeaders requestHeaders) {
-		return new InterceptingClientHttpRequest(requestFactory, this.interceptors, uri, httpMethod, requestHeaders);
-	}
+    @Override
+    protected ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod, ClientHttpRequestFactory requestFactory,
+            HttpHeaders requestHeaders) {
+        return new InterceptingClientHttpRequest(requestFactory, this.interceptors, uri, httpMethod, requestHeaders);
+    }
 
 }

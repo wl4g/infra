@@ -44,284 +44,284 @@ import static org.apache.commons.lang3.SystemUtils.USER_HOME;
  */
 public abstract class SSH2Holders<S, F> {
 
-	private static final SmartLogger log = getLogger(SSH2Holders.class);
+    private static final SmartLogger log = getLogger(SSH2Holders.class);
 
-	/**
-	 * Gets default {@link SSH2Holders} instance by provider class.
-	 * 
-	 * @param <T>
-	 * @return
-	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public final static <T extends SSH2Holders> T getDefault() {
-		// @see:dopass-infras-common/pom.xml#<groupId>com.hierynomus</groupId>
-		return (T) getInstance(SshjHolder.class);
-	}
+    /**
+     * Gets default {@link SSH2Holders} instance by provider class.
+     * 
+     * @param <T>
+     * @return
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public final static <T extends SSH2Holders> T getDefault() {
+        // @see:dopass-infras-common/pom.xml#<groupId>com.hierynomus</groupId>
+        return (T) getInstance(SshjHolder.class);
+    }
 
-	/**
-	 * Gets {@link SSH2Holders} instance by provider class.
-	 * 
-	 * @param <T>
-	 * @param providerClass
-	 * @return
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public final static <T extends SSH2Holders> T getInstance(Class<T> providerClass) {
-		T t = (T) registry.get(providerClass);
-		if (isNull(t)) {
-			synchronized (SSH2Holders.class) {
-				t = (T) registry.get(providerClass);
-				if (isNull(t)) {
-					registry.put(providerClass, (t = ObjectInstantiators.newInstance(providerClass)));
-				}
-			}
-		}
-		return t;
-	}
+    /**
+     * Gets {@link SSH2Holders} instance by provider class.
+     * 
+     * @param <T>
+     * @param providerClass
+     * @return
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public final static <T extends SSH2Holders> T getInstance(Class<T> providerClass) {
+        T t = (T) registry.get(providerClass);
+        if (isNull(t)) {
+            synchronized (SSH2Holders.class) {
+                t = (T) registry.get(providerClass);
+                if (isNull(t)) {
+                    registry.put(providerClass, (t = ObjectInstantiators.newInstance(providerClass)));
+                }
+            }
+        }
+        return t;
+    }
 
-	// --- Transfer files. ---
+    // --- Transfer files. ---
 
-	/**
-	 * Transfer get file from remote host.(user sftp)
-	 * 
-	 * @param host
-	 * @param user
-	 * @param pemPrivateKey
-	 * @param localFile
-	 * @param remoteFilePath
-	 * @throws Exception
-	 */
-	public abstract void scpGetFile(String host, String user, char[] pemPrivateKey, String password, File localFile,
-			String remoteFilePath) throws Exception;
+    /**
+     * Transfer get file from remote host.(user sftp)
+     * 
+     * @param host
+     * @param user
+     * @param pemPrivateKey
+     * @param localFile
+     * @param remoteFilePath
+     * @throws Exception
+     */
+    public abstract void scpGetFile(String host, String user, char[] pemPrivateKey, String password, File localFile,
+            String remoteFilePath) throws Exception;
 
-	/**
-	 * Transfer put file to remote host directory.
-	 * 
-	 * @param host
-	 * @param user
-	 * @param pemPrivateKey
-	 * @param localFile
-	 * @param remoteDir
-	 * @throws Exception
-	 */
-	public abstract void scpPutFile(String host, String user, char[] pemPrivateKey, String password, File localFile,
-			String remoteDir) throws Exception;
+    /**
+     * Transfer put file to remote host directory.
+     * 
+     * @param host
+     * @param user
+     * @param pemPrivateKey
+     * @param localFile
+     * @param remoteDir
+     * @throws Exception
+     */
+    public abstract void scpPutFile(String host, String user, char[] pemPrivateKey, String password, File localFile,
+            String remoteDir) throws Exception;
 
-	/**
-	 * Perform file transfer with remote host, including scp.put/upload or
-	 * scp.get/download.
-	 * 
-	 * @param host
-	 * @param user
-	 * @param pemPrivateKey
-	 * @param processor
-	 * @throws IOException
-	 */
-	protected abstract void doScpTransfer(String host, String user, char[] pemPrivateKey, String password,
-			CallbackFunction<F> processor) throws Exception;
+    /**
+     * Perform file transfer with remote host, including scp.put/upload or
+     * scp.get/download.
+     * 
+     * @param host
+     * @param user
+     * @param pemPrivateKey
+     * @param processor
+     * @throws IOException
+     */
+    protected abstract void doScpTransfer(String host, String user, char[] pemPrivateKey, String password,
+            CallbackFunction<F> processor) throws Exception;
 
-	// --- Execution commands. ---
+    // --- Execution commands. ---
 
-	/**
-	 * Execution commands with SSH2.
-	 * 
-	 * @param host
-	 * @param user
-	 * @param pemPrivateKey
-	 * @param command
-	 * @param timeoutMs
-	 * @return
-	 * @throws IOException
-	 */
-	public abstract Ssh2ExecResult execWaitForResponse(String host, String user, char[] pemPrivateKey, String password,
-			String command, long timeoutMs) throws Exception;
+    /**
+     * Execution commands with SSH2.
+     * 
+     * @param host
+     * @param user
+     * @param pemPrivateKey
+     * @param command
+     * @param timeoutMs
+     * @return
+     * @throws IOException
+     */
+    public abstract Ssh2ExecResult execWaitForResponse(String host, String user, char[] pemPrivateKey, String password,
+            String command, long timeoutMs) throws Exception;
 
-	/**
-	 * Execution commands wait for complete with SSH2
-	 * 
-	 * @param host
-	 * @param user
-	 * @param pemPrivateKey
-	 * @param command
-	 * @param processor
-	 * @param timeoutMs
-	 * @return
-	 * @throws IOException
-	 */
-	public abstract <T> T execWaitForComplete(String host, String user, char[] pemPrivateKey, String password, String command,
-			ProcessFunction<S, T> processor, long timeoutMs) throws Exception;
+    /**
+     * Execution commands wait for complete with SSH2
+     * 
+     * @param host
+     * @param user
+     * @param pemPrivateKey
+     * @param command
+     * @param processor
+     * @param timeoutMs
+     * @return
+     * @throws IOException
+     */
+    public abstract <T> T execWaitForComplete(String host, String user, char[] pemPrivateKey, String password, String command,
+            ProcessFunction<S, T> processor, long timeoutMs) throws Exception;
 
-	/**
-	 * Execution commands with SSH2
-	 * 
-	 * @param host
-	 * @param user
-	 * @param pemPrivateKey
-	 * @param command
-	 * @param processor
-	 * @return
-	 * @throws IOException
-	 */
-	public abstract <T> T doExecCommand(String host, String user, char[] pemPrivateKey, String password, String command,
-			ProcessFunction<S, T> processor) throws Exception;
+    /**
+     * Execution commands with SSH2
+     * 
+     * @param host
+     * @param user
+     * @param pemPrivateKey
+     * @param command
+     * @param processor
+     * @return
+     * @throws IOException
+     */
+    public abstract <T> T doExecCommand(String host, String user, char[] pemPrivateKey, String password, String command,
+            ProcessFunction<S, T> processor) throws Exception;
 
-	/**
-	 * Get local current user ssh authentication private key of default.
-	 * 
-	 * @param host
-	 * @param user
-	 * @return
-	 * @throws Exception
-	 */
-	protected final char[] getDefaultLocalUserPrivateKey() throws Exception {
-		// Check private key.
-		File privateKeyFile = new File(USER_HOME + "/.ssh/id_rsa");
-		isTrue(privateKeyFile.exists(), String.format("Not found privateKey for %s", privateKeyFile));
+    /**
+     * Get local current user ssh authentication private key of default.
+     * 
+     * @param host
+     * @param user
+     * @return
+     * @throws Exception
+     */
+    protected final char[] getDefaultLocalUserPrivateKey() throws Exception {
+        // Check private key.
+        File privateKeyFile = new File(USER_HOME + "/.ssh/id_rsa");
+        isTrue(privateKeyFile.exists(), String.format("Not found privateKey for %s", privateKeyFile));
 
-		log.warn("Fallback use local user pemPrivateKey of: {}", privateKeyFile);
-		try (CharArrayWriter cw = new CharArrayWriter(); FileReader fr = new FileReader(privateKeyFile.getAbsolutePath())) {
-			char[] buff = new char[256];
-			int len = 0;
-			while ((len = fr.read(buff)) != -1) {
-				cw.write(buff, 0, len);
-			}
-			return cw.toCharArray();
-		}
-	}
+        log.warn("Fallback use local user pemPrivateKey of: {}", privateKeyFile);
+        try (CharArrayWriter cw = new CharArrayWriter(); FileReader fr = new FileReader(privateKeyFile.getAbsolutePath())) {
+            char[] buff = new char[256];
+            int len = 0;
+            while ((len = fr.read(buff)) != -1) {
+                cw.write(buff, 0, len);
+            }
+            return cw.toCharArray();
+        }
+    }
 
-	// --- Tool function's. ---
+    // --- Tool function's. ---
 
-	/**
-	 * Generate keypair of SSH2 based on RSA/DSA/ECDSA.
-	 * 
-	 * @param type
-	 *            Algorithm type(RSA/DSA/ECDSA).
-	 * @param comment
-	 * @return
-	 * @throws Exception
-	 */
-	public abstract Ssh2KeyPair generateKeypair(AlgorithmType type, String comment) throws Exception;
+    /**
+     * Generate keypair of SSH2 based on RSA/DSA/ECDSA.
+     * 
+     * @param type
+     *            Algorithm type(RSA/DSA/ECDSA).
+     * @param comment
+     * @return
+     * @throws Exception
+     */
+    public abstract Ssh2KeyPair generateKeypair(AlgorithmType type, String comment) throws Exception;
 
-	/**
-	 * {@link SSH2Holders} providers registry.
-	 */
-	@SuppressWarnings("rawtypes")
-	private final static Map<Class<? extends SSH2Holders>, SSH2Holders> registry = new HashMap<>();
+    /**
+     * {@link SSH2Holders} providers registry.
+     */
+    @SuppressWarnings("rawtypes")
+    private final static Map<Class<? extends SSH2Holders>, SSH2Holders> registry = new HashMap<>();
 
-	/**
-	 * Default IO buffer size.
-	 */
-	final public static int DEFAULT_TRANSFER_BUFFER = 1024 * 6;
+    /**
+     * Default IO buffer size.
+     */
+    final public static int DEFAULT_TRANSFER_BUFFER = 1024 * 6;
 
-	/**
-	 * {@link Ssh2ExecResult}
-	 * 
-	 * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
-	 * @version 2020年1月9日 v1.0.0
-	 * @see
-	 */
-	public final static class Ssh2ExecResult {
+    /**
+     * {@link Ssh2ExecResult}
+     * 
+     * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+     * @version 2020年1月9日 v1.0.0
+     * @see
+     */
+    public final static class Ssh2ExecResult {
 
-		/** Remote commands exit signal. */
-		final private String exitSignal;
+        /** Remote commands exit signal. */
+        final private String exitSignal;
 
-		/** Remote commands exit code. */
-		final private Integer exitCode;
+        /** Remote commands exit code. */
+        final private Integer exitCode;
 
-		/** Standard message */
-		final private String message;
+        /** Standard message */
+        final private String message;
 
-		/** Error message */
-		final private String errmsg;
+        /** Error message */
+        final private String errmsg;
 
-		public Ssh2ExecResult(String exitSignal, Integer exitCode, String message, String errmsg) {
-			super();
-			this.exitSignal = exitSignal;
-			this.exitCode = exitCode;
-			this.message = message;
-			this.errmsg = errmsg;
-		}
+        public Ssh2ExecResult(String exitSignal, Integer exitCode, String message, String errmsg) {
+            super();
+            this.exitSignal = exitSignal;
+            this.exitCode = exitCode;
+            this.message = message;
+            this.errmsg = errmsg;
+        }
 
-		public String getExitSignal() {
-			return exitSignal;
-		}
+        public String getExitSignal() {
+            return exitSignal;
+        }
 
-		public Integer getExitCode() {
-			return exitCode;
-		}
+        public Integer getExitCode() {
+            return exitCode;
+        }
 
-		public String getMessage() {
-			return message;
-		}
+        public String getMessage() {
+            return message;
+        }
 
-		public String getErrmsg() {
-			return errmsg;
-		}
+        public String getErrmsg() {
+            return errmsg;
+        }
 
-	}
+    }
 
-	/**
-	 * {@link Ssh2KeyPair}
-	 * 
-	 * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
-	 * @version 2020年2月4日 v1.0.0
-	 * @see
-	 */
-	public final static class Ssh2KeyPair {
+    /**
+     * {@link Ssh2KeyPair}
+     * 
+     * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+     * @version 2020年2月4日 v1.0.0
+     * @see
+     */
+    public final static class Ssh2KeyPair {
 
-		/** Generate ssh2 privateKey. */
-		final private String privateKey;
+        /** Generate ssh2 privateKey. */
+        final private String privateKey;
 
-		/** Generate ssh2 publicKey. */
-		final private String publicKey;
+        /** Generate ssh2 publicKey. */
+        final private String publicKey;
 
-		public Ssh2KeyPair(String privateKey, String publicKey) {
-			notNullOf(privateKey, "privateKey");
-			notNullOf(publicKey, "publicKey");
-			this.privateKey = privateKey;
-			this.publicKey = publicKey;
-		}
+        public Ssh2KeyPair(String privateKey, String publicKey) {
+            notNullOf(privateKey, "privateKey");
+            notNullOf(publicKey, "publicKey");
+            this.privateKey = privateKey;
+            this.publicKey = publicKey;
+        }
 
-		public String getPrivateKey() {
-			return privateKey;
-		}
+        public String getPrivateKey() {
+            return privateKey;
+        }
 
-		public String getPublicKey() {
-			return publicKey;
-		}
+        public String getPublicKey() {
+            return publicKey;
+        }
 
-	}
+    }
 
-	/**
-	 * {@link AlgorithmType}
-	 * 
-	 * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
-	 * @version 2020年2月4日 v1.0.0
-	 * @see
-	 */
-	public static enum AlgorithmType {
-		RSA, DSA, ECDSA
-	}
+    /**
+     * {@link AlgorithmType}
+     * 
+     * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+     * @version 2020年2月4日 v1.0.0
+     * @see
+     */
+    public static enum AlgorithmType {
+        RSA, DSA, ECDSA
+    }
 
-	/**
-	 * Default environments path for different Linux distributions.</br>
-	 * e.g:
-	 * <p>
-	 * CentOS: /etc/bashrc </br>
-	 * Ubuntu: /etc/bash.bashrc
-	 * </p>
-	 */
-	@Deprecated
-	public static final String DEFAULT_LINUX_ENV_CMD = join(new String[] {
-			// e.g: CentOS|Ubuntu
-			"source /etc/profile",
-			// e.g: CentOS
-			"source /etc/bashrc",
-			// e.g: Ubuntu
-			"source /etc/bash.bashrc",
-			// e.g: CentOS|Ubuntu
-			"source ~/.profile",
-			// e.g: CentOS|Ubuntu
-			"source ~/.bashrc" }, " ");
+    /**
+     * Default environments path for different Linux distributions.</br>
+     * e.g:
+     * <p>
+     * CentOS: /etc/bashrc </br>
+     * Ubuntu: /etc/bash.bashrc
+     * </p>
+     */
+    @Deprecated
+    public static final String DEFAULT_LINUX_ENV_CMD = join(new String[] {
+            // e.g: CentOS|Ubuntu
+            "source /etc/profile",
+            // e.g: CentOS
+            "source /etc/bashrc",
+            // e.g: Ubuntu
+            "source /etc/bash.bashrc",
+            // e.g: CentOS|Ubuntu
+            "source ~/.profile",
+            // e.g: CentOS|Ubuntu
+            "source ~/.bashrc" }, " ");
 
 }

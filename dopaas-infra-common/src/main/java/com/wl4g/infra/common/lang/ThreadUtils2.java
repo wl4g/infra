@@ -28,37 +28,37 @@ import org.apache.commons.lang3.ThreadUtils;
  */
 public abstract class ThreadUtils2 extends ThreadUtils {
 
-	/**
-	 * Random sleep current thread.
-	 * 
-	 * @param least
-	 *            the least value returned
-	 * @param bound
-	 *            the upper bound (exclusive)
-	 * @throws IllegalStateException
-	 */
-	public static void sleep(long sleepMillis) throws IllegalStateException {
-		try {
-			Thread.sleep(sleepMillis);
-		} catch (InterruptedException e) {
-			throw new IllegalStateException(e);
-		}
-	}
+    /**
+     * Random sleep current thread.
+     * 
+     * @param least
+     *            the least value returned
+     * @param bound
+     *            the upper bound (exclusive)
+     * @throws IllegalStateException
+     */
+    public static void sleep(long sleepMillis) throws IllegalStateException {
+        try {
+            Thread.sleep(sleepMillis);
+        } catch (InterruptedException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
-	/**
-	 * Random sleep current thread.
-	 * 
-	 * @param least
-	 *            the least value returned
-	 * @param bound
-	 *            the upper bound (exclusive)
-	 * @return Returns the duration of the previous sleep(ms)
-	 * @throws IllegalStateException
-	 */
-	public static long sleepRandom(long least, long bound) throws IllegalStateException {
-		long sleepMillis = current().nextLong(least, bound);
-		sleep(sleepMillis);
-		return sleepMillis;
-	}
+    /**
+     * Random sleep current thread.
+     * 
+     * @param least
+     *            the least value returned
+     * @param bound
+     *            the upper bound (exclusive)
+     * @return Returns the duration of the previous sleep(ms)
+     * @throws IllegalStateException
+     */
+    public static long sleepRandom(long least, long bound) throws IllegalStateException {
+        long sleepMillis = current().nextLong(least, bound);
+        sleep(sleepMillis);
+        return sleepMillis;
+    }
 
 }

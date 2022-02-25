@@ -19,11 +19,11 @@ import com.wl4g.infra.common.codec.Base58;
 
 public class Base58Tests {
 
-	public static void main(String[] args) {
-		String enc = Base58.encodeBase58("123".getBytes());
-		System.out.println(enc);
-		byte[] dec = Base58.decodeBase58(enc);
-		System.out.println(new String(dec));
-	}
+    public static void main(String[] args) {
+        String enc = Base58.encodeBase58("123".getBytes());
+        System.out.println(enc);
+        byte[] dec = Base58.decodeBase58(enc);
+        System.out.println(new String(dec));
+    }
 
 }

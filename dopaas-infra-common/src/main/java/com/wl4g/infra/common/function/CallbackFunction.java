@@ -26,12 +26,12 @@ package com.wl4g.infra.common.function;
 @FunctionalInterface
 public interface CallbackFunction<T> {
 
-	/**
-	 * Do processing.
-	 * 
-	 * @param t
-	 * @throws Exception
-	 */
-	void process(T t) throws Exception;
+    /**
+     * Do processing.
+     * 
+     * @param t
+     * @throws Exception
+     */
+    void process(T t) throws Exception;
 
 }

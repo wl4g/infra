@@ -22,49 +22,49 @@ import com.wl4g.infra.common.remoting.RestClient;
 
 public class RestClientSimpleTests {
 
-	public static void main(String[] args) {
-		getForEntityTest1();
-		getForObjectTest2();
-	}
+    public static void main(String[] args) {
+        getForEntityTest1();
+        getForObjectTest2();
+    }
 
-	public static void getForEntityTest1() {
-		String uri = "http://api.map.baidu.com/telematics/v3/weather?location=嘉兴&output=json&ak=5slgyqGDENN7Sy7pw29IUvrZ";
-		HttpResponseEntity<String> resp = new RestClient().getForEntity(URI.create(uri), String.class);
-		System.out.println(resp.getBody());
-	}
+    public static void getForEntityTest1() {
+        String uri = "http://api.map.baidu.com/telematics/v3/weather?location=嘉兴&output=json&ak=5slgyqGDENN7Sy7pw29IUvrZ";
+        HttpResponseEntity<String> resp = new RestClient().getForEntity(URI.create(uri), String.class);
+        System.out.println(resp.getBody());
+    }
 
-	public static void getForObjectTest2() {
-		String uri = "http://api.map.baidu.com/telematics/v3/weather?location=嘉兴&output=json&ak=5slgyqGDENN7Sy7pw29IUvrZ";
-		BaiduWeatherBean resp = new RestClient().getForObject(URI.create(uri), BaiduWeatherBean.class);
-		System.out.println(resp);
-	}
+    public static void getForObjectTest2() {
+        String uri = "http://api.map.baidu.com/telematics/v3/weather?location=嘉兴&output=json&ak=5slgyqGDENN7Sy7pw29IUvrZ";
+        BaiduWeatherBean resp = new RestClient().getForObject(URI.create(uri), BaiduWeatherBean.class);
+        System.out.println(resp);
+    }
 
-	public static class BaiduWeatherBean {
+    public static class BaiduWeatherBean {
 
-		private String status;
-		private String message;
+        private String status;
+        private String message;
 
-		public String getStatus() {
-			return status;
-		}
+        public String getStatus() {
+            return status;
+        }
 
-		public void setStatus(String status) {
-			this.status = status;
-		}
+        public void setStatus(String status) {
+            this.status = status;
+        }
 
-		public String getMessage() {
-			return message;
-		}
+        public String getMessage() {
+            return message;
+        }
 
-		public void setMessage(String message) {
-			this.message = message;
-		}
+        public void setMessage(String message) {
+            this.message = message;
+        }
 
-		@Override
-		public String toString() {
-			return "BaiduWeatherBean [status=" + status + ", message=" + message + "]";
-		}
+        @Override
+        public String toString() {
+            return "BaiduWeatherBean [status=" + status + ", message=" + message + "]";
+        }
 
-	}
+    }
 
 }

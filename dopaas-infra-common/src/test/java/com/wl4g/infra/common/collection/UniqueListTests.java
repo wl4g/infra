@@ -24,28 +24,28 @@ import com.wl4g.infra.common.collection.UniqueList;
 
 public class UniqueListTests {
 
-	public static void main(String[] args) {
-		List<String> list1 = new UniqueList<>(new ArrayList<>());
-		list1.add("a");
-		list1.add("A");
-		list1.add(null);
-		list1.add("b");
-		list1.add("b");
-		System.out.println("------- all() Remove duplicate tests -------");
-		System.out.println("size=" + list1.size());
-		list1.forEach(e -> out.println(e));
+    public static void main(String[] args) {
+        List<String> list1 = new UniqueList<>(new ArrayList<>());
+        list1.add("a");
+        list1.add("A");
+        list1.add(null);
+        list1.add("b");
+        list1.add("b");
+        System.out.println("------- all() Remove duplicate tests -------");
+        System.out.println("size=" + list1.size());
+        list1.forEach(e -> out.println(e));
 
-		List<String> list2 = new ArrayList<>();
-		list1.add(null);
-		list2.add("C");
-		list2.add("C");
-		list2.add("D");
-		list1.addAll(list2);
+        List<String> list2 = new ArrayList<>();
+        list1.add(null);
+        list2.add("C");
+        list2.add("C");
+        list2.add("D");
+        list1.addAll(list2);
 
-		System.out.println("------- addAll() Remove duplicate tests -------");
-		System.out.println("size=" + list1.size());
-		list1.forEach(e -> out.println(e));
+        System.out.println("------- addAll() Remove duplicate tests -------");
+        System.out.println("size=" + list1.size());
+        list1.forEach(e -> out.println(e));
 
-	}
+    }
 
 }

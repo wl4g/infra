@@ -27,14 +27,14 @@ import com.wl4g.infra.common.web.rest.RespBase.RetCode;
  */
 public interface LockStateException extends RESTfulException {
 
-	/**
-	 * Get exception response code.
-	 * 
-	 * @return
-	 */
-	@Override
-	default RetCode getCode() {
-		return RetCode.LOCKD_ERR;
-	}
+    /**
+     * Get exception response code.
+     * 
+     * @return
+     */
+    @Override
+    default RetCode getCode() {
+        return RetCode.LOCKD_ERR;
+    }
 
 }

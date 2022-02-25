@@ -21,11 +21,11 @@ import java.util.Date;
 
 public class DateUtils2Tests {
 
-	public static void main(String[] args) {
-		System.out.println(formatDate(parseDate("2010/3/6")));
-		System.out.println(getDate("yyyy年MM月dd日 E"));
-		long time = new Date().getTime() - parseDate("2012-11-19").getTime();
-		System.out.println(time / (24 * 60 * 60 * 1000));
-	}
+    public static void main(String[] args) {
+        System.out.println(formatDate(parseDate("2010/3/6")));
+        System.out.println(getDate("yyyy年MM月dd日 E"));
+        long time = new Date().getTime() - parseDate("2012-11-19").getTime();
+        System.out.println(time / (24 * 60 * 60 * 1000));
+    }
 
 }

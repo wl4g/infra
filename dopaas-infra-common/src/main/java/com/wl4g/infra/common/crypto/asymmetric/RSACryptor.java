@@ -30,37 +30,37 @@ import com.wl4g.infra.common.crypto.asymmetric.spec.RSAKeyPairSpec;
  */
 public class RSACryptor extends AbstractAsymmetricCryptor {
 
-	public RSACryptor() {
-		super(1024);
-	}
+    public RSACryptor() {
+        super(1024);
+    }
 
-	public RSACryptor(int keysize) {
-		super(keysize);
-	}
+    public RSACryptor(int keysize) {
+        super(keysize);
+    }
 
-	@Override
-	public String getAlgorithmPrimary() {
-		return "RSA";
-	}
+    @Override
+    public String getAlgorithmPrimary() {
+        return "RSA";
+    }
 
-	@Override
-	public String getPadAlgorithm() {
-		return "RSA/ECB/PKCS1Padding";
-	}
+    @Override
+    public String getPadAlgorithm() {
+        return "RSA/ECB/PKCS1Padding";
+    }
 
-	@Override
-	public Class<? extends KeySpec> getPublicKeySpecClass() {
-		return RSAPublicKeySpec.class;
-	}
+    @Override
+    public Class<? extends KeySpec> getPublicKeySpecClass() {
+        return RSAPublicKeySpec.class;
+    }
 
-	@Override
-	public Class<? extends KeySpec> getPrivateKeySpecClass() {
-		return RSAPrivateCrtKeySpec.class;
-	}
+    @Override
+    public Class<? extends KeySpec> getPrivateKeySpecClass() {
+        return RSAPrivateCrtKeySpec.class;
+    }
 
-	@Override
-	protected RSAKeyPairSpec newKeySpec(String algorithm, KeySpec pubKeySpec, KeySpec keySpec) {
-		return new RSAKeyPairSpec(algorithm, pubKeySpec, keySpec);
-	}
+    @Override
+    protected RSAKeyPairSpec newKeySpec(String algorithm, KeySpec pubKeySpec, KeySpec keySpec) {
+        return new RSAKeyPairSpec(algorithm, pubKeySpec, keySpec);
+    }
 
 }

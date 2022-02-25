@@ -37,7 +37,7 @@ import com.google.common.annotations.Beta;
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target({ ElementType.ANNOTATION_TYPE, ElementType.CONSTRUCTOR, ElementType.FIELD, ElementType.METHOD, ElementType.PACKAGE,
-		ElementType.TYPE })
+        ElementType.TYPE })
 @Documented
 public @interface Stable {
 }

@@ -48,175 +48,175 @@ import com.wl4g.infra.common.codec.CodecSource;
  */
 abstract class JdkCryptorSupport extends SymmetricCryptorSupport {
 
-	protected JdkCryptorSupport(AlgorithmSpec config) {
-		super(config);
-	}
+    protected JdkCryptorSupport(AlgorithmSpec config) {
+        super(config);
+    }
 
-	/**
-	 * Generate symmetric algorithm key keybits.
-	 * 
-	 * @return
-	 */
-	public CodecSource generateKey() {
-		return generateKey(config.getKeybits());
-	}
+    /**
+     * Generate symmetric algorithm key keybits.
+     * 
+     * @return
+     */
+    public CodecSource generateKey() {
+        return generateKey(config.getKeybits());
+    }
 
-	/**
-	 * Generate symmetric algorithm key.
-	 * 
-	 * @param keybits
-	 * @return
-	 */
-	public CodecSource generateKey(int keybits) {
-		try {
-			SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-			KeyGenerator keyGenerator = KeyGenerator.getInstance(config.getAlgName());
-			keyGenerator.init(keybits, random);
-			SecretKey secretKey = keyGenerator.generateKey();
-			return new CodecSource(secretKey.getEncoded());
-		} catch (GeneralSecurityException e) {
-			throw new IllegalStateException(e);
-		}
-	}
+    /**
+     * Generate symmetric algorithm key.
+     * 
+     * @param keybits
+     * @return
+     */
+    public CodecSource generateKey(int keybits) {
+        try {
+            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+            KeyGenerator keyGenerator = KeyGenerator.getInstance(config.getAlgName());
+            keyGenerator.init(keybits, random);
+            SecretKey secretKey = keyGenerator.generateKey();
+            return new CodecSource(secretKey.getEncoded());
+        } catch (GeneralSecurityException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
-	/**
-	 * Encryption symmetric cipher source.
-	 * 
-	 * @param key
-	 * @param cipherSource
-	 * @return
-	 */
-	public CodecSource encrypt(byte[] key, CodecSource plainSource) {
-		return encrypt(key, null, plainSource);
-	}
+    /**
+     * Encryption symmetric cipher source.
+     * 
+     * @param key
+     * @param cipherSource
+     * @return
+     */
+    public CodecSource encrypt(byte[] key, CodecSource plainSource) {
+        return encrypt(key, null, plainSource);
+    }
 
-	/**
-	 * Encryption symmetric cipher source.
-	 * 
-	 * @param key
-	 * @param iv
-	 * @param cipherSource
-	 * @return
-	 */
-	public CodecSource encrypt(byte[] key, byte[] iv, CodecSource plainSource) {
-		// Cleanup
-		byte[][] parameters = cleanAlgorithmParameters(key, iv);
-		key = parameters[0];
-		iv = parameters[1];
+    /**
+     * Encryption symmetric cipher source.
+     * 
+     * @param key
+     * @param iv
+     * @param cipherSource
+     * @return
+     */
+    public CodecSource encrypt(byte[] key, byte[] iv, CodecSource plainSource) {
+        // Cleanup
+        byte[][] parameters = cleanAlgorithmParameters(key, iv);
+        key = parameters[0];
+        iv = parameters[1];
 
-		if (isNull(iv)) {
-			return doEncrypt(key, null, plainSource);
-		}
+        if (isNull(iv)) {
+            return doEncrypt(key, null, plainSource);
+        }
 
-		return doEncrypt(key, new IvParameterSpec(iv), plainSource);
-	}
+        return doEncrypt(key, new IvParameterSpec(iv), plainSource);
+    }
 
-	/**
-	 * Decryption symmetric cipher source.
-	 * 
-	 * @param key
-	 * @param cipherSource
-	 * @return
-	 */
-	public CodecSource decrypt(byte[] key, CodecSource cipherSource) {
-		return decrypt(key, null, cipherSource);
-	}
+    /**
+     * Decryption symmetric cipher source.
+     * 
+     * @param key
+     * @param cipherSource
+     * @return
+     */
+    public CodecSource decrypt(byte[] key, CodecSource cipherSource) {
+        return decrypt(key, null, cipherSource);
+    }
 
-	/**
-	 * Decryption symmetric cipher source.
-	 * 
-	 * @param key
-	 * @param iv
-	 * @param cipherSource
-	 * @return
-	 */
-	public CodecSource decrypt(byte[] key, byte[] iv, CodecSource cipherSource) {
-		// Cleanup
-		byte[][] parameters = cleanAlgorithmParameters(key, iv);
-		key = parameters[0];
-		iv = parameters[1];
+    /**
+     * Decryption symmetric cipher source.
+     * 
+     * @param key
+     * @param iv
+     * @param cipherSource
+     * @return
+     */
+    public CodecSource decrypt(byte[] key, byte[] iv, CodecSource cipherSource) {
+        // Cleanup
+        byte[][] parameters = cleanAlgorithmParameters(key, iv);
+        key = parameters[0];
+        iv = parameters[1];
 
-		if (isNull(iv)) {
-			return doDecrypt(key, null, cipherSource);
-		}
+        if (isNull(iv)) {
+            return doDecrypt(key, null, cipherSource);
+        }
 
-		return doDecrypt(key, new IvParameterSpec(iv), cipherSource);
-	}
+        return doDecrypt(key, new IvParameterSpec(iv), cipherSource);
+    }
 
-	/**
-	 * Encryption symmetric plain source.
-	 * 
-	 * @param key
-	 * @param iv
-	 * @param plainSource
-	 * @return
-	 */
-	protected CodecSource doEncrypt(byte[] key, IvParameterSpec iv, CodecSource plainSource) {
-		notNullOf(key, "key");
-		notNullOf(plainSource, "plainSource");
-		try {
-			SecretKey _key = createSecretKey(key);
-			// Create a cipher, PKCS5padding is more efficient than
-			// PKCS7padding. PKCS7padding can support IOS encryption and
-			// decryption.
-			Cipher cipher = Cipher.getInstance(config.getAlgTransformationName());
-			// This method can be added in three ways according to the
-			// requirements of encryption algorithm. (1) No third parameter; (2)
-			// the third parameter is SecureRandom; (not available for
-			// AES) (3) uses IVParameterspec.
-			if (config.isRequireIv()) {
-				notNull(iv, "Init algorithm %s cipher Iv is requires", config.getAlgTransformationName());
-				cipher.init(Cipher.ENCRYPT_MODE, _key, iv);
-			} else {
-				cipher.init(Cipher.ENCRYPT_MODE, _key);
-			}
-			return new CodecSource(cipher.doFinal(plainSource.getBytes()));
-		} catch (Exception e) {
-			throw new IllegalStateException(e);
-		}
-	}
+    /**
+     * Encryption symmetric plain source.
+     * 
+     * @param key
+     * @param iv
+     * @param plainSource
+     * @return
+     */
+    protected CodecSource doEncrypt(byte[] key, IvParameterSpec iv, CodecSource plainSource) {
+        notNullOf(key, "key");
+        notNullOf(plainSource, "plainSource");
+        try {
+            SecretKey _key = createSecretKey(key);
+            // Create a cipher, PKCS5padding is more efficient than
+            // PKCS7padding. PKCS7padding can support IOS encryption and
+            // decryption.
+            Cipher cipher = Cipher.getInstance(config.getAlgTransformationName());
+            // This method can be added in three ways according to the
+            // requirements of encryption algorithm. (1) No third parameter; (2)
+            // the third parameter is SecureRandom; (not available for
+            // AES) (3) uses IVParameterspec.
+            if (config.isRequireIv()) {
+                notNull(iv, "Init algorithm %s cipher Iv is requires", config.getAlgTransformationName());
+                cipher.init(Cipher.ENCRYPT_MODE, _key, iv);
+            } else {
+                cipher.init(Cipher.ENCRYPT_MODE, _key);
+            }
+            return new CodecSource(cipher.doFinal(plainSource.getBytes()));
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
-	/**
-	 * Decryption symmetric cipher source.
-	 * 
-	 * @param key
-	 * @param iv
-	 * @param cipherSource
-	 * @return
-	 */
-	protected CodecSource doDecrypt(byte[] key, IvParameterSpec iv, CodecSource cipherSource) {
-		notNullOf(key, "key");
-		notNullOf(cipherSource, "cipherSource");
-		try {
-			SecretKey _key = createSecretKey(key);
-			// Create a cipher, PKCS5padding is more efficient than
-			// PKCS7padding. PKCS7padding can support IOS encryption and
-			// decryption.
-			Cipher cipher = Cipher.getInstance(config.getAlgTransformationName());
-			// This method can be added in three ways according to the
-			// requirements of encryption algorithm. (1) No third parameter; (2)
-			// the third parameter is SecureRandom; (not available for
-			// AES) (3) uses IVParameterspec.
-			if (config.isRequireIv()) {
-				notNull(iv, "Init algorithm %s cipher Iv is requires", config.getAlgTransformationName());
-				cipher.init(Cipher.DECRYPT_MODE, _key, iv);
-			} else {
-				cipher.init(Cipher.DECRYPT_MODE, _key);
-			}
-			return new CodecSource(cipher.doFinal(cipherSource.getBytes()));
-		} catch (Exception e) {
-			throw new IllegalStateException(e);
-		}
-	}
+    /**
+     * Decryption symmetric cipher source.
+     * 
+     * @param key
+     * @param iv
+     * @param cipherSource
+     * @return
+     */
+    protected CodecSource doDecrypt(byte[] key, IvParameterSpec iv, CodecSource cipherSource) {
+        notNullOf(key, "key");
+        notNullOf(cipherSource, "cipherSource");
+        try {
+            SecretKey _key = createSecretKey(key);
+            // Create a cipher, PKCS5padding is more efficient than
+            // PKCS7padding. PKCS7padding can support IOS encryption and
+            // decryption.
+            Cipher cipher = Cipher.getInstance(config.getAlgTransformationName());
+            // This method can be added in three ways according to the
+            // requirements of encryption algorithm. (1) No third parameter; (2)
+            // the third parameter is SecureRandom; (not available for
+            // AES) (3) uses IVParameterspec.
+            if (config.isRequireIv()) {
+                notNull(iv, "Init algorithm %s cipher Iv is requires", config.getAlgTransformationName());
+                cipher.init(Cipher.DECRYPT_MODE, _key, iv);
+            } else {
+                cipher.init(Cipher.DECRYPT_MODE, _key);
+            }
+            return new CodecSource(cipher.doFinal(cipherSource.getBytes()));
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
-	/**
-	 * Create secret key by keydata
-	 * 
-	 * @param key
-	 * @return
-	 */
-	protected SecretKey createSecretKey(byte[] key) {
-		return new SecretKeySpec(key, config.getAlgName());
-	}
+    /**
+     * Create secret key by keydata
+     * 
+     * @param key
+     * @return
+     */
+    protected SecretKey createSecretKey(byte[] key) {
+        return new SecretKeySpec(key, config.getAlgName());
+    }
 
 }

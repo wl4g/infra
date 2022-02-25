@@ -34,79 +34,79 @@ import io.netty.handler.codec.http.HttpMethod;
  */
 class InterceptingClientHttpRequest extends AbstractBufferingClientHttpRequest {
 
-	private final ClientHttpRequestFactory requestFactory;
-	private final List<ClientHttpRequestInterceptor> interceptors;
-	private HttpMethod method;
-	private HttpHeaders requestHeaders;
-	private URI uri;
+    private final ClientHttpRequestFactory requestFactory;
+    private final List<ClientHttpRequestInterceptor> interceptors;
+    private HttpMethod method;
+    private HttpHeaders requestHeaders;
+    private URI uri;
 
-	protected InterceptingClientHttpRequest(ClientHttpRequestFactory requestFactory,
-			List<ClientHttpRequestInterceptor> interceptors, URI uri, HttpMethod method, HttpHeaders requestHeaders) {
-		this.requestFactory = requestFactory;
-		this.interceptors = interceptors;
-		this.method = method;
-		this.uri = uri;
-		this.requestHeaders = requestHeaders;
-	}
+    protected InterceptingClientHttpRequest(ClientHttpRequestFactory requestFactory,
+            List<ClientHttpRequestInterceptor> interceptors, URI uri, HttpMethod method, HttpHeaders requestHeaders) {
+        this.requestFactory = requestFactory;
+        this.interceptors = interceptors;
+        this.method = method;
+        this.uri = uri;
+        this.requestHeaders = requestHeaders;
+    }
 
-	@Override
-	public HttpMethod getMethod() {
-		return this.method;
-	}
+    @Override
+    public HttpMethod getMethod() {
+        return this.method;
+    }
 
-	@Override
-	public URI getURI() {
-		return this.uri;
-	}
+    @Override
+    public URI getURI() {
+        return this.uri;
+    }
 
-	@Override
-	protected final ClientHttpResponse executeInternal(HttpHeaders headers, byte[] bufferedOutput) throws IOException {
-		InterceptingRequestExecution requestExecution = new InterceptingRequestExecution();
-		return requestExecution.execute(this, bufferedOutput);
-	}
+    @Override
+    protected final ClientHttpResponse executeInternal(HttpHeaders headers, byte[] bufferedOutput) throws IOException {
+        InterceptingRequestExecution requestExecution = new InterceptingRequestExecution();
+        return requestExecution.execute(this, bufferedOutput);
+    }
 
-	private class InterceptingRequestExecution implements ClientHttpRequestExecution {
+    private class InterceptingRequestExecution implements ClientHttpRequestExecution {
 
-		private final Iterator<ClientHttpRequestInterceptor> iterator;
+        private final Iterator<ClientHttpRequestInterceptor> iterator;
 
-		public InterceptingRequestExecution() {
-			this.iterator = interceptors.iterator();
-		}
+        public InterceptingRequestExecution() {
+            this.iterator = interceptors.iterator();
+        }
 
-		@Override
-		public ClientHttpResponse execute(HttpRequest request, final byte[] body) throws IOException {
-			if (this.iterator.hasNext()) {
-				ClientHttpRequestInterceptor nextInterceptor = this.iterator.next();
-				return nextInterceptor.intercept(request, body, this);
-			} else {
-				ClientHttpRequest delegate = requestFactory.createRequest(request.getURI(), request.getMethod(), requestHeaders);
-				for (Map.Entry<String, List<String>> entry : request.getHeaders().entrySet()) {
-					List<String> values = entry.getValue();
-					for (String value : values) {
-						delegate.getHeaders().add(entry.getKey(), value);
-					}
-				}
-				if (body.length > 0) {
-					if (delegate instanceof StreamingHttpOutputMessage) {
-						StreamingHttpOutputMessage streamingOutputMessage = (StreamingHttpOutputMessage) delegate;
-						streamingOutputMessage.setBody(new StreamingHttpOutputMessage.Body() {
-							@Override
-							public void writeTo(final OutputStream outputStream) throws IOException {
-								ByteStreamUtils.copy(body, outputStream);
-							}
-						});
-					} else {
-						ByteStreamUtils.copy(body, delegate.getBody());
-					}
-				}
-				return delegate.execute();
-			}
-		}
-	}
+        @Override
+        public ClientHttpResponse execute(HttpRequest request, final byte[] body) throws IOException {
+            if (this.iterator.hasNext()) {
+                ClientHttpRequestInterceptor nextInterceptor = this.iterator.next();
+                return nextInterceptor.intercept(request, body, this);
+            } else {
+                ClientHttpRequest delegate = requestFactory.createRequest(request.getURI(), request.getMethod(), requestHeaders);
+                for (Map.Entry<String, List<String>> entry : request.getHeaders().entrySet()) {
+                    List<String> values = entry.getValue();
+                    for (String value : values) {
+                        delegate.getHeaders().add(entry.getKey(), value);
+                    }
+                }
+                if (body.length > 0) {
+                    if (delegate instanceof StreamingHttpOutputMessage) {
+                        StreamingHttpOutputMessage streamingOutputMessage = (StreamingHttpOutputMessage) delegate;
+                        streamingOutputMessage.setBody(new StreamingHttpOutputMessage.Body() {
+                            @Override
+                            public void writeTo(final OutputStream outputStream) throws IOException {
+                                ByteStreamUtils.copy(body, outputStream);
+                            }
+                        });
+                    } else {
+                        ByteStreamUtils.copy(body, delegate.getBody());
+                    }
+                }
+                return delegate.execute();
+            }
+        }
+    }
 
-	@Override
-	public String getMethodValue() {
-		return method.name();
-	}
+    @Override
+    public String getMethodValue() {
+        return method.name();
+    }
 
 }

@@ -28,20 +28,20 @@ import com.wl4g.infra.common.lang.ClassUtils2;
  */
 public class AllEncompassingFormHttpMessageParser extends FormHttpMessageParser {
 
-	private static final boolean jackson2Present;
+    private static final boolean jackson2Present;
 
-	static {
-		ClassLoader classLoader = AllEncompassingFormHttpMessageParser.class.getClassLoader();
-		jackson2Present = ClassUtils2.isPresent("com.fasterxml.jackson.databind.ObjectMapper", classLoader)
-				&& ClassUtils2.isPresent("com.fasterxml.jackson.core.JsonGenerator", classLoader);
-		// gsonPresent = ClassUtils2.isPresent("com.google.gson.Gson",
-		// classLoader);
-	}
+    static {
+        ClassLoader classLoader = AllEncompassingFormHttpMessageParser.class.getClassLoader();
+        jackson2Present = ClassUtils2.isPresent("com.fasterxml.jackson.databind.ObjectMapper", classLoader)
+                && ClassUtils2.isPresent("com.fasterxml.jackson.core.JsonGenerator", classLoader);
+        // gsonPresent = ClassUtils2.isPresent("com.google.gson.Gson",
+        // classLoader);
+    }
 
-	public AllEncompassingFormHttpMessageParser() {
-		if (jackson2Present) {
-			addPartParser(new MappingJackson2HttpMessageParser());
-		}
-	}
+    public AllEncompassingFormHttpMessageParser() {
+        if (jackson2Present) {
+            addPartParser(new MappingJackson2HttpMessageParser());
+        }
+    }
 
 }

@@ -48,101 +48,101 @@ import lombok.ToString;
  */
 public class EasyExcelServicesTests {
 
-	@Test
-	public void simpleReadCase1() {
-		EasyExcelServices.createDefault().read(new File(READ_EXCEL_FILE), new ReadExcelListener());
-	}
+    @Test
+    public void simpleReadCase1() {
+        EasyExcelServices.createDefault().read(new File(READ_EXCEL_FILE), new ReadExcelListener());
+    }
 
-	@Test
-	public void simpleWriteCase1() throws IOException {
-		List<Student> dataset = new ArrayList<Student>();
-		dataset.add(new Student("张三丰", 18, "古国1"));
-		dataset.add(new Student("张二丰", 11, "远古之城x"));
-		dataset.add(new Student("张一丰", 22, "USA"));
-		File file = File.createTempFile("simpleWriteEasyExcel", ".xlsx");
-		FileIOUtils.ensureFile(file);
-		EasyExcelServices.createDefault().write(file, dataset,
-				new CellColorSheetWriteHandler(singletonList(1), singletonList(1), Font.COLOR_RED));
+    @Test
+    public void simpleWriteCase1() throws IOException {
+        List<Student> dataset = new ArrayList<Student>();
+        dataset.add(new Student("张三丰", 18, "古国1"));
+        dataset.add(new Student("张二丰", 11, "远古之城x"));
+        dataset.add(new Student("张一丰", 22, "USA"));
+        File file = File.createTempFile("simpleWriteEasyExcel", ".xlsx");
+        FileIOUtils.ensureFile(file);
+        EasyExcelServices.createDefault().write(file, dataset,
+                new CellColorSheetWriteHandler(singletonList(1), singletonList(1), Font.COLOR_RED));
 
-		System.out.println("Writed for " + file);
-	}
+        System.out.println("Writed for " + file);
+    }
 
-	@Getter
-	@Setter
-	@ToString
-	@ColumnWidth(40)
-	public static class Student {
+    @Getter
+    @Setter
+    @ToString
+    @ColumnWidth(40)
+    public static class Student {
 
-		@ExcelProperty(value = { "姓名" })
-		private String name;
+        @ExcelProperty(value = { "姓名" })
+        private String name;
 
-		@ExcelProperty(value = { "年齡" })
-		private Integer age;
+        @ExcelProperty(value = { "年齡" })
+        private Integer age;
 
-		@ExcelProperty(value = { "住址" })
-		private String address;
+        @ExcelProperty(value = { "住址" })
+        private String address;
 
-		public Student() {
-			super();
-		}
+        public Student() {
+            super();
+        }
 
-		public Student(String name, Integer age, String address) {
-			super();
-			this.name = name;
-			this.age = age;
-			this.address = address;
-		}
+        public Student(String name, Integer age, String address) {
+            super();
+            this.name = name;
+            this.age = age;
+            this.address = address;
+        }
 
-	}
+    }
 
-	public static class ReadExcelListener extends AnalysisEventListener<Student> {
+    public static class ReadExcelListener extends AnalysisEventListener<Student> {
 
-		// The invoke method is called every time a row is parsed
-		@Override
-		public void invoke(Student data, AnalysisContext context) {
-			System.out.println("invoke: " + data + ", context: " + context);
-		}
+        // The invoke method is called every time a row is parsed
+        @Override
+        public void invoke(Student data, AnalysisContext context) {
+            System.out.println("invoke: " + data + ", context: " + context);
+        }
 
-		@SuppressWarnings({ "rawtypes" })
-		@Override
-		public void invokeHead(Map<Integer, CellData> headMap, AnalysisContext context) {
-			System.out.println("invokeHead: " + headMap + ", context: " + context);
-		}
+        @SuppressWarnings({ "rawtypes" })
+        @Override
+        public void invokeHead(Map<Integer, CellData> headMap, AnalysisContext context) {
+            System.out.println("invokeHead: " + headMap + ", context: " + context);
+        }
 
-		@Override
-		public void invokeHeadMap(Map<Integer, String> headMap, AnalysisContext context) {
-			System.out.println("headMap: " + headMap + ", context: " + context);
-		}
+        @Override
+        public void invokeHeadMap(Map<Integer, String> headMap, AnalysisContext context) {
+            System.out.println("headMap: " + headMap + ", context: " + context);
+        }
 
-		@Override
-		public void extra(CellExtra extra, AnalysisContext context) {
-			System.out.println("extra: " + extra + ", context: " + context);
-		}
+        @Override
+        public void extra(CellExtra extra, AnalysisContext context) {
+            System.out.println("extra: " + extra + ", context: " + context);
+        }
 
-		@Override
-		public void onException(Exception exception, AnalysisContext context) throws Exception {
-			System.out.println("onException context: " + context);
-			exception.printStackTrace();
-		}
+        @Override
+        public void onException(Exception exception, AnalysisContext context) throws Exception {
+            System.out.println("onException context: " + context);
+            exception.printStackTrace();
+        }
 
-		@Override
-		public boolean hasNext(AnalysisContext context) {
-			System.out.println("hasNext context: " + context);
-			return super.hasNext(context);
-		}
+        @Override
+        public boolean hasNext(AnalysisContext context) {
+            System.out.println("hasNext context: " + context);
+            return super.hasNext(context);
+        }
 
-		// Call automatically after parsing
-		@Override
-		public void doAfterAllAnalysed(AnalysisContext context) {
-			System.out.println("read finshed. context: " + context);
+        // Call automatically after parsing
+        @Override
+        public void doAfterAllAnalysed(AnalysisContext context) {
+            System.out.println("read finshed. context: " + context);
 
-		}
+        }
 
-	}
+    }
 
-	static String READ_EXCEL_FILE = USER_DIR + File.separator + "src" + File.separator
-			+ "test" + File.separator + "java" + File.separator + EasyExcelServicesTests.class.getName()
-					.replace(".", File.separator).replace(EasyExcelServicesTests.class.getSimpleName(), "")
-			+ File.separator + "easyexcel_example.xlsx";
+    static String READ_EXCEL_FILE = USER_DIR + File.separator + "src" + File.separator + "test" + File.separator + "java"
+            + File.separator + EasyExcelServicesTests.class.getName().replace(".", File.separator).replace(
+                    EasyExcelServicesTests.class.getSimpleName(), "")
+            + File.separator + "easyexcel_example.xlsx";
 
 }

@@ -37,28 +37,28 @@ import com.wl4g.infra.common.crypto.symmetric.DES56ECBPKCS5;
  */
 public class DES56ECBPKCS5Tests {
 
-	public static void main(String[] args) throws Exception {
-		DES56ECBPKCS5 des3 = new DES56ECBPKCS5();
-		CodecSource genKey = des3.generateKey();
-		out.println("new generateKey => (" + genKey.toBase64() + ")" + genKey.getBytes().length + "bytes");
+    public static void main(String[] args) throws Exception {
+        DES56ECBPKCS5 des3 = new DES56ECBPKCS5();
+        CodecSource genKey = des3.generateKey();
+        out.println("new generateKey => (" + genKey.toBase64() + ")" + genKey.getBytes().length + "bytes");
 
-		String plainText = "abcdefghijklmnopqrstuvwxyz";
-		CodecSource key = new CodecSource("abcd1234abcd1234"); // 8bytes
-		CodecSource cipherText = des3.encrypt(key.getBytes(), new CodecSource(plainText));
-		out.println("plainText => " + plainText);
-		out.println("key => " + key);
-		out.println("encrypt => " + cipherText.toBase64());
-		out.println("decrypt => " + des3.decrypt(key.getBytes(), cipherText).toString());
+        String plainText = "abcdefghijklmnopqrstuvwxyz";
+        CodecSource key = new CodecSource("abcd1234abcd1234"); // 8bytes
+        CodecSource cipherText = des3.encrypt(key.getBytes(), new CodecSource(plainText));
+        out.println("plainText => " + plainText);
+        out.println("key => " + key);
+        out.println("encrypt => " + cipherText.toBase64());
+        out.println("decrypt => " + des3.decrypt(key.getBytes(), cipherText).toString());
 
-		System.out.println("-------------------");
-		productionDbPasswordDecryptTest1();
-	}
+        System.out.println("-------------------");
+        productionDbPasswordDecryptTest1();
+    }
 
-	public static void productionDbPasswordDecryptTest1() {
-		DES56ECBPKCS5 des = new DES56ECBPKCS5();
-		String plainText = "2xg9mqvAmHILk8Op8iof/g+NsvJ+nhF7";
-		CodecSource key = new CodecSource("c716a85d4fcd9101");
-		System.out.println(des.decrypt(key.getBytes(), CodecSource.fromBase64(plainText)));
-	}
+    public static void productionDbPasswordDecryptTest1() {
+        DES56ECBPKCS5 des = new DES56ECBPKCS5();
+        String plainText = "2xg9mqvAmHILk8Op8iof/g+NsvJ+nhF7";
+        CodecSource key = new CodecSource("c716a85d4fcd9101");
+        System.out.println(des.decrypt(key.getBytes(), CodecSource.fromBase64(plainText)));
+    }
 
 }

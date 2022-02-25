@@ -68,231 +68,231 @@ import io.netty.handler.timeout.ReadTimeoutHandler;
  */
 public class Netty4ClientHttpRequestFactory implements ClientHttpRequestFactory, Closeable {
 
-	private final boolean defaultEventLoopGroup;
-	private final EventLoopGroup eventLoopGroup;
+    private final boolean defaultEventLoopGroup;
+    private final EventLoopGroup eventLoopGroup;
 
-	@Nullable
-	private SslContext sslContext;
-	private boolean debug = false;
-	private long connectTimeout;
-	private long readTimeout;
-	private int maxResponseSize;
+    @Nullable
+    private SslContext sslContext;
+    private boolean debug = false;
+    private long connectTimeout;
+    private long readTimeout;
+    private int maxResponseSize;
 
-	@Nullable
-	private volatile Bootstrap bootstrap;
+    @Nullable
+    private volatile Bootstrap bootstrap;
 
-	/**
-	 * Create a new {@code Netty4ClientHttpRequestFactory} with a default
-	 * {@link NioEventLoopGroup}.
-	 */
-	public Netty4ClientHttpRequestFactory() {
-		this(false, -1, -1, DEFAULT_MAX_RESPONSE_SIZE);
-	}
+    /**
+     * Create a new {@code Netty4ClientHttpRequestFactory} with a default
+     * {@link NioEventLoopGroup}.
+     */
+    public Netty4ClientHttpRequestFactory() {
+        this(false, -1, -1, DEFAULT_MAX_RESPONSE_SIZE);
+    }
 
-	/**
-	 * Create a new {@code Netty4ClientHttpRequestFactory} with a default
-	 * {@link NioEventLoopGroup}.
-	 */
-	public Netty4ClientHttpRequestFactory(boolean debug) {
-		this(debug, -1, -1, DEFAULT_MAX_RESPONSE_SIZE);
-	}
+    /**
+     * Create a new {@code Netty4ClientHttpRequestFactory} with a default
+     * {@link NioEventLoopGroup}.
+     */
+    public Netty4ClientHttpRequestFactory(boolean debug) {
+        this(debug, -1, -1, DEFAULT_MAX_RESPONSE_SIZE);
+    }
 
-	/**
-	 * Create a new {@code Netty4ClientHttpRequestFactory} with a default
-	 * {@link NioEventLoopGroup}.
-	 * 
-	 * @param debug
-	 */
-	public Netty4ClientHttpRequestFactory(boolean debug, int connectTimeout, int readTimeout, int maxResponseSize) {
-		this(new NioEventLoopGroup(getRuntime().availableProcessors() * 2), debug);
-		setConnectTimeout(connectTimeout);
-		setReadTimeout(readTimeout);
-		setMaxResponseSize(maxResponseSize);
-	}
+    /**
+     * Create a new {@code Netty4ClientHttpRequestFactory} with a default
+     * {@link NioEventLoopGroup}.
+     * 
+     * @param debug
+     */
+    public Netty4ClientHttpRequestFactory(boolean debug, int connectTimeout, int readTimeout, int maxResponseSize) {
+        this(new NioEventLoopGroup(getRuntime().availableProcessors() * 2), debug);
+        setConnectTimeout(connectTimeout);
+        setReadTimeout(readTimeout);
+        setMaxResponseSize(maxResponseSize);
+    }
 
-	/**
-	 * Create a new {@code Netty4ClientHttpRequestFactory} with the given
-	 * {@link EventLoopGroup}.
-	 * <p>
-	 * <b>NOTE:</b> the given group will <strong>not</strong> be
-	 * {@linkplain EventLoopGroup#shutdownGracefully() shutdown} by this
-	 * factory; doing so becomes the responsibility of the caller.
-	 * 
-	 * @param debug
-	 */
-	public Netty4ClientHttpRequestFactory(EventLoopGroup eventLoopGroup, boolean debug) {
-		// notNull(eventLoopGroup, "EventLoopGroup must not be null");
-		this.eventLoopGroup = eventLoopGroup;
-		this.defaultEventLoopGroup = isNull(eventLoopGroup);
-		this.debug = debug;
-	}
+    /**
+     * Create a new {@code Netty4ClientHttpRequestFactory} with the given
+     * {@link EventLoopGroup}.
+     * <p>
+     * <b>NOTE:</b> the given group will <strong>not</strong> be
+     * {@linkplain EventLoopGroup#shutdownGracefully() shutdown} by this
+     * factory; doing so becomes the responsibility of the caller.
+     * 
+     * @param debug
+     */
+    public Netty4ClientHttpRequestFactory(EventLoopGroup eventLoopGroup, boolean debug) {
+        // notNull(eventLoopGroup, "EventLoopGroup must not be null");
+        this.eventLoopGroup = eventLoopGroup;
+        this.defaultEventLoopGroup = isNull(eventLoopGroup);
+        this.debug = debug;
+    }
 
-	/**
-	 * Set the default maximum response size.
-	 * <p>
-	 * By default this is set to {@link #DEFAULT_MAX_RESPONSE_SIZE}.
-	 * 
-	 * @since 4.1.5
-	 * @see HttpObjectAggregator#HttpObjectAggregator(int)
-	 */
-	public void setMaxResponseSize(int maxResponseSize) {
-		this.maxResponseSize = maxResponseSize;
-	}
+    /**
+     * Set the default maximum response size.
+     * <p>
+     * By default this is set to {@link #DEFAULT_MAX_RESPONSE_SIZE}.
+     * 
+     * @since 4.1.5
+     * @see HttpObjectAggregator#HttpObjectAggregator(int)
+     */
+    public void setMaxResponseSize(int maxResponseSize) {
+        this.maxResponseSize = maxResponseSize;
+    }
 
-	/**
-	 * Set the SSL context. When configured it is used to create and insert an
-	 * {@link io.netty.handler.ssl.SslHandler} in the channel pipeline.
-	 * <p>
-	 * A default client SslContext is configured if none has been provided.
-	 */
-	public void setSslContext(SslContext sslContext) {
-		this.sslContext = sslContext;
-	}
+    /**
+     * Set the SSL context. When configured it is used to create and insert an
+     * {@link io.netty.handler.ssl.SslHandler} in the channel pipeline.
+     * <p>
+     * A default client SslContext is configured if none has been provided.
+     */
+    public void setSslContext(SslContext sslContext) {
+        this.sslContext = sslContext;
+    }
 
-	/**
-	 * Set the underlying connect timeout (in milliseconds). A timeout value of
-	 * 0 specifies an infinite timeout.
-	 * 
-	 * @see ChannelConfig#setConnectTimeoutMillis(int)
-	 */
-	public void setConnectTimeout(long connectTimeout) {
-		this.connectTimeout = connectTimeout;
-	}
+    /**
+     * Set the underlying connect timeout (in milliseconds). A timeout value of
+     * 0 specifies an infinite timeout.
+     * 
+     * @see ChannelConfig#setConnectTimeoutMillis(int)
+     */
+    public void setConnectTimeout(long connectTimeout) {
+        this.connectTimeout = connectTimeout;
+    }
 
-	/**
-	 * Set the underlying URLConnection's read timeout (in milliseconds). A
-	 * timeout value of 0 specifies an infinite timeout.
-	 * 
-	 * @see ReadTimeoutHandler
-	 */
-	public void setReadTimeout(long readTimeout) {
-		this.readTimeout = readTimeout;
-	}
+    /**
+     * Set the underlying URLConnection's read timeout (in milliseconds). A
+     * timeout value of 0 specifies an infinite timeout.
+     * 
+     * @see ReadTimeoutHandler
+     */
+    public void setReadTimeout(long readTimeout) {
+        this.readTimeout = readTimeout;
+    }
 
-	/**
-	 * Create nttp request of netty.
-	 * 
-	 * @param uri
-	 * @param httpMethod
-	 * @param requestHeaders
-	 * @return
-	 * @throws IOException
-	 */
-	public ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod, HttpHeaders requestHeaders) throws IOException {
-		return new Netty4ClientHttpRequest(getBootstrap(uri, requestHeaders), uri, httpMethod);
-	}
+    /**
+     * Create nttp request of netty.
+     * 
+     * @param uri
+     * @param httpMethod
+     * @param requestHeaders
+     * @return
+     * @throws IOException
+     */
+    public ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod, HttpHeaders requestHeaders) throws IOException {
+        return new Netty4ClientHttpRequest(getBootstrap(uri, requestHeaders), uri, httpMethod);
+    }
 
-	/**
-	 * Template method for changing properties on the given
-	 * {@link SocketChannelConfig}.
-	 * <p>
-	 * The default implementation sets the connect timeout based on the set
-	 * property.
-	 * 
-	 * @param config
-	 *            the channel configuration
-	 */
-	protected void configureChannel(SocketChannelConfig config) {
-		if (connectTimeout >= 0) {
-			config.setConnectTimeoutMillis(safeLongToInt(connectTimeout));
-		}
-	}
+    /**
+     * Template method for changing properties on the given
+     * {@link SocketChannelConfig}.
+     * <p>
+     * The default implementation sets the connect timeout based on the set
+     * property.
+     * 
+     * @param config
+     *            the channel configuration
+     */
+    protected void configureChannel(SocketChannelConfig config) {
+        if (connectTimeout >= 0) {
+            config.setConnectTimeoutMillis(safeLongToInt(connectTimeout));
+        }
+    }
 
-	private SslContext getSslContext() {
-		if (sslContext == null) {
-			sslContext = buildClientSslContext();
-		}
-		return sslContext;
-	}
+    private SslContext getSslContext() {
+        if (sslContext == null) {
+            sslContext = buildClientSslContext();
+        }
+        return sslContext;
+    }
 
-	private SslContext buildClientSslContext() {
-		try {
-			return SslContextBuilder.forClient().build();
-		} catch (SSLException ex) {
-			throw new IllegalStateException("Could not create default client SslContext", ex);
-		}
-	}
+    private SslContext buildClientSslContext() {
+        try {
+            return SslContextBuilder.forClient().build();
+        } catch (SSLException ex) {
+            throw new IllegalStateException("Could not create default client SslContext", ex);
+        }
+    }
 
-	private Bootstrap getBootstrap(URI uri, HttpHeaders requestHeaders) {
-		boolean isSecure = (uri.getPort() == 443 || "https".equalsIgnoreCase(uri.getScheme()));
-		// if (isSecure) {
-		// return createBootstrap(uri, true, requestHeaders);
-		// } else if (isNull(bootstrap)) {
-		// this.bootstrap = createBootstrap(uri, false, requestHeaders);
-		// }
-		// return bootstrap;
-		return createBootstrap(uri, isSecure, requestHeaders);
-	}
+    private Bootstrap getBootstrap(URI uri, HttpHeaders requestHeaders) {
+        boolean isSecure = (uri.getPort() == 443 || "https".equalsIgnoreCase(uri.getScheme()));
+        // if (isSecure) {
+        // return createBootstrap(uri, true, requestHeaders);
+        // } else if (isNull(bootstrap)) {
+        // this.bootstrap = createBootstrap(uri, false, requestHeaders);
+        // }
+        // return bootstrap;
+        return createBootstrap(uri, isSecure, requestHeaders);
+    }
 
-	private Bootstrap createBootstrap(final URI uri, final boolean isSecure, final HttpHeaders requestHeaders) {
-		Bootstrap bootstrap = new Bootstrap();
-		bootstrap.group(eventLoopGroup).channel(NioSocketChannel.class)
-				.handler(new HttpChannelInitializer(uri, isSecure, requestHeaders));
-		return bootstrap;
-	}
+    private Bootstrap createBootstrap(final URI uri, final boolean isSecure, final HttpHeaders requestHeaders) {
+        Bootstrap bootstrap = new Bootstrap();
+        bootstrap.group(eventLoopGroup).channel(NioSocketChannel.class).handler(
+                new HttpChannelInitializer(uri, isSecure, requestHeaders));
+        return bootstrap;
+    }
 
-	@Override
-	public void close() throws IOException {
-		if (defaultEventLoopGroup) {
-			// Clean up the EventLoopGroup if we created it in the constructor
-			try {
-				eventLoopGroup.shutdownGracefully().sync();
-			} catch (InterruptedException e) {
-				throw new IllegalStateException(e);
-			}
-		}
-	}
+    @Override
+    public void close() throws IOException {
+        if (defaultEventLoopGroup) {
+            // Clean up the EventLoopGroup if we created it in the constructor
+            try {
+                eventLoopGroup.shutdownGracefully().sync();
+            } catch (InterruptedException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+    }
 
-	/**
-	 * {@link HttpChannelInitializer}
-	 */
-	private class HttpChannelInitializer extends ChannelInitializer<SocketChannel> {
-		final private URI uri;
-		final private boolean isSecure;
-		final private HttpHeaders requestHeaders;
+    /**
+     * {@link HttpChannelInitializer}
+     */
+    private class HttpChannelInitializer extends ChannelInitializer<SocketChannel> {
+        final private URI uri;
+        final private boolean isSecure;
+        final private HttpHeaders requestHeaders;
 
-		HttpChannelInitializer(final URI uri, final boolean isSecure, final HttpHeaders requestHeaders) {
-			this.uri = uri;
-			this.isSecure = isSecure;
-			this.requestHeaders = requestHeaders;
-		}
+        HttpChannelInitializer(final URI uri, final boolean isSecure, final HttpHeaders requestHeaders) {
+            this.uri = uri;
+            this.isSecure = isSecure;
+            this.requestHeaders = requestHeaders;
+        }
 
-		@Override
-		protected void initChannel(SocketChannel ch) throws Exception {
-			configureChannel(ch.config());
+        @Override
+        protected void initChannel(SocketChannel ch) throws Exception {
+            configureChannel(ch.config());
 
-			ChannelPipeline pipe = ch.pipeline();
-			if (debug) {
-				pipe.addLast(new LoggingHandler(LogLevel.INFO));
-			}
-			if (isSecure) {
-				notNull(getSslContext(), "sslContext should not be null");
-				pipe.addLast(getSslContext().newHandler(ch.alloc(), uri.getHost(), uri.getPort()));
-			}
-			pipe.addLast(new HttpClientCodec());
+            ChannelPipeline pipe = ch.pipeline();
+            if (debug) {
+                pipe.addLast(new LoggingHandler(LogLevel.INFO));
+            }
+            if (isSecure) {
+                notNull(getSslContext(), "sslContext should not be null");
+                pipe.addLast(getSslContext().newHandler(ch.alloc(), uri.getHost(), uri.getPort()));
+            }
+            pipe.addLast(new HttpClientCodec());
 
-			if (nonNull(requestHeaders) && MULTIPART_FORM_DATA.isCompatibleWith(requestHeaders.getContentType())) {
-				// Remove the following line if you don't want automatic
-				// content decompression.
-				pipe.addLast("inflater", new HttpContentDecompressor());
-				// to be used since huge file transfer
-				pipe.addLast("chunkedWriter", new ChunkedWriteHandler());
-			} else {
-				pipe.addLast(new HttpObjectAggregator(maxResponseSize));
-			}
+            if (nonNull(requestHeaders) && MULTIPART_FORM_DATA.isCompatibleWith(requestHeaders.getContentType())) {
+                // Remove the following line if you don't want automatic
+                // content decompression.
+                pipe.addLast("inflater", new HttpContentDecompressor());
+                // to be used since huge file transfer
+                pipe.addLast("chunkedWriter", new ChunkedWriteHandler());
+            } else {
+                pipe.addLast(new HttpObjectAggregator(maxResponseSize));
+            }
 
-			if (readTimeout > 0) {
-				pipe.addLast(new ReadTimeoutHandler(safeLongToInt(readTimeout), MILLISECONDS));
-			}
-		}
+            if (readTimeout > 0) {
+                pipe.addLast(new ReadTimeoutHandler(safeLongToInt(readTimeout), MILLISECONDS));
+            }
+        }
 
-	}
+    }
 
-	/**
-	 * The default maximum response size.
-	 * 
-	 * @see #setMaxResponseSize(int)
-	 */
-	public static final int DEFAULT_MAX_RESPONSE_SIZE = 1024 * 1024 * 10;
+    /**
+     * The default maximum response size.
+     * 
+     * @see #setMaxResponseSize(int)
+     */
+    public static final int DEFAULT_MAX_RESPONSE_SIZE = 1024 * 1024 * 10;
 
 }

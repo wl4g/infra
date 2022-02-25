@@ -32,32 +32,32 @@ import java.io.File;
  */
 public class EthzHolderTests {
 
-	static String PRIVATE_KEY = ResourceUtils2.getResourceString(EthzHolderTests.class, "id_pub");
+    static String PRIVATE_KEY = ResourceUtils2.getResourceString(EthzHolderTests.class, "id_pub");
 
-	public static void main(String[] args) throws Exception {
-		// executeCommand();
-		transation();
-	}
+    public static void main(String[] args) throws Exception {
+        // executeCommand();
+        transation();
+    }
 
-	public static void executeCommand() throws Exception {
-		String command = "sleep 10";
-		SSH2Holders.getInstance(EthzHolder.class).execWaitForComplete("10.0.0.160", "root", null,null, command, s -> {
-			System.err.println(ByteStreamUtils.readFullyToString(s.getStderr()));
-			System.out.println(ByteStreamUtils.readFullyToString(s.getStdout()));
-			s.close();
-			System.err.println("signal:" + s.getExitSignal() + ", state:" + s.getState() + ", status:" + s.getExitStatus());
-			return null;
-		}, 30_000);
-	}
+    public static void executeCommand() throws Exception {
+        String command = "sleep 10";
+        SSH2Holders.getInstance(EthzHolder.class).execWaitForComplete("10.0.0.160", "root", null, null, command, s -> {
+            System.err.println(ByteStreamUtils.readFullyToString(s.getStderr()));
+            System.out.println(ByteStreamUtils.readFullyToString(s.getStdout()));
+            s.close();
+            System.err.println("signal:" + s.getExitSignal() + ", state:" + s.getState() + ", status:" + s.getExitStatus());
+            return null;
+        }, 30_000);
+    }
 
-	public static void transation() throws Exception {
-		long t1 = System.currentTimeMillis();
-		// Test upload file
-		String loaclFile = "/Users/vjay/Downloads/safecloud-0203.sql";
-		SSH2Holders.getInstance(EthzHolder.class).scpPutFile("10.0.0.160", "root", PRIVATE_KEY.toCharArray(),null, new File(loaclFile),
-				"/root/testssh/");
-		long t2 = System.currentTimeMillis();
-		System.out.println(t2 - t1);
-	}
+    public static void transation() throws Exception {
+        long t1 = System.currentTimeMillis();
+        // Test upload file
+        String loaclFile = "/Users/vjay/Downloads/safecloud-0203.sql";
+        SSH2Holders.getInstance(EthzHolder.class).scpPutFile("10.0.0.160", "root", PRIVATE_KEY.toCharArray(), null,
+                new File(loaclFile), "/root/testssh/");
+        long t2 = System.currentTimeMillis();
+        System.out.println(t2 - t1);
+    }
 
 }

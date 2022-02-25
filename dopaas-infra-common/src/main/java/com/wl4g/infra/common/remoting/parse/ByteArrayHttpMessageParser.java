@@ -37,35 +37,35 @@ import com.wl4g.infra.common.remoting.standard.HttpMediaType;
  */
 public class ByteArrayHttpMessageParser extends AbstractHttpMessageParser<byte[]> {
 
-	/**
-	 * Create a new instance of the {@code ByteArrayHttpMessageConverter}.
-	 */
-	public ByteArrayHttpMessageParser() {
-		super(new HttpMediaType("application", "octet-stream"), HttpMediaType.ALL);
-	}
+    /**
+     * Create a new instance of the {@code ByteArrayHttpMessageConverter}.
+     */
+    public ByteArrayHttpMessageParser() {
+        super(new HttpMediaType("application", "octet-stream"), HttpMediaType.ALL);
+    }
 
-	@Override
-	public boolean supports(Class<?> clazz) {
-		return byte[].class == clazz;
-	}
+    @Override
+    public boolean supports(Class<?> clazz) {
+        return byte[].class == clazz;
+    }
 
-	@Override
-	public byte[] readInternal(Class<? extends byte[]> clazz, HttpInputMessage inputMessage) throws IOException {
-		long contentLength = inputMessage.getHeaders().getContentLength();
-		ByteArrayOutputStream bos = new ByteArrayOutputStream(
-				contentLength >= 0 ? (int) contentLength : ByteStreamUtils.BUFFER_SIZE);
-		ByteStreamUtils.copy(inputMessage.getBody(), bos);
-		return bos.toByteArray();
-	}
+    @Override
+    public byte[] readInternal(Class<? extends byte[]> clazz, HttpInputMessage inputMessage) throws IOException {
+        long contentLength = inputMessage.getHeaders().getContentLength();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream(
+                contentLength >= 0 ? (int) contentLength : ByteStreamUtils.BUFFER_SIZE);
+        ByteStreamUtils.copy(inputMessage.getBody(), bos);
+        return bos.toByteArray();
+    }
 
-	@Override
-	protected Long getContentLength(byte[] bytes, HttpMediaType contentType) {
-		return (long) bytes.length;
-	}
+    @Override
+    protected Long getContentLength(byte[] bytes, HttpMediaType contentType) {
+        return (long) bytes.length;
+    }
 
-	@Override
-	protected void writeInternal(byte[] bytes, HttpOutputMessage outputMessage) throws IOException {
-		ByteStreamUtils.copy(bytes, outputMessage.getBody());
-	}
+    @Override
+    protected void writeInternal(byte[] bytes, HttpOutputMessage outputMessage) throws IOException {
+        ByteStreamUtils.copy(bytes, outputMessage.getBody());
+    }
 
 }

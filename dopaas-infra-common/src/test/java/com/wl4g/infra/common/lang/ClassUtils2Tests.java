@@ -33,32 +33,32 @@ import org.junit.Test;
  */
 public class ClassUtils2Tests {
 
-	@Test
-	public void anyInstanceOfCase1() {
-		out.println(ClassUtils2.anyTypeOf(new MySubType1(), MyBaseType1.class)); // true
-		out.println(ClassUtils2.anyTypeOf(new MySubType1(), MyBaseType2.class)); // false
-		out.println(ClassUtils2.anyTypeOf(new MySubType1(), MyBaseType1.class, MyBaseType2.class)); // true
-		out.println(ClassUtils2.anyTypeOf(new MySubType1(), MyBaseType1.class, MyBaseType3.class)); // true
-	}
+    @Test
+    public void anyInstanceOfCase1() {
+        out.println(ClassUtils2.anyTypeOf(new MySubType1(), MyBaseType1.class)); // true
+        out.println(ClassUtils2.anyTypeOf(new MySubType1(), MyBaseType2.class)); // false
+        out.println(ClassUtils2.anyTypeOf(new MySubType1(), MyBaseType1.class, MyBaseType2.class)); // true
+        out.println(ClassUtils2.anyTypeOf(new MySubType1(), MyBaseType1.class, MyBaseType3.class)); // true
+    }
 
-	@Test
-	public void allInstanceOfCase1() {
-		out.println(ClassUtils2.allTypeOf(new MySubType1(), MyBaseType1.class)); // true
-		out.println(ClassUtils2.allTypeOf(new MySubType1(), MyBaseType2.class)); // false
-		out.println(ClassUtils2.allTypeOf(new MySubType1(), MyBaseType1.class, MyBaseType2.class)); // false
-		out.println(ClassUtils2.allTypeOf(new MySubType1(), MyBaseType1.class, MyBaseType3.class)); // true
-	}
+    @Test
+    public void allInstanceOfCase1() {
+        out.println(ClassUtils2.allTypeOf(new MySubType1(), MyBaseType1.class)); // true
+        out.println(ClassUtils2.allTypeOf(new MySubType1(), MyBaseType2.class)); // false
+        out.println(ClassUtils2.allTypeOf(new MySubType1(), MyBaseType1.class, MyBaseType2.class)); // false
+        out.println(ClassUtils2.allTypeOf(new MySubType1(), MyBaseType1.class, MyBaseType3.class)); // true
+    }
 
-	static class MyBaseType1 {
-	}
+    static class MyBaseType1 {
+    }
 
-	static class MyBaseType2 {
-	}
+    static class MyBaseType2 {
+    }
 
-	static interface MyBaseType3 {
-	}
+    static interface MyBaseType3 {
+    }
 
-	static class MySubType1 extends MyBaseType1 implements MyBaseType3 {
-	}
+    static class MySubType1 extends MyBaseType1 implements MyBaseType3 {
+    }
 
 }

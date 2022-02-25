@@ -30,13 +30,13 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
  */
 public class AES256ECBPKCS7 extends JdkCryptorSupport {
 
-	static {
-		// Let java support pkcs7padding
-		Security.addProvider(new BouncyCastleProvider());
-	}
+    static {
+        // Let java support pkcs7padding
+        Security.addProvider(new BouncyCastleProvider());
+    }
 
-	public AES256ECBPKCS7() {
-		super(new AlgorithmSpec("AES", "AES/ECB/PKCS7Padding", false, 256, 32, 32));
-	}
+    public AES256ECBPKCS7() {
+        super(new AlgorithmSpec("AES", "AES/ECB/PKCS7Padding", false, 256, 32, 32));
+    }
 
 }

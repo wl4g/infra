@@ -39,148 +39,148 @@ import nl.bitwalker.useragentutils.UserAgent;
  */
 public abstract class UserAgentUtils {
 
-	/**
-	 * Gets the user agent object
-	 * 
-	 * @param request
-	 * @return
-	 */
-	public static UserAgent getUserAgent(@NotNull HttpServletRequest request) {
-		notNullOf(request, "request");
-		return parseUserAgent(request.getHeader("User-Agent"));
-	}
+    /**
+     * Gets the user agent object
+     * 
+     * @param request
+     * @return
+     */
+    public static UserAgent getUserAgent(@NotNull HttpServletRequest request) {
+        notNullOf(request, "request");
+        return parseUserAgent(request.getHeader("User-Agent"));
+    }
 
-	/**
-	 * Gets the user agent object
-	 * 
-	 * @param request
-	 * @return
-	 */
-	public static UserAgent parseUserAgent(@Nullable String uaString) {
-		return isNull(uaString) ? null : UserAgent.parseUserAgentString(uaString);
-	}
+    /**
+     * Gets the user agent object
+     * 
+     * @param request
+     * @return
+     */
+    public static UserAgent parseUserAgent(@Nullable String uaString) {
+        return isNull(uaString) ? null : UserAgent.parseUserAgentString(uaString);
+    }
 
-	/**
-	 * Get device type
-	 * 
-	 * @param request
-	 * @return
-	 */
-	public static DeviceType getDeviceType(@NotNull HttpServletRequest request) {
-		notNullOf(request, "request");
-		UserAgent ua = getUserAgent(request);
-		return (isNull(ua) ? null : ((isNull(ua.getOperatingSystem()) ? null : ua.getOperatingSystem()).getDeviceType()));
-	}
+    /**
+     * Get device type
+     * 
+     * @param request
+     * @return
+     */
+    public static DeviceType getDeviceType(@NotNull HttpServletRequest request) {
+        notNullOf(request, "request");
+        UserAgent ua = getUserAgent(request);
+        return (isNull(ua) ? null : ((isNull(ua.getOperatingSystem()) ? null : ua.getOperatingSystem()).getDeviceType()));
+    }
 
-	/**
-	 * Is it a PC?
-	 * 
-	 * @param request
-	 * @return
-	 */
-	public static boolean isComputer(@NotNull HttpServletRequest request) {
-		DeviceType dt = getDeviceType(request);
-		return dt != null && DeviceType.COMPUTER.equals(dt);
-	}
+    /**
+     * Is it a PC?
+     * 
+     * @param request
+     * @return
+     */
+    public static boolean isComputer(@NotNull HttpServletRequest request) {
+        DeviceType dt = getDeviceType(request);
+        return dt != null && DeviceType.COMPUTER.equals(dt);
+    }
 
-	/**
-	 * Is it a cell phone?
-	 * 
-	 * @param request
-	 * @return
-	 */
-	public static boolean isMobile(@NotNull HttpServletRequest request) {
-		DeviceType dt = getDeviceType(request);
-		return dt != null && DeviceType.MOBILE.equals(dt);
-	}
+    /**
+     * Is it a cell phone?
+     * 
+     * @param request
+     * @return
+     */
+    public static boolean isMobile(@NotNull HttpServletRequest request) {
+        DeviceType dt = getDeviceType(request);
+        return dt != null && DeviceType.MOBILE.equals(dt);
+    }
 
-	/**
-	 * Is it a flat panel?
-	 * 
-	 * @param request
-	 * @return
-	 */
-	public static boolean isTablet(@NotNull HttpServletRequest request) {
-		DeviceType dt = getDeviceType(request);
-		return dt != null && DeviceType.TABLET.equals(dt);
-	}
+    /**
+     * Is it a flat panel?
+     * 
+     * @param request
+     * @return
+     */
+    public static boolean isTablet(@NotNull HttpServletRequest request) {
+        DeviceType dt = getDeviceType(request);
+        return dt != null && DeviceType.TABLET.equals(dt);
+    }
 
-	/**
-	 * Are they mobile phones and tablets?
-	 * 
-	 * @param request
-	 * @return
-	 */
-	public static boolean isMobileOrTablet(@NotNull HttpServletRequest request) {
-		DeviceType dt = getDeviceType(request);
-		return (dt != null && (DeviceType.MOBILE.equals(dt) || DeviceType.TABLET.equals(dt)));
-	}
+    /**
+     * Are they mobile phones and tablets?
+     * 
+     * @param request
+     * @return
+     */
+    public static boolean isMobileOrTablet(@NotNull HttpServletRequest request) {
+        DeviceType dt = getDeviceType(request);
+        return (dt != null && (DeviceType.MOBILE.equals(dt) || DeviceType.TABLET.equals(dt)));
+    }
 
-	/**
-	 * Is it a browser?
-	 * 
-	 * @param request
-	 * @return
-	 */
-	public static boolean isBrowser(@NotNull HttpServletRequest request) {
-		Browser br = getBrowser(request);
-		return (nonNull(br) && nonNull(br.getBrowserType()) && br.getBrowserType() != BrowserType.UNKNOWN);
-	}
+    /**
+     * Is it a browser?
+     * 
+     * @param request
+     * @return
+     */
+    public static boolean isBrowser(@NotNull HttpServletRequest request) {
+        Browser br = getBrowser(request);
+        return (nonNull(br) && nonNull(br.getBrowserType()) && br.getBrowserType() != BrowserType.UNKNOWN);
+    }
 
-	/**
-	 * Is it a browser?
-	 * 
-	 * @param uaString
-	 * @return
-	 */
-	public static boolean isBrowser(@Nullable String uaString) {
-		Browser br = getBrowser(uaString);
-		return (nonNull(br) && nonNull(br.getBrowserType()) && br.getBrowserType() != BrowserType.UNKNOWN);
-	}
+    /**
+     * Is it a browser?
+     * 
+     * @param uaString
+     * @return
+     */
+    public static boolean isBrowser(@Nullable String uaString) {
+        Browser br = getBrowser(uaString);
+        return (nonNull(br) && nonNull(br.getBrowserType()) && br.getBrowserType() != BrowserType.UNKNOWN);
+    }
 
-	/**
-	 * Gets the browsing type
-	 * 
-	 * @param uaString
-	 * @return
-	 */
-	public static Browser getBrowser(@Nullable String uaString) {
-		UserAgent ua = parseUserAgent(uaString);
-		return (nonNull(ua) && nonNull(ua.getBrowser()) && ua.getBrowser() != Browser.UNKNOWN) ? ua.getBrowser() : null;
-	}
+    /**
+     * Gets the browsing type
+     * 
+     * @param uaString
+     * @return
+     */
+    public static Browser getBrowser(@Nullable String uaString) {
+        UserAgent ua = parseUserAgent(uaString);
+        return (nonNull(ua) && nonNull(ua.getBrowser()) && ua.getBrowser() != Browser.UNKNOWN) ? ua.getBrowser() : null;
+    }
 
-	/**
-	 * Gets the browsing type
-	 * 
-	 * @param request
-	 * @return
-	 */
-	public static Browser getBrowser(@NotNull HttpServletRequest request) {
-		UserAgent ua = getUserAgent(request);
-		return (nonNull(ua) && nonNull(ua.getBrowser()) && ua.getBrowser() != Browser.UNKNOWN) ? ua.getBrowser() : null;
-	}
+    /**
+     * Gets the browsing type
+     * 
+     * @param request
+     * @return
+     */
+    public static Browser getBrowser(@NotNull HttpServletRequest request) {
+        UserAgent ua = getUserAgent(request);
+        return (nonNull(ua) && nonNull(ua.getBrowser()) && ua.getBrowser() != Browser.UNKNOWN) ? ua.getBrowser() : null;
+    }
 
-	/**
-	 * Gets the browsing type name
-	 * 
-	 * @param request
-	 * @return
-	 */
-	public static String getBrowserName(@NotNull HttpServletRequest request) {
-		Browser browser = getBrowser(request);
-		return isNull(browser) ? null : browser.getName();
-	}
+    /**
+     * Gets the browsing type name
+     * 
+     * @param request
+     * @return
+     */
+    public static String getBrowserName(@NotNull HttpServletRequest request) {
+        Browser browser = getBrowser(request);
+        return isNull(browser) ? null : browser.getName();
+    }
 
-	/**
-	 * Whether the IE version is less than or equal to IE8
-	 * 
-	 * @param request
-	 * @return
-	 */
-	public static boolean isLteIE8(@NotNull HttpServletRequest request) {
-		Browser br = getBrowser(request);
-		return (nonNull(br)
-				&& (Browser.IE5.equals(br) || Browser.IE6.equals(br) || Browser.IE7.equals(br) || Browser.IE8.equals(br)));
-	}
+    /**
+     * Whether the IE version is less than or equal to IE8
+     * 
+     * @param request
+     * @return
+     */
+    public static boolean isLteIE8(@NotNull HttpServletRequest request) {
+        Browser br = getBrowser(request);
+        return (nonNull(br)
+                && (Browser.IE5.equals(br) || Browser.IE6.equals(br) || Browser.IE7.equals(br) || Browser.IE8.equals(br)));
+    }
 
 }

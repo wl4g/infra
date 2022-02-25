@@ -25,10 +25,10 @@ package com.wl4g.infra.common.nlp;
  */
 public class Pinyin4jUtilsTests {
 
-	public static void main(String[] args) {
-		System.out.println(PingyUtils.getPingyin("广东省"));
-		System.out.println(PingyUtils.getPinyinHeadChar("广东省"));
-		System.out.println(PingyUtils.getPinyinHeadChar("北京市"));
-	}
+    public static void main(String[] args) {
+        System.out.println(PingyUtils.getPingyin("广东省"));
+        System.out.println(PingyUtils.getPinyinHeadChar("广东省"));
+        System.out.println(PingyUtils.getPinyinHeadChar("北京市"));
+    }
 
 }

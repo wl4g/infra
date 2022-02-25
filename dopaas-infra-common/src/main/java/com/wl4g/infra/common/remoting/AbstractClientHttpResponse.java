@@ -25,9 +25,9 @@ import com.wl4g.infra.common.remoting.standard.HttpStatus;
  */
 public abstract class AbstractClientHttpResponse implements ClientHttpResponse {
 
-	@Override
-	public HttpStatus getStatusCode() throws IOException {
-		return HttpStatus.valueOf(getRawStatusCode());
-	}
+    @Override
+    public HttpStatus getStatusCode() throws IOException {
+        return HttpStatus.valueOf(getRawStatusCode());
+    }
 
 }

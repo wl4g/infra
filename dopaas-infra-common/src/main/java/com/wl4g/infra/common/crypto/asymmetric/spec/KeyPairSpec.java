@@ -30,40 +30,40 @@ import com.wl4g.infra.common.lang.Assert2;
  * @since
  */
 public abstract class KeyPairSpec implements Serializable {
-	private static final long serialVersionUID = -4466016486932734335L;
+    private static final long serialVersionUID = -4466016486932734335L;
 
-	/**
-	 * KeySpec unique identification.
-	 */
-	private String keySpecId;
+    /**
+     * KeySpec unique identification.
+     */
+    private String keySpecId;
 
-	public KeyPairSpec() {
-		setKeySpecId("keySpec" + UUID.randomUUID().toString().replaceAll("-", "").substring(12));
-	}
+    public KeyPairSpec() {
+        setKeySpecId("keySpec" + UUID.randomUUID().toString().replaceAll("-", "").substring(12));
+    }
 
-	public KeyPairSpec(String keySpecId) {
-		Assert2.hasText(keySpecId, "KeySpecId must not be empty.");
-		this.keySpecId = keySpecId;
-	}
+    public KeyPairSpec(String keySpecId) {
+        Assert2.hasText(keySpecId, "KeySpecId must not be empty.");
+        this.keySpecId = keySpecId;
+    }
 
-	public String getKeySpecId() {
-		return keySpecId;
-	}
+    public String getKeySpecId() {
+        return keySpecId;
+    }
 
-	public void setKeySpecId(String keySpecId) {
-		this.keySpecId = keySpecId;
-	}
+    public void setKeySpecId(String keySpecId) {
+        this.keySpecId = keySpecId;
+    }
 
-	public abstract KeySpec getKeySpec();
+    public abstract KeySpec getKeySpec();
 
-	public abstract KeySpec getPubKeySpec();
+    public abstract KeySpec getPubKeySpec();
 
-	public abstract String getHexString();
+    public abstract String getHexString();
 
-	public abstract String getPubHexString();
+    public abstract String getPubHexString();
 
-	public abstract String getBase64String();
+    public abstract String getBase64String();
 
-	public abstract String getPubBase64String();
+    public abstract String getPubBase64String();
 
 }

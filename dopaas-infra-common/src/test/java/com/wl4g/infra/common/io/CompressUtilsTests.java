@@ -22,9 +22,9 @@ import org.apache.commons.compress.archivers.ArchiveException;
 
 public class CompressUtilsTests {
 
-	public static void main(String[] args) throws IOException, ArchiveException {
-		CompressUtils.appendTarArchive(new File("/Users/vjay/Downloads/base-view-master-bin.tar"),
-				new File("/Users/vjay/Downloads/rap1.json"), "rap1.json");
-	}
+    public static void main(String[] args) throws IOException, ArchiveException {
+        CompressUtils.appendTarArchive(new File("/Users/vjay/Downloads/base-view-master-bin.tar"),
+                new File("/Users/vjay/Downloads/rap1.json"), "rap1.json");
+    }
 
 }

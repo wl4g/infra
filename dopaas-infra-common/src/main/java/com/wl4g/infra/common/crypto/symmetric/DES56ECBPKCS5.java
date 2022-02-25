@@ -28,19 +28,19 @@ import javax.crypto.spec.DESKeySpec;
  */
 public class DES56ECBPKCS5 extends JdkCryptorSupport {
 
-	public DES56ECBPKCS5() {
-		super(new AlgorithmSpec("DES", "DES", false, 56, 16, 16));
-	}
+    public DES56ECBPKCS5() {
+        super(new AlgorithmSpec("DES", "DES", false, 56, 16, 16));
+    }
 
-	@Override
-	protected SecretKey createSecretKey(byte[] key) {
-		try {
-			DESKeySpec dks = new DESKeySpec(key);
-			SecretKeyFactory skf = SecretKeyFactory.getInstance(config.getAlgName());
-			return skf.generateSecret(dks);
-		} catch (Exception e) {
-			throw new IllegalStateException(e);
-		}
-	}
+    @Override
+    protected SecretKey createSecretKey(byte[] key) {
+        try {
+            DESKeySpec dks = new DESKeySpec(key);
+            SecretKeyFactory skf = SecretKeyFactory.getInstance(config.getAlgName());
+            return skf.generateSecret(dks);
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
 }

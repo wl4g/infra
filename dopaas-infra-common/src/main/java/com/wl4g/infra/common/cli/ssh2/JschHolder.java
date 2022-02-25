@@ -33,81 +33,81 @@ import java.io.*;
 @Beta
 public class JschHolder extends SSH2Holders<Void, Void> {
 
-	// --- Transfer files. ---
+    // --- Transfer files. ---
 
-	@Override
-	public void scpGetFile(String host, String user, char[] pemPrivateKey, String password, File localFile, String remoteFilePath)
-			throws Exception {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public void scpGetFile(String host, String user, char[] pemPrivateKey, String password, File localFile, String remoteFilePath)
+            throws Exception {
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public void scpPutFile(String host, String user, char[] pemPrivateKey, String password, File localFile, String remoteDir)
-			throws Exception {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public void scpPutFile(String host, String user, char[] pemPrivateKey, String password, File localFile, String remoteDir)
+            throws Exception {
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	protected void doScpTransfer(String host, String user, char[] pemPrivateKey, String password,
-			CallbackFunction<Void> processor) throws Exception {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    protected void doScpTransfer(String host, String user, char[] pemPrivateKey, String password,
+            CallbackFunction<Void> processor) throws Exception {
+        throw new UnsupportedOperationException();
+    }
 
-	// --- Execution commands. ---
+    // --- Execution commands. ---
 
-	@Override
-	public Ssh2ExecResult execWaitForResponse(String host, String user, char[] pemPrivateKey, String password, String command,
-			long timeoutMs) throws Exception {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public Ssh2ExecResult execWaitForResponse(String host, String user, char[] pemPrivateKey, String password, String command,
+            long timeoutMs) throws Exception {
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public <T> T execWaitForComplete(String host, String user, char[] pemPrivateKey, String password, String command,
-			ProcessFunction<Void, T> processor, long timeoutMs) throws Exception {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public <T> T execWaitForComplete(String host, String user, char[] pemPrivateKey, String password, String command,
+            ProcessFunction<Void, T> processor, long timeoutMs) throws Exception {
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public <T> T doExecCommand(String host, String user, char[] pemPrivateKey, String password, String command,
-			ProcessFunction<Void, T> processor) throws Exception {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public <T> T doExecCommand(String host, String user, char[] pemPrivateKey, String password, String command,
+            ProcessFunction<Void, T> processor) throws Exception {
+        throw new UnsupportedOperationException();
+    }
 
-	// --- Tool function's. ---
+    // --- Tool function's. ---
 
-	@Override
-	public Ssh2KeyPair generateKeypair(AlgorithmType type, String comment) throws Exception {
-		int algType = KeyPair.RSA;
-		if (type == AlgorithmType.DSA) {
-			algType = KeyPair.DSA;
-		} else if (type == AlgorithmType.ECDSA) {
-			algType = KeyPair.ECDSA;
-		}
-		KeyPair kpair = KeyPair.genKeyPair(new JSch(), algType);
+    @Override
+    public Ssh2KeyPair generateKeypair(AlgorithmType type, String comment) throws Exception {
+        int algType = KeyPair.RSA;
+        if (type == AlgorithmType.DSA) {
+            algType = KeyPair.DSA;
+        } else if (type == AlgorithmType.ECDSA) {
+            algType = KeyPair.ECDSA;
+        }
+        KeyPair kpair = KeyPair.genKeyPair(new JSch(), algType);
 
-		// 私钥
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();// 向OutPutStream中写入
-		kpair.writePrivateKey(baos);
-		final String privateKey = baos.toString();
-		// 公钥
-		baos = new ByteArrayOutputStream();
-		kpair.writePublicKey(baos, comment);
-		final String publicKey = baos.toString();
-		kpair.dispose();
+        // 私钥
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();// 向OutPutStream中写入
+        kpair.writePrivateKey(baos);
+        final String privateKey = baos.toString();
+        // 公钥
+        baos = new ByteArrayOutputStream();
+        kpair.writePublicKey(baos, comment);
+        final String publicKey = baos.toString();
+        kpair.dispose();
 
-		// To rsa.pub
-		// String publicKeyString =
-		// RSAEncrypt.loadPublicKeyByFile(filePath,filename + ".pub");
-		// System.out.println(publicKeyString.length());
-		// System.out.println(publicKeyString);
+        // To rsa.pub
+        // String publicKeyString =
+        // RSAEncrypt.loadPublicKeyByFile(filePath,filename + ".pub");
+        // System.out.println(publicKeyString.length());
+        // System.out.println(publicKeyString);
 
-		// To rsa
-		// String privateKeyString =
-		// RSAEncrypt.loadPrivateKeyByFile(filePath,filename);
-		// System.out.println(privateKeyString.length());
-		// System.out.println(privateKeyString);
+        // To rsa
+        // String privateKeyString =
+        // RSAEncrypt.loadPrivateKeyByFile(filePath,filename);
+        // System.out.println(privateKeyString.length());
+        // System.out.println(privateKeyString);
 
-		return new Ssh2KeyPair(privateKey, publicKey);
-	}
+        return new Ssh2KeyPair(privateKey, publicKey);
+    }
 
 }

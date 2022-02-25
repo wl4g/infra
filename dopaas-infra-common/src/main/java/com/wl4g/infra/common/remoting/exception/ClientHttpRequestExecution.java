@@ -32,18 +32,18 @@ import com.wl4g.infra.common.remoting.HttpRequest;
  */
 public interface ClientHttpRequestExecution {
 
-	/**
-	 * Execute the request with the given request attributes and body, and
-	 * return the response.
-	 * 
-	 * @param request
-	 *            the request, containing method, URI, and headers
-	 * @param body
-	 *            the body of the request to execute
-	 * @return the response
-	 * @throws IOException
-	 *             in case of I/O errors
-	 */
-	ClientHttpResponse execute(HttpRequest request, byte[] body) throws IOException;
+    /**
+     * Execute the request with the given request attributes and body, and
+     * return the response.
+     * 
+     * @param request
+     *            the request, containing method, URI, and headers
+     * @param body
+     *            the body of the request to execute
+     * @return the response
+     * @throws IOException
+     *             in case of I/O errors
+     */
+    ClientHttpResponse execute(HttpRequest request, byte[] body) throws IOException;
 
 }

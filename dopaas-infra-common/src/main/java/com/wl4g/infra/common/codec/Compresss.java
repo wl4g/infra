@@ -28,32 +28,32 @@ import org.xerial.snappy.Snappy;
  */
 public abstract class Compresss {
 
-	/**
-	 * Using snappy compress.
-	 * 
-	 * @param data
-	 * @return
-	 */
-	public static byte[] snappyCompress(byte[] data) {
-		try {
-			return Snappy.compress(data);
-		} catch (IOException e) {
-			throw new IllegalStateException(e);
-		}
-	}
+    /**
+     * Using snappy compress.
+     * 
+     * @param data
+     * @return
+     */
+    public static byte[] snappyCompress(byte[] data) {
+        try {
+            return Snappy.compress(data);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
-	/**
-	 * Using snappy uncompress.
-	 * 
-	 * @param data
-	 * @return
-	 */
-	public static byte[] snappyUnCompress(byte[] data) {
-		try {
-			return Snappy.uncompress(data);
-		} catch (IOException e) {
-			throw new IllegalStateException(e);
-		}
-	}
+    /**
+     * Using snappy uncompress.
+     * 
+     * @param data
+     * @return
+     */
+    public static byte[] snappyUnCompress(byte[] data) {
+        try {
+            return Snappy.uncompress(data);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
 }

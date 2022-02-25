@@ -15,7 +15,6 @@
  */
 package com.wl4g.infra.common.cli.ssh2;
 
-
 import com.wl4g.infra.common.cli.ssh2.SSH2Holders;
 import com.wl4g.infra.common.cli.ssh2.SshdHolder;
 import com.wl4g.infra.common.cli.ssh2.SSH2Holders.Ssh2ExecResult;
@@ -43,62 +42,62 @@ import static java.util.Objects.nonNull;
  */
 public class SshdHolderTests {
 
-	static String PRIVATE_KEY = ResourceUtils2.getResourceString(SshdHolderTests.class, "id_pub");
+    static String PRIVATE_KEY = ResourceUtils2.getResourceString(SshdHolderTests.class, "id_pub");
 
-	static {
-		// Generate sample data.
-		File file = new File("/tmp/test_vim_file.txt");
-		try {
-			FileUtils.write(file, "abcdefghijklmnopqrstuvwxyz", UTF_8);
-		} catch (IOException e) {
-			throw new IllegalStateException(e);
-		}
-	}
+    static {
+        // Generate sample data.
+        File file = new File("/tmp/test_vim_file.txt");
+        try {
+            FileUtils.write(file, "abcdefghijklmnopqrstuvwxyz", UTF_8);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
-	public static void main(String[] args) throws Exception {
-		// execCatInteractiveCommandTest1();
-		execVimCommandTest2();
-		// sshdPutTransferTest2();
-	}
+    public static void main(String[] args) throws Exception {
+        // execCatInteractiveCommandTest1();
+        execVimCommandTest2();
+        // sshdPutTransferTest2();
+    }
 
-	public static void execCatCommandTest1() throws Exception {
-		String cmd = "cat /tmp/test_vim_file.txt";
-		Ssh2ExecResult resp = SSH2Holders.getInstance(SshdHolder.class).execWaitForResponse("127.0.0.1", "wanglsir",
-				PRIVATE_KEY.toCharArray(),null, cmd, 3_000);
-		out.println("stdout=" + resp.getMessage());
-		out.println("stderr=" + resp.getErrmsg());
-		out.println("exitCode=" + resp.getExitCode());
+    public static void execCatCommandTest1() throws Exception {
+        String cmd = "cat /tmp/test_vim_file.txt";
+        Ssh2ExecResult resp = SSH2Holders.getInstance(SshdHolder.class).execWaitForResponse("127.0.0.1", "wanglsir",
+                PRIVATE_KEY.toCharArray(), null, cmd, 3_000);
+        out.println("stdout=" + resp.getMessage());
+        out.println("stderr=" + resp.getErrmsg());
+        out.println("exitCode=" + resp.getExitCode());
 
-	}
+    }
 
-	public static void execVimCommandTest2() throws Exception {
-		String cmd = "vim /tmp/test_vim_file.txt";
-		SSH2Holders.getInstance(SshdHolder.class).doExecCommand("127.0.0.1", "wanglsir", PRIVATE_KEY.toCharArray(),null, cmd,
-				chSession -> {
-					chSession.waitFor(singleton(ClientChannelEvent.CLOSED), 3_000);
+    public static void execVimCommandTest2() throws Exception {
+        String cmd = "vim /tmp/test_vim_file.txt";
+        SSH2Holders.getInstance(SshdHolder.class).doExecCommand("127.0.0.1", "wanglsir", PRIVATE_KEY.toCharArray(), null, cmd,
+                chSession -> {
+                    chSession.waitFor(singleton(ClientChannelEvent.CLOSED), 3_000);
 
-					String msg = null, errmsg = null;
-					if (nonNull(chSession.getOut())) {
-						msg = chSession.getOut().toString();
-						out.println("stdout=" + msg);
-					}
-					if (nonNull(chSession.getErr())) {
-						errmsg = chSession.getErr().toString();
-						out.println("stderr=" + errmsg);
-					}
-					return null;
-				});
+                    String msg = null, errmsg = null;
+                    if (nonNull(chSession.getOut())) {
+                        msg = chSession.getOut().toString();
+                        out.println("stdout=" + msg);
+                    }
+                    if (nonNull(chSession.getErr())) {
+                        errmsg = chSession.getErr().toString();
+                        out.println("stderr=" + errmsg);
+                    }
+                    return null;
+                });
 
-	}
+    }
 
-	public static void putTransferTest2() throws Exception {
-		long begin = currentTimeMillis();
-		// Test upload file
-		String loaclFile = "/Users/vjay/Downloads/elasticsearch-7.6.0-linux-x86_64.tar";
-		SSH2Holders.getInstance(SshdHolder.class).scpPutFile("10.0.0.160", "root", PRIVATE_KEY.toCharArray(),null, new File(loaclFile),
-				"$HOME/testssh/elasticsearch-7.6.0-linux-x86_64.tar");
-		long end = currentTimeMillis();
-		out.println("cost:" + (end - begin));// 80801ms 150<cpu<200
-	}
+    public static void putTransferTest2() throws Exception {
+        long begin = currentTimeMillis();
+        // Test upload file
+        String loaclFile = "/Users/vjay/Downloads/elasticsearch-7.6.0-linux-x86_64.tar";
+        SSH2Holders.getInstance(SshdHolder.class).scpPutFile("10.0.0.160", "root", PRIVATE_KEY.toCharArray(), null,
+                new File(loaclFile), "$HOME/testssh/elasticsearch-7.6.0-linux-x86_64.tar");
+        long end = currentTimeMillis();
+        out.println("cost:" + (end - begin));// 80801ms 150<cpu<200
+    }
 
 }

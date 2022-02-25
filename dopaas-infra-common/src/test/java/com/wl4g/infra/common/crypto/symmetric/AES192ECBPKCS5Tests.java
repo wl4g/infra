@@ -28,7 +28,8 @@ import com.wl4g.infra.common.crypto.symmetric.AES192ECBPKCS5;
  * </p>
  * <p>
  * Verified2:
- * <a href="http://tool.chacuo.net/cryptaes">http://tool.chacuo.net/cryptaes (128bits)</a>
+ * <a href="http://tool.chacuo.net/cryptaes">http://tool.chacuo.net/cryptaes
+ * (128bits)</a>
  * </p>
  *
  * @author Wangl.sir <wanglsir@gmail.com, 983708408@qq.com>
@@ -37,19 +38,19 @@ import com.wl4g.infra.common.crypto.symmetric.AES192ECBPKCS5;
  */
 public class AES192ECBPKCS5Tests {
 
-	public static void main(String[] args) throws Exception {
-		AES192ECBPKCS5 aes = new AES192ECBPKCS5();
-		CodecSource genKey = aes.generateKey();
-		out.println("new generateKey => (" + genKey.toBase64() + ")" + genKey.getBytes().length + "bytes");
+    public static void main(String[] args) throws Exception {
+        AES192ECBPKCS5 aes = new AES192ECBPKCS5();
+        CodecSource genKey = aes.generateKey();
+        out.println("new generateKey => (" + genKey.toBase64() + ")" + genKey.getBytes().length + "bytes");
 
-		String plainText = "abcdefghijklmnopqrstuvwxyz";
-		CodecSource key = new CodecSource("123456781234567812345678"); // 24bytes
-		CodecSource cipherText = aes.encrypt(key.getBytes(), new CodecSource(plainText));
-		out.println("plainText => " + plainText);
-		out.println("key => " + key);
-		out.println("encrypt => " + cipherText.toBase64());
-		out.println("decrypt => " + aes.decrypt(key.getBytes(), cipherText).toString());
+        String plainText = "abcdefghijklmnopqrstuvwxyz";
+        CodecSource key = new CodecSource("123456781234567812345678"); // 24bytes
+        CodecSource cipherText = aes.encrypt(key.getBytes(), new CodecSource(plainText));
+        out.println("plainText => " + plainText);
+        out.println("key => " + key);
+        out.println("encrypt => " + cipherText.toBase64());
+        out.println("decrypt => " + aes.decrypt(key.getBytes(), cipherText).toString());
 
-	}
+    }
 
 }

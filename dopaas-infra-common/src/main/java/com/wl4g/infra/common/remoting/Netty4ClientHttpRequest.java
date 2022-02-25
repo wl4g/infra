@@ -50,184 +50,184 @@ import io.netty.handler.codec.http.HttpVersion;
  */
 class Netty4ClientHttpRequest extends AbstractAsyncClientHttpRequest implements ClientHttpRequest {
 
-	private final Bootstrap bootstrap;
-	private final URI uri;
-	private final HttpMethod method;
-	private final ByteBufOutputStream body;
-	private boolean executed = false;
+    private final Bootstrap bootstrap;
+    private final URI uri;
+    private final HttpMethod method;
+    private final ByteBufOutputStream body;
+    private boolean executed = false;
 
-	public Netty4ClientHttpRequest(Bootstrap bootstrap, URI uri, HttpMethod method) {
-		notNullOf(bootstrap, "bootstrap");
-		notNullOf(uri, "uri");
-		notNullOf(method, "method");
-		this.bootstrap = bootstrap;
-		this.uri = uri;
-		this.method = method;
-		this.body = new ByteBufOutputStream(Unpooled.buffer(1024));
-	}
+    public Netty4ClientHttpRequest(Bootstrap bootstrap, URI uri, HttpMethod method) {
+        notNullOf(bootstrap, "bootstrap");
+        notNullOf(uri, "uri");
+        notNullOf(method, "method");
+        this.bootstrap = bootstrap;
+        this.uri = uri;
+        this.method = method;
+        this.body = new ByteBufOutputStream(Unpooled.buffer(1024));
+    }
 
-	/**
-	 * Return the HTTP method of the request.
-	 * 
-	 * @return the HTTP method as an HttpMethod enum value, or {@code null} if
-	 *         not resolvable (e.g. in case of a non-standard HTTP method)
-	 */
-	public HttpMethod getMethod() {
-		return this.method;
-	}
+    /**
+     * Return the HTTP method of the request.
+     * 
+     * @return the HTTP method as an HttpMethod enum value, or {@code null} if
+     *         not resolvable (e.g. in case of a non-standard HTTP method)
+     */
+    public HttpMethod getMethod() {
+        return this.method;
+    }
 
-	@Override
-	public String getMethodValue() {
-		return this.method.name();
-	}
+    @Override
+    public String getMethodValue() {
+        return this.method.name();
+    }
 
-	/**
-	 * Return the URI of the request (including a query string if any, but only
-	 * if it is well-formed for a URI representation).
-	 * 
-	 * @return the URI of the request (never {@code null})
-	 */
-	public URI getURI() {
-		return this.uri;
-	}
+    /**
+     * Return the URI of the request (including a query string if any, but only
+     * if it is well-formed for a URI representation).
+     * 
+     * @return the URI of the request (never {@code null})
+     */
+    public URI getURI() {
+        return this.uri;
+    }
 
-	/**
-	 * Execute this request asynchronously, resulting in a Future handle.
-	 * {@link ClientHttpResponse} that can be read.
-	 * 
-	 * @return the future response result of the execution
-	 * @throws java.io.IOException
-	 *             in case of I/O errors
-	 */
-	public ListenableFuture<ClientHttpResponse> executeAsync() throws IOException {
-		assertNotExecuted();
-		ListenableFuture<ClientHttpResponse> result = executeInternal(getHeaders());
-		this.executed = true;
-		return result;
-	}
+    /**
+     * Execute this request asynchronously, resulting in a Future handle.
+     * {@link ClientHttpResponse} that can be read.
+     * 
+     * @return the future response result of the execution
+     * @throws java.io.IOException
+     *             in case of I/O errors
+     */
+    public ListenableFuture<ClientHttpResponse> executeAsync() throws IOException {
+        assertNotExecuted();
+        ListenableFuture<ClientHttpResponse> result = executeInternal(getHeaders());
+        this.executed = true;
+        return result;
+    }
 
-	/**
-	 * Asserts that this request has not been {@linkplain #executeAsync()
-	 * executed} yet.
-	 * 
-	 * @throws IllegalStateException
-	 *             if this request has been executed
-	 */
-	protected void assertNotExecuted() {
-		Assert2.state(!executed, "ClientHttpRequest already executed");
-	}
+    /**
+     * Asserts that this request has not been {@linkplain #executeAsync()
+     * executed} yet.
+     * 
+     * @throws IllegalStateException
+     *             if this request has been executed
+     */
+    protected void assertNotExecuted() {
+        Assert2.state(!executed, "ClientHttpRequest already executed");
+    }
 
-	/**
-	 * Execute this request, resulting in a {@link ClientHttpResponse} that can
-	 * be read.
-	 * 
-	 * @return the response result of the execution
-	 * @throws IOException
-	 *             in case of I/O errors
-	 */
-	public ClientHttpResponse execute() throws IOException {
-		try {
-			return executeAsync().get();
-		} catch (InterruptedException ex) {
-			Thread.currentThread().interrupt();
-			throw new IOException("Interrupted during request execution", ex);
-		} catch (ExecutionException ex) {
-			if (ex.getCause() instanceof IOException) {
-				throw (IOException) ex.getCause();
-			} else {
-				throw new IOException(ex.getMessage(), ex.getCause());
-			}
-		}
-	}
+    /**
+     * Execute this request, resulting in a {@link ClientHttpResponse} that can
+     * be read.
+     * 
+     * @return the response result of the execution
+     * @throws IOException
+     *             in case of I/O errors
+     */
+    public ClientHttpResponse execute() throws IOException {
+        try {
+            return executeAsync().get();
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            throw new IOException("Interrupted during request execution", ex);
+        } catch (ExecutionException ex) {
+            if (ex.getCause() instanceof IOException) {
+                throw (IOException) ex.getCause();
+            } else {
+                throw new IOException(ex.getMessage(), ex.getCause());
+            }
+        }
+    }
 
-	/**
-	 * Abstract template method that returns the body.
-	 * 
-	 * @param headers
-	 *            the HTTP headers
-	 * @return the body output stream
-	 */
-	protected OutputStream getBodyInternal(HttpHeaders headers) throws IOException {
-		return this.body;
-	}
+    /**
+     * Abstract template method that returns the body.
+     * 
+     * @param headers
+     *            the HTTP headers
+     * @return the body output stream
+     */
+    protected OutputStream getBodyInternal(HttpHeaders headers) throws IOException {
+        return this.body;
+    }
 
-	/**
-	 * Abstract template method that writes the given headers and content to the
-	 * HTTP request.
-	 * 
-	 * @param headers
-	 *            the HTTP headers
-	 * @return the response object for the executed request
-	 */
-	protected ListenableFuture<ClientHttpResponse> executeInternal(final HttpHeaders headers) throws IOException {
-		final SettableFuture<ClientHttpResponse> responseFuture = SettableFuture.create();
+    /**
+     * Abstract template method that writes the given headers and content to the
+     * HTTP request.
+     * 
+     * @param headers
+     *            the HTTP headers
+     * @return the response object for the executed request
+     */
+    protected ListenableFuture<ClientHttpResponse> executeInternal(final HttpHeaders headers) throws IOException {
+        final SettableFuture<ClientHttpResponse> responseFuture = SettableFuture.create();
 
-		ChannelFutureListener connectionListener = future -> {
-			if (future.isSuccess()) {
-				Channel channel = future.channel();
-				channel.pipeline().addLast(new RequestExecuteHandler(responseFuture));
-				channel.writeAndFlush(createFullHttpRequest(headers));
-			} else {
-				responseFuture.setException(future.cause());
-			}
-		};
+        ChannelFutureListener connectionListener = future -> {
+            if (future.isSuccess()) {
+                Channel channel = future.channel();
+                channel.pipeline().addLast(new RequestExecuteHandler(responseFuture));
+                channel.writeAndFlush(createFullHttpRequest(headers));
+            } else {
+                responseFuture.setException(future.cause());
+            }
+        };
 
-		this.bootstrap.connect(uri.getHost(), getPort(uri)).addListener(connectionListener);
-		return responseFuture;
-	}
+        this.bootstrap.connect(uri.getHost(), getPort(uri)).addListener(connectionListener);
+        return responseFuture;
+    }
 
-	private FullHttpRequest createFullHttpRequest(HttpHeaders headers) {
-		io.netty.handler.codec.http.HttpMethod nettyMethod = io.netty.handler.codec.http.HttpMethod.valueOf(method.name());
+    private FullHttpRequest createFullHttpRequest(HttpHeaders headers) {
+        io.netty.handler.codec.http.HttpMethod nettyMethod = io.netty.handler.codec.http.HttpMethod.valueOf(method.name());
 
-		String authority = uri.getRawAuthority();
-		String path = uri.toString().substring(uri.toString().indexOf(authority) + authority.length());
-		FullHttpRequest nettyRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, nettyMethod, path, body.buffer());
+        String authority = uri.getRawAuthority();
+        String path = uri.toString().substring(uri.toString().indexOf(authority) + authority.length());
+        FullHttpRequest nettyRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, nettyMethod, path, body.buffer());
 
-		nettyRequest.headers().set(HttpHeaders.HOST, uri.getHost() + ":" + getPort(uri));
-		nettyRequest.headers().set(HttpHeaders.CONNECTION, "close");
-		for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
-			nettyRequest.headers().add(entry.getKey(), entry.getValue());
-		}
-		if (!nettyRequest.headers().contains(HttpHeaders.CONTENT_LENGTH) && body.buffer().readableBytes() > 0) {
-			nettyRequest.headers().set(HttpHeaders.CONTENT_LENGTH, body.buffer().readableBytes());
-		}
+        nettyRequest.headers().set(HttpHeaders.HOST, uri.getHost() + ":" + getPort(uri));
+        nettyRequest.headers().set(HttpHeaders.CONNECTION, "close");
+        for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+            nettyRequest.headers().add(entry.getKey(), entry.getValue());
+        }
+        if (!nettyRequest.headers().contains(HttpHeaders.CONTENT_LENGTH) && body.buffer().readableBytes() > 0) {
+            nettyRequest.headers().set(HttpHeaders.CONTENT_LENGTH, body.buffer().readableBytes());
+        }
 
-		return nettyRequest;
-	}
+        return nettyRequest;
+    }
 
-	private static int getPort(URI uri) {
-		int port = uri.getPort();
-		if (port == -1) {
-			if ("http".equalsIgnoreCase(uri.getScheme())) {
-				port = 80;
-			} else if ("https".equalsIgnoreCase(uri.getScheme())) {
-				port = 443;
-			}
-		}
-		return port;
-	}
+    private static int getPort(URI uri) {
+        int port = uri.getPort();
+        if (port == -1) {
+            if ("http".equalsIgnoreCase(uri.getScheme())) {
+                port = 80;
+            } else if ("https".equalsIgnoreCase(uri.getScheme())) {
+                port = 443;
+            }
+        }
+        return port;
+    }
 
-	/**
-	 * A SimpleChannelInboundHandler to update the given
-	 * SettableListenableFuture.
-	 */
-	private static class RequestExecuteHandler extends SimpleChannelInboundHandler<FullHttpResponse> {
+    /**
+     * A SimpleChannelInboundHandler to update the given
+     * SettableListenableFuture.
+     */
+    private static class RequestExecuteHandler extends SimpleChannelInboundHandler<FullHttpResponse> {
 
-		private final SettableFuture<ClientHttpResponse> responseFuture;
+        private final SettableFuture<ClientHttpResponse> responseFuture;
 
-		public RequestExecuteHandler(SettableFuture<ClientHttpResponse> responseFuture) {
-			this.responseFuture = responseFuture;
-		}
+        public RequestExecuteHandler(SettableFuture<ClientHttpResponse> responseFuture) {
+            this.responseFuture = responseFuture;
+        }
 
-		@Override
-		protected void channelRead0(ChannelHandlerContext context, FullHttpResponse response) throws Exception {
-			this.responseFuture.set(new Netty4ClientHttpResponse(context, response));
-		}
+        @Override
+        protected void channelRead0(ChannelHandlerContext context, FullHttpResponse response) throws Exception {
+            this.responseFuture.set(new Netty4ClientHttpResponse(context, response));
+        }
 
-		@Override
-		public void exceptionCaught(ChannelHandlerContext context, Throwable cause) throws Exception {
-			this.responseFuture.setException(cause);
-		}
-	}
+        @Override
+        public void exceptionCaught(ChannelHandlerContext context, Throwable cause) throws Exception {
+            this.responseFuture.setException(cause);
+        }
+    }
 
 }

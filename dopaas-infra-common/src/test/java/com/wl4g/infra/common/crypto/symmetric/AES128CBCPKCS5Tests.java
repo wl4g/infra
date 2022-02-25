@@ -38,31 +38,31 @@ import com.wl4g.infra.common.crypto.symmetric.AES128CBCPKCS5;
  */
 public class AES128CBCPKCS5Tests {
 
-	public static void main(String[] args) throws Exception {
-		AES128CBCPKCS5 aes = new AES128CBCPKCS5();
-		CodecSource genKey = aes.generateKey();
-		out.println("new generateKey => (" + genKey.toBase64() + ")" + genKey.getBytes().length + "bytes");
+    public static void main(String[] args) throws Exception {
+        AES128CBCPKCS5 aes = new AES128CBCPKCS5();
+        CodecSource genKey = aes.generateKey();
+        out.println("new generateKey => (" + genKey.toBase64() + ")" + genKey.getBytes().length + "bytes");
 
-		String plainText = "abcdefghijklmnopqrstuvwxyz";
-		CodecSource key = new CodecSource("1234567812345678"); // must 16bytes
-		CodecSource iv = new CodecSource("1234567890123456");
-		CodecSource cipherText = aes.encrypt(key.getBytes(), iv.getBytes(), new CodecSource(plainText));
-		out.println("plainText => " + plainText);
-		out.println("key => " + key);
-		out.println("iv => " + iv);
-		out.println("encrypt => " + cipherText.toBase64());
-		out.println("decrypt => " + aes.decrypt(key.getBytes(), iv.getBytes(), cipherText).toString());
+        String plainText = "abcdefghijklmnopqrstuvwxyz";
+        CodecSource key = new CodecSource("1234567812345678"); // must 16bytes
+        CodecSource iv = new CodecSource("1234567890123456");
+        CodecSource cipherText = aes.encrypt(key.getBytes(), iv.getBytes(), new CodecSource(plainText));
+        out.println("plainText => " + plainText);
+        out.println("key => " + key);
+        out.println("iv => " + iv);
+        out.println("encrypt => " + cipherText.toBase64());
+        out.println("decrypt => " + aes.decrypt(key.getBytes(), iv.getBytes(), cipherText).toString());
 
-		System.out.println("---------- Jsch AES128 verify ---------");
-		jschAES128VerifyTest(key, iv, cipherText);
-	}
+        System.out.println("---------- Jsch AES128 verify ---------");
+        jschAES128VerifyTest(key, iv, cipherText);
+    }
 
-	public static void jschAES128VerifyTest(CodecSource key, CodecSource iv, CodecSource cipherText) throws Exception {
-		AES128CBC aes128 = new AES128CBC();
-		aes128.init(AES128CBC.DECRYPT_MODE, key.getBytes(), iv.getBytes());
-		byte[] out = new byte[32];
-		aes128.update(cipherText.getBytes(), 0, out.length, out, 0);
-		System.out.println(new CodecSource(out));
-	}
+    public static void jschAES128VerifyTest(CodecSource key, CodecSource iv, CodecSource cipherText) throws Exception {
+        AES128CBC aes128 = new AES128CBC();
+        aes128.init(AES128CBC.DECRYPT_MODE, key.getBytes(), iv.getBytes());
+        byte[] out = new byte[32];
+        aes128.update(cipherText.getBytes(), 0, out.length, out, 0);
+        System.out.println(new CodecSource(out));
+    }
 
 }

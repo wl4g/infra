@@ -22,23 +22,23 @@ import com.wl4g.infra.common.crypto.symmetric.Blowfish448CBC;
 
 public class Blowfish448CBCTests {
 
-	public static void main(String[] args) throws Exception {
-		Blowfish448CBC aes = new Blowfish448CBC();
-		CodecSource genKey = aes.generateKey();
-		out.println("new generateKey => (" + genKey.toBase64() + ")" + genKey.getBytes().length + "bytes");
+    public static void main(String[] args) throws Exception {
+        Blowfish448CBC aes = new Blowfish448CBC();
+        CodecSource genKey = aes.generateKey();
+        out.println("new generateKey => (" + genKey.toBase64() + ")" + genKey.getBytes().length + "bytes");
 
-		// must multiple of 8 bytes
-		String plainText = "abcdefghijklmnopqrstuvwxyz123456";
-		// must 32bytes
-		CodecSource key = new CodecSource("12345678123456781234567812345678123456781234567812345678"); // 56bytes
-		CodecSource iv = new CodecSource("12345678"); // must 8bytes
-		CodecSource cipherText = aes.encrypt(key.getBytes(), iv.getBytes(), new CodecSource(plainText));
-		out.println("plainText => " + plainText);
-		out.println("key => " + key);
-		out.println("iv => " + iv);
-		out.println("encrypt => " + cipherText.toBase64());
-		out.println("decrypt => " + aes.decrypt(key.getBytes(), iv.getBytes(), cipherText).toString());
+        // must multiple of 8 bytes
+        String plainText = "abcdefghijklmnopqrstuvwxyz123456";
+        // must 32bytes
+        CodecSource key = new CodecSource("12345678123456781234567812345678123456781234567812345678"); // 56bytes
+        CodecSource iv = new CodecSource("12345678"); // must 8bytes
+        CodecSource cipherText = aes.encrypt(key.getBytes(), iv.getBytes(), new CodecSource(plainText));
+        out.println("plainText => " + plainText);
+        out.println("key => " + key);
+        out.println("iv => " + iv);
+        out.println("encrypt => " + cipherText.toBase64());
+        out.println("decrypt => " + aes.decrypt(key.getBytes(), iv.getBytes(), cipherText).toString());
 
-	}
+    }
 
 }

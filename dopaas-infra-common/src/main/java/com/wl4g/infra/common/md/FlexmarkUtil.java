@@ -20,10 +20,11 @@ public class FlexmarkUtil {
         MutableDataSet options = new MutableDataSet();
 
         // uncomment to set optional extensions
-        options.set(Parser.EXTENSIONS, Arrays.asList(TablesExtension.create(), StrikethroughExtension.create(), GitLabExtension.create()));
+        options.set(Parser.EXTENSIONS,
+                Arrays.asList(TablesExtension.create(), StrikethroughExtension.create(), GitLabExtension.create()));
 
         // uncomment to convert soft-breaks to hard breaks
-        //options.set(HtmlRenderer.SOFT_BREAK, "<br />\n");
+        // options.set(HtmlRenderer.SOFT_BREAK, "<br />\n");
 
         Parser parser = Parser.builder(options).build();
         HtmlRenderer renderer = HtmlRenderer.builder(options).build();
@@ -34,9 +35,9 @@ public class FlexmarkUtil {
         return renderer.render(document);
     }
 
-    /*public static void main(String[] args){
-        System.out.println(md2html("# aaa\n\n| 栏目1 | 栏目2 | \n" +
-                "| ----- | ----- | \n" +
-                "| 内容1 | 内容2 | "));
-    }*/
+    /*
+     * public static void main(String[] args){
+     * System.out.println(md2html("# aaa\n\n| 栏目1 | 栏目2 | \n" +
+     * "| ----- | ----- | \n" + "| 内容1 | 内容2 | ")); }
+     */
 }

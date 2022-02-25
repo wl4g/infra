@@ -38,94 +38,94 @@ import com.wl4g.infra.common.lang.Assert2;
  */
 public class ByteArrayStreamResource extends AbstractStreamResource {
 
-	final private byte[] byteArray;
-	final private String description;
+    final private byte[] byteArray;
+    final private String description;
 
-	/**
-	 * Create a new {@code ByteArrayStreamResource}.
-	 * 
-	 * @param byteArray
-	 *            the byte array to wrap
-	 */
-	public ByteArrayStreamResource(byte[] byteArray) {
-		this(byteArray, "resource loaded from byte array");
-	}
+    /**
+     * Create a new {@code ByteArrayStreamResource}.
+     * 
+     * @param byteArray
+     *            the byte array to wrap
+     */
+    public ByteArrayStreamResource(byte[] byteArray) {
+        this(byteArray, "resource loaded from byte array");
+    }
 
-	/**
-	 * Create a new {@code ByteArrayStreamResource} with a description.
-	 * 
-	 * @param byteArray
-	 *            the byte array to wrap
-	 * @param description
-	 *            where the byte array comes from
-	 */
-	public ByteArrayStreamResource(byte[] byteArray, String description) {
-		Assert2.notNull(byteArray, "Byte array must not be null");
-		this.byteArray = byteArray;
-		this.description = (description != null ? description : "");
-	}
+    /**
+     * Create a new {@code ByteArrayStreamResource} with a description.
+     * 
+     * @param byteArray
+     *            the byte array to wrap
+     * @param description
+     *            where the byte array comes from
+     */
+    public ByteArrayStreamResource(byte[] byteArray, String description) {
+        Assert2.notNull(byteArray, "Byte array must not be null");
+        this.byteArray = byteArray;
+        this.description = (description != null ? description : "");
+    }
 
-	/**
-	 * Return the underlying byte array.
-	 */
-	public final byte[] getByteArray() {
-		return this.byteArray;
-	}
+    /**
+     * Return the underlying byte array.
+     */
+    public final byte[] getByteArray() {
+        return this.byteArray;
+    }
 
-	/**
-	 * This implementation always returns {@code true}.
-	 */
-	@Override
-	public boolean exists() {
-		return true;
-	}
+    /**
+     * This implementation always returns {@code true}.
+     */
+    @Override
+    public boolean exists() {
+        return true;
+    }
 
-	/**
-	 * This implementation returns the length of the underlying byte array.
-	 */
-	@Override
-	public long contentLength() {
-		return this.byteArray.length;
-	}
+    /**
+     * This implementation returns the length of the underlying byte array.
+     */
+    @Override
+    public long contentLength() {
+        return this.byteArray.length;
+    }
 
-	/**
-	 * This implementation returns a ByteArrayInputStream for the underlying
-	 * byte array.
-	 * 
-	 * @see java.io.ByteArrayInputStream
-	 */
-	@Override
-	public InputStream getInputStream() throws IOException {
-		return new ByteArrayInputStream(this.byteArray);
-	}
+    /**
+     * This implementation returns a ByteArrayInputStream for the underlying
+     * byte array.
+     * 
+     * @see java.io.ByteArrayInputStream
+     */
+    @Override
+    public InputStream getInputStream() throws IOException {
+        return new ByteArrayInputStream(this.byteArray);
+    }
 
-	/**
-	 * This implementation returns a description that includes the passed-in
-	 * {@code description}, if any.
-	 */
-	@Override
-	public String getDescription() {
-		return "Byte array resource [" + this.description + "]";
-	}
+    /**
+     * This implementation returns a description that includes the passed-in
+     * {@code description}, if any.
+     */
+    @Override
+    public String getDescription() {
+        return "Byte array resource [" + this.description + "]";
+    }
 
-	/**
-	 * This implementation compares the underlying byte array.
-	 * 
-	 * @see java.util.Arrays#equals(byte[], byte[])
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		return (obj == this || (obj instanceof ByteArrayStreamResource
-				&& Arrays.equals(((ByteArrayStreamResource) obj).byteArray, this.byteArray)));
-	}
+    /**
+     * This implementation compares the underlying byte array.
+     * 
+     * @see java.util.Arrays#equals(byte[], byte[])
+     */
+    @Override
+    public boolean equals(Object obj) {
+        return (obj == this || (obj instanceof ByteArrayStreamResource
+                && Arrays.equals(((ByteArrayStreamResource) obj).byteArray, this.byteArray)));
+    }
 
-	/**
-	 * This implementation returns the hash code based on the underlying byte
-	 * array.
-	 */
-	@Override
-	public int hashCode() {
-		return (byte[].class.hashCode() * 29 * this.byteArray.length);
-	}
+    /**
+     * This implementation returns the hash code based on the underlying byte
+     * array.
+     */
+    @Override
+    public int hashCode() {
+        return (byte[].class.hashCode() * 29 * this.byteArray.length);
+    }
 
 }

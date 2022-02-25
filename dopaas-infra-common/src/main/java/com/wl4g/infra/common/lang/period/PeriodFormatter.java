@@ -42,175 +42,175 @@ import com.wl4g.infra.common.log.SmartLogger;
  */
 public abstract class PeriodFormatter {
 
-	protected final SmartLogger log = getLogger(getClass());
+    protected final SmartLogger log = getLogger(getClass());
 
-	/**
-	 * Current configuration for locale.
-	 */
-	private Locale locale = Locale.getDefault();
+    /**
+     * Current configuration for locale.
+     */
+    private Locale locale = Locale.getDefault();
 
-	/**
-	 * The lower time unit section will be ignored.
-	 */
-	private boolean ignoreLowerDate = false;
+    /**
+     * The lower time unit section will be ignored.
+     */
+    private boolean ignoreLowerDate = false;
 
-	/**
-	 * Gets instance by default impl class.
-	 * 
-	 * @return
-	 */
-	public static PeriodFormatter getDefault() {
-		return getInstance(SamplePeriodFormatter.class);
-	}
+    /**
+     * Gets instance by default impl class.
+     * 
+     * @return
+     */
+    public static PeriodFormatter getDefault() {
+        return getInstance(SamplePeriodFormatter.class);
+    }
 
-	/**
-	 * Gets instance by impl class.
-	 * 
-	 * @param implClass
-	 * @return
-	 */
-	public static PeriodFormatter getInstance(Class<? extends PeriodFormatter> implClass) {
-		return registers.get(implClass);
-	}
+    /**
+     * Gets instance by impl class.
+     * 
+     * @param implClass
+     * @return
+     */
+    public static PeriodFormatter getInstance(Class<? extends PeriodFormatter> implClass) {
+        return registers.get(implClass);
+    }
 
-	/**
-	 * Gets current locale.
-	 * 
-	 * @return
-	 */
-	public Locale getLocale() {
-		return locale;
-	}
+    /**
+     * Gets current locale.
+     * 
+     * @return
+     */
+    public Locale getLocale() {
+        return locale;
+    }
 
-	/**
-	 * Sets current thread locale.
-	 * 
-	 * @param locale
-	 */
-	public PeriodFormatter locale(Locale locale) {
-		this.locale = locale;
-		return this;
-	}
+    /**
+     * Sets current thread locale.
+     * 
+     * @param locale
+     */
+    public PeriodFormatter locale(Locale locale) {
+        this.locale = locale;
+        return this;
+    }
 
-	/**
-	 * Gets current is ignore lower date.
-	 * 
-	 * @return
-	 */
-	public boolean isIngoreLowerDate() {
-		return ignoreLowerDate;
-	}
+    /**
+     * Gets current is ignore lower date.
+     * 
+     * @return
+     */
+    public boolean isIngoreLowerDate() {
+        return ignoreLowerDate;
+    }
 
-	/**
-	 * Sets current thread locale.
-	 * 
-	 * @param l
-	 */
-	public PeriodFormatter ignoreLowerDate(boolean ignoreLowerDate) {
-		this.ignoreLowerDate = ignoreLowerDate;
-		return this;
-	}
+    /**
+     * Sets current thread locale.
+     * 
+     * @param l
+     */
+    public PeriodFormatter ignoreLowerDate(boolean ignoreLowerDate) {
+        this.ignoreLowerDate = ignoreLowerDate;
+        return this;
+    }
 
-	/**
-	 * Formatting to human Date time formatted as human friendly
-	 * 
-	 * @param startTime
-	 *            current timestamp
-	 * @param endTime
-	 *            Target timestamp to format
-	 * @return
-	 */
-	public abstract String formatHumanDate(long startTime, long endTime);
+    /**
+     * Formatting to human Date time formatted as human friendly
+     * 
+     * @param startTime
+     *            current timestamp
+     * @param endTime
+     *            Target timestamp to format
+     * @return
+     */
+    public abstract String formatHumanDate(long startTime, long endTime);
 
-	/**
-	 * Formatting to human Date time formatted as human friendly
-	 * 
-	 * @param targetTime
-	 *            Target timestamp to format
-	 * @return
-	 */
-	public String formatHumanDate(long targetTime) {
-		return formatHumanDate(currentTimeMillis(), targetTime);
-	}
+    /**
+     * Formatting to human Date time formatted as human friendly
+     * 
+     * @param targetTime
+     *            Target timestamp to format
+     * @return
+     */
+    public String formatHumanDate(long targetTime) {
+        return formatHumanDate(currentTimeMillis(), targetTime);
+    }
 
-	/**
-	 * Cleanup date empty string.
-	 * 
-	 * @param dateString
-	 * @return
-	 */
-	protected String cleanupDateEmptyString(String dateString) {
-		int safeThreshold = 10;
-		String cleared = dateString.toString().trim(), lastCleared = EMPTY;
-		for (int i = 0; i < safeThreshold && !lastCleared.equals(cleared); i++, lastCleared = cleared) {
-			cleared = cleared.replace("  ", " ");
-		}
-		return cleared;
-	}
+    /**
+     * Cleanup date empty string.
+     * 
+     * @param dateString
+     * @return
+     */
+    protected String cleanupDateEmptyString(String dateString) {
+        int safeThreshold = 10;
+        String cleared = dateString.toString().trim(), lastCleared = EMPTY;
+        for (int i = 0; i < safeThreshold && !lastCleared.equals(cleared); i++, lastCleared = cleared) {
+            cleared = cleared.replace("  ", " ");
+        }
+        return cleared;
+    }
 
-	/**
-	 * Gets localized message by key.
-	 * 
-	 * @param localizedKey
-	 * @return
-	 * @see {@link com.wl4g.iam.core.utils.IamSecurityHolder#getBindValue(String)}
-	 * @see {@link com.wl4g.iam.common.i18n.SessionResourceMessageBundler#getSessionLocale()}
-	 * @see {@link com.wl4g.infra.core.constants.IAMDevOpsConstants#KEY_LANG_NAME}
-	 */
-	protected String getLocalizedMessage(String localizedKey) {
-		String loc = null;
-		try {
-			if (IamSecurityHolderBridges.hasIamSecurityHolderClass()) {
-				loc = (String) IamSecurityHolderBridges.invokeGetBindValue("langAttrName");
-			}
-		} catch (Exception e) {
-			log.warn(format("Cannot get IAM session locale, fallback use '%s'", locale), e);
-		}
+    /**
+     * Gets localized message by key.
+     * 
+     * @param localizedKey
+     * @return
+     * @see {@link com.wl4g.iam.core.utils.IamSecurityHolder#getBindValue(String)}
+     * @see {@link com.wl4g.iam.common.i18n.SessionResourceMessageBundler#getSessionLocale()}
+     * @see {@link com.wl4g.infra.core.constants.IAMDevOpsConstants#KEY_LANG_NAME}
+     */
+    protected String getLocalizedMessage(String localizedKey) {
+        String loc = null;
+        try {
+            if (IamSecurityHolderBridges.hasIamSecurityHolderClass()) {
+                loc = (String) IamSecurityHolderBridges.invokeGetBindValue("langAttrName");
+            }
+        } catch (Exception e) {
+            log.warn(format("Cannot get IAM session locale, fallback use '%s'", locale), e);
+        }
 
-		try {
-			return getResourceBundle(isNull(loc) ? locale : new Locale(loc)).getString(localizedKey);
-		} catch (MissingResourceException e) {
-			return localizedKey;
-		}
-	}
+        try {
+            return getResourceBundle(isNull(loc) ? locale : new Locale(loc)).getString(localizedKey);
+        } catch (MissingResourceException e) {
+            return localizedKey;
+        }
+    }
 
-	/**
-	 * Gets resources bundle.
-	 * 
-	 * @param loc
-	 * @return
-	 */
-	private static ResourceBundle getResourceBundle(Locale loc) {
-		try {
-			return ResourceBundle.getBundle(defaultI18nResourcesBaseName, loc);
-		} catch (MissingResourceException e) {
-			return ResourceBundle.getBundle(defaultI18nResourcesBaseName, US);
-		}
-	}
+    /**
+     * Gets resources bundle.
+     * 
+     * @param loc
+     * @return
+     */
+    private static ResourceBundle getResourceBundle(Locale loc) {
+        try {
+            return ResourceBundle.getBundle(defaultI18nResourcesBaseName, loc);
+        } catch (MissingResourceException e) {
+            return ResourceBundle.getBundle(defaultI18nResourcesBaseName, US);
+        }
+    }
 
-	/**
-	 * Gets default i18n resources base-name.
-	 * 
-	 * @return
-	 */
-	private static String getDefaultI18nResourcesBaseName0() {
-		String className = PeriodFormatter.class.getName();
-		return className.substring(0, className.lastIndexOf(".")).replace(".", "/").concat("/messages");
-	}
+    /**
+     * Gets default i18n resources base-name.
+     * 
+     * @return
+     */
+    private static String getDefaultI18nResourcesBaseName0() {
+        String className = PeriodFormatter.class.getName();
+        return className.substring(0, className.lastIndexOf(".")).replace(".", "/").concat("/messages");
+    }
 
-	/**
-	 * Default i18n resources base-name.
-	 */
-	private static final String defaultI18nResourcesBaseName = getDefaultI18nResourcesBaseName0();
+    /**
+     * Default i18n resources base-name.
+     */
+    private static final String defaultI18nResourcesBaseName = getDefaultI18nResourcesBaseName0();
 
-	/**
-	 * {@link PeriodFormatter} register instances
-	 */
-	private static final Map<Class<? extends PeriodFormatter>, PeriodFormatter> registers = synchronizedMap(new HashMap<>());
+    /**
+     * {@link PeriodFormatter} register instances
+     */
+    private static final Map<Class<? extends PeriodFormatter>, PeriodFormatter> registers = synchronizedMap(new HashMap<>());
 
-	static {
-		registers.put(JodaPeriodFormatter.class, new JodaPeriodFormatter());
-		registers.put(SamplePeriodFormatter.class, new SamplePeriodFormatter());
-	}
+    static {
+        registers.put(JodaPeriodFormatter.class, new JodaPeriodFormatter());
+        registers.put(SamplePeriodFormatter.class, new SamplePeriodFormatter());
+    }
 
 }

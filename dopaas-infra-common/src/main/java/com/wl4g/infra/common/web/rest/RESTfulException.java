@@ -26,11 +26,11 @@ import com.wl4g.infra.common.web.rest.RespBase.RetCode;
  */
 public interface RESTfulException {
 
-	/**
-	 * Restful exception HTTP status code.
-	 * 
-	 * @return
-	 */
-	RetCode getCode();
+    /**
+     * Restful exception HTTP status code.
+     * 
+     * @return
+     */
+    RetCode getCode();
 
 }

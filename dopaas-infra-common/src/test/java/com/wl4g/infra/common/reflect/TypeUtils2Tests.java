@@ -21,13 +21,13 @@ import com.wl4g.infra.common.reflect.TypeUtils2;
 
 public class TypeUtils2Tests {
 
-	public static void main(String[] args) {
-		test1();
-	}
+    public static void main(String[] args) {
+        test1();
+    }
 
-	public static void test1() {
-		System.out.println(TypeUtils2.instantiateSimpleType(1, int.class));
-		System.out.println(TypeUtils2.instantiateCollectionType(null, Map.class));
-	}
+    public static void test1() {
+        System.out.println(TypeUtils2.instantiateSimpleType(1, int.class));
+        System.out.println(TypeUtils2.instantiateCollectionType(null, Map.class));
+    }
 
 }

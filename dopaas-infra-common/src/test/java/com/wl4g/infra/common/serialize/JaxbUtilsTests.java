@@ -37,47 +37,47 @@ import com.wl4g.infra.common.serialize.xmlbean.MqttData;
  */
 public class JaxbUtilsTests {
 
-	public static void main(String[] args) {
-		String xml = "";
-		xml += "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-		xml += "<mqttData>";
-		xml += "  <Session id=\"10\">";
-		xml += "  <DataCollector id=\"ncyt02_dc\">";
-		xml += "  	<time>2016-11-22T03:39:30Z</time>";
-		xml += "    <type Type=\"Yk\">";
-		xml += "      <yk pId=\"0\">1</yk>";
-		xml += "      <yk pId=\"1\">1</yk>";
-		xml += "      <yk pId=\"2\">1</yk>";
-		xml += "      <yk pId=\"3\">0</yk>";
-		xml += "      <yk pId=\"4\">1</yk>";
-		xml += "      <yk pId=\"5\">1</yk>";
-		xml += "      <yk pId=\"6\">0</yk>";
-		xml += "      <yk pId=\"7\">1</yk>";
-		xml += "      <yk pId=\"8\">0</yk>";
-		xml += "    </type>";
-		xml += "    <type Type=\"Yt\">";
-		xml += "      <yt pId=\"0\">30.00</yt>";
-		xml += "      <yt pId=\"1\">40.00</yt>";
-		xml += "      <yt pId=\"2\">50.00</yt>";
-		xml += "      <yt pId=\"3\">60.00</yt>";
-		xml += "      <yt pId=\"4\">70.00</yt>";
-		xml += "      <yt pId=\"5\">80.00</yt>";
-		xml += "      <yt pId=\"6\">90.00</yt>";
-		xml += "      <yt pId=\"7\">100.00</yt>";
-		xml += "      <yt pId=\"8\">11.000</yt>";
-		xml += "    </type>";
-		xml += "  </DataCollector>";
-		xml += "  </Session>";
-		xml += "</mqttData>";
+    public static void main(String[] args) {
+        String xml = "";
+        xml += "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+        xml += "<mqttData>";
+        xml += "  <Session id=\"10\">";
+        xml += "  <DataCollector id=\"ncyt02_dc\">";
+        xml += "  	<time>2016-11-22T03:39:30Z</time>";
+        xml += "    <type Type=\"Yk\">";
+        xml += "      <yk pId=\"0\">1</yk>";
+        xml += "      <yk pId=\"1\">1</yk>";
+        xml += "      <yk pId=\"2\">1</yk>";
+        xml += "      <yk pId=\"3\">0</yk>";
+        xml += "      <yk pId=\"4\">1</yk>";
+        xml += "      <yk pId=\"5\">1</yk>";
+        xml += "      <yk pId=\"6\">0</yk>";
+        xml += "      <yk pId=\"7\">1</yk>";
+        xml += "      <yk pId=\"8\">0</yk>";
+        xml += "    </type>";
+        xml += "    <type Type=\"Yt\">";
+        xml += "      <yt pId=\"0\">30.00</yt>";
+        xml += "      <yt pId=\"1\">40.00</yt>";
+        xml += "      <yt pId=\"2\">50.00</yt>";
+        xml += "      <yt pId=\"3\">60.00</yt>";
+        xml += "      <yt pId=\"4\">70.00</yt>";
+        xml += "      <yt pId=\"5\">80.00</yt>";
+        xml += "      <yt pId=\"6\">90.00</yt>";
+        xml += "      <yt pId=\"7\">100.00</yt>";
+        xml += "      <yt pId=\"8\">11.000</yt>";
+        xml += "    </type>";
+        xml += "  </DataCollector>";
+        xml += "  </Session>";
+        xml += "</mqttData>";
 
-		System.out.println("------serialization-------");
-		MqttData msg = JaxbUtils.fromXml(xml, MqttData.class);
-		System.out.println(msg.getSession().getDataCollector().getTime());
+        System.out.println("------serialization-------");
+        MqttData msg = JaxbUtils.fromXml(xml, MqttData.class);
+        System.out.println(msg.getSession().getDataCollector().getTime());
 
-		System.out.println("\n\n");
+        System.out.println("\n\n");
 
-		System.out.println("------serialization-------");
-		System.out.println(JaxbUtils.toXml(msg, "UTF-8", MqttData.class));
-	}
+        System.out.println("------serialization-------");
+        System.out.println(JaxbUtils.toXml(msg, "UTF-8", MqttData.class));
+    }
 
 }

@@ -41,8 +41,8 @@ public class EventBusSupportTests {
 
     @Test
     public void testPublish() {
-        bus.getBus().post(new StartingEvent("Starting server ..."));
-        bus.getBus().post(new StartedEvent("Started server on 8080."));
+        bus.post(new StartingEvent("Starting server ..."));
+        bus.post(new StartedEvent("Started server on 8080."));
     }
 
     @Subscribe

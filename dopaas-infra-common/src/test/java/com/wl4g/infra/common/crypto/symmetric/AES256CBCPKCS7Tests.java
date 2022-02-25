@@ -38,20 +38,20 @@ import com.wl4g.infra.common.crypto.symmetric.AES256CBCPKCS7;
  */
 public class AES256CBCPKCS7Tests {
 
-	public static void main(String[] args) throws Exception {
-		AES256CBCPKCS7 aes = new AES256CBCPKCS7();
-		CodecSource genKey = aes.generateKey();
-		out.println("new generateKey => (" + genKey.toBase64() + ")" + genKey.getBytes().length + "bytes");
+    public static void main(String[] args) throws Exception {
+        AES256CBCPKCS7 aes = new AES256CBCPKCS7();
+        CodecSource genKey = aes.generateKey();
+        out.println("new generateKey => (" + genKey.toBase64() + ")" + genKey.getBytes().length + "bytes");
 
-		String plainText = "abcdefghijklmnopqrstuvwxyz";
-		CodecSource key = new CodecSource("12345678123456781234567812345678"); // 32bytes
-		CodecSource iv = new CodecSource("1234567890abcdef");
-		CodecSource cipherText = aes.encrypt(key.getBytes(), iv.getBytes(), new CodecSource(plainText));
-		out.println("plainText => " + plainText);
-		out.println("key => " + key);
-		out.println("iv => " + iv);
-		out.println("encrypt => " + cipherText.toBase64());
-		out.println("decrypt => " + aes.decrypt(key.getBytes(), iv.getBytes(), cipherText).toString());
-	}
+        String plainText = "abcdefghijklmnopqrstuvwxyz";
+        CodecSource key = new CodecSource("12345678123456781234567812345678"); // 32bytes
+        CodecSource iv = new CodecSource("1234567890abcdef");
+        CodecSource cipherText = aes.encrypt(key.getBytes(), iv.getBytes(), new CodecSource(plainText));
+        out.println("plainText => " + plainText);
+        out.println("key => " + key);
+        out.println("iv => " + iv);
+        out.println("encrypt => " + cipherText.toBase64());
+        out.println("decrypt => " + aes.decrypt(key.getBytes(), iv.getBytes(), cipherText).toString());
+    }
 
 }

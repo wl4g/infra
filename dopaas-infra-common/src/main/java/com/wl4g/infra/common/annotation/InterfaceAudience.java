@@ -31,23 +31,23 @@ import java.lang.annotation.RetentionPolicy;
 @InterfaceStability.Stable
 public abstract class InterfaceAudience {
 
-	/**
-	 * Intended for use by any project or application.
-	 */
-	@Documented
-	@Retention(RetentionPolicy.RUNTIME)
-	public @interface Public {
-	}
+    /**
+     * Intended for use by any project or application.
+     */
+    @Documented
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface Public {
+    }
 
-	/**
-	 * Intended for use only within the project itself.
-	 */
-	@Documented
-	@Retention(RetentionPolicy.RUNTIME)
-	public @interface Private {
-	}
+    /**
+     * Intended for use only within the project itself.
+     */
+    @Documented
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface Private {
+    }
 
-	private InterfaceAudience() {
-	} // Audience can't exist on its own
+    private InterfaceAudience() {
+    } // Audience can't exist on its own
 
 }

@@ -23,17 +23,17 @@ import com.wl4g.infra.common.natives.ClassPathNativeLibraryLoader;
 
 public class ClassPathNativeLibraryLoaderTests {
 
-	public static void main(String[] args) throws Exception {
-		loadXerialSnappyLibForDeleteOnExitTest1();
-	}
+    public static void main(String[] args) throws Exception {
+        loadXerialSnappyLibForDeleteOnExitTest1();
+    }
 
-	public static void loadXerialSnappyLibForDeleteOnExitTest1() throws Exception {
-		out.println(OS_NAME);
-		out.println(OS_ARCH);
-		new ClassPathNativeLibraryLoader().loadLibrarys("/org/xerial/snappy/native/**/*.*");
+    public static void loadXerialSnappyLibForDeleteOnExitTest1() throws Exception {
+        out.println(OS_NAME);
+        out.println(OS_ARCH);
+        new ClassPathNativeLibraryLoader().loadLibrarys("/org/xerial/snappy/native/**/*.*");
 
-		out.println("Demo execution waiting... Observe whether temporary files will be cleared when exiting");
-		Thread.sleep(3000L);
-	}
+        out.println("Demo execution waiting... Observe whether temporary files will be cleared when exiting");
+        Thread.sleep(3000L);
+    }
 
 }

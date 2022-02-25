@@ -37,63 +37,63 @@ import com.wl4g.infra.common.remoting.standard.HttpHeaders;
  */
 abstract class AbstractAsyncClientHttpRequest implements HttpRequest, HttpOutputMessage {
 
-	private final HttpHeaders headers = new HttpHeaders();
-	private boolean executed = false;
+    private final HttpHeaders headers = new HttpHeaders();
+    private boolean executed = false;
 
-	@Override
-	public final HttpHeaders getHeaders() {
-		return (this.executed ? HttpHeaders.readOnlyHttpHeaders(headers) : headers);
-	}
+    @Override
+    public final HttpHeaders getHeaders() {
+        return (this.executed ? HttpHeaders.readOnlyHttpHeaders(headers) : headers);
+    }
 
-	@Override
-	public final OutputStream getBody() throws IOException {
-		assert2NotExecuted();
-		return getBodyInternal(headers);
-	}
+    @Override
+    public final OutputStream getBody() throws IOException {
+        assert2NotExecuted();
+        return getBodyInternal(headers);
+    }
 
-	/**
-	 * Execute this request asynchronously, resulting in a Future handle.
-	 * {@link ClientHttpResponse} that can be read.
-	 * 
-	 * @return the future response result of the execution
-	 * @throws java.io.IOException
-	 *             in case of I/O errors
-	 */
-	public ListenableFuture<ClientHttpResponse> executeAsync() throws IOException {
-		assert2NotExecuted();
-		ListenableFuture<ClientHttpResponse> result = executeInternal(headers);
-		this.executed = true;
-		return result;
-	}
+    /**
+     * Execute this request asynchronously, resulting in a Future handle.
+     * {@link ClientHttpResponse} that can be read.
+     * 
+     * @return the future response result of the execution
+     * @throws java.io.IOException
+     *             in case of I/O errors
+     */
+    public ListenableFuture<ClientHttpResponse> executeAsync() throws IOException {
+        assert2NotExecuted();
+        ListenableFuture<ClientHttpResponse> result = executeInternal(headers);
+        this.executed = true;
+        return result;
+    }
 
-	/**
-	 * Assert2s that this request has not been {@linkplain #executeAsync()
-	 * executed} yet.
-	 * 
-	 * @throws IllegalStateException
-	 *             if this request has been executed
-	 */
-	protected void assert2NotExecuted() {
-		Assert2.state(!executed, "ClientHttpRequest already executed");
-	}
+    /**
+     * Assert2s that this request has not been {@linkplain #executeAsync()
+     * executed} yet.
+     * 
+     * @throws IllegalStateException
+     *             if this request has been executed
+     */
+    protected void assert2NotExecuted() {
+        Assert2.state(!executed, "ClientHttpRequest already executed");
+    }
 
-	/**
-	 * Abstract template method that returns the body.
-	 * 
-	 * @param headers
-	 *            the HTTP headers
-	 * @return the body output stream
-	 */
-	protected abstract OutputStream getBodyInternal(HttpHeaders headers) throws IOException;
+    /**
+     * Abstract template method that returns the body.
+     * 
+     * @param headers
+     *            the HTTP headers
+     * @return the body output stream
+     */
+    protected abstract OutputStream getBodyInternal(HttpHeaders headers) throws IOException;
 
-	/**
-	 * Abstract template method that writes the given headers and content to the
-	 * HTTP request.
-	 * 
-	 * @param headers
-	 *            the HTTP headers
-	 * @return the response object for the executed request
-	 */
-	protected abstract ListenableFuture<ClientHttpResponse> executeInternal(HttpHeaders headers) throws IOException;
+    /**
+     * Abstract template method that writes the given headers and content to the
+     * HTTP request.
+     * 
+     * @param headers
+     *            the HTTP headers
+     * @return the response object for the executed request
+     */
+    protected abstract ListenableFuture<ClientHttpResponse> executeInternal(HttpHeaders headers) throws IOException;
 
 }

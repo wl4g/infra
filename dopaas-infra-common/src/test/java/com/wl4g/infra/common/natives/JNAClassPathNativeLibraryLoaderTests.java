@@ -31,27 +31,27 @@ import com.wl4g.infra.common.natives.JNAClassPathNativeLibraryLoader;
  */
 public class JNAClassPathNativeLibraryLoaderTests {
 
-	public static void main(String[] args) throws Exception {
-		loadSampleLibForDeleteOnExitTest1();
-	}
+    public static void main(String[] args) throws Exception {
+        loadSampleLibForDeleteOnExitTest1();
+    }
 
-	public static void loadSampleLibForDeleteOnExitTest1() throws Exception {
-		out.println(OS_NAME);
-		out.println(OS_ARCH);
+    public static void loadSampleLibForDeleteOnExitTest1() throws Exception {
+        out.println(OS_NAME);
+        out.println(OS_ARCH);
 
-		JNAClassPathNativeLibraryLoader loader = new JNAClassPathNativeLibraryLoader().loadLibrarys(locationPattern);
-		LibSample1 sample1 = loader.loadInstance(LibSample1.class);
+        JNAClassPathNativeLibraryLoader loader = new JNAClassPathNativeLibraryLoader().loadLibrarys(locationPattern);
+        LibSample1 sample1 = loader.loadInstance(LibSample1.class);
 
-		System.out.println("Load instance: " + sample1);
-		System.out.println("Call Sum() Result: " + sample1.Sum(111, 222));
-	}
+        System.out.println("Load instance: " + sample1);
+        System.out.println("Call Sum() Result: " + sample1.Sum(111, 222));
+    }
 
-	private static final String locationPattern;
+    private static final String locationPattern;
 
-	static {
-		String location = JNAClassPathNativeLibraryLoaderTests.class.getName().replace(".", "/")
-				.replace(JNAClassPathNativeLibraryLoaderTests.class.getSimpleName(), "");
-		locationPattern = location.concat("library/**/*.*");
-	}
+    static {
+        String location = JNAClassPathNativeLibraryLoaderTests.class.getName().replace(".", "/").replace(
+                JNAClassPathNativeLibraryLoaderTests.class.getSimpleName(), "");
+        locationPattern = location.concat("library/**/*.*");
+    }
 
 }

@@ -42,52 +42,52 @@ import com.wl4g.infra.common.resource.resolver.ClassPathResourcePatternResolver;
  */
 public abstract class HoconConfigUtils {
 
-	/**
-	 * Load hocon configuration
-	 * 
-	 * @param clazz
-	 * @return
-	 */
-	public static <T> T loadConfig(Class<T> clazz) {
-		return loadConfig(CLASSPATH_ALL_URL_PREFIX.concat("application.conf"), clazz);
-	}
+    /**
+     * Load hocon configuration
+     * 
+     * @param clazz
+     * @return
+     */
+    public static <T> T loadConfig(Class<T> clazz) {
+        return loadConfig(CLASSPATH_ALL_URL_PREFIX.concat("application.conf"), clazz);
+    }
 
-	/**
-	 * Load hocon configuration
-	 * 
-	 * @param location
-	 * @param clazz
-	 * @return
-	 */
-	public static <T> T loadConfig(String location, Class<T> clazz) {
-		return create(loadConfig(location), clazz);
-	}
+    /**
+     * Load hocon configuration
+     * 
+     * @param location
+     * @param clazz
+     * @return
+     */
+    public static <T> T loadConfig(String location, Class<T> clazz) {
+        return create(loadConfig(location), clazz);
+    }
 
-	/**
-	 * Load hocon configuration
-	 * 
-	 * @param location
-	 * @param clazz
-	 * @return
-	 */
-	public static Config loadConfig(String location) {
-		hasTextOf(location, "location");
+    /**
+     * Load hocon configuration
+     * 
+     * @param location
+     * @param clazz
+     * @return
+     */
+    public static Config loadConfig(String location) {
+        hasTextOf(location, "location");
 
-		// Correct scan path
-		if (!startsWithAny(location, CLASSPATH_URL_PREFIX, CLASSPATH_ALL_URL_PREFIX)) {
-			location = CLASSPATH_ALL_URL_PREFIX.concat(location);
-		}
+        // Correct scan path
+        if (!startsWithAny(location, CLASSPATH_URL_PREFIX, CLASSPATH_ALL_URL_PREFIX)) {
+            location = CLASSPATH_ALL_URL_PREFIX.concat(location);
+        }
 
-		ClassPathResourcePatternResolver resovler = new ClassPathResourcePatternResolver();
-		try {
-			Set<StreamResource> ress = resovler.getResources(location);
-			notEmpty(ress, "Not found hocon configuration for %s", location);
+        ClassPathResourcePatternResolver resovler = new ClassPathResourcePatternResolver();
+        try {
+            Set<StreamResource> ress = resovler.getResources(location);
+            notEmpty(ress, "Not found hocon configuration for %s", location);
 
-			ConfigParseOptions options = defaults().setSyntax(CONF).setAllowMissing(true);
-			return parseURL(ress.iterator().next().getURL(), options);
-		} catch (IOException e) {
-			throw new IllegalStateException(e);
-		}
-	}
+            ConfigParseOptions options = defaults().setSyntax(CONF).setAllowMissing(true);
+            return parseURL(ress.iterator().next().getURL(), options);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
 }

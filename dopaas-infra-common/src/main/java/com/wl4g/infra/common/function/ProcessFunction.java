@@ -26,12 +26,12 @@ package com.wl4g.infra.common.function;
 @FunctionalInterface
 public interface ProcessFunction<T, R> {
 
-	/**
-	 * Do processing.
-	 * 
-	 * @param t
-	 * @throws Exception
-	 */
-	R process(T t) throws Exception;
+    /**
+     * Do processing.
+     * 
+     * @param t
+     * @throws Exception
+     */
+    R process(T t) throws Exception;
 
 }

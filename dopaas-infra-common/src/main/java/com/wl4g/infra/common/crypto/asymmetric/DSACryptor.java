@@ -30,37 +30,37 @@ import com.wl4g.infra.common.crypto.asymmetric.spec.DSAKeyPairSpec;
  */
 public class DSACryptor extends AbstractAsymmetricCryptor {
 
-	public DSACryptor() {
-		super(1024);
-	}
+    public DSACryptor() {
+        super(1024);
+    }
 
-	public DSACryptor(int keysize) {
-		super(keysize);
-	}
+    public DSACryptor(int keysize) {
+        super(keysize);
+    }
 
-	@Override
-	public String getAlgorithmPrimary() {
-		return "DSA";
-	}
+    @Override
+    public String getAlgorithmPrimary() {
+        return "DSA";
+    }
 
-	@Override
-	public String getPadAlgorithm() {
-		return "DSA/ECB/PKCS1Padding";
-	}
+    @Override
+    public String getPadAlgorithm() {
+        return "DSA/ECB/PKCS1Padding";
+    }
 
-	@Override
-	protected Class<? extends KeySpec> getPublicKeySpecClass() {
-		return DSAPublicKeySpec.class;
-	}
+    @Override
+    protected Class<? extends KeySpec> getPublicKeySpecClass() {
+        return DSAPublicKeySpec.class;
+    }
 
-	@Override
-	protected Class<? extends KeySpec> getPrivateKeySpecClass() {
-		return DSAPrivateKeySpec.class;
-	}
+    @Override
+    protected Class<? extends KeySpec> getPrivateKeySpecClass() {
+        return DSAPrivateKeySpec.class;
+    }
 
-	@Override
-	protected DSAKeyPairSpec newKeySpec(String algorithm, KeySpec pubKeySpec, KeySpec keySpec) {
-		return new DSAKeyPairSpec(algorithm, pubKeySpec, keySpec);
-	}
+    @Override
+    protected DSAKeyPairSpec newKeySpec(String algorithm, KeySpec pubKeySpec, KeySpec keySpec) {
+        return new DSAKeyPairSpec(algorithm, pubKeySpec, keySpec);
+    }
 
 }

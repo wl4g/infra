@@ -28,97 +28,97 @@ import org.junit.Test;
  */
 public class HoconConfigUtilsTests {
 
-	@Test
-	public void loadAndParseTest1() {
-		UserHoconConfig user = HoconConfigUtils.loadConfig("hocon/application-sample.conf", UserHoconConfig.class);
-		System.out.println(user);
-	}
+    @Test
+    public void loadAndParseTest1() {
+        UserHoconConfig user = HoconConfigUtils.loadConfig("hocon/application-sample.conf", UserHoconConfig.class);
+        System.out.println(user);
+    }
 
-	/**
-	 * Exmpple hocon configuration bean.
-	 *
-	 * @since
-	 */
-	public static class UserHoconConfig {
+    /**
+     * Exmpple hocon configuration bean.
+     *
+     * @since
+     */
+    public static class UserHoconConfig {
 
-		private String firstName;
-		private String lastName;
-		private int age;
-		private int sex;
-		private double height;
-		// private java.util.Date birthDate;
-		// private java.util.List<UserHoconConfig> children;
-		// private UserHoconConfig parent;
+        private String firstName;
+        private String lastName;
+        private int age;
+        private int sex;
+        private double height;
+        // private java.util.Date birthDate;
+        // private java.util.List<UserHoconConfig> children;
+        // private UserHoconConfig parent;
 
-		public String getFirstName() {
-			return firstName;
-		}
+        public String getFirstName() {
+            return firstName;
+        }
 
-		public void setFirstName(String firstName) {
-			this.firstName = firstName;
-		}
+        public void setFirstName(String firstName) {
+            this.firstName = firstName;
+        }
 
-		public String getLastName() {
-			return lastName;
-		}
+        public String getLastName() {
+            return lastName;
+        }
 
-		public void setLastName(String lastName) {
-			this.lastName = lastName;
-		}
+        public void setLastName(String lastName) {
+            this.lastName = lastName;
+        }
 
-		public int getAge() {
-			return age;
-		}
+        public int getAge() {
+            return age;
+        }
 
-		public void setAge(int age) {
-			this.age = age;
-		}
+        public void setAge(int age) {
+            this.age = age;
+        }
 
-		public int getSex() {
-			return sex;
-		}
+        public int getSex() {
+            return sex;
+        }
 
-		public void setSex(int sex) {
-			this.sex = sex;
-		}
+        public void setSex(int sex) {
+            this.sex = sex;
+        }
 
-		public double getHeight() {
-			return height;
-		}
+        public double getHeight() {
+            return height;
+        }
 
-		public void setHeight(double height) {
-			this.height = height;
-		}
+        public void setHeight(double height) {
+            this.height = height;
+        }
 
-		// public java.util.Date getBirthDate() {
-		// return birthDate;
-		// }
-		//
-		// public void setBirthDate(java.util.Date birthDate) {
-		// this.birthDate = birthDate;
-		// }
-		//
-		// public java.util.List<UserHoconConfig> getChildren() {
-		// return children;
-		// }
-		//
-		// public void setChildren(java.util.List<UserHoconConfig> children) {
-		// this.children = children;
-		// }
-		//
-		// public UserHoconConfig getParent() {
-		// return parent;
-		// }
-		//
-		// public void setParent(UserHoconConfig parent) {
-		// this.parent = parent;
-		// }
+        // public java.util.Date getBirthDate() {
+        // return birthDate;
+        // }
+        //
+        // public void setBirthDate(java.util.Date birthDate) {
+        // this.birthDate = birthDate;
+        // }
+        //
+        // public java.util.List<UserHoconConfig> getChildren() {
+        // return children;
+        // }
+        //
+        // public void setChildren(java.util.List<UserHoconConfig> children) {
+        // this.children = children;
+        // }
+        //
+        // public UserHoconConfig getParent() {
+        // return parent;
+        // }
+        //
+        // public void setParent(UserHoconConfig parent) {
+        // this.parent = parent;
+        // }
 
-		@Override
-		public String toString() {
-			return getClass().getSimpleName().concat(" - ").concat(toJSONString(this));
-		}
+        @Override
+        public String toString() {
+            return getClass().getSimpleName().concat(" - ").concat(toJSONString(this));
+        }
 
-	}
+    }
 
 }
