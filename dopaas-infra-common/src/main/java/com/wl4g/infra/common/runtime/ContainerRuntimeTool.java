@@ -53,14 +53,12 @@ public abstract class ContainerRuntimeTool {
                         }
                     }
                 }
-            } else {
-                return ContainerEnvType.UNKNOWN;
+                return ContainerEnvType.HOST;
             }
         } catch (Exception e) {
             log.warn("Failed to get current JVM runtime container env. cause by: {}", e.getMessage());
-            return ContainerEnvType.UNKNOWN;
         }
-        return ContainerEnvType.HOST;
+        return ContainerEnvType.UNKNOWN;
     }
 
     private static boolean isInContainer0() {
