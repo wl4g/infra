@@ -16,13 +16,13 @@
 package com.wl4g.infra.common.crypto.symmetric;
 
 import static com.google.common.base.Charsets.UTF_8;
-import static com.wl4g.infra.common.jvm.JvmRuntimeKit.*;
 import static com.wl4g.infra.common.lang.Assert2.hasText;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.lang.Assert2.isTrue;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
+import static com.wl4g.infra.common.runtime.JvmRuntimeTool.*;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
@@ -340,7 +340,7 @@ abstract class SymmetricCryptorSupport {
         // Print cipherKey?
         String envCipherPrintKey = envCipherKey + ".print";
         String print = valueOf(getenv(envCipherPrintKey)).toLowerCase(US);
-        if (isJVMDebugging || StringUtils2.isTrue(print)) {
+        if (isJvmInDebugging || StringUtils2.isTrue(print)) {
             out.println(format("Use default symmetric algorithm cipherKey: [%s]", cipherKey));
         }
 

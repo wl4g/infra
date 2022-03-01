@@ -81,10 +81,10 @@ import com.google.common.net.MediaType;
 import com.wl4g.infra.common.collection.CollectionUtils2;
 import com.wl4g.infra.common.collection.multimap.LinkedMultiValueMap;
 import com.wl4g.infra.common.collection.multimap.MultiValueMap;
-import com.wl4g.infra.common.jvm.JvmRuntimeKit;
 import com.wl4g.infra.common.lang.Assert2;
 import com.wl4g.infra.common.lang.StringUtils2;
 import com.wl4g.infra.common.log.SmartLogger;
+import com.wl4g.infra.common.runtime.JvmRuntimeTool;
 
 /**
  * Generic Web utilitys.
@@ -877,7 +877,7 @@ public abstract class WebUtils2 {
         final String baseURI = getBaseURIForDefault(scheme, serverName, port).concat(ctxPath);
 
         // Debugging.
-        if (JvmRuntimeKit.isJVMDebugging) {
+        if (JvmRuntimeTool.isJvmInDebugging) {
             Map<String, String> headers = new HashMap<>();
             Enumeration<String> en = request.getHeaderNames();
             while (en.hasMoreElements()) {
@@ -1018,7 +1018,7 @@ public abstract class WebUtils2 {
         if (isNull(request)) {
             return false;
         }
-        if (JvmRuntimeKit.isJVMDebugging) {
+        if (JvmRuntimeTool.isJvmInDebugging) {
             return true;
         }
         String stacktrace = request.getParameter(PARAM_STACKTRACE);

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.common.jvm;
+package com.wl4g.infra.common.runtime;
 
 import static org.apache.commons.lang3.StringUtils.startsWithAny;
 
@@ -28,21 +28,21 @@ import java.util.Locale;
  * @version v1.0 2019年1月12日
  * @since
  */
-public abstract class JvmRuntimeKit {
+public abstract class JvmRuntimeTool {
 
     /**
-     * Current runtime in debugging.
+     * Check currently JVM runtime in debug mode.
      */
-    final public static boolean isJVMDebugging = isJvmDebugg0();
+    public static final boolean isJvmInDebugging = isDebugMode0();
 
     /**
-     * Check current JVM runtime debug status. See: <a href=
+     * Check currently JVM runtime debug status. See: <a href=
      * "http://hg.openjdk.java.net/jdk8u/jdk8u/jdk/file/c30db4c968f6/src/share/classes/com/sun/tools/jdi/SunCommandLineLauncher.java#l216">OpenJDK8
      * source</a>
      * 
      * @return
      */
-    private static boolean isJvmDebugg0() {
+    private static boolean isDebugMode0() {
         List<String> arguments = ManagementFactory.getRuntimeMXBean().getInputArguments();
         for (String str : arguments) {
             if (startsWithAny(str.toLowerCase(Locale.US), "-agentlib", "-Xrunjdwp", "-Xdebug")) {

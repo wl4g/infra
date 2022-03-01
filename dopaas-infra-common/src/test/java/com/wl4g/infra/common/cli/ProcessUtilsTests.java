@@ -23,38 +23,36 @@ import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
 import java.io.File;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.Test;
 
 import com.wl4g.infra.common.cli.ProcessUtils;
 
 public class ProcessUtilsTests {
 
-    public static void main(String[] args) throws Exception {
-        // buildCrossSingleCommandsTest1();
-        // execMultiTest2();
-        // execProgressTest3();
-        execInteractiveCommandTest4();
-    }
-
-    public static void buildCrossSingleCommandsTest1() throws Exception {
+    @Test
+    public void buildCrossSingleCommandsTest1() throws Exception {
         String[] cmdarray = buildCrossSingleCommands("mvn -version", new File("c:\\out"), new File("c:\\err"), false, false);
         Runtime.getRuntime().exec(cmdarray).waitFor();
     }
 
-    public static void execMultiWithWindowsTest2() throws Exception {
+    @Test
+    public void execMultiWithWindowsTest2() throws Exception {
         if (IS_OS_WINDOWS) {
             execMulti("echo \"start...\"\njps \necho \"end\"", new File("d:\\"), new File("c:\\out"), new File("c:\\err"), true,
                     false);
         }
     }
 
-    public static void execProgressTest3() throws Exception {
+    @Test
+    public void execProgressTest3() throws Exception {
         int whole = 120;
         for (int i = 0; i < whole; i++) {
             ProcessUtils.printProgress("正在分析...", i, whole, '#');
         }
     }
 
-    public static void execInteractiveCommandTest4() throws Exception {
+    @Test
+    public void execInteractiveCommandTest4() throws Exception {
         // Generate sample data.
         File file = new File("/tmp/test_vim_file.txt");
         FileUtils.write(file, "abcdefghijklmnopqrstuvwxyz", UTF_8);
