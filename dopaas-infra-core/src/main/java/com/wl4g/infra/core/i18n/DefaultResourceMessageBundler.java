@@ -26,13 +26,13 @@ import java.util.Locale;
  */
 public class DefaultResourceMessageBundler extends AbstractResourceMessageBundler {
 
-	/**
-	 * Default usage local locale.
-	 * 
-	 * @return
-	 */
-	protected Locale getSessionLocale() {
-		return Locale.CHINESE;
-	}
+    /**
+     * Default usage local locale.
+     * 
+     * @return
+     */
+    protected Locale getSessionLocale() {
+        return Locale.CHINESE;
+    }
 
 }

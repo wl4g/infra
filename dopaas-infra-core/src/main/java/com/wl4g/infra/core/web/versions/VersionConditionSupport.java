@@ -39,41 +39,41 @@ import com.wl4g.infra.core.web.versions.annotation.ApiVersionManagementWrapper;
  */
 public abstract class VersionConditionSupport {
 
-	protected final SmartLogger log = getLogger(getClass());
+    protected final SmartLogger log = getLogger(getClass());
 
-	/**
-	 * API version mapping wrapper, attributes from {@link ApiVersionMapping}
-	 * and {@link EnableApiVersionManagement}
-	 */
-	@NotNull
-	private final ApiVersionMappingWrapper versionMapping;
+    /**
+     * API version mapping wrapper, attributes from {@link ApiVersionMapping}
+     * and {@link EnableApiVersionManagement}
+     */
+    @NotNull
+    private final ApiVersionMappingWrapper versionMapping;
 
-	/**
-	 * {@link org.springframework.web.servlet.mvc.method.RequestMappingInfo#getMatchingCondition(HttpServletRequest)}
-	 */
-	@Nullable
-	private final List<String> matchingCandidateVersions;
+    /**
+     * {@link org.springframework.web.servlet.mvc.method.RequestMappingInfo#getMatchingCondition(HttpServletRequest)}
+     */
+    @Nullable
+    private final List<String> matchingCandidateVersions;
 
-	public VersionConditionSupport(@NotNull ApiVersionMappingWrapper versionMapping) {
-		this(versionMapping, null);
-	}
+    public VersionConditionSupport(@NotNull ApiVersionMappingWrapper versionMapping) {
+        this(versionMapping, null);
+    }
 
-	public VersionConditionSupport(@NotNull ApiVersionMappingWrapper versionMapping,
-			@Nullable List<String> matchingCandidateVersions) {
-		this.versionMapping = notNullOf(versionMapping, "versionMapping");
-		this.matchingCandidateVersions = matchingCandidateVersions;
-	}
+    public VersionConditionSupport(@NotNull ApiVersionMappingWrapper versionMapping,
+            @Nullable List<String> matchingCandidateVersions) {
+        this.versionMapping = notNullOf(versionMapping, "versionMapping");
+        this.matchingCandidateVersions = matchingCandidateVersions;
+    }
 
-	public ApiVersionMappingWrapper getVersionMapping() {
-		return versionMapping;
-	}
+    public ApiVersionMappingWrapper getVersionMapping() {
+        return versionMapping;
+    }
 
-	public List<String> getMatchingCandidateVersions() {
-		return matchingCandidateVersions;
-	}
+    public List<String> getMatchingCandidateVersions() {
+        return matchingCandidateVersions;
+    }
 
-	protected ApiVersionManagementWrapper getVersionConfig() {
-		return versionMapping.getVersionConfig();
-	}
+    protected ApiVersionManagementWrapper getVersionConfig() {
+        return versionMapping.getVersionConfig();
+    }
 
 }

@@ -29,27 +29,27 @@ import org.springframework.aop.support.AopUtils;
  */
 public abstract class AopUtils2 extends AopUtils {
 
-	/**
-	 * Get target object
-	 * 
-	 * @param candidate
-	 *            Proxy object
-	 * @return
-	 * @throws Exception
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T> T getTarget(Object candidate) {
-		try {
-			if (candidate == null) {
-				return null;
-			}
-			if (isAopProxy(candidate) && (candidate instanceof Advised)) {
-				return (T) ((Advised) candidate).getTargetSource().getTarget();
-			}
-		} catch (Exception e) {
-			throw new IllegalStateException("Failed to unwarp proxied object.", e);
-		}
-		return (T) candidate;
-	}
+    /**
+     * Get target object
+     * 
+     * @param candidate
+     *            Proxy object
+     * @return
+     * @throws Exception
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T getTarget(Object candidate) {
+        try {
+            if (candidate == null) {
+                return null;
+            }
+            if (isAopProxy(candidate) && (candidate instanceof Advised)) {
+                return (T) ((Advised) candidate).getTargetSource().getTarget();
+            }
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to unwarp proxied object.", e);
+        }
+        return (T) candidate;
+    }
 
 }

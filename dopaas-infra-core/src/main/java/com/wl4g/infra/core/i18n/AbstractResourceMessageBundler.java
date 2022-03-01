@@ -30,62 +30,62 @@ import java.util.Locale;
  */
 public abstract class AbstractResourceMessageBundler extends ResourceBundleMessageSource {
 
-	/**
-	 * Message source accessor delegate.
-	 */
-	private MessageSourceAccessor accessor;
+    /**
+     * Message source accessor delegate.
+     */
+    private MessageSourceAccessor accessor;
 
-	public AbstractResourceMessageBundler() {
-		this(AbstractResourceMessageBundler.class);
-	}
+    public AbstractResourceMessageBundler() {
+        this(AbstractResourceMessageBundler.class);
+    }
 
-	public AbstractResourceMessageBundler(Class<?> withClassPath) {
-		this(getBasename(withClassPath));
-	}
+    public AbstractResourceMessageBundler(Class<?> withClassPath) {
+        this(getBasename(withClassPath));
+    }
 
-	public AbstractResourceMessageBundler(String... basenames) {
-		Assert.isTrue((basenames != null && basenames.length > 0), "'basenames' cannot not be empty");
-		super.setBasenames(basenames);
-	}
+    public AbstractResourceMessageBundler(String... basenames) {
+        Assert.isTrue((basenames != null && basenames.length > 0), "'basenames' cannot not be empty");
+        super.setBasenames(basenames);
+    }
 
-	/**
-	 * Get locale message
-	 * 
-	 * @param code
-	 * @return
-	 */
-	public String getMessage(String code, Object... args) {
-		return getSource().getMessage(code, args, getSessionLocale());
-	}
+    /**
+     * Get locale message
+     * 
+     * @param code
+     * @return
+     */
+    public String getMessage(String code, Object... args) {
+        return getSource().getMessage(code, args, getSessionLocale());
+    }
 
-	/**
-	 * Get actual message source
-	 * 
-	 * @return
-	 */
-	public MessageSourceAccessor getSource() {
-		if (accessor != null) {
-			return accessor;
-		}
-		return (accessor = new MessageSourceAccessor(this));
-	}
+    /**
+     * Get actual message source
+     * 
+     * @return
+     */
+    public MessageSourceAccessor getSource() {
+        if (accessor != null) {
+            return accessor;
+        }
+        return (accessor = new MessageSourceAccessor(this));
+    }
 
-	/**
-	 * Default i18n message base class-path prefix.
-	 * 
-	 * @return
-	 */
-	protected static String getBasename(Class<?> clazz) {
-		Assert.notNull(clazz, "Basename class cannot not be null");
-		String path = clazz.getName();
-		return path.substring(0, path.lastIndexOf(".")) + ".messages";
-	}
+    /**
+     * Default i18n message base class-path prefix.
+     * 
+     * @return
+     */
+    protected static String getBasename(Class<?> clazz) {
+        Assert.notNull(clazz, "Basename class cannot not be null");
+        String path = clazz.getName();
+        return path.substring(0, path.lastIndexOf(".")) + ".messages";
+    }
 
-	/**
-	 * Get current session locale.</br>
-	 * 
-	 * @return
-	 */
-	protected abstract Locale getSessionLocale();
+    /**
+     * Get current session locale.</br>
+     * 
+     * @return
+     */
+    protected abstract Locale getSessionLocale();
 
 }

@@ -36,21 +36,21 @@ import com.wl4g.infra.core.logging.logback.LogbackLoggingSystem;
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE)
 public class EnhancedLoggingApplicationListener extends LoggingApplicationListener {
 
-	/**
-	 * Automatic setting uses the enhanced spring log system. Refer to the
-	 * source code: </br>
-	 * {@link org.springframework.boot.logging.LoggingApplicationListener#onApplicationStartingEvent(ApplicationStartingEvent)}
-	 * </br>
-	 * {@link org.springframework.boot.logging.LoggingSystem#get(ClassLoader)}
-	 * </br>
-	 * {@link org.springframework.boot.logging.LoggingApplicationListener#onApplicationPreparedEvent(ApplicationPreparedEvent)}
-	 * </br>
-	 */
-	@Override
-	public void onApplicationEvent(ApplicationEvent event) {
-		// Force priority use custom logging system
-		System.setProperty(SYSTEM_PROPERTY, LogbackLoggingSystem.class.getName());
-		super.onApplicationEvent(event);
-	}
+    /**
+     * Automatic setting uses the enhanced spring log system. Refer to the
+     * source code: </br>
+     * {@link org.springframework.boot.logging.LoggingApplicationListener#onApplicationStartingEvent(ApplicationStartingEvent)}
+     * </br>
+     * {@link org.springframework.boot.logging.LoggingSystem#get(ClassLoader)}
+     * </br>
+     * {@link org.springframework.boot.logging.LoggingApplicationListener#onApplicationPreparedEvent(ApplicationPreparedEvent)}
+     * </br>
+     */
+    @Override
+    public void onApplicationEvent(ApplicationEvent event) {
+        // Force priority use custom logging system
+        System.setProperty(SYSTEM_PROPERTY, LogbackLoggingSystem.class.getName());
+        super.onApplicationEvent(event);
+    }
 
 }

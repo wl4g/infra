@@ -73,39 +73,39 @@ import org.springframework.core.DefaultParameterNameDiscoverer;
  */
 public class HierarchyParameterNameDiscoverer extends DefaultParameterNameDiscoverer {
 
-	public static final HierarchyParameterNameDiscoverer DEFAULT = new HierarchyParameterNameDiscoverer();
+    public static final HierarchyParameterNameDiscoverer DEFAULT = new HierarchyParameterNameDiscoverer();
 
-	@Override
-	public String[] getParameterNames(Method method) {
-		String[] parameterNames = super.getParameterNames(method);
-		if (!isEmptyArray(parameterNames)) {
-			return parameterNames;
-		}
+    @Override
+    public String[] getParameterNames(Method method) {
+        String[] parameterNames = super.getParameterNames(method);
+        if (!isEmptyArray(parameterNames)) {
+            return parameterNames;
+        }
 
-		// Fallback, try to get the parameter name through the super classes and
-		// interfaces as much as possible.
-		List<Class<?>> classes = new ArrayList<>(safeArrayToList(method.getDeclaringClass().getInterfaces()));
-		Class<?> clazz = method.getDeclaringClass();
-		do {
-			classes.add(clazz);
-			classes.addAll(safeArrayToList(clazz.getInterfaces()));
-			clazz = clazz.getSuperclass();
-		} while (nonNull(clazz) && clazz != Object.class);
+        // Fallback, try to get the parameter name through the super classes and
+        // interfaces as much as possible.
+        List<Class<?>> classes = new ArrayList<>(safeArrayToList(method.getDeclaringClass().getInterfaces()));
+        Class<?> clazz = method.getDeclaringClass();
+        do {
+            classes.add(clazz);
+            classes.addAll(safeArrayToList(clazz.getInterfaces()));
+            clazz = clazz.getSuperclass();
+        } while (nonNull(clazz) && clazz != Object.class);
 
-		// find parametered names.
-		for (Class<?> cls : classes) {
-			try {
-				Method superMethod = cls.getMethod(method.getName(), method.getParameterTypes());
-				parameterNames = super.getParameterNames(superMethod);
-				if (!isEmptyArray(parameterNames)) {
-					return parameterNames;
-				}
-			} catch (NoSuchMethodException e) {
-				continue;
-			}
-		}
+        // find parametered names.
+        for (Class<?> cls : classes) {
+            try {
+                Method superMethod = cls.getMethod(method.getName(), method.getParameterTypes());
+                parameterNames = super.getParameterNames(superMethod);
+                if (!isEmptyArray(parameterNames)) {
+                    return parameterNames;
+                }
+            } catch (NoSuchMethodException e) {
+                continue;
+            }
+        }
 
-		return null;
-	}
+        return null;
+    }
 
 }

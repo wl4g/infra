@@ -43,116 +43,116 @@ import org.springframework.core.io.ByteArrayResource;
  */
 public abstract class PropertySources {
 
-	/**
-	 * Resolving configuration content of {@link ConfigType}
-	 * 
-	 * @param type
-	 * @param content
-	 * @return if resolved null return empty {@link Map}.
-	 */
-	public static Map<String, Object> resolve(@NotNull ConfigType type, @NotBlank String content) {
-		notNullOf(type, "configType");
-		hasTextOf(content, "configContent");
-		return type.getHandle().resolve(content);
-	}
+    /**
+     * Resolving configuration content of {@link ConfigType}
+     * 
+     * @param type
+     * @param content
+     * @return if resolved null return empty {@link Map}.
+     */
+    public static Map<String, Object> resolve(@NotNull ConfigType type, @NotBlank String content) {
+        notNullOf(type, "configType");
+        hasTextOf(content, "configContent");
+        return type.getHandle().resolve(content);
+    }
 
-	/**
-	 * {@link ConfigType}
-	 * 
-	 * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
-	 * @sine v1.0
-	 * @see
-	 */
-	public static enum ConfigType {
-		YML(new YamlResolveHandler()), YAML(new YamlResolveHandler()), PROPS(new PropertiesResolveHandler());
+    /**
+     * {@link ConfigType}
+     * 
+     * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+     * @sine v1.0
+     * @see
+     */
+    public static enum ConfigType {
+        YML(new YamlResolveHandler()), YAML(new YamlResolveHandler()), PROPS(new PropertiesResolveHandler());
 
-		private ResolveHandler handle;
+        private ResolveHandler handle;
 
-		private ConfigType(ResolveHandler handle) {
-			this.handle = handle;
-		}
+        private ConfigType(ResolveHandler handle) {
+            this.handle = handle;
+        }
 
-		public ResolveHandler getHandle() {
-			return handle;
-		}
+        public ResolveHandler getHandle() {
+            return handle;
+        }
 
-		public void setHandle(ResolveHandler handle) {
-			this.handle = handle;
-		}
+        public void setHandle(ResolveHandler handle) {
+            this.handle = handle;
+        }
 
-		public static ConfigType of(String name) {
-			for (ConfigType t : values()) {
-				if (t.name().equalsIgnoreCase(String.valueOf(name))) {
-					return t;
-				}
-			}
-			throw new IllegalStateException(String.format(" 'name' : %s", String.valueOf(name)));
-		}
+        public static ConfigType of(String name) {
+            for (ConfigType t : values()) {
+                if (t.name().equalsIgnoreCase(String.valueOf(name))) {
+                    return t;
+                }
+            }
+            throw new IllegalStateException(String.format(" 'name' : %s", String.valueOf(name)));
+        }
 
-	}
+    }
 
-	/**
-	 * {@link ResolveHandler}
-	 * 
-	 * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
-	 * @sine v1.0
-	 * @see
-	 */
-	public static interface ResolveHandler {
-		Map<String, Object> resolve(String content);
-	}
+    /**
+     * {@link ResolveHandler}
+     * 
+     * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+     * @sine v1.0
+     * @see
+     */
+    public static interface ResolveHandler {
+        Map<String, Object> resolve(String content);
+    }
 
-	/**
-	 * {@link YamlResolveHandler}
-	 * 
-	 * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
-	 * @sine v1.0
-	 * @see
-	 */
-	private static class YamlResolveHandler implements ResolveHandler {
+    /**
+     * {@link YamlResolveHandler}
+     * 
+     * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+     * @sine v1.0
+     * @see
+     */
+    private static class YamlResolveHandler implements ResolveHandler {
 
-		@Override
-		public Map<String, Object> resolve(String content) {
-			YamlPropertiesFactoryBean factory = new YamlPropertiesFactoryBean();
-			factory.setResources(new ByteArrayResource(content.getBytes(UTF_8)));
-			factory.afterPropertiesSet();
+        @Override
+        public Map<String, Object> resolve(String content) {
+            YamlPropertiesFactoryBean factory = new YamlPropertiesFactoryBean();
+            factory.setResources(new ByteArrayResource(content.getBytes(UTF_8)));
+            factory.afterPropertiesSet();
 
-			// Properties to map
-			Map<String, Object> map = new HashMap<>();
-			if (nonNull(factory) && nonNull(factory.getObject())) {
-				factory.getObject().forEach((k, v) -> map.put(valueOf(k), v));
-			}
+            // Properties to map
+            Map<String, Object> map = new HashMap<>();
+            if (nonNull(factory) && nonNull(factory.getObject())) {
+                factory.getObject().forEach((k, v) -> map.put(valueOf(k), v));
+            }
 
-			return map;
-		}
+            return map;
+        }
 
-	}
+    }
 
-	/**
-	 * {@link PropertiesResolveHandler}
-	 * 
-	 * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
-	 * @sine v1.0
-	 * @see
-	 */
-	private static class PropertiesResolveHandler implements ResolveHandler {
+    /**
+     * {@link PropertiesResolveHandler}
+     * 
+     * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+     * @sine v1.0
+     * @see
+     */
+    private static class PropertiesResolveHandler implements ResolveHandler {
 
-		@Override
-		public Map<String, Object> resolve(String content) {
-			Map<String, Object> result = new HashMap<>();
-			try {
-				Properties prop = new Properties();
-				prop.load(new StringReader(content));
-				// Copy and check.
-				prop.forEach((k, v) -> {
-					result.put(String.valueOf(k), v);
-				});
-			} catch (IOException e) {
-				throw new IllegalArgumentException(e);
-			}
-			return result;
-		}
+        @Override
+        public Map<String, Object> resolve(String content) {
+            Map<String, Object> result = new HashMap<>();
+            try {
+                Properties prop = new Properties();
+                prop.load(new StringReader(content));
+                // Copy and check.
+                prop.forEach((k, v) -> {
+                    result.put(String.valueOf(k), v);
+                });
+            } catch (IOException e) {
+                throw new IllegalArgumentException(e);
+            }
+            return result;
+        }
 
-	}
+    }
 
 }

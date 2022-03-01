@@ -42,90 +42,90 @@ import com.wl4g.infra.common.lang.ClassUtils2;
  */
 public abstract class PrefixHandlerMappingSupport implements ApplicationContextAware {
 
-	/**
-	 * {@link ApplicationContext}
-	 */
-	protected ApplicationContext actx;
+    /**
+     * {@link ApplicationContext}
+     */
+    protected ApplicationContext actx;
 
-	@Override
-	public void setApplicationContext(ApplicationContext actx) throws BeansException {
-		this.actx = notNullOf(actx, "applicationContext");
-	}
+    @Override
+    public void setApplicationContext(ApplicationContext actx) throws BeansException {
+        this.actx = notNullOf(actx, "applicationContext");
+    }
 
-	/**
-	 * New create prefix handler mapping.
-	 * 
-	 * @param mappingPrefix
-	 * @param annotationClass
-	 * @return
-	 */
-	protected Object newPrefixHandlerMapping(@NotBlank String mappingPrefix,
-			@NotNull Class<? extends Annotation> annotationClass) {
-		hasTextOf(mappingPrefix, "mappingPrefix");
-		notNullOf(annotationClass, "annotationClass");
+    /**
+     * New create prefix handler mapping.
+     * 
+     * @param mappingPrefix
+     * @param annotationClass
+     * @return
+     */
+    protected Object newPrefixHandlerMapping(@NotBlank String mappingPrefix,
+            @NotNull Class<? extends Annotation> annotationClass) {
+        hasTextOf(mappingPrefix, "mappingPrefix");
+        notNullOf(annotationClass, "annotationClass");
 
-		Map<String, Object> handlers = actx.getBeansWithAnnotation(annotationClass);
-		return newPrefixHandlerMapping(mappingPrefix, handlers.values().toArray(new Object[handlers.size()]));
-	}
+        Map<String, Object> handlers = actx.getBeansWithAnnotation(annotationClass);
+        return newPrefixHandlerMapping(mappingPrefix, handlers.values().toArray(new Object[handlers.size()]));
+    }
 
-	/**
-	 * New create prefix handler mapping.
-	 * 
-	 * @param mappingPrefix
-	 * @param handlers
-	 * @return
-	 */
-	protected Object newPrefixHandlerMapping(@NotBlank String mappingPrefix, @NotNull Object... handlers) {
-		hasTextOf(mappingPrefix, "mappingPrefix");
-		notNullOf(handlers, "handlers");
-		if (isReactiveWebApplication()) { // Reactive priority
-			return new ReactivePrefixHandlerMapping(mappingPrefix, handlers);
-		} else {
-			return new ServletPrefixHandlerMapping(mappingPrefix, handlers);
-		}
-	}
+    /**
+     * New create prefix handler mapping.
+     * 
+     * @param mappingPrefix
+     * @param handlers
+     * @return
+     */
+    protected Object newPrefixHandlerMapping(@NotBlank String mappingPrefix, @NotNull Object... handlers) {
+        hasTextOf(mappingPrefix, "mappingPrefix");
+        notNullOf(handlers, "handlers");
+        if (isReactiveWebApplication()) { // Reactive priority
+            return new ReactivePrefixHandlerMapping(mappingPrefix, handlers);
+        } else {
+            return new ServletPrefixHandlerMapping(mappingPrefix, handlers);
+        }
+    }
 
-	/**
-	 * Check whether the current web application environment is reactive
-	 * 
-	 * @return
-	 */
-	public static boolean isReactiveWebApplication() {
-		return ClassUtils2.isPresent(REACTIVE_WEB_APPLICATION_CLASS, Thread.currentThread().getContextClassLoader());
-	}
+    /**
+     * Check whether the current web application environment is reactive
+     * 
+     * @return
+     */
+    public static boolean isReactiveWebApplication() {
+        return ClassUtils2.isPresent(REACTIVE_WEB_APPLICATION_CLASS, Thread.currentThread().getContextClassLoader());
+    }
 
-	/**
-	 * {@link PathUtils}
-	 * 
-	 * @see
-	 */
-	public final static class PathUtils {
+    /**
+     * {@link PathUtils}
+     * 
+     * @see
+     */
+    public final static class PathUtils {
 
-		private PathUtils() {
-		}
+        private PathUtils() {
+        }
 
-		public static String normalizePath(String path) {
-			if (!StringUtils.hasText(path)) {
-				return path;
-			}
-			String normalizedPath = path;
-			if (!normalizedPath.startsWith("/")) {
-				normalizedPath = "/" + normalizedPath;
-			}
-			if (normalizedPath.endsWith("/")) {
-				normalizedPath = normalizedPath.substring(0, normalizedPath.length() - 1);
-			}
-			return normalizedPath;
-		}
+        public static String normalizePath(String path) {
+            if (!StringUtils.hasText(path)) {
+                return path;
+            }
+            String normalizedPath = path;
+            if (!normalizedPath.startsWith("/")) {
+                normalizedPath = "/" + normalizedPath;
+            }
+            if (normalizedPath.endsWith("/")) {
+                normalizedPath = normalizedPath.substring(0, normalizedPath.length() - 1);
+            }
+            return normalizedPath;
+        }
 
-	}
+    }
 
-	/**
-	 * Marked webflux reactive web application primary class.
-	 * 
-	 * @see {@link de.codecentric.boot.admin.server.config.AdminServerWebConfiguration.ReactiveRestApiConfiguration}
-	 * @see {@link org.springframework.boot.autoconfigure.condition.OnWebApplicationCondition}
-	 */
-	private static final String REACTIVE_WEB_APPLICATION_CLASS = "org.springframework.web.reactive.HandlerResult";
+    /**
+     * Marked webflux reactive web application primary class.
+     * 
+     * @see {@link de.codecentric.boot.admin.server.config.AdminServerWebConfiguration.ReactiveRestApiConfiguration}
+     * @see {@link org.springframework.boot.autoconfigure.condition.OnWebApplicationCondition}
+     */
+    private static final String REACTIVE_WEB_APPLICATION_CLASS = "org.springframework.web.reactive.HandlerResult";
 
 }

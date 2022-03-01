@@ -68,234 +68,234 @@ import reactor.core.publisher.Mono;
  */
 public abstract class ErrorConfigurer implements InitializingBean {
 
-	protected final SmartLogger log = getLogger(getClass());
+    protected final SmartLogger log = getLogger(getClass());
 
-	/** Errors configuration properties. */
-	protected final ErrorHandlerProperties config;
+    /** Errors configuration properties. */
+    protected final ErrorHandlerProperties config;
 
-	/** Errors {@link Template} cache. */
-	protected final Map<Integer, Template> errorTplMappingCache;
+    /** Errors {@link Template} cache. */
+    protected final Map<Integer, Template> errorTplMappingCache;
 
-	public ErrorConfigurer(ErrorHandlerProperties config) {
-		this.config = notNullOf(config, "config");
-		this.errorTplMappingCache = new ConcurrentHashMap<>(4);
-	}
+    public ErrorConfigurer(ErrorHandlerProperties config) {
+        this.config = notNullOf(config, "config");
+        this.errorTplMappingCache = new ConcurrentHashMap<>(4);
+    }
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		log.info("Initializing global smart error configurer ...");
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        log.info("Initializing global smart error configurer ...");
 
-		Configuration fmc = Freemarkers.create(config.getBasePath()).build();
-		safeMap(config.getRenderingMapping()).entrySet().stream().forEach(p -> {
-			try {
-				if (!isErrorRedirectURI(p.getValue())) { // e.g 404.tpl.html
-					Template tpl = fmc.getTemplate(p.getValue(), UTF_8.name());
-					notNull(tpl, "Default (%s) error template must not be null", p.getKey());
-					errorTplMappingCache.put(p.getKey(), tpl);
-				}
-			} catch (Exception e) {
-				throw new IllegalStateException(e);
-			}
-		});
-	}
+        Configuration fmc = Freemarkers.create(config.getBasePath()).build();
+        safeMap(config.getRenderingMapping()).entrySet().stream().forEach(p -> {
+            try {
+                if (!isErrorRedirectURI(p.getValue())) { // e.g 404.tpl.html
+                    Template tpl = fmc.getTemplate(p.getValue(), UTF_8.name());
+                    notNull(tpl, "Default (%s) error template must not be null", p.getKey());
+                    errorTplMappingCache.put(p.getKey(), tpl);
+                }
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
+            }
+        });
+    }
 
-	/**
-	 * Obtain exception http status. {@link HttpStatus}
-	 * 
-	 * @param th
-	 * @return
-	 */
-	public Integer getStatus(Throwable th) {
-		return getStatus(emptyMap(), th);
-	}
+    /**
+     * Obtain exception http status. {@link HttpStatus}
+     * 
+     * @param th
+     * @return
+     */
+    public Integer getStatus(Throwable th) {
+        return getStatus(emptyMap(), th);
+    }
 
-	/**
-	 * Obtain exception http status. {@link HttpStatus}
-	 * 
-	 * @param model
-	 * @param th
-	 * @return
-	 */
-	public abstract Integer getStatus(Map<String, Object> model, Throwable th);
+    /**
+     * Obtain exception http status. {@link HttpStatus}
+     * 
+     * @param model
+     * @param th
+     * @return
+     */
+    public abstract Integer getStatus(Map<String, Object> model, Throwable th);
 
-	/**
-	 * Obtain exception as string.
-	 * 
-	 * @param model
-	 * @param th
-	 * @return
-	 */
-	public abstract String getRootCause(Map<String, Object> model, Throwable th);
+    /**
+     * Obtain exception as string.
+     * 
+     * @param model
+     * @param th
+     * @return
+     */
+    public abstract String getRootCause(Map<String, Object> model, Throwable th);
 
-	/**
-	 * Handle automatic errors & rendering.
-	 * 
-	 * @param extractor
-	 * @param model
-	 * @param th
-	 * @param errorHandler
-	 * @return handle errors result(if necessary). for example: {@link Mono}
-	 */
-	public Object handleErrorRendering(@NotNull RequestExtractor extractor, @NotNull Map<String, Object> model,
-			@NotNull Throwable th, @NotNull RenderingErrorHandler errorHandler) {
-		try {
-			// Obtain custom extension response status.
-			int status = getStatus(model, th);
-			String errmsg = getRootCause(model, th);
+    /**
+     * Handle automatic errors & rendering.
+     * 
+     * @param extractor
+     * @param model
+     * @param th
+     * @param errorHandler
+     * @return handle errors result(if necessary). for example: {@link Mono}
+     */
+    public Object handleErrorRendering(@NotNull RequestExtractor extractor, @NotNull Map<String, Object> model,
+            @NotNull Throwable th, @NotNull RenderingErrorHandler errorHandler) {
+        try {
+            // Obtain custom extension response status.
+            int status = getStatus(model, th);
+            String errmsg = getRootCause(model, th);
 
-			// Gets redirectUrl or rendering template.
-			Object uriOrTpl = getRedirectUriOrRenderErrorView(status);
+            // Gets redirectUrl or rendering template.
+            Object uriOrTpl = getRedirectUriOrRenderErrorView(status);
 
-			// When the client is not a browser or the exception rendering
-			// configuration is empty, the JSON message is returned by default.
-			if (isNull(uriOrTpl) || isRespJSON(extractor, null)) { // Resp json
-				RespBase<Object> resp = new RespBase<>(newCode(status, errmsg));
-				if (!(uriOrTpl instanceof Template)) {
-					resp.forMap().put(DEFAULT_REDIRECT_KEY, uriOrTpl);
-				}
-				log.error("Resp err json => {}", resp.asJson());
-				return errorHandler.renderingWithJson(model, resp);
-			}
-			// Rendering errview
-			else {
-				if (uriOrTpl instanceof Template) {
-					log.error("Redirect errview => http({})", status);
-					// Merge configuration to model.
-					model.putAll(config.asMap());
-					// Rendering
-					String renderString = processTemplateIntoString((Template) uriOrTpl, model);
-					return errorHandler.renderingWithView(model, status, renderString);
-				} else {
-					log.error("Redirect errview => {}", uriOrTpl);
-					return errorHandler.redirectError(model, (String) uriOrTpl);
-				}
-			}
-		} catch (Throwable th0) {
-			log.error("Unable to handle global errors, origin cause: \n{} at causes:\n{}", getStackTraceAsString(th),
-					getStackTraceAsString(th0));
-		}
+            // When the client is not a browser or the exception rendering
+            // configuration is empty, the JSON message is returned by default.
+            if (isNull(uriOrTpl) || isRespJSON(extractor, null)) { // Resp json
+                RespBase<Object> resp = new RespBase<>(newCode(status, errmsg));
+                if (!(uriOrTpl instanceof Template)) {
+                    resp.forMap().put(DEFAULT_REDIRECT_KEY, uriOrTpl);
+                }
+                log.error("Resp err json => {}", resp.asJson());
+                return errorHandler.renderingWithJson(model, resp);
+            }
+            // Rendering errview
+            else {
+                if (uriOrTpl instanceof Template) {
+                    log.error("Redirect errview => http({})", status);
+                    // Merge configuration to model.
+                    model.putAll(config.asMap());
+                    // Rendering
+                    String renderString = processTemplateIntoString((Template) uriOrTpl, model);
+                    return errorHandler.renderingWithView(model, status, renderString);
+                } else {
+                    log.error("Redirect errview => {}", uriOrTpl);
+                    return errorHandler.redirectError(model, (String) uriOrTpl);
+                }
+            }
+        } catch (Throwable th0) {
+            log.error("Unable to handle global errors, origin cause: \n{} at causes:\n{}", getStackTraceAsString(th),
+                    getStackTraceAsString(th0));
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	/**
-	 * Gets redirectUri rendering errors page view.
-	 * 
-	 * @param status
-	 * @return
-	 * @throws TemplateException
-	 * @throws IOException
-	 */
-	private Object getRedirectUriOrRenderErrorView(int status) throws IOException, TemplateException {
-		Template tpl = errorTplMappingCache.get(status);
-		if (nonNull(tpl)) { // error template?
-			return tpl;
-		}
+    /**
+     * Gets redirectUri rendering errors page view.
+     * 
+     * @param status
+     * @return
+     * @throws TemplateException
+     * @throws IOException
+     */
+    private Object getRedirectUriOrRenderErrorView(int status) throws IOException, TemplateException {
+        Template tpl = errorTplMappingCache.get(status);
+        if (nonNull(tpl)) { // error template?
+            return tpl;
+        }
 
-		// error redirect URI
-		String errorRedirectUri = config.getRenderingMapping().get(status);
-		if (isBlank(errorRedirectUri)) {
-			log.debug("No render template or redirection URI found for error status: %s", status);
-			return null;
-		}
-		return errorRedirectUri.substring(DEFAULT_REDIRECT_PREFIX.length());
-	}
+        // error redirect URI
+        String errorRedirectUri = config.getRenderingMapping().get(status);
+        if (isBlank(errorRedirectUri)) {
+            log.debug("No render template or redirection URI found for error status: %s", status);
+            return null;
+        }
+        return errorRedirectUri.substring(DEFAULT_REDIRECT_PREFIX.length());
+    }
 
-	/**
-	 * Check redirection error URI.
-	 * 
-	 * @param uriOrTpl
-	 * @return
-	 */
-	private boolean isErrorRedirectURI(String uriOrTpl) {
-		return startsWithIgnoreCase(uriOrTpl, DEFAULT_REDIRECT_PREFIX);
-	}
+    /**
+     * Check redirection error URI.
+     * 
+     * @param uriOrTpl
+     * @return
+     */
+    private boolean isErrorRedirectURI(String uriOrTpl) {
+        return startsWithIgnoreCase(uriOrTpl, DEFAULT_REDIRECT_PREFIX);
+    }
 
-	/**
-	 * Extract meaningful valid errors messages.
-	 * 
-	 * @param model
-	 * @return
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static String extractValidErrorsMessage(@NotNull Map<String, Object> model) {
-		notNull(model, "Shouldn't be here");
+    /**
+     * Extract meaningful valid errors messages.
+     * 
+     * @param model
+     * @return
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public static String extractValidErrorsMessage(@NotNull Map<String, Object> model) {
+        notNull(model, "Shouldn't be here");
 
-		StringBuffer errmsg = new StringBuffer();
-		Object message = model.get("message");
-		if (message != null) {
-			errmsg.append(message);
-		}
+        StringBuffer errmsg = new StringBuffer();
+        Object message = model.get("message");
+        if (message != null) {
+            errmsg.append(message);
+        }
 
-		Object errors = model.get("errors"); // @NotNull?
-		if (errors != null) {
-			errmsg.setLength(0); // Print only errors information
-			if (errors instanceof Collection) {
-				// Used to remove duplication
-				List<String> fieldErrs = new ArrayList<>(8);
+        Object errors = model.get("errors"); // @NotNull?
+        if (errors != null) {
+            errmsg.setLength(0); // Print only errors information
+            if (errors instanceof Collection) {
+                // Used to remove duplication
+                List<String> fieldErrs = new ArrayList<>(8);
 
-				Collection<Object> _errors = (Collection) errors;
-				Iterator<Object> it = _errors.iterator();
-				while (it.hasNext()) {
-					Object err = it.next();
-					if (err instanceof FieldError) {
-						FieldError ferr = (FieldError) err;
-						/*
-						 * Remove duplicate field validation errors,
-						 * e.g. @NotNull and @NotEmpty
-						 */
-						String fieldErr = ferr.getField();
-						if (!fieldErrs.contains(fieldErr)) {
-							errmsg.append("'");
-							errmsg.append(fieldErr);
-							errmsg.append("' ");
-							errmsg.append(ferr.getDefaultMessage());
-							errmsg.append(", ");
-						}
-						fieldErrs.add(fieldErr);
-					} else {
-						errmsg.append(err.toString());
-						errmsg.append(", ");
-					}
-				}
-			} else {
-				errmsg.append(errors.toString());
-			}
-		}
+                Collection<Object> _errors = (Collection) errors;
+                Iterator<Object> it = _errors.iterator();
+                while (it.hasNext()) {
+                    Object err = it.next();
+                    if (err instanceof FieldError) {
+                        FieldError ferr = (FieldError) err;
+                        /*
+                         * Remove duplicate field validation errors,
+                         * e.g. @NotNull and @NotEmpty
+                         */
+                        String fieldErr = ferr.getField();
+                        if (!fieldErrs.contains(fieldErr)) {
+                            errmsg.append("'");
+                            errmsg.append(fieldErr);
+                            errmsg.append("' ");
+                            errmsg.append(ferr.getDefaultMessage());
+                            errmsg.append(", ");
+                        }
+                        fieldErrs.add(fieldErr);
+                    } else {
+                        errmsg.append(err.toString());
+                        errmsg.append(", ");
+                    }
+                }
+            } else {
+                errmsg.append(errors.toString());
+            }
+        }
 
-		return errmsg.toString();
-	}
+        return errmsg.toString();
+    }
 
-	/**
-	 * Obtain error attribute options.
-	 * 
-	 * @param isStacktrace
-	 * @return
-	 */
-	public static ErrorAttributeOptions obtainErrorAttributeOptions(boolean isStacktrace) {
-		return isStacktrace ? of(STACK_TRACE, MESSAGE, BINDING_ERRORS, EXCEPTION) : of(MESSAGE, BINDING_ERRORS, EXCEPTION);
-	}
+    /**
+     * Obtain error attribute options.
+     * 
+     * @param isStacktrace
+     * @return
+     */
+    public static ErrorAttributeOptions obtainErrorAttributeOptions(boolean isStacktrace) {
+        return isStacktrace ? of(STACK_TRACE, MESSAGE, BINDING_ERRORS, EXCEPTION) : of(MESSAGE, BINDING_ERRORS, EXCEPTION);
+    }
 
-	/**
-	 * {@link RenderingErrorHandler}
-	 */
-	public static interface RenderingErrorHandler {
+    /**
+     * {@link RenderingErrorHandler}
+     */
+    public static interface RenderingErrorHandler {
 
-		default Object renderingWithJson(Map<String, Object> model, RespBase<Object> resp) throws Exception {
-			throw new UnsupportedOperationException();
-		}
+        default Object renderingWithJson(Map<String, Object> model, RespBase<Object> resp) throws Exception {
+            throw new UnsupportedOperationException();
+        }
 
-		default Object renderingWithView(Map<String, Object> model, int status, String renderString) throws Exception {
-			throw new UnsupportedOperationException();
-		}
+        default Object renderingWithView(Map<String, Object> model, int status, String renderString) throws Exception {
+            throw new UnsupportedOperationException();
+        }
 
-		default Object redirectError(Map<String, Object> model, String errorRedirectURI) throws Exception {
-			throw new UnsupportedOperationException();
-		}
+        default Object redirectError(Map<String, Object> model, String errorRedirectURI) throws Exception {
+            throw new UnsupportedOperationException();
+        }
 
-	}
+    }
 
-	final private static String DEFAULT_REDIRECT_PREFIX = "redirect:";
-	final private static String DEFAULT_REDIRECT_KEY = "redirectUrl";
+    final private static String DEFAULT_REDIRECT_PREFIX = "redirect:";
+    final private static String DEFAULT_REDIRECT_KEY = "redirectUrl";
 
 }

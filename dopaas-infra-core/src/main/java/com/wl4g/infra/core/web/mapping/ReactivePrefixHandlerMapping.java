@@ -45,57 +45,57 @@ import com.wl4g.infra.core.web.mapping.PrefixHandlerMappingSupport.PathUtils;
  */
 public class ReactivePrefixHandlerMapping extends RequestMappingHandlerMapping {
 
-	private final String mappingPrefix;
-	private final Object handlers[];
+    private final String mappingPrefix;
+    private final Object handlers[];
 
-	public ReactivePrefixHandlerMapping(@Nullable String mappingPrefix, @NotNull Object... handlers) {
-		// Default by empty
-		this.mappingPrefix = isBlank(mappingPrefix) ? "" : mappingPrefix;
-		this.handlers = handlers.clone();
-		setOrder(-50);
-	}
+    public ReactivePrefixHandlerMapping(@Nullable String mappingPrefix, @NotNull Object... handlers) {
+        // Default by empty
+        this.mappingPrefix = isBlank(mappingPrefix) ? "" : mappingPrefix;
+        this.handlers = handlers.clone();
+        setOrder(-50);
+    }
 
-	@Override
-	public void afterPropertiesSet() {
-		super.afterPropertiesSet();
-		for (Object handler : handlers) {
-			detectHandlerMethods(handler);
-		}
-	}
+    @Override
+    public void afterPropertiesSet() {
+        super.afterPropertiesSet();
+        for (Object handler : handlers) {
+            detectHandlerMethods(handler);
+        }
+    }
 
-	@Override
-	protected void initApplicationContext() throws BeansException {
-		super.initApplicationContext();
-	}
+    @Override
+    protected void initApplicationContext() throws BeansException {
+        super.initApplicationContext();
+    }
 
-	@Override
-	protected boolean isHandler(Class<?> beanType) {
-		return false;
-	}
+    @Override
+    protected boolean isHandler(Class<?> beanType) {
+        return false;
+    }
 
-	@Override
-	protected void registerHandlerMethod(Object handler, Method method, RequestMappingInfo mapping) {
-		if (mapping == null) {
-			return;
-		}
-		super.registerHandlerMethod(handler, method, withPrefix(mapping));
-	}
+    @Override
+    protected void registerHandlerMethod(Object handler, Method method, RequestMappingInfo mapping) {
+        if (mapping == null) {
+            return;
+        }
+        super.registerHandlerMethod(handler, method, withPrefix(mapping));
+    }
 
-	private RequestMappingInfo withPrefix(RequestMappingInfo mapping) {
-		PatternsRequestCondition patterns = new PatternsRequestCondition(
-				withNewPatterns(mapping.getPatternsCondition().getPatterns()));
-		return new RequestMappingInfo(patterns, mapping.getMethodsCondition(), mapping.getParamsCondition(),
-				mapping.getHeadersCondition(), mapping.getConsumesCondition(), mapping.getProducesCondition(),
-				mapping.getCustomCondition());
-	}
+    private RequestMappingInfo withPrefix(RequestMappingInfo mapping) {
+        PatternsRequestCondition patterns = new PatternsRequestCondition(
+                withNewPatterns(mapping.getPatternsCondition().getPatterns()));
+        return new RequestMappingInfo(patterns, mapping.getMethodsCondition(), mapping.getParamsCondition(),
+                mapping.getHeadersCondition(), mapping.getConsumesCondition(), mapping.getProducesCondition(),
+                mapping.getCustomCondition());
+    }
 
-	/**
-	 * @see {@link de.codecentric.boot.admin.server.web.reactive.AdminControllerHandlerMapping#withNewPatterns(Set)}
-	 */
-	private List<PathPattern> withNewPatterns(Set<PathPattern> patterns) {
-		return patterns.stream()
-				.map(pattern -> getPathPatternParser().parse(PathUtils.normalizePath(mappingPrefix.concat(pattern.toString()))))
-				.collect(toList());
-	}
+    /**
+     * @see {@link de.codecentric.boot.admin.server.web.reactive.AdminControllerHandlerMapping#withNewPatterns(Set)}
+     */
+    private List<PathPattern> withNewPatterns(Set<PathPattern> patterns) {
+        return patterns.stream()
+                .map(pattern -> getPathPatternParser().parse(PathUtils.normalizePath(mappingPrefix.concat(pattern.toString()))))
+                .collect(toList());
+    }
 
 }

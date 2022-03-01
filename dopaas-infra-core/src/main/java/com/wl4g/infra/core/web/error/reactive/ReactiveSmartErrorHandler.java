@@ -43,7 +43,7 @@ import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
-import com.wl4g.infra.common.jvm.JvmRuntimeKit;
+import static com.wl4g.infra.common.runtime.JvmRuntimeTool.isJvmInDebugging;
 import com.wl4g.infra.common.log.SmartLogger;
 import com.wl4g.infra.common.web.WebUtils2.RequestExtractor;
 import com.wl4g.infra.common.web.rest.RespBase;
@@ -68,103 +68,105 @@ import reactor.core.publisher.Mono;
 @ConditionalOnBean(ReactiveErrorAutoConfiguration.class)
 public class ReactiveSmartErrorHandler extends AbstractErrorWebExceptionHandler implements InitializingBean {
 
-	protected final SmartLogger log = getLogger(getClass());
+    protected final SmartLogger log = getLogger(getClass());
 
-	/** {@link ErrorHandlerProperties} */
-	@Autowired
-	protected ErrorHandlerProperties config;
+    /** {@link ErrorHandlerProperties} */
+    @Autowired
+    protected ErrorHandlerProperties config;
 
-	/** {@link ErrorConfigurer} */
-	@Autowired
-	protected CompositeErrorConfigurer configurer;
+    /** {@link ErrorConfigurer} */
+    @Autowired
+    protected CompositeErrorConfigurer configurer;
 
-	public ReactiveSmartErrorHandler(ErrorAttributes errorAttributes, ResourceProperties resourceProperties,
-			ApplicationContext actx) {
-		super(errorAttributes, resourceProperties, actx);
-	}
+    public ReactiveSmartErrorHandler(ErrorAttributes errorAttributes, ResourceProperties resourceProperties,
+            ApplicationContext actx) {
+        super(errorAttributes, resourceProperties, actx);
+    }
 
-	@Override
-	protected RouterFunction<ServerResponse> getRoutingFunction(final ErrorAttributes errorAttributes) {
-		return RouterFunctions.route(RequestPredicates.all(), this::renderErrorResponse);
-	}
+    @Override
+    protected RouterFunction<ServerResponse> getRoutingFunction(final ErrorAttributes errorAttributes) {
+        return RouterFunctions.route(RequestPredicates.all(), this::renderErrorResponse);
+    }
 
-	@Override
-	protected Map<String, Object> getErrorAttributes(ServerRequest request, boolean includeStackTrace) {
-		boolean _stacktrace = isStackTrace(request);
-		Map<String, Object> model = super.getErrorAttributes(request, obtainErrorAttributeOptions(_stacktrace));
-		if (_stacktrace) {
-			log.error("Origin Errors - {}", model);
-		}
+    @Override
+    protected Map<String, Object> getErrorAttributes(ServerRequest request, boolean includeStackTrace) {
+        boolean _stacktrace = isStackTrace(request);
+        Map<String, Object> model = super.getErrorAttributes(request, obtainErrorAttributeOptions(_stacktrace));
+        if (_stacktrace) {
+            log.error("Origin Errors - {}", model);
+        }
 
-		// Correct replacement using meaningful status codes.
-		model.put("status", configurer.getStatus(model, getError(request)));
-		// Correct replacement with meaningful status messages.
-		model.put("message", configurer.getRootCause(model, getError(request)));
-		return model;
-	}
+        // Correct replacement using meaningful status codes.
+        model.put("status", configurer.getStatus(model, getError(request)));
+        // Correct replacement with meaningful status messages.
+        model.put("message", configurer.getRootCause(model, getError(request)));
+        return model;
+    }
 
-	/**
-	 * Rendering error response.
-	 * 
-	 * @param request
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	private Mono<ServerResponse> renderErrorResponse(final ServerRequest request) {
-		Map<String, Object> model = getErrorAttributes(request, false);
+    /**
+     * Rendering error response.
+     * 
+     * @param request
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    private Mono<ServerResponse> renderErrorResponse(final ServerRequest request) {
+        Map<String, Object> model = getErrorAttributes(request, false);
 
-		return (Mono<ServerResponse>) configurer.handleErrorRendering(new RequestExtractor() {
-			@Override
-			public String getQueryParam(String name) {
-				return request.queryParam(name).orElse(null);
-			}
+        return (Mono<ServerResponse>) configurer.handleErrorRendering(new RequestExtractor() {
+            @Override
+            public String getQueryParam(String name) {
+                return request.queryParam(name).orElse(null);
+            }
 
-			@Override
-			public String getHeader(String name) {
-				return request.headers().asHttpHeaders().getFirst(name);
-			}
-		}, model, getError(request), new RenderingErrorHandler() {
+            @Override
+            public String getHeader(String name) {
+                return request.headers().asHttpHeaders().getFirst(name);
+            }
+        }, model, getError(request), new RenderingErrorHandler() {
 
-			@Override
-			public Object renderingWithJson(Map<String, Object> model, RespBase<Object> resp) throws Exception {
-				return ServerResponse.ok().contentType(APPLICATION_JSON).body(fromValue(resp));
-			}
+            @Override
+            public Object renderingWithJson(Map<String, Object> model, RespBase<Object> resp) throws Exception {
+                return ServerResponse.ok().contentType(APPLICATION_JSON).body(fromValue(resp));
+            }
 
-			@Override
-			public Object renderingWithView(Map<String, Object> model, int status, String renderString) throws Exception {
-				return ServerResponse.status(status).contentType(TEXT_HTML).body(fromValue(renderString));
-			}
+            @Override
+            public Object renderingWithView(Map<String, Object> model, int status, String renderString) throws Exception {
+                return ServerResponse.status(status).contentType(TEXT_HTML).body(fromValue(renderString));
+            }
 
-			@Override
-			public Object redirectError(Map<String, Object> model, String errorRedirectURI) throws Exception {
-				return ServerResponse.status(TEMPORARY_REDIRECT.value()).contentType(TEXT_HTML)
-						.location(URI.create(errorRedirectURI)).build();
-			}
-		});
+            @Override
+            public Object redirectError(Map<String, Object> model, String errorRedirectURI) throws Exception {
+                return ServerResponse.status(TEMPORARY_REDIRECT.value())
+                        .contentType(TEXT_HTML)
+                        .location(URI.create(errorRedirectURI))
+                        .build();
+            }
+        });
 
-	}
+    }
 
-	/**
-	 * Whether error stack information is enabled
-	 * 
-	 * @param request
-	 * @return
-	 */
-	private boolean isStackTrace(ServerRequest request) {
-		if (log.isDebugEnabled() || JvmRuntimeKit.isJVMDebugging) {
-			return true;
-		}
-		String stacktrace = request.queryParam(PARAM_STACKTRACE).orElse(null);
-		if (isBlank(stacktrace)) {
-			stacktrace = request.headers().firstHeader(PARAM_STACKTRACE);
-		}
-		if (isBlank(stacktrace)) {
-			stacktrace = request.cookies().getFirst(PARAM_STACKTRACE).getValue();
-		}
-		if (isBlank(stacktrace)) {
-			return false;
-		}
-		return isTrue(stacktrace.toLowerCase(US), false);
-	}
+    /**
+     * Whether error stack information is enabled
+     * 
+     * @param request
+     * @return
+     */
+    private boolean isStackTrace(ServerRequest request) {
+        if (log.isDebugEnabled() || isJvmInDebugging) {
+            return true;
+        }
+        String stacktrace = request.queryParam(PARAM_STACKTRACE).orElse(null);
+        if (isBlank(stacktrace)) {
+            stacktrace = request.headers().firstHeader(PARAM_STACKTRACE);
+        }
+        if (isBlank(stacktrace)) {
+            stacktrace = request.cookies().getFirst(PARAM_STACKTRACE).getValue();
+        }
+        if (isBlank(stacktrace)) {
+            return false;
+        }
+        return isTrue(stacktrace.toLowerCase(US), false);
+    }
 
 }

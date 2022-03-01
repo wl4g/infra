@@ -40,21 +40,21 @@ import javax.validation.constraints.NotNull;
  */
 public abstract class BaseConstant {
 
-	/** OS environment map cache. */
-	public static final Map<String, String> ENV = Collections.unmodifiableMap(System.getenv());
+    /** OS environment map cache. */
+    public static final Map<String, String> ENV = Collections.unmodifiableMap(System.getenv());
 
-	public static String getStringProperty(@NotNull String key, @Nullable String defaultValue) {
-		return getProperty(key, defaultValue);
-	}
+    public static String getStringProperty(@NotNull String key, @Nullable String defaultValue) {
+        return getProperty(key, defaultValue);
+    }
 
-	public static Long getLongProperty(@NotNull String key, @Nullable Long defaultValue) {
-		Long value = parseLongOrNull(getProperty(key));
-		return nonNull(value) ? value : defaultValue;
-	}
+    public static Long getLongProperty(@NotNull String key, @Nullable Long defaultValue) {
+        Long value = parseLongOrNull(getProperty(key));
+        return nonNull(value) ? value : defaultValue;
+    }
 
-	public static Integer getIntegerProperty(@NotNull String key, @Nullable Integer defaultValue) {
-		Integer value = parseIntOrNull(getProperty(key));
-		return nonNull(value) ? value : defaultValue;
-	}
+    public static Integer getIntegerProperty(@NotNull String key, @Nullable Integer defaultValue) {
+        Integer value = parseIntOrNull(getProperty(key));
+        return nonNull(value) ? value : defaultValue;
+    }
 
 }

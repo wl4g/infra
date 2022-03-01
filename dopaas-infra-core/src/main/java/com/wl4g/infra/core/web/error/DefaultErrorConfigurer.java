@@ -38,42 +38,42 @@ import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration.ErrorHandler
 @Order(Ordered.LOWEST_PRECEDENCE)
 public class DefaultErrorConfigurer extends ErrorConfigurer {
 
-	public DefaultErrorConfigurer(ErrorHandlerProperties config) {
-		super(config);
-	}
+    public DefaultErrorConfigurer(ErrorHandlerProperties config) {
+        super(config);
+    }
 
-	final protected SmartLogger log = getLogger(getClass());
+    final protected SmartLogger log = getLogger(getClass());
 
-	@Override
-	public Integer getStatus(Map<String, Object> model, Throwable th) {
-		Integer statusCode = (Integer) model.get("status");
-		/**
-		 * Eliminate meaningless status code: 999
-		 * 
-		 * @see {@link org.springframework.boot.autoconfigure.web.DefaultErrorAttributes#addStatus()}
-		 */
-		if (isNull(statusCode) || statusCode == 999) {
-			RetCode retCode = getRestfulCode(th);
-			if (!isNull(retCode)) {
-				statusCode = retCode.getErrcode();
-			} else if (th instanceof IllegalArgumentException) {
-				return BAD_PARAMS.getErrcode();
-			} else if (th instanceof UnsupportedOperationException) {
-				return UNSUPPORTED.getErrcode();
-			} else { // status=999?
-				// statusCode = (Integer)
-				// equest.getAttribute("javax.servlet.error.status_code");
-			}
-		}
-		if (!isNull(statusCode)) {
-			return statusCode;
-		}
-		return null;
-	}
+    @Override
+    public Integer getStatus(Map<String, Object> model, Throwable th) {
+        Integer statusCode = (Integer) model.get("status");
+        /**
+         * Eliminate meaningless status code: 999
+         * 
+         * @see {@link org.springframework.boot.autoconfigure.web.DefaultErrorAttributes#addStatus()}
+         */
+        if (isNull(statusCode) || statusCode == 999) {
+            RetCode retCode = getRestfulCode(th);
+            if (!isNull(retCode)) {
+                statusCode = retCode.getErrcode();
+            } else if (th instanceof IllegalArgumentException) {
+                return BAD_PARAMS.getErrcode();
+            } else if (th instanceof UnsupportedOperationException) {
+                return UNSUPPORTED.getErrcode();
+            } else { // status=999?
+                // statusCode = (Integer)
+                // equest.getAttribute("javax.servlet.error.status_code");
+            }
+        }
+        if (!isNull(statusCode)) {
+            return statusCode;
+        }
+        return null;
+    }
 
-	@Override
-	public String getRootCause(Map<String, Object> model, Throwable th) {
-		return extractValidErrorsMessage(model);
-	}
+    @Override
+    public String getRootCause(Map<String, Object> model, Throwable th) {
+        return extractValidErrorsMessage(model);
+    }
 
 }

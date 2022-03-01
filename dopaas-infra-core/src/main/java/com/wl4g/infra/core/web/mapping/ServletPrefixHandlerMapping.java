@@ -43,55 +43,55 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
  */
 public class ServletPrefixHandlerMapping extends RequestMappingHandlerMapping {
 
-	private final String mappingPrefix;
-	private final Object handlers[];
+    private final String mappingPrefix;
+    private final Object handlers[];
 
-	public ServletPrefixHandlerMapping(@Nullable String mappingPrefix, @NotNull Object... handlers) {
-		// Default by empty
-		this.mappingPrefix = isBlank(mappingPrefix) ? "" : mappingPrefix;
-		this.handlers = handlers.clone();
-		setOrder(-50);
-	}
+    public ServletPrefixHandlerMapping(@Nullable String mappingPrefix, @NotNull Object... handlers) {
+        // Default by empty
+        this.mappingPrefix = isBlank(mappingPrefix) ? "" : mappingPrefix;
+        this.handlers = handlers.clone();
+        setOrder(-50);
+    }
 
-	@Override
-	public void afterPropertiesSet() {
-		super.afterPropertiesSet();
-		for (Object handler : handlers) {
-			detectHandlerMethods(handler);
-		}
-	}
+    @Override
+    public void afterPropertiesSet() {
+        super.afterPropertiesSet();
+        for (Object handler : handlers) {
+            detectHandlerMethods(handler);
+        }
+    }
 
-	@Override
-	protected void initApplicationContext() throws BeansException {
-		setInterceptors(safeMap(getApplicationContext().getBeansOfType(HandlerInterceptor.class)).values().toArray());
-		super.initApplicationContext();
-	}
+    @Override
+    protected void initApplicationContext() throws BeansException {
+        setInterceptors(safeMap(getApplicationContext().getBeansOfType(HandlerInterceptor.class)).values().toArray());
+        super.initApplicationContext();
+    }
 
-	@Override
-	protected boolean isHandler(Class<?> beanType) {
-		return false;
-	}
+    @Override
+    protected boolean isHandler(Class<?> beanType) {
+        return false;
+    }
 
-	@Override
-	protected void registerHandlerMethod(Object handler, Method method, RequestMappingInfo mapping) {
-		if (mapping == null) {
-			return;
-		}
-		super.registerHandlerMethod(handler, method, withPrefix(mapping));
-	}
+    @Override
+    protected void registerHandlerMethod(Object handler, Method method, RequestMappingInfo mapping) {
+        if (mapping == null) {
+            return;
+        }
+        super.registerHandlerMethod(handler, method, withPrefix(mapping));
+    }
 
-	private RequestMappingInfo withPrefix(RequestMappingInfo mapping) {
-		List<String> newPatterns = withNewPatterns(mapping);
+    private RequestMappingInfo withPrefix(RequestMappingInfo mapping) {
+        List<String> newPatterns = withNewPatterns(mapping);
 
-		PatternsRequestCondition patterns = new PatternsRequestCondition(newPatterns.toArray(new String[newPatterns.size()]));
-		return new RequestMappingInfo(patterns, mapping.getMethodsCondition(), mapping.getParamsCondition(),
-				mapping.getHeadersCondition(), mapping.getConsumesCondition(), mapping.getProducesCondition(),
-				mapping.getCustomCondition());
-	}
+        PatternsRequestCondition patterns = new PatternsRequestCondition(newPatterns.toArray(new String[newPatterns.size()]));
+        return new RequestMappingInfo(patterns, mapping.getMethodsCondition(), mapping.getParamsCondition(),
+                mapping.getHeadersCondition(), mapping.getConsumesCondition(), mapping.getProducesCondition(),
+                mapping.getCustomCondition());
+    }
 
-	private List<String> withNewPatterns(RequestMappingInfo mapping) {
-		return mapping.getPatternsCondition().getPatterns().stream().map(pattern -> mappingPrefix.concat(pattern))
-				.collect(toList());
-	}
+    private List<String> withNewPatterns(RequestMappingInfo mapping) {
+        return mapping.getPatternsCondition().getPatterns().stream().map(pattern -> mappingPrefix.concat(pattern)).collect(
+                toList());
+    }
 
 }
