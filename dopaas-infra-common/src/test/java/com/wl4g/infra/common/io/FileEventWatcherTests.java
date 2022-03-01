@@ -16,6 +16,7 @@
 package com.wl4g.infra.common.io;
 
 import static java.lang.String.format;
+import static java.util.Collections.singletonList;
 
 import java.io.File;
 
@@ -37,7 +38,7 @@ public class FileEventWatcherTests {
         System.out.println(format("Created target file1: %s", targetfile1));
 
         // Watching.
-        try (FileEventWatcher watcher = new FileEventWatcher(targetdir);) {
+        try (FileEventWatcher watcher = new FileEventWatcher(singletonList(targetdir));) {
             watcher.addListenrs(new MyFileEventListener()).run();
 
             // Testing change.

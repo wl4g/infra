@@ -16,7 +16,7 @@
 package com.wl4g.infra.common.io;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToList;
-import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.infra.common.lang.Assert2.notEmptyOf;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static java.lang.String.format;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
@@ -52,18 +52,18 @@ public class FileEventWatcher implements Runnable, Closeable {
     private final SmartLogger log = getLogger(getClass());
 
     private final List<Object> listeners = new ArrayList<>(4);
-    private final File targetdir;
+    private final List<File> monitorDirs;
     private final EventBusSupport eventbus;
 
     private final AtomicBoolean running = new AtomicBoolean(false);
     private Thread wacher;
 
-    public FileEventWatcher(File targetdir) {
-        this(targetdir, 1);
+    public FileEventWatcher(List<File> monitorDirs) {
+        this(monitorDirs, 1);
     }
 
-    public FileEventWatcher(File target, int eventThreads) {
-        this.targetdir = notNullOf(target, "target");
+    public FileEventWatcher(List<File> monitorDirs, int eventThreads) {
+        this.monitorDirs = notEmptyOf(monitorDirs, "monitorDirs");
         this.eventbus = new EventBusSupport(eventThreads);
     }
 
@@ -79,18 +79,29 @@ public class FileEventWatcher implements Runnable, Closeable {
 
     @Override
     public final void run() {
-        if (!targetdir.exists()) {
-            targetdir.mkdirs();
-        } else if (!targetdir.isDirectory()) {
-            throw new IllegalStateException(format("Watching target: %s is not a directory.", targetdir));
+        // Checking monitors directory.
+        for (File f : monitorDirs) {
+            if (!f.exists()) {
+                f.mkdirs();
+            } else if (!f.isDirectory()) {
+                throw new IllegalStateException(format("Watching target: %s is not a directory.", f));
+            }
         }
+
         if (running.compareAndSet(false, true)) {
+            // Register call listeners.
             eventbus.register(listeners.toArray());
 
+            // Watching change events.
             wacher = new Thread(() -> {
                 try {
                     WatchService ws = FileSystems.getDefault().newWatchService();
-                    targetdir.toPath().register(ws, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
+
+                    // Register monitors directory.
+                    for (File f : monitorDirs) {
+                        f.toPath().register(ws, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
+                    }
+
                     while (!wacher.isInterrupted()) {
                         WatchKey key = ws.take();
                         for (WatchEvent<?> event : key.pollEvents()) {
@@ -99,10 +110,12 @@ public class FileEventWatcher implements Runnable, Closeable {
                         }
                         key.reset();
                     }
+
                 } catch (Exception e) {
-                    log.error(format("Failed to watching process. - %s", targetdir), e);
+                    log.error(format("Failed to watching process. - %s", monitorDirs), e);
                 }
             });
+
             wacher.setDaemon(true);
             wacher.start();
         }
