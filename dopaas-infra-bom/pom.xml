@@ -138,9 +138,11 @@
 		<belerweb.pinyin4j.version>2.5.1</belerweb.pinyin4j.version>
 		<!-- testing -->
 		<junit.version>4.13.1</junit.version>
-		<!--seata -->
+		<!-- Seata -->
 		<druid-spring-boot-starter.version>1.1.10</druid-spring-boot-starter.version>
 		<seata.version>1.4.0</seata.version>
+		<!-- Kubernetes -->
+		<kubernetes-client.version>14.0.0</kubernetes-client.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
@@ -825,7 +827,7 @@
 				<version>${junit.version}</version>
 				<scope>test</scope>
 			</dependency>
-			<!--seata -->
+			<!-- Seata -->
 			<dependency>
 				<groupId>com.alibaba</groupId>
 				<artifactId>druid-spring-boot-starter</artifactId>
@@ -835,6 +837,22 @@
 				<groupId>io.seata</groupId>
 				<artifactId>seata-spring-boot-starter</artifactId>
 				<version>${seata.version}</version>
+			</dependency>
+			<!-- Kubernetes -->
+			<dependency>
+				<groupId>io.kubernetes</groupId>
+				<artifactId>client-java-spring-integration</artifactId>
+				<version>${kubernetes-client.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.kubernetes</groupId>
+				<artifactId>client-java-api</artifactId>
+				<version>${kubernetes-client.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.kubernetes</groupId>
+				<artifactId>client-java-extended</artifactId>
+				<version>${kubernetes-client.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
