@@ -126,14 +126,14 @@ public abstract class GenericTaskRunner<C extends RunnerProperties> implements C
     /**
      * Closing properties processing.
      */
-    protected void closingPropertiesSet() {
+    protected void closingPropertiesSet() throws IOException {
         // Ignore
     }
 
     /**
      * Closed properties processing.
      */
-    protected void closedPropertiesSet() {
+    protected void closedPropertiesSet() throws IOException {
         // Ignore
     }
 
