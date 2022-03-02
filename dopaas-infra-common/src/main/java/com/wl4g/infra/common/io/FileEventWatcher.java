@@ -94,9 +94,7 @@ public class FileEventWatcher implements Runnable, Closeable {
 
             // Watching change events.
             wacher = new Thread(() -> {
-                try {
-                    WatchService ws = FileSystems.getDefault().newWatchService();
-
+                try (WatchService ws = FileSystems.getDefault().newWatchService();) {
                     // Register monitors directory.
                     for (File f : monitorDirs) {
                         f.toPath().register(ws, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
@@ -110,12 +108,10 @@ public class FileEventWatcher implements Runnable, Closeable {
                         }
                         key.reset();
                     }
-
                 } catch (Exception e) {
                     log.error(format("Failed to watching process. - %s", monitorDirs), e);
                 }
             });
-
             wacher.setDaemon(true);
             wacher.start();
         }
@@ -124,6 +120,7 @@ public class FileEventWatcher implements Runnable, Closeable {
     @Override
     public void close() throws IOException {
         wacher.interrupt();
+        eventbus.close();
     }
 
     public static class FileChangedEvent extends EventObject {
