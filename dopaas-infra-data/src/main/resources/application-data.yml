@@ -11,6 +11,10 @@
 spring:
   infra:
     data:
+      mybatis:
+        configLocation: mybatis/mybatis-config.xml
+        mapperLocations: classpath:mybatis/**/*Mapper.xml
+        typeAliasesPackage: com.wl4g.infra.data.example.bean.*,com.wl4g.infra.data.example.bean.*.*
       #mybatis-loader:
       #  enabled: false # Default by auto(currently running in JVM jdwp mode?)
       #  fastFail: false # Default by false
