@@ -143,6 +143,7 @@
 		<seata.version>1.4.0</seata.version>
 		<!-- Kubernetes -->
 		<kubernetes-client.version>14.0.0</kubernetes-client.version>
+		<fabric8-kubernetes-client.version>5.12.1</fabric8-kubernetes-client.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
@@ -853,6 +854,118 @@
 				<groupId>io.kubernetes</groupId>
 				<artifactId>client-java-extended</artifactId>
 				<version>${kubernetes-client.version}</version>
+			</dependency>
+			<!-- fabric8 Kubernetes -->
+			<dependency>
+				<groupId>io.fabric8</groupId>
+				<artifactId>kubernetes-client</artifactId>
+				<version>${fabric8-kubernetes-client.version}</version>
+			</dependency>
+			<!-- https://github.com/fabric8io/kubernetes-client/tree/master/extensions/istio -->
+			<dependency>
+				<groupId>io.fabric8</groupId>
+				<artifactId>istio-client</artifactId>
+				<version>${fabric8-kubernetes-client.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.fabric8</groupId>
+				<artifactId>kubernetes-model-common</artifactId>
+				<version>${fabric8-kubernetes-client.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.fabric8</groupId>
+				<artifactId>kubernetes-model-core</artifactId>
+				<version>${fabric8-kubernetes-client.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.fabric8</groupId>
+				<artifactId>kubernetes-model-rbac</artifactId>
+				<version>${fabric8-kubernetes-client.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.fabric8</groupId>
+				<artifactId>kubernetes-model-admissionregistration</artifactId>
+				<version>${fabric8-kubernetes-client.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.fabric8</groupId>
+				<artifactId>kubernetes-model-apps</artifactId>
+				<version>${fabric8-kubernetes-client.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.fabric8</groupId>
+				<artifactId>kubernetes-model-autoscaling</artifactId>
+				<version>${fabric8-kubernetes-client.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.fabric8</groupId>
+				<artifactId>kubernetes-model-apiextensions</artifactId>
+				<version>${fabric8-kubernetes-client.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.fabric8</groupId>
+				<artifactId>kubernetes-model-batch</artifactId>
+				<version>${fabric8-kubernetes-client.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.fabric8</groupId>
+				<artifactId>kubernetes-model-certificates</artifactId>
+				<version>${fabric8-kubernetes-client.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.fabric8</groupId>
+				<artifactId>kubernetes-model-coordination</artifactId>
+				<version>${fabric8-kubernetes-client.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.fabric8</groupId>
+				<artifactId>kubernetes-model-discovery</artifactId>
+				<version>${fabric8-kubernetes-client.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.fabric8</groupId>
+				<artifactId>kubernetes-model-events</artifactId>
+				<version>${fabric8-kubernetes-client.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.fabric8</groupId>
+				<artifactId>kubernetes-model-extensions</artifactId>
+				<version>${fabric8-kubernetes-client.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.fabric8</groupId>
+				<artifactId>kubernetes-model-flowcontrol</artifactId>
+				<version>${fabric8-kubernetes-client.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.fabric8</groupId>
+				<artifactId>kubernetes-model-networking</artifactId>
+				<version>${fabric8-kubernetes-client.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.fabric8</groupId>
+				<artifactId>kubernetes-model-metrics</artifactId>
+				<version>${fabric8-kubernetes-client.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.fabric8</groupId>
+				<artifactId>kubernetes-model-policy</artifactId>
+				<version>${fabric8-kubernetes-client.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.fabric8</groupId>
+				<artifactId>kubernetes-model-scheduling</artifactId>
+				<version>${fabric8-kubernetes-client.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.fabric8</groupId>
+				<artifactId>kubernetes-model-storageclass</artifactId>
+				<version>${fabric8-kubernetes-client.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.fabric8</groupId>
+				<artifactId>kubernetes-model-node</artifactId>
+				<version>${fabric8-kubernetes-client.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
