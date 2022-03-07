@@ -28,7 +28,7 @@
 	</issueManagement>
 	<developers>
 		<developer>
-			<id>Wangl01</id>
+			<id>Wanglsir01</id>
 			<name>Wanglsir</name>
 			<email>wanglsir@gmail.com,983708408@qq.com</email>
 			<roles>
@@ -119,7 +119,7 @@
 		<!-- serialization -->
 		<!-- Note: Must be consistent with springboot -->
 		<!-- <jackson.version>2.10.2</jackson.version> -->
-		<jackson.version>2.11.0</jackson.version>
+		<jackson.version>2.13.1</jackson.version>
 		<!-- <fastjson.version>1.2.56</fastjson.version> -->
 		<protobuf.version>3.8.0</protobuf.version>
 		<!-- <protobuf.version>2.5.0</protobuf.version> hbase-1.2.5 dependency -->

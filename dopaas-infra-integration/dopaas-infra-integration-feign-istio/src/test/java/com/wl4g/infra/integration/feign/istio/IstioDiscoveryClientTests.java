@@ -66,7 +66,7 @@ import io.fabric8.kubernetes.client.ConfigBuilder;
  */
 public class IstioDiscoveryClientTests {
 
-    private static final String NAMESPACE = "test";
+    private static final String NAMESPACE = "default";
 
     // https://github.com/fabric8io/kubernetes-client/blob/master/extensions/istio/examples/src/main/java/io/fabric8/istio/api/examples/v1beta1/GatewayExample.java
     @Test
