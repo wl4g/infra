@@ -37,7 +37,7 @@
   }
   EOF
   
-  cat /tmp/1.json | curl -H "Content-Type:application/json" -X POST -d @- "$BASE_WEB_URL/order/createOrder"
+  cat /tmp/1.json | curl -H "Content-Type:application/json" -X POST -d @- "$BASE_WEB_URL/order/create"
   
   {"code":200,"status":"Normal","requestId":null,"message":"Ok","data":{}}
   ```

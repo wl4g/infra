@@ -17,7 +17,7 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.infra.integration.example.service.impl;
+package com.wl4g.infra.integration.feign.springcloud.example.service.impl;
 
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 
@@ -28,9 +28,9 @@ import org.springframework.stereotype.Service;
 
 import com.wl4g.infra.common.log.SmartLogger;
 import com.wl4g.infra.core.page.PageHolder;
-import com.wl4g.infra.integration.example.bean.OrderInfo;
-import com.wl4g.infra.integration.example.dao.OrderDao;
-import com.wl4g.infra.integration.example.service.OrderService;
+import com.wl4g.infra.integration.feign.springcloud.example.bean.OrderInfo;
+import com.wl4g.infra.integration.feign.springcloud.example.service.OrderService;
+import com.wl4g.infra.integration.feign.springcloud.example.dao.OrderDao;
 
 /**
  * {@link OrderServiceImpl}
@@ -43,22 +43,22 @@ import com.wl4g.infra.integration.example.service.OrderService;
 @Service
 public class OrderServiceImpl implements OrderService {
 
-	private final SmartLogger log = getLogger(getClass());
+    private final SmartLogger log = getLogger(getClass());
 
-	private @Autowired OrderDao orderDao;
+    private @Autowired OrderDao orderDao;
 
-	@Override
-	public List<OrderInfo> list(PageHolder<OrderInfo> page, String orderName) {
-		page.useCount().bind();
-		List<OrderInfo> orders = orderDao.list(orderName);
-		log.info("find orders result: {}", orders);
-		return orders;
-	}
+    @Override
+    public List<OrderInfo> list(PageHolder<OrderInfo> page, String orderName) {
+        page.useCount().bind();
+        List<OrderInfo> orders = orderDao.list(orderName);
+        log.info("find orders result: {}", orders);
+        return orders;
+    }
 
-	@Override
-	public int createOrder(OrderInfo order, Long goodsId) {
-		log.info("create order: {}, goodsId: {}", order, goodsId);
-		return orderDao.insertSelective(order);
-	}
+    @Override
+    public int create(OrderInfo order, Long goodsId) {
+        log.info("create order: {}, goodsId: {}", order, goodsId);
+        return orderDao.insertSelective(order);
+    }
 
 }

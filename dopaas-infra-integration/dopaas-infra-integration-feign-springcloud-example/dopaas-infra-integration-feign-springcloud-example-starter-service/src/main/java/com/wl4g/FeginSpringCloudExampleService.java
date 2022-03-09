@@ -32,12 +32,12 @@ import com.wl4g.infra.data.annotation.EnableComponentDataConfiguration;
  * @sine v1.0
  * @see
  */
-@EnableComponentDataConfiguration("com.wl4g.infra.integration.example.dao")
-@SpringBootApplication(scanBasePackages = "com.wl4g.infra.integration.example")
+@EnableComponentDataConfiguration("com.wl4g.infra.integration.feign.springcloud.example.dao")
+@SpringBootApplication(scanBasePackages = "com.wl4g.infra.integration")
 public class FeginSpringCloudExampleService {
 
-	public static void main(String[] args) {
-		SpringApplication.run(FeginSpringCloudExampleService.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(FeginSpringCloudExampleService.class, args);
+    }
 
 }

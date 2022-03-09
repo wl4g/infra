@@ -17,7 +17,7 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.infra.integration.example.bean;
+package com.wl4g.infra.integration.feign.springcloud.example.bean;
 
 import java.util.Properties;
 

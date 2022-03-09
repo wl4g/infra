@@ -17,13 +17,13 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.infra.integration.example.dao;
+package com.wl4g.infra.integration.feign.istio.example.dao;
 
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
-import com.wl4g.infra.integration.example.bean.OrderInfo;
+import com.wl4g.infra.integration.feign.istio.example.bean.OrderInfo;
 
 /**
  * {@link OrderDao}
@@ -35,8 +35,8 @@ import com.wl4g.infra.integration.example.bean.OrderInfo;
  */
 public interface OrderDao {
 
-	List<OrderInfo> list(@Param("orderName") String orderName);
+    List<OrderInfo> list(@Param("orderName") String orderName);
 
-	int insertSelective(OrderInfo order);
+    int insertSelective(OrderInfo order);
 
 }

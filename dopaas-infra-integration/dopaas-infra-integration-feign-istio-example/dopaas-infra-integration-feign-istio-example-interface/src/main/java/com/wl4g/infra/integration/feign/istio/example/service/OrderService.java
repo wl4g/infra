@@ -17,7 +17,7 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.infra.integration.example.service;
+package com.wl4g.infra.integration.feign.istio.example.service;
 
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -28,8 +28,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.wl4g.infra.core.page.PageHolder;
-import com.wl4g.infra.integration.example.bean.OrderInfo;
 import com.wl4g.infra.integration.feign.core.annotation.FeignConsumer;
+import com.wl4g.infra.integration.feign.istio.example.bean.OrderInfo;
 
 /**
  * {@link OrderService}
@@ -39,16 +39,16 @@ import com.wl4g.infra.integration.feign.core.annotation.FeignConsumer;
  * @sine v1.0
  * @see
  */
-@FeignConsumer("${provider.serviceId.feign-example-service:feign-example-service}")
+@FeignConsumer("${provider.serviceId.feign-example-service}")
 @RequestMapping("/order-service")
 public interface OrderService {
 
-	// Notes: Cannot be used @GetMapping, because feign convention does not
-	// allow it.
-	@RequestMapping(value = "/findOrderByUser", method = POST)
-	List<OrderInfo> list(@RequestBody PageHolder<OrderInfo> page, @RequestParam("orderName") String orderName);
+    // Notes: Cannot be used @GetMapping, because feign convention does not
+    // allow it.
+    @RequestMapping(value = "/order_list", method = POST)
+    List<OrderInfo> list(@RequestBody PageHolder<OrderInfo> page, @RequestParam("orderName") String orderName);
 
-	@RequestMapping(value = "/createOrder", method = POST)
-	int createOrder(@RequestBody OrderInfo order, @RequestParam("goodsId") Long goodsId);
+    @RequestMapping(value = "/order_create", method = POST)
+    int create(@RequestBody OrderInfo order, @RequestParam("goodsId") Long goodsId);
 
 }

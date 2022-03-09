@@ -31,8 +31,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.infra.core.page.PageHolder;
 import com.wl4g.infra.core.web.BaseController;
-import com.wl4g.infra.integration.example.bean.OrderInfo;
-import com.wl4g.infra.integration.example.service.OrderService;
+import com.wl4g.infra.integration.feign.springcloud.example.bean.OrderInfo;
+import com.wl4g.infra.integration.feign.springcloud.example.service.OrderService;
 
 /**
  * {@link OrderController}
@@ -58,13 +58,13 @@ public class OrderController extends BaseController {
         return resp;
     }
 
-    @RequestMapping(value = "/createOrder", method = POST)
-    public RespBase<?> createOrder(@RequestBody OrderInfo order,
+    @RequestMapping(value = "/create", method = POST)
+    public RespBase<?> create(@RequestBody OrderInfo order,
             @RequestParam(name = "goodsId", defaultValue = "20001", required = false) Long goodsId) {
         log.info("Saving order, orderId: {}", order.getId());
         RespBase<Object> resp = RespBase.create();
 
-        orderService.createOrder(order, goodsId);
+        orderService.create(order, goodsId);
         log.info("Created orders resp: {}", resp);
         return resp;
     }

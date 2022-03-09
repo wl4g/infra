@@ -32,13 +32,13 @@ import com.wl4g.infra.integration.feign.core.annotation.EnableFeignConsumers;
  * @sine v1.0
  * @see
  */
-// @EnableFeignClients("com.wl4g.infra.integration.example.service")
-@EnableFeignConsumers("com.wl4g.infra.integration.example.service")
-@SpringBootApplication(scanBasePackages = "com.wl4g.infra.integration.example")
+// @EnableFeignClients("com.wl4g.infra.integration.feign.springcloud.example.service")
+@EnableFeignConsumers("com.wl4g.infra.integration.feign.springcloud.example.service")
+@SpringBootApplication(scanBasePackages = "com.wl4g.infra.integration")
 public class FeginSpringCloudExampleWeb {
 
-	public static void main(String[] args) {
-		SpringApplication.run(FeginSpringCloudExampleWeb.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(FeginSpringCloudExampleWeb.class, args);
+    }
 
 }

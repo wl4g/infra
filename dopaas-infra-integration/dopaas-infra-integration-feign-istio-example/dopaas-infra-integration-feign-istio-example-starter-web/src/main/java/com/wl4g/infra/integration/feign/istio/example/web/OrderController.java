@@ -17,7 +17,7 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.infra.integration.example.web;
+package com.wl4g.infra.integration.feign.istio.example.web;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -31,8 +31,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.infra.core.page.PageHolder;
 import com.wl4g.infra.core.web.BaseController;
-import com.wl4g.infra.integration.example.bean.OrderInfo;
-import com.wl4g.infra.integration.example.service.OrderService;
+import com.wl4g.infra.integration.feign.istio.example.bean.OrderInfo;
+import com.wl4g.infra.integration.feign.istio.example.service.OrderService;
 
 /**
  * {@link OrderController}
@@ -46,25 +46,27 @@ import com.wl4g.infra.integration.example.service.OrderService;
 @RequestMapping("/order")
 public class OrderController extends BaseController {
 
-	private @Autowired OrderService orderService;
+    private @Autowired OrderService orderService;
 
-	@RequestMapping(value = "/list", method = GET)
-	public RespBase<?> list(PageHolder<OrderInfo> page,
-			@RequestParam(name = "orderName", defaultValue = "", required = false) String orderName) {
-		RespBase<Object> resp = RespBase.create();
-		resp.setData(orderService.list(page, orderName));
-		log.info("find orders resp: {}", resp);
-		return resp;
-	}
+    @RequestMapping(value = "/list", method = GET)
+    public RespBase<?> list(PageHolder<OrderInfo> page,
+            @RequestParam(name = "orderName", defaultValue = "", required = false) String orderName) {
+        RespBase<Object> resp = RespBase.create();
 
-	@RequestMapping(value = "/createOrder", method = POST)
-	public RespBase<?> createOrder(@RequestBody OrderInfo order,
-			@RequestParam(name = "goodsId", defaultValue = "20001", required = false) Long goodsId) {
-		RespBase<Object> resp = RespBase.create();
-		orderService.createOrder(order, goodsId);
-		log.info("saved order, orderId: {}", order.getId());
-		log.info("create orders resp: {}", resp);
-		return resp;
-	}
+        resp.setData(orderService.list(page, orderName));
+        log.info("find orders resp: {}", resp);
+        return resp;
+    }
+
+    @RequestMapping(value = "/create", method = POST)
+    public RespBase<?> createOrder(@RequestBody OrderInfo order,
+            @RequestParam(name = "goodsId", defaultValue = "20001", required = false) Long goodsId) {
+        log.info("Saving order, orderId: {}", order.getId());
+        RespBase<Object> resp = RespBase.create();
+
+        orderService.create(order, goodsId);
+        log.info("Created orders resp: {}", resp);
+        return resp;
+    }
 
 }
