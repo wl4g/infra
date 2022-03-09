@@ -35,18 +35,18 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ImportAutoConfiguration({ OkhttpFeignConsumerAutoConfiguration.class, Http2FeignConsumerAutoConfiguration.class })
 public class FeignConsumerAutoConfiguration {
 
-	@Bean
-	@ConfigurationProperties(prefix = KEY_CONFIG_PREFIX)
-	public FeignConsumerProperties feignConsumerProperties() {
-		return new FeignConsumerProperties();
-	}
+    @Bean
+    @ConfigurationProperties(prefix = KEY_CONFIG_PREFIX)
+    public FeignConsumerProperties feignConsumerProperties() {
+        return new FeignConsumerProperties();
+    }
 
-	@Bean(BEAN_SPRINGMVC_CONTRACT)
-	public SpringMvcContract springMvcContract() {
-		return new SpringMvcContract();
-	}
+    @Bean(BEAN_SPRINGMVC_CONTRACT)
+    public SpringMvcContract springMvcContract() {
+        return new SpringMvcContract();
+    }
 
-	public static final String BEAN_FEIGN_CLIENT = "defaultFeignConsumerClient";
-	public static final String BEAN_SPRINGMVC_CONTRACT = "defaultFeignConsumerMvcContract";
+    public static final String BEAN_SPRINGMVC_CONTRACT = "infraSpringBootFeign.defaultConsumerMvcContract";
+    public static final String BEAN_DEFAULT_FEIGN_CLIENT = "infraSpringBootFeign.defaultFeignClient";
 
 }

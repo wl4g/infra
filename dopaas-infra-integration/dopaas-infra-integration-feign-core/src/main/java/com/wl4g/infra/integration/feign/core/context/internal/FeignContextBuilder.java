@@ -32,7 +32,6 @@ import java.util.Map;
 import com.wl4g.infra.integration.feign.core.context.internal.FeignContextCoprocessor.Invokers;
 
 import feign.Feign;
-import feign.Feign.Builder;
 import feign.InvocationHandlerFactory;
 import feign.InvocationHandlerFactory.MethodHandler;
 import feign.Target;
@@ -47,84 +46,75 @@ import feign.Target;
  */
 public class FeignContextBuilder extends Feign.Builder {
 
-	private final Feign.Builder builder;
+    /**
+     * refer to:{@link feign.hystrix.HystrixFeign.Builder#build} and
+     * {@link com.alibaba.cloud.sentinel.feign.SentinelFeign.Builder#build}
+     */
+    @Override
+    public Feign build() {
+        // Gets origin InvocationHandlerFactory.
+        final InvocationHandlerFactory originalFactory = getField(invocationHandlerFactoryField, this, true);
 
-	public FeignContextBuilder() {
-		this(Feign.builder());
-	}
+        // Override sets to InvocationHandlerFactory.
+        super.invocationHandlerFactory(new InvocationHandlerFactory() {
+            @SuppressWarnings("rawtypes")
+            @Override
+            public InvocationHandler create(Target target, Map<Method, MethodHandler> dispatch) {
+                return new FeignContextInvocationHandler(originalFactory, target, dispatch);
+            }
+        });
 
-	public FeignContextBuilder(Builder builder) {
-		this.builder = notNullOf(builder, "builder");
-	}
+        return super.build();
+    }
 
-	@Override
-	public Feign build() {
-		// Let the actual builder set invocationhandlerfactory first.
-		// @see:feign.hystrix.HystrixFeign.Builder#build
-		// @see:com.alibaba.cloud.sentinel.feign.SentinelFeign.Builder#build
-		builder.build();
+    /**
+     * {@link FeignContextInvocationHandler}
+     * 
+     * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+     * @version v1.0 2021-05-20
+     * @sine v1.0
+     * @see {@link com.alibaba.cloud.sentinel.feign.SentinelInvocationHandler}
+     */
+    static class FeignContextInvocationHandler implements InvocationHandler {
+        protected final InvocationHandlerFactory originalFactory;
+        protected final Target<?> target;
+        protected final Map<Method, MethodHandler> dispatch;
 
-		// Gets origin invocationHandlerFactory.
-		final InvocationHandlerFactory originFactory = getField(invocationHandlerFactoryField, this, true);
+        public FeignContextInvocationHandler(InvocationHandlerFactory originalFactory, Target<?> target,
+                Map<Method, MethodHandler> dispatch) {
+            this.originalFactory = notNullOf(originalFactory, "originalFactory");
+            this.target = notNullOf(target, "target");
+            this.dispatch = notNullOf(dispatch, "dispatch");
+        }
 
-		// Override sets detegate invocationHandlerFactory.
-		super.invocationHandlerFactory(new InvocationHandlerFactory() {
-			@SuppressWarnings("rawtypes")
-			@Override
-			public InvocationHandler create(Target target, Map<Method, MethodHandler> dispatch) {
-				return new FeignContextInvocationHandler(originFactory, target, dispatch);
-			}
-		});
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            //
+            // Notice: early exit if the invoked method is from java.lang.Object
+            // code is the same as ReflectiveFeign.FeignInvocationHandler
+            //
+            if ("equals".equals(method.getName())) {
+                try {
+                    Object otherHandler = args.length > 0 && args[0] != null ? Proxy.getInvocationHandler(args[0]) : null;
+                    return equals(otherHandler);
+                } catch (IllegalArgumentException e) {
+                    return false;
+                }
+            } else if ("hashCode".equals(method.getName())) {
+                return hashCode();
+            } else if ("toString".equals(method.getName())) {
+                return toString();
+            }
 
-		return super.build();
-	}
+            // Call the coprocessor first.
+            Invokers.beforeConsumerExecution(proxy, method, args);
 
-	/**
-	 * {@link FeignContextInvocationHandler}
-	 * 
-	 * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
-	 * @version v1.0 2021-05-20
-	 * @sine v1.0
-	 * @see {@link com.alibaba.cloud.sentinel.feign.SentinelInvocationHandler}
-	 */
-	static class FeignContextInvocationHandler implements InvocationHandler {
-		protected final InvocationHandlerFactory originFactory;
-		protected final Target<?> target;
-		protected final Map<Method, MethodHandler> dispatch;
+            // @see:feign.ReflectiveFeign.FeignInvocationHandler#invoke
+            return originalFactory.create(target, dispatch).invoke(proxy, method, args);
+        }
+    }
 
-		public FeignContextInvocationHandler(InvocationHandlerFactory originFactory, Target<?> target,
-				Map<Method, MethodHandler> dispatch) {
-			this.originFactory = notNullOf(originFactory, "originFactory");
-			this.target = notNullOf(target, "target");
-			this.dispatch = notNullOf(dispatch, "dispatch");
-		}
-
-		@Override
-		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-			// early exit if the invoked method is from java.lang.Object
-			// code is the same as ReflectiveFeign.FeignInvocationHandler
-			if ("equals".equals(method.getName())) {
-				try {
-					Object otherHandler = args.length > 0 && args[0] != null ? Proxy.getInvocationHandler(args[0]) : null;
-					return equals(otherHandler);
-				} catch (IllegalArgumentException e) {
-					return false;
-				}
-			} else if ("hashCode".equals(method.getName())) {
-				return hashCode();
-			} else if ("toString".equals(method.getName())) {
-				return toString();
-			}
-
-			// Call the coprocessor first.
-			Invokers.beforeConsumerExecution(proxy, method, args);
-
-			// @see:feign.ReflectiveFeign.FeignInvocationHandler#invoke
-			return originFactory.create(target, dispatch).invoke(proxy, method, args);
-		}
-	}
-
-	private static final Field invocationHandlerFactoryField = findField(feign.Feign.Builder.class, "invocationHandlerFactory",
-			InvocationHandlerFactory.class);
+    private static final Field invocationHandlerFactoryField = findField(feign.Feign.Builder.class, "invocationHandlerFactory",
+            InvocationHandlerFactory.class);
 
 }

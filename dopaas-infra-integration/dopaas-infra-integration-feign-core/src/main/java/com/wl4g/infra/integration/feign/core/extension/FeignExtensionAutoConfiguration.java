@@ -44,7 +44,7 @@ public class FeignExtensionAutoConfiguration {
     }
 
     @Bean
-    public SimpleStacktraceContextCoprocessor traceFeignContextCoprocessor(FeignConsumerProperties config) {
+    public SimpleStacktraceContextCoprocessor simpleStacktraceFeignContextCoprocessor(FeignConsumerProperties config) {
         return new SimpleStacktraceContextCoprocessor(config);
     }
 

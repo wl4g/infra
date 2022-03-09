@@ -78,224 +78,231 @@ import com.wl4g.infra.common.log.SmartLogger;
  * @see
  */
 class FeignConsumersRegistrar implements ImportBeanDefinitionRegistrar, ResourceLoaderAware, EnvironmentAware {
-	private static final SmartLogger log = getLogger(FeignConsumersRegistrar.class);
+    private static final SmartLogger log = getLogger(FeignConsumersRegistrar.class);
 
-	@SuppressWarnings("unused")
-	private ResourceLoader resourceLoader;
-	private Environment environment;
+    @SuppressWarnings("unused")
+    private ResourceLoader resourceLoader;
+    private Environment environment;
 
-	@Override
-	public void setResourceLoader(ResourceLoader resourceLoader) {
-		this.resourceLoader = resourceLoader;
-	}
+    @Override
+    public void setResourceLoader(ResourceLoader resourceLoader) {
+        this.resourceLoader = resourceLoader;
+    }
 
-	@Override
-	public void setEnvironment(Environment environment) {
-		this.environment = environment;
-	}
+    @Override
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
+    }
 
-	@Override
-	public void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
-		// Check enabled configuration
-		if (!isEnableConfiguration(environment)) {
-			log.warn("No enabled Spring Boot/Cloud Feign configuration!");
-			return;
-		}
+    @Override
+    public void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
+        // Check enabled configuration
+        if (!isEnableConfiguration(environment)) {
+            log.warn("No enabled Spring Boot/Cloud Feign configuration!");
+            return;
+        }
 
-		AnnotationAttributes attrs = AnnotationAttributes
-				.fromMap(metadata.getAnnotationAttributes(EnableFeignConsumers.class.getName()));
-		if (nonNull(attrs)) {
-			final Class<?>[] clients = isNull(attrs) ? null : attrs.getClassArray("clients");
-			if (isEmptyArray(clients)) {
-				/**
-				 * Notes：这里需手动合并，因为当@EnableFeignConsumers引用了@EnableFeignClients时，
-				 * 且没有依赖spring-cloud-openfeign包时，就不能合并属性值？
-				 * 如，配了value就只能获取value的值，而无法获取被@AliasFor的basePackages的值，稳妥起见手动合并。
-				 */
-				Set<String> scanBasePackages = getScanBasePackages(metadata, attrs).stream().filter(pkg -> !isBlank(pkg))
-						.collect(toSet());
+        AnnotationAttributes attrs = AnnotationAttributes
+                .fromMap(metadata.getAnnotationAttributes(EnableFeignConsumers.class.getName()));
+        if (nonNull(attrs)) {
+            final Class<?>[] clients = isNull(attrs) ? null : attrs.getClassArray("clients");
+            if (isEmptyArray(clients)) {
+                /**
+                 * Notes：这里需手动合并，因为当@EnableFeignConsumers引用了@EnableFeignClients时，
+                 * 且没有依赖spring-cloud-openfeign包时，就不能合并属性值？
+                 * 如，配了value就只能获取value的值，而无法获取被@AliasFor的basePackages的值，稳妥起见手动合并。
+                 */
+                Set<String> scanBasePackages = getScanBasePackages(metadata, attrs).stream().filter(pkg -> !isBlank(pkg)).collect(
+                        toSet());
 
-				// Spring Cloud + feign
-				if (hasSpringCloudFeignClass()) {
-					log.info("The current classpath contains springcloud feign, "
-							+ "which automatically enables the SpringCloud + Feign architecture. "
-							+ "SpringBoot + Feign has been ignored");
-				}
-				// Spring Boot + feign
-				else {
-					registerSpringBootFeignClients(metadata, registry, attrs, scanBasePackages);
-				}
-			} else {
-				for (Class<?> clazz : clients) {
-					AnnotatedGenericBeanDefinition definition = new AnnotatedGenericBeanDefinition(clazz);
-					configurerFeignClientPropertyValues(definition, attrs.getClassArray(DEFAULT_CONFIGURATION));
-					registry.registerBeanDefinition(defaultBeanGenerator.generateBeanName(definition, registry), definition);
-				}
-			}
-		}
-	}
+                // Spring Cloud + feign
+                if (hasSpringCloudFeignClass()) {
+                    log.info("The current classpath contains springcloud feign, "
+                            + "which automatically enables the SpringCloud + Feign architecture. "
+                            + "SpringBoot + Feign has been ignored");
+                }
+                // Spring Boot + feign
+                else {
+                    registerSpringBootFeignClients(metadata, registry, attrs, scanBasePackages);
+                }
+            } else {
+                for (Class<?> clazz : clients) {
+                    AnnotatedGenericBeanDefinition definition = new AnnotatedGenericBeanDefinition(clazz);
+                    configurerFeignClientPropertyValues(definition, attrs.getClassArray(DEFAULT_CONFIGURATION));
+                    registry.registerBeanDefinition(defaultBeanGenerator.generateBeanName(definition, registry), definition);
+                }
+            }
+        }
+    }
 
-	private void registerSpringBootFeignClients(AnnotationMetadata metadata, BeanDefinitionRegistry registry,
-			AnnotationAttributes attrs, Set<String> scanBasePackages) {
-		new SpringBootFeignClientScanner(registry, attrs.getClassArray(DEFAULT_CONFIGURATION))
-				.doScan(StringUtils.toStringArray(scanBasePackages));
-	}
+    private void registerSpringBootFeignClients(AnnotationMetadata metadata, BeanDefinitionRegistry registry,
+            AnnotationAttributes attrs, Set<String> scanBasePackages) {
+        new SpringBootFeignClientScanner(registry, attrs.getClassArray(DEFAULT_CONFIGURATION))
+                .doScan(StringUtils.toStringArray(scanBasePackages));
+    }
 
-	private Set<String> getScanBasePackages(AnnotationMetadata metadata, AnnotationAttributes attrs) {
-		Set<String> scanBasePackages = new HashSet<>();
-		for (String pkg : (String[]) attrs.get("value")) {
-			if (hasText(pkg)) {
-				scanBasePackages.add(pkg);
-			}
-		}
-		for (String pkg : (String[]) attrs.get(BASE_PACKAGES)) {
-			if (hasText(pkg)) {
-				scanBasePackages.add(pkg);
-			}
-		}
-		for (Class<?> clazz : (Class[]) attrs.get(BASE_PACKAGE_CLASSES)) {
-			scanBasePackages.add(ClassUtils.getPackageName(clazz));
-		}
-		if (scanBasePackages.isEmpty()) {
-			scanBasePackages.add(ClassUtils.getPackageName(metadata.getClassName()));
-		}
-		return scanBasePackages;
-	}
+    private Set<String> getScanBasePackages(AnnotationMetadata metadata, AnnotationAttributes attrs) {
+        Set<String> scanBasePackages = new HashSet<>();
+        for (String pkg : (String[]) attrs.get("value")) {
+            if (hasText(pkg)) {
+                scanBasePackages.add(pkg);
+            }
+        }
+        for (String pkg : (String[]) attrs.get(BASE_PACKAGES)) {
+            if (hasText(pkg)) {
+                scanBasePackages.add(pkg);
+            }
+        }
+        for (Class<?> clazz : (Class[]) attrs.get(BASE_PACKAGE_CLASSES)) {
+            scanBasePackages.add(ClassUtils.getPackageName(clazz));
+        }
+        if (scanBasePackages.isEmpty()) {
+            scanBasePackages.add(ClassUtils.getPackageName(metadata.getClassName()));
+        }
+        return scanBasePackages;
+    }
 
-	private void configurerFeignClientPropertyValues(BeanDefinition definition, @Nullable Class<?>[] defaultConfiguration) {
-		// First, find springboot feign client definition.
-		MergedAnnotation<?> feignClient = ((AnnotatedBeanDefinition) definition).getMetadata().getAnnotations()
-				.get(FeignConsumer.class);
-		if (!feignClient.isPresent()) {
-			// Fallback, find springcloud feign
-			feignClient = ((ScannedGenericBeanDefinition) definition).getMetadata().getAnnotations().get(FeignClient.class);
-			if (!feignClient.isPresent()) {
-				return;
-			}
-		}
+    private void configurerFeignClientPropertyValues(BeanDefinition definition, @Nullable Class<?>[] defaultConfiguration) {
+        // First, find springboot feign client definition.
+        MergedAnnotation<?> feignClient = ((AnnotatedBeanDefinition) definition).getMetadata().getAnnotations().get(
+                FeignConsumer.class);
+        if (!feignClient.isPresent()) {
+            // Fallback, find springcloud feign
+            feignClient = ((ScannedGenericBeanDefinition) definition).getMetadata().getAnnotations().get(FeignClient.class);
+            if (!feignClient.isPresent()) {
+                return;
+            }
+        }
 
-		String beanClassName = definition.getBeanClassName();
-		((GenericBeanDefinition) definition).setBeanClass(FeignConsumerFactoryBean.class);
-		definition.setPrimary(feignClient.getBoolean("primary"));
-		MutablePropertyValues propertyValues = definition.getPropertyValues();
-		propertyValues.add("targetClass", beanClassName);
-		propertyValues.add("url", environment.resolveRequiredPlaceholders(feignClient.getString("url")));// baseUrl
-		propertyValues.add("path", getRequestPath(definition, feignClient));
-		propertyValues.add("decode404", feignClient.getBoolean("decode404"));
-		propertyValues.add("configuration", feignClient.getClassArray("configuration"));
-		propertyValues.add("logLevel", feignClient.getValue("logLevel").orElse(null));
-		propertyValues.add("connectTimeout", resolveNullableLong(feignClient, "connectTimeout"));
-		propertyValues.add("readTimeout", resolveNullableLong(feignClient, "readTimeout"));
-		propertyValues.add("writeTimeout", resolveNullableLong(feignClient, "writeTimeout"));
-		propertyValues.add("followRedirects", resolveNullableBoolean(feignClient, "followRedirects"));
-		propertyValues.add("defaultConfiguration", defaultConfiguration);
-	}
+        String beanClassName = definition.getBeanClassName();
+        ((GenericBeanDefinition) definition).setBeanClass(FeignConsumerFactoryBean.class);
+        MutablePropertyValues propertyValues = definition.getPropertyValues();
+        propertyValues.add("targetClass", beanClassName);
 
-	private Boolean resolveNullableBoolean(MergedAnnotation<?> feignClient, String attributeName) {
-		try {
-			return Boolean.parseBoolean(environment.resolveRequiredPlaceholders(feignClient.getString(attributeName)));
-		} catch (NoSuchElementException e) {
-			log.debug(format("Cannot resolve %s, using default value", attributeName), e.getMessage());
-		}
-		return null;
-	}
+        // It works in both spring boot feign and spring cloud feign frameworks.
+        propertyValues.add("url", environment.resolveRequiredPlaceholders(feignClient.getString("url")));// baseUrl
+        propertyValues.add("path", getRequestPath(definition, feignClient));
+        propertyValues.add("decode404", feignClient.getBoolean("decode404"));
+        propertyValues.add("configuration", feignClient.getClassArray("configuration"));
+        propertyValues.add("primary", feignClient.getBoolean("primary"));
 
-	private Long resolveNullableLong(MergedAnnotation<?> feignClient, String attributeName) {
-		try {
-			return parseLongOrNull(environment.resolveRequiredPlaceholders(feignClient.getString(attributeName)));
-		} catch (NoSuchElementException e) {
-			log.debug(format("Cannot resolve %s, using default value", attributeName), e.getMessage());
-		}
-		return null;
-	}
+        // It can only work in spring boot feign frameworks.
+        propertyValues.add("logLevel", feignClient.getValue("logLevel").orElse(null));
+        propertyValues.add("connectTimeout", resolveNullableLong(feignClient, "connectTimeout"));
+        propertyValues.add("readTimeout", resolveNullableLong(feignClient, "readTimeout"));
+        propertyValues.add("writeTimeout", resolveNullableLong(feignClient, "writeTimeout"));
+        propertyValues.add("followRedirects", resolveNullableBoolean(feignClient, "followRedirects"));
 
-	private String getRequestPath(BeanDefinition definition, MergedAnnotation<?> feignClient) {
-		String path = "";
+        // It can only work in spring cloud feign frameworks.
+        propertyValues.add("defaultConfiguration", defaultConfiguration);
+    }
 
-		// Notes: SpringMvcContract It will automatically splice to the URL.
-		MergedAnnotation<?> requestMapping = ((AnnotatedBeanDefinition) definition).getMetadata().getAnnotations()
-				.get(RequestMapping.class);
-		if (!requestMapping.isPresent()) {
-			// Fallback, find by @FeignClient/@SpringBootFeignClient
-			path = feignClient.getString("path");
-		}
+    private Boolean resolveNullableBoolean(MergedAnnotation<?> feignClient, String attributeName) {
+        try {
+            return Boolean.parseBoolean(environment.resolveRequiredPlaceholders(feignClient.getString(attributeName)));
+        } catch (NoSuchElementException e) {
+            log.debug(format("Cannot resolve %s, using default value", attributeName), e.getMessage());
+        }
+        return null;
+    }
 
-		return environment.resolveRequiredPlaceholders(path);
+    private Long resolveNullableLong(MergedAnnotation<?> feignClient, String attributeName) {
+        try {
+            return parseLongOrNull(environment.resolveRequiredPlaceholders(feignClient.getString(attributeName)));
+        } catch (NoSuchElementException e) {
+            log.debug(format("Cannot resolve %s, using default value", attributeName), e.getMessage());
+        }
+        return null;
+    }
 
-	}
+    private String getRequestPath(BeanDefinition definition, MergedAnnotation<?> feignClient) {
+        String path = "";
 
-	public static boolean hasSpringCloudFeignClass() {
-		return isPresent("org.springframework.cloud.openfeign.FeignClientsRegistrar");
-	}
+        // Notes: SpringMvcContract It will automatically splice to the URL.
+        MergedAnnotation<?> requestMapping = ((AnnotatedBeanDefinition) definition).getMetadata().getAnnotations().get(
+                RequestMapping.class);
+        if (!requestMapping.isPresent()) {
+            // Fallback, find by @FeignClient/@SpringBootFeignClient
+            path = feignClient.getString("path");
+        }
 
-	/**
-	 * Check enabled Spring Boot/Cloud Feign configuration.
-	 * 
-	 * @return
-	 */
-	public static boolean isEnableConfiguration(Environment environment) {
-		// Default by true, If want to run in standalone mode, should set false
-		return environment.getProperty(KEY_CONFIG_ENABLE, boolean.class, true);
-	}
+        return environment.resolveRequiredPlaceholders(path);
 
-	/**
-	 * {@link SpringBootFeignClientScanner}
-	 * 
-	 * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
-	 * @version v1.0 2020-12-23
-	 * @sine v1.0
-	 * @see
-	 */
-	class SpringBootFeignClientScanner extends ClassPathBeanDefinitionScanner {
+    }
 
-		@Nullable
-		private final Class<?>[] defaultConfiguration;
+    public static boolean hasSpringCloudFeignClass() {
+        return isPresent("org.springframework.cloud.openfeign.FeignClientsRegistrar");
+    }
 
-		public SpringBootFeignClientScanner(BeanDefinitionRegistry registry, Class<?>[] defaultConfiguration) {
-			super(registry, true);
-			this.defaultConfiguration = defaultConfiguration;
-			registerFilters();
-			setBeanNameGenerator(defaultBeanGenerator);
-		}
+    /**
+     * Check enabled Spring Boot/Cloud Feign configuration.
+     * 
+     * @return
+     */
+    public static boolean isEnableConfiguration(Environment environment) {
+        // Default by true, If want to run in standalone mode, should set false
+        return environment.getProperty(KEY_CONFIG_ENABLE, boolean.class, true);
+    }
 
-		@Override
-		public Set<BeanDefinitionHolder> doScan(String... basePackages) {
-			Set<BeanDefinitionHolder> beanDefinitions = super.doScan(basePackages);
-			if (beanDefinitions.isEmpty()) {
-				log.warn("No spring boot feign client is found in package '" + Arrays.toString(basePackages) + "'.");
-			}
+    /**
+     * {@link SpringBootFeignClientScanner}
+     * 
+     * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+     * @version v1.0 2020-12-23
+     * @sine v1.0
+     * @see
+     */
+    class SpringBootFeignClientScanner extends ClassPathBeanDefinitionScanner {
 
-			for (BeanDefinitionHolder holder : beanDefinitions) {
-				ScannedGenericBeanDefinition definition = (ScannedGenericBeanDefinition) holder.getBeanDefinition();
-				configurerFeignClientPropertyValues(definition, defaultConfiguration);
-			}
+        @Nullable
+        private final Class<?>[] defaultConfiguration;
 
-			return beanDefinitions;
-		}
+        public SpringBootFeignClientScanner(BeanDefinitionRegistry registry, Class<?>[] defaultConfiguration) {
+            super(registry, true);
+            this.defaultConfiguration = defaultConfiguration;
+            registerFilters();
+            setBeanNameGenerator(defaultBeanGenerator);
+        }
 
-		@Override
-		protected boolean isCandidateComponent(AnnotatedBeanDefinition beanDefinition) {
-			return beanDefinition.getMetadata().isInterface();
-		}
+        @Override
+        public Set<BeanDefinitionHolder> doScan(String... basePackages) {
+            Set<BeanDefinitionHolder> beanDefinitions = super.doScan(basePackages);
+            if (beanDefinitions.isEmpty()) {
+                log.warn("No spring boot feign client is found in package '" + Arrays.toString(basePackages) + "'.");
+                return beanDefinitions;
+            }
 
-		private void registerFilters() {
-			// Include service interfaces.
-			addIncludeFilter(new AnnotationTypeFilter(FeignConsumer.class, true, true));
-			addIncludeFilter(new AnnotationTypeFilter(FeignClient.class, true, true)); // For-compatibility
+            for (BeanDefinitionHolder holder : beanDefinitions) {
+                ScannedGenericBeanDefinition definition = (ScannedGenericBeanDefinition) holder.getBeanDefinition();
+                configurerFeignClientPropertyValues(definition, defaultConfiguration);
+            }
 
-			// Exclude service interfaces.
-			addExcludeFilter(new TypeFilter() {
-				@Override
-				public boolean match(MetadataReader metadataReader, MetadataReaderFactory metadataReaderFactory)
-						throws IOException {
-					String className = metadataReader.getClassMetadata().getClassName();
-					return endsWithAny(className, "package-info", "module-info.java");
-				}
-			});
-		}
-	}
+            return beanDefinitions;
+        }
 
-	public static final BeanNameGenerator defaultBeanGenerator = (definition,
-			registry) -> AnnotationBeanNameGenerator.INSTANCE.generateBeanName(definition, registry) + ".SpringBootFeignClient";
+        @Override
+        protected boolean isCandidateComponent(AnnotatedBeanDefinition beanDefinition) {
+            return beanDefinition.getMetadata().isInterface();
+        }
+
+        private void registerFilters() {
+            // Include service interfaces.
+            addIncludeFilter(new AnnotationTypeFilter(FeignConsumer.class, true, true));
+            addIncludeFilter(new AnnotationTypeFilter(FeignClient.class, true, true)); // For-compatibility
+
+            // Exclude service interfaces.
+            addExcludeFilter(new TypeFilter() {
+                @Override
+                public boolean match(MetadataReader metadataReader, MetadataReaderFactory metadataReaderFactory)
+                        throws IOException {
+                    String className = metadataReader.getClassMetadata().getClassName();
+                    return endsWithAny(className, "package-info", "module-info.java");
+                }
+            });
+        }
+    }
+
+    public static final BeanNameGenerator defaultBeanGenerator = (definition,
+            registry) -> AnnotationBeanNameGenerator.INSTANCE.generateBeanName(definition, registry) + ".SpringBootFeignClient";
 
 }

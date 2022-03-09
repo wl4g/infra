@@ -25,7 +25,7 @@ import com.wl4g.infra.core.boot.listener.IBootstrappingConfigurer
 /**
  * Example facade implementation of {@link IBootstrappingConfigurer}
  */
-class ExampleFacadeSpringLauncherConfigurer implements IBootstrappingConfigurer {
+class ExampleFacadeBootstrappingConfigurer implements IBootstrappingConfigurer {
 
 	@Override
 	def int getOrder() {

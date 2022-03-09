@@ -14,7 +14,7 @@
 # #### Spring boot configuration. ####
 #
 spring:
-  application.name: feign-example-service
+  application.name: springcloud-feign-example-service
   profiles:
     active: dev
   h2.console.enabled: true
@@ -50,7 +50,7 @@ logging:
       apache: INFO
     feign: DEBUG
     com:
-      wl4g.component.integration.example: DEBUG
+      wl4g.infra.integration.example: DEBUG
 
 # ### Server configuration. ###
 server:

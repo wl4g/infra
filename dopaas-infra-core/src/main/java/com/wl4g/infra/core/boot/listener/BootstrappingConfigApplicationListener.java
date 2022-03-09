@@ -220,7 +220,8 @@ public class BootstrappingConfigApplicationListener implements GenericApplicatio
         }
         if (!isEmptyArray(currentAdditionalProfiles)) {
             String[] additionalProfiles = safeArrayToList(currentAdditionalProfiles).stream()
-                    .map(p -> defaultTrim2EmptyClear.apply(p)).toArray(String[]::new);
+                    .map(p -> defaultTrim2EmptyClear.apply(p))
+                    .toArray(String[]::new);
             if (isDebug) {
                 log.debug("Preset SpringApplication#setAdditionalProfiles: {}", asList(additionalProfiles));
             }
@@ -315,7 +316,7 @@ public class BootstrappingConfigApplicationListener implements GenericApplicatio
         List<Class<?>> classes = emptyList();
         try (GroovyClassLoader gcl = new GroovyClassLoader()) {
             ClassPathResourcePatternResolver resolver = new ClassPathResourcePatternResolver();
-            Set<StreamResource> ress = resolver.getResources(DEFAULT_LAUNCHER_CLASSNAME);
+            Set<StreamResource> ress = resolver.getResources(BOOTSTRAPPING_RESOURCE_NAME);
             classes = ress.stream().map(r -> {
                 try {
                     return gcl.parseClass(Resources.toString(r.getURL(), UTF_8),
@@ -365,9 +366,9 @@ public class BootstrappingConfigApplicationListener implements GenericApplicatio
     // Newline and invalid char clear.
     private static final Function<String, String> defaultTrim2EmptyClear = value -> replaceAll(value, "\\s*| |\t|\r|\\r|\n|\\n",
             "");
-    // Spring boot config end comm clear.
+    // Spring boot configuration end comm clear.
     private static final Function<String, String> defaultSafeCommClear = value -> join(split(trimToEmpty(value), ","), ",");
-    private static final String DEFAULT_LAUNCHER_CLASSNAME = "classpath*:/META-INF/bootstrapping.groovy";
+    private static final String BOOTSTRAPPING_RESOURCE_NAME = "classpath*:/META-INF/bootstrapping.groovy";
     private static final String PROPERTY_ENABLED = "spring.bootstrapping.enabled";
     private static final String PROPERTY_DEBUG = "spring.bootstrapping.debug";
     private static final List<String> DEFAULT_PROPERTIES_MERGE_KEYS = asList(ACTIVE_PROFILES_PROPERTY, INCLUDE_PROFILES_PROPERTY,

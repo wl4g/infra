@@ -50,7 +50,7 @@ logging:
       apache: INFO
     feign: DEBUG
     com:
-      wl4g.component.integration.example: DEBUG
+      wl4g.infra.integration.example: DEBUG
 
 # ### Server configuration. ###
 server:

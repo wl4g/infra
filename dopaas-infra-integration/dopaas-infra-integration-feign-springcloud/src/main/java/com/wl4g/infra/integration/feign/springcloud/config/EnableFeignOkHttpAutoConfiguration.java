@@ -68,15 +68,15 @@ import feign.Client;
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE)
 public class EnableFeignOkHttpAutoConfiguration {
 
-    @Bean(BEAN_OKHTTP3_CONNECTPOOL)
-    public okhttp3.ConnectionPool okHttpConnectionPool(FeignHttpClientProperties config,
+    @Bean(BEAN_OKHTTP3_POOL)
+    public okhttp3.ConnectionPool okHttp3ConnectionPool(FeignHttpClientProperties config,
             OkHttpClientConnectionPoolFactory factory) {
         return factory.create(config.getMaxConnections(), config.getTimeToLive(), config.getTimeToLiveUnit());
     }
 
     @Bean(BEAN_OKHTTP3_CLIENT)
-    public okhttp3.OkHttpClient okhttpClient(OkHttpClientFactory factory, okhttp3.ConnectionPool pool,
-            FeignHttpClientProperties config) {
+    public okhttp3.OkHttpClient okhttp3Client(OkHttpClientFactory factory,
+            @Qualifier(BEAN_OKHTTP3_POOL) okhttp3.ConnectionPool pool, FeignHttpClientProperties config) {
         return factory.createBuilder(config.isDisableSslValidation())
                 .connectTimeout((long) config.getConnectionTimeout(), TimeUnit.MILLISECONDS)
                 .followRedirects(config.isFollowRedirects())
@@ -87,15 +87,15 @@ public class EnableFeignOkHttpAutoConfiguration {
     // @see:org.springframework.cloud.openfeign.loadbalancer.DefaultFeignLoadBalancerConfiguration
     // @see:org.springframework.cloud.openfeign.loadbalancer.OkHttpFeignLoadBalancerConfiguration
 
-    @Bean(BEAN_OKHTTP3_FEIGN_CLIENT)
-    public feign.okhttp.OkHttpClient okHttpFeignClient(@Qualifier(BEAN_OKHTTP3_CLIENT) okhttp3.OkHttpClient okhttpClient) {
+    @Bean(BEAN_FEIGN_OKHTTP3_CLIENT)
+    public feign.okhttp.OkHttpClient feignOkhttp3Client(@Qualifier(BEAN_OKHTTP3_CLIENT) okhttp3.OkHttpClient okhttpClient) {
         return new feign.okhttp.OkHttpClient(okhttpClient);
     }
 
     @Bean(BEAN_FEIGN_LB_CLIENT)
     @Primary
     @Conditional(OnRetryNotEnabledCondition.class)
-    public Client feignLoadBalancerClient(@Qualifier(BEAN_OKHTTP3_FEIGN_CLIENT) feign.Client feignClient,
+    public Client feignLoadBalancerClient(@Qualifier(BEAN_FEIGN_OKHTTP3_CLIENT) feign.Client feignClient,
             BlockingLoadBalancerClient loadBalancerClient) {
         return new FeignBlockingLoadBalancerClient(feignClient, loadBalancerClient);
     }
@@ -115,9 +115,9 @@ public class EnableFeignOkHttpAutoConfiguration {
         return new RetryableFeignBlockingLoadBalancerClient(feignOkHttpClient, loadBalancerClient, lbRetryFactories.get(0));
     }
 
-    private static final String BEAN_OKHTTP3_CONNECTPOOL = "xcloudComponentRpcOkhttp3ConnectionPool";
-    private static final String BEAN_OKHTTP3_CLIENT = "xcloudComponentRpcOkhttp3Client";
-    private static final String BEAN_OKHTTP3_FEIGN_CLIENT = "xcloudComponentRpcOkhttp3FeignClient";
-    private static final String BEAN_FEIGN_LB_CLIENT = "xcloudComponentRpcFeignLoadBalancerClient";
+    private static final String BEAN_OKHTTP3_POOL = "infraSpringCloudFeign.okhttp3Pool";
+    private static final String BEAN_OKHTTP3_CLIENT = "infraSpringCloudFeign.okhttp3Client";
+    private static final String BEAN_FEIGN_OKHTTP3_CLIENT = "infraSpringCloudFeign.okhttp3FeignClient";
+    private static final String BEAN_FEIGN_LB_CLIENT = "infraSpringCloudFeign.loadBalancerClient";
 
 }

@@ -62,7 +62,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.wl4g</groupId>
-			<artifactId>dopaas-infra-integration-feign-example-interface</artifactId>
+			<artifactId>dopaas-infra-integration-feign-istio-example-interface</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>

@@ -1,6 +1,7 @@
 # Application Auto Configuration.
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.wl4g.infra.integration.feign.core.config.FeignConsumerAutoConfiguration,\
 com.wl4g.infra.integration.feign.core.context.internal.FeignContextAutoConfiguration,\
-com.wl4g.infra.integration.feign.core.context.JedisReferenceRepositoryAutoConfiguration,\
 com.wl4g.infra.integration.feign.core.context.DefaultFeignContextAutoConfiguration,\
+com.wl4g.infra.integration.feign.core.context.JedisReferenceRepositoryAutoConfiguration,\
 com.wl4g.infra.integration.feign.core.extension.FeignExtensionAutoConfiguration
