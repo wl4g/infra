@@ -21,13 +21,13 @@ package com.wl4g.infra.integration.feign.core.context;
 /**
  * 关于配置类、注册类的启用说明: </br>
  * 1. 当运行在 SpringBoot+Feign 环境下将启用以下配置类:
- * {@link FeignRpcContextAutoConfiguration} </br>
- * {@link JedisReferenceRepositoryAutoConfiguration} </br>
+ * {@link FeignContextAutoConfiguration} </br>
  * {@link DefaultFeignContextAutoConfiguration} </br>
+ * {@link JedisReferenceRepositoryAutoConfiguration} </br>
  * 以及其他包如: feign.core.annotation/feign.core.config 下的配置类、注册类启用 </br>
  * 
  * 2. 当运行在 SpringBoot+Feign+Istio 环境和 Feign+SpringCloud 环境下将启用以下配置类:
- * {@link FeignRpcContextAutoConfiguration} </br>
+ * {@link FeignContextAutoConfiguration} </br>
  * {@link JedisReferenceRepositoryAutoConfiguration} </br>
  * 以及其他包如: feign.core.annotation/feign.core.config 下的配置类、注册类启用 </br>
  * 

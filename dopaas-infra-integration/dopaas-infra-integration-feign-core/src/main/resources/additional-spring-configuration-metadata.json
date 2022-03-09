@@ -2,56 +2,56 @@
 	"groups": [],
 	"properties": [
 		{
-			"name": "spring.xcloud.component.integration.feign.enable",
+			"name": "spring.infra.integration.feign.enable",
 			"type": "java.lang.Boolean",
 			"description": "If false, Even if annotated by @EnableSpringBootFeignClients, it will not be automatically configured, which is especially suitable for local mode starter module, But Notes: if the startup class is annotated by @EnableFeignClients, you cannot turn off auto configuration.(Tip: using @EnableSpringBootFeignClients is equivalent to @EnableFeignClients)",
 			"defaultValue": "true"
 		},
 		{
-			"name": "spring.xcloud.component.integration.feign.defaultUrl",
+			"name": "spring.infra.integration.feign.defaultUrl",
 			"type": "java.lang.String",
 			"description": "Default feign client remote call base url. (Note: only applicable to springboot + feign environment, not applicable to springcloud + feign environment)",
 			"defaultValue": null
 		},
 		{
-			"name": "spring.xcloud.component.integration.feign.defaultLogLevel",
+			"name": "spring.infra.integration.feign.defaultLogLevel",
 			"type": "java.lang.String",
 			"description": "Default feign client remote call logLevel. (Note: only applicable to springboot + feign environment, not applicable to springcloud + feign environment)",
 			"sourceType": "feign.Logger.Level",
 			"defaultValue": "feign.Logger.Level.NONE"
 		},
 		{
-			"name": "spring.xcloud.component.integration.feign.maxIdleConnections",
+			"name": "spring.infra.integration.feign.maxIdleConnections",
 			"type": "java.lang.Integer",
 			"description": "Default feign client maxIdleConnections. (Note: only applicable to springboot + feign environment, not applicable to springcloud + feign environment)",
 			"defaultValue": 200
 		},
 		{
-			"name": "spring.xcloud.component.integration.feign.keepAliveDuration",
+			"name": "spring.infra.integration.feign.keepAliveDuration",
 			"type": "java.lang.Long",
 			"description": "Default feign client keepAliveDuration ms. (Note: only applicable to springboot + feign environment, not applicable to springcloud + feign environment)",
 			"defaultValue": 5
 		},
 		{
-			"name": "spring.xcloud.component.integration.feign.connectTimeout",
+			"name": "spring.infra.integration.feign.connectTimeout",
 			"type": "java.lang.Long",
 			"description": "Default feign client connectTimeout. (Note: only applicable to springboot + feign environment, not applicable to springcloud + feign environment)",
 			"defaultValue": 3000
 		},
 		{
-			"name": "spring.xcloud.component.integration.feign.readTimeout",
+			"name": "spring.infra.integration.feign.readTimeout",
 			"type": "java.lang.Long",
 			"description": "Default feign client readTimeout. (Note: only applicable to springboot + feign environment, not applicable to springcloud + feign environment)",
 			"defaultValue": 6000
 		},
 		{
-			"name": "spring.xcloud.component.integration.feign.writeTimeout",
+			"name": "spring.infra.integration.feign.writeTimeout",
 			"type": "java.lang.Long",
 			"description": "Default feign client writeTimeout. (Note: only applicable to springboot + feign environment, not applicable to springcloud + feign environment)",
 			"defaultValue": 6000
 		},
 		{
-			"name": "spring.xcloud.component.integration.feign.followRedirects",
+			"name": "spring.infra.integration.feign.followRedirects",
 			"type": "java.lang.Boolean",
 			"description": "Default feign client followRedirects. (Note: only applicable to springboot + feign environment, not applicable to springcloud + feign environment)",
 			"defaultValue": false

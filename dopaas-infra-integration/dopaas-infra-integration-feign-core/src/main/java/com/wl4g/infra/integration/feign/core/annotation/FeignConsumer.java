@@ -38,7 +38,7 @@ import feign.Retryer;
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version v1.0 2020-12-23
  * @sine v1.0
- * @see {@link com.wl4g.infra.integration.feign.core.annotation.FeignConsumersRegistrar#configurerFeignClientPropertyValues}
+ * @see {@link com.wl4g.infra.integration.feign.core.annotation.SpringBootFeignConsumersRegistrar#configurerFeignClientPropertyValues}
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

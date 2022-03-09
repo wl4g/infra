@@ -31,16 +31,18 @@ import com.wl4g.infra.core.constant.BaseConstant;
  */
 public abstract class FeignConsumerConstant extends BaseConstant {
 
-    public static final String KEY_CONFIG_PREFIX = "spring.infra.integration.feign";
+    public static final String KEY_BASE_PREFIX = "spring.infra.integration.feign";
 
     // Default by true.
-    public static final String KEY_CONFIG_ENABLE = KEY_CONFIG_PREFIX + ".enabled";
+    public static final String KEY_CONFIG_ENABLE = KEY_BASE_PREFIX + ".enabled";
 
-    /**
-     * For example, Tomcat 8.0 allows a maximum of 8KB of HTTP request headers
-     * by default
-     */
-    public static final long RPC_ATTACTMENT_MAX_BYTES = getLongProperty(KEY_CONFIG_PREFIX + ".context.attachments-max-bytes",
+    public static final String KEY_CLIENT_PRIVODER = KEY_BASE_PREFIX + ".client-provider";
+
+    public static final String KEY_PLUGIN_CLASSES = KEY_BASE_PREFIX + ".plugin-classes";
+
+    // For example, Tomcat 8.0 allows a maximum of 8KB of HTTP request headers
+    // by default
+    public static final long RPC_ATTACTMENT_MAX_BYTES = getLongProperty(KEY_BASE_PREFIX + ".context.attachments-max-bytes",
             6144L);
 
 }

@@ -14,6 +14,15 @@
 #  infra:
 #    integration:
 #      fegin:
+#        client-provider: okhttp3 # okhttp3|http2
+#        plugin-classes: # Default: InsertBeanBindingContextCoprocessor,PageBindingContextCoprocessor,SimpleStacktraceContextCoprocessor
+#        defaultUrl:
+#        maxIdleConnections: 200
+#        keepAliveDuration: 5
+#        connectTimeout: 3000
+#        readTimeout: 6000
+#        writeTimeout: 6000
+#        followRedirects: false
 #        tracing:
 #          prefix-http-headers:
 #            - 'X-Forwarded-'

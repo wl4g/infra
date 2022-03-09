@@ -44,68 +44,68 @@ import feign.Retryer;
 @Documented
 // 排除@FeignConsumer的接口,如:facade层启动需注入的是data层feign实例这个场景(不需要创建facade层接口的feign实例).
 @EnableSmartRequestMapping(packagePatternsUseForInclude = false)
-@Import({ FeignConsumerConfigurerRegistrar.class, FeignConsumersRegistrar.class, BridgeSpringCloudFeignClientsRegistrar.class })
+@Import({ AutoConfigurationRegistrar.class, SpringBootFeignConsumersRegistrar.class, SpringCloudFeignClientsRegistrar.class })
 public @interface EnableFeignConsumers {
 
-	@AliasFor(annotation = EnableSmartRequestMapping.class, attribute = PACKAGE_PATTERNS)
-	String[] value() default {};
+    @AliasFor(annotation = EnableSmartRequestMapping.class, attribute = PACKAGE_PATTERNS)
+    String[] value() default {};
 
-	/**
-	 * Base packages to scan for annotated components.
-	 * 
-	 * @return
-	 */
-	@AliasFor(annotation = EnableSmartRequestMapping.class, attribute = PACKAGE_PATTERNS)
-	String[] basePackages() default {};
+    /**
+     * Base packages to scan for annotated components.
+     * 
+     * @return
+     */
+    @AliasFor(annotation = EnableSmartRequestMapping.class, attribute = PACKAGE_PATTERNS)
+    String[] basePackages() default {};
 
-	/**
-	 * Base packages to scan for annotated components.
-	 * 
-	 * @return
-	 */
-	Class<?>[] basePackageClasses() default {};
+    /**
+     * Base packages to scan for annotated components.
+     * 
+     * @return
+     */
+    Class<?>[] basePackageClasses() default {};
 
-	/**
-	 * The default custom <code>@Configuration</code> for all feign clients. Can
-	 * contain override <code>@Bean</code> definition for the pieces that make
-	 * up the client, for instance {@link feign.codec.Decoder},
-	 * {@link feign.codec.Encoder}, {@link feign.Contract}, {@link Retryer},
-	 * {@link Logger}. </br>
-	 * </br>
-	 * 
-	 * The if empty, default refer to
-	 * {@link FeignConsumerFactoryBean#mergeFeignConfigurationSet()}
-	 * 
-	 * @see {@link org.springframework.cloud.openfeign.FeignClientsConfiguration}
-	 *      for the defaults
-	 * @return list of default configurations
-	 */
-	Class<?>[] defaultConfiguration() default {};
+    /**
+     * The default custom <code>@Configuration</code> for all feign clients. Can
+     * contain override <code>@Bean</code> definition for the pieces that make
+     * up the client, for instance {@link feign.codec.Decoder},
+     * {@link feign.codec.Encoder}, {@link feign.Contract}, {@link Retryer},
+     * {@link Logger}. </br>
+     * </br>
+     * 
+     * The if empty, default refer to
+     * {@link FeignConsumerFactoryBean#mergeFeignConfigurationSet()}
+     * 
+     * @see {@link org.springframework.cloud.openfeign.FeignClientsConfiguration}
+     *      for the defaults
+     * @return list of default configurations
+     */
+    Class<?>[] defaultConfiguration() default {};
 
-	/**
-	 * List of classes annotated with {@code @SpringBootFeignClient} or
-	 * {@code @FeignClient}. If not empty, disables classpath scanning.</br>
-	 * </br>
-	 * Notes: Valid when the current environment is running in the springcloud
-	 * environment.
-	 * 
-	 * @return list of FeignClient classes
-	 */
-	Class<?>[] clients() default {};
+    /**
+     * List of classes annotated with {@code @SpringBootFeignClient} or
+     * {@code @FeignClient}. If not empty, disables classpath scanning.</br>
+     * </br>
+     * Notes: Valid when the current environment is running in the springcloud
+     * environment.
+     * 
+     * @return list of FeignClient classes
+     */
+    Class<?>[] clients() default {};
 
-	/**
-	 * Refer: {@link #basePackages()}
-	 */
-	public static final String BASE_PACKAGES = "basePackages";
+    /**
+     * Refer: {@link #basePackages()}
+     */
+    public static final String BASE_PACKAGES = "basePackages";
 
-	/**
-	 * Refer: {@link #basePackageClasses()}
-	 */
-	public static final String BASE_PACKAGE_CLASSES = "basePackageClasses";
+    /**
+     * Refer: {@link #basePackageClasses()}
+     */
+    public static final String BASE_PACKAGE_CLASSES = "basePackageClasses";
 
-	/**
-	 * Refer: {@link #defaultConfiguration()}
-	 */
-	public static final String DEFAULT_CONFIGURATION = "defaultConfiguration";
+    /**
+     * Refer: {@link #defaultConfiguration()}
+     */
+    public static final String DEFAULT_CONFIGURATION = "defaultConfiguration";
 
 }

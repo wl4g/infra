@@ -31,6 +31,7 @@ import javax.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import com.wl4g.infra.integration.feign.core.context.RpcContextHolder.ReferenceRepository;
 import com.wl4g.infra.support.cache.jedis.JedisClient;
@@ -46,40 +47,41 @@ import com.wl4g.infra.support.cache.jedis.JedisClientFactoryBean;
  * @sine v1.0
  * @see
  */
+@Configuration
 @ConditionalOnClass(JedisClientFactoryBean.class)
 public class JedisReferenceRepositoryAutoConfiguration {
 
-	@Bean
-	// @ConditionalOnBean(JedisClientFactoryBean.class) // invalid??
-	public ReferenceRepository jedisReferenceRepository(@Autowired(required = false) JedisClient jedisClient) {
-		return isNull(jedisClient) ? null : new JedisReferenceRepository(jedisClient);
-	}
+    @Bean
+    // @ConditionalOnBean(JedisClientFactoryBean.class) // invalid??
+    public ReferenceRepository jedisReferenceRepository(@Autowired(required = false) JedisClient jedisClient) {
+        return isNull(jedisClient) ? null : new JedisReferenceRepository(jedisClient);
+    }
 
-	/**
-	 * Jedis implemention reference attachments repository.
-	 */
-	class JedisReferenceRepository implements ReferenceRepository {
-		private final JedisClient jedisClient;
+    /**
+     * Jedis implemention reference attachments repository.
+     */
+    class JedisReferenceRepository implements ReferenceRepository {
+        private final JedisClient jedisClient;
 
-		public JedisReferenceRepository(JedisClient jedisClient) {
-			this.jedisClient = notNullOf(jedisClient, "jedisClient");
-		}
+        public JedisReferenceRepository(JedisClient jedisClient) {
+            this.jedisClient = notNullOf(jedisClient, "jedisClient");
+        }
 
-		@Override
-		public <T> T doGetRefValue(@NotBlank String refKey, @NotNull Class<T> valueType) {
-			return parseJSON(jedisClient.get(refKey), valueType);
-		}
+        @Override
+        public <T> T doGetRefValue(@NotBlank String refKey, @NotNull Class<T> valueType) {
+            return parseJSON(jedisClient.get(refKey), valueType);
+        }
 
-		@Override
-		public boolean doSetRefValue(@NotBlank String refKey, Object value) {
-			return nonNull(jedisClient.set(refKey, toJSONString(value)));
-		}
+        @Override
+        public boolean doSetRefValue(@NotBlank String refKey, Object value) {
+            return nonNull(jedisClient.set(refKey, toJSONString(value)));
+        }
 
-		@Override
-		public boolean doRemoveRefValue(@NotBlank String refKey) {
-			Long result = jedisClient.del(refKey);
-			return nonNull(result) && result > 0;
-		}
-	}
+        @Override
+        public boolean doRemoveRefValue(@NotBlank String refKey) {
+            Long result = jedisClient.del(refKey);
+            return nonNull(result) && result > 0;
+        }
+    }
 
 }

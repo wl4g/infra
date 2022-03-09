@@ -17,35 +17,30 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.infra.integration.feign.core.extension;
+package com.wl4g.infra.integration.feign.core.plugin;
 
-import org.springframework.context.annotation.Bean;
+import java.lang.reflect.Type;
 
-import com.wl4g.infra.integration.feign.core.config.FeignConsumerProperties;
+import javax.validation.constraints.NotNull;
+
+import com.wl4g.infra.core.page.PageHolder;
+import com.wl4g.infra.integration.feign.core.context.internal.FeignContextCoprocessor;
+
+import feign.Response;
 
 /**
- * {@link FeignExtensionAutoConfiguration}
+ * {@link PageBindingPluginCoprocessor}
  * 
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version v1.0 2021-04-27
  * @sine v1.0
  * @see
  */
-public class FeignExtensionAutoConfiguration {
+public class PageBindingPluginCoprocessor implements FeignContextCoprocessor {
 
-    @Bean
-    public PageBindingContextCoprocessor pageBindingFeignContextCoprocessor() {
-        return new PageBindingContextCoprocessor();
-    }
-
-    @Bean
-    public InsertBeanBindingContextCoprocessor insertBeanBindingFeignContextCoprocessor() {
-        return new InsertBeanBindingContextCoprocessor();
-    }
-
-    @Bean
-    public SimpleStacktraceContextCoprocessor simpleStacktraceFeignContextCoprocessor(FeignConsumerProperties config) {
-        return new SimpleStacktraceContextCoprocessor(config);
+    @Override
+    public void afterConsumerExecution(@NotNull Response response, Type type) {
+        PageHolder.Util.update();
     }
 
 }

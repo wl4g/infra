@@ -17,7 +17,7 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.infra.integration.feign.core.extension;
+package com.wl4g.infra.integration.feign.core.plugin;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.web.WebUtils2.PARAM_STACKTRACE;
@@ -33,19 +33,19 @@ import com.wl4g.infra.integration.feign.core.context.internal.FeignContextCoproc
 import feign.RequestTemplate;
 
 /**
- * {@link SimpleStacktraceContextCoprocessor}
+ * {@link SimpleStacktracePluginCoprocessor}
  * 
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version v1.0 2021-04-27
  * @sine v1.0
  * @see
  */
-public class SimpleStacktraceContextCoprocessor implements FeignContextCoprocessor {
+public class SimpleStacktracePluginCoprocessor implements FeignContextCoprocessor {
 
     @SuppressWarnings("unused")
     private FeignConsumerProperties config;
 
-    public SimpleStacktraceContextCoprocessor(FeignConsumerProperties config) {
+    public SimpleStacktracePluginCoprocessor(FeignConsumerProperties config) {
         this.config = notNullOf(config, "config");
     }
 

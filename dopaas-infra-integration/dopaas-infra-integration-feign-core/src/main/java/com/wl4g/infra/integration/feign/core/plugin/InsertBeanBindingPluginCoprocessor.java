@@ -17,7 +17,7 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.infra.integration.feign.core.extension;
+package com.wl4g.infra.integration.feign.core.plugin;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.isEmptyArray;
 import static java.util.Objects.nonNull;
@@ -34,14 +34,14 @@ import com.wl4g.infra.integration.feign.core.context.internal.FeignContextCoproc
 import feign.Response;
 
 /**
- * {@link InsertBeanBindingContextCoprocessor}
+ * {@link InsertBeanBindingPluginCoprocessor}
  * 
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version v1.0 2021-05-20
  * @sine v1.0
  * @see
  */
-public class InsertBeanBindingContextCoprocessor implements FeignContextCoprocessor {
+public class InsertBeanBindingPluginCoprocessor implements FeignContextCoprocessor {
 
 	@Override
 	public void beforeConsumerExecution(@NotNull Object proxy, @NotNull Method method, @Nullable Object[] args) {

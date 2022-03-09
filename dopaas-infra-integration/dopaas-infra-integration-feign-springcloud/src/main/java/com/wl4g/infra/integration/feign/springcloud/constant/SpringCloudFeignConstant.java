@@ -31,8 +31,8 @@ import com.wl4g.infra.integration.feign.core.constant.FeignConsumerConstant;
  */
 public abstract class SpringCloudFeignConstant extends FeignConsumerConstant {
 
-    public static final String KEY_LOADBALANCER_RANDOM = KEY_CONFIG_PREFIX + ".loadbalancer.random";
+    public static final String KEY_LOADBALANCER_RANDOM = KEY_BASE_PREFIX + ".loadbalancer.random";
 
-    public static final String KEY_LOADBALANCER_GRAY = KEY_CONFIG_PREFIX + ".loadbalancer.gray";
+    public static final String KEY_LOADBALANCER_GRAY = KEY_BASE_PREFIX + ".loadbalancer.gray";
 
 }

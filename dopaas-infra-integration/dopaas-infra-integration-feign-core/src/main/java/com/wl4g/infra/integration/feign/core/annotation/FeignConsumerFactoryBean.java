@@ -23,8 +23,8 @@ import static com.wl4g.infra.common.lang.ClassUtils2.resolveClassNameNullable;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.findMethodNullable;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.invokeMethod;
-import static com.wl4g.infra.integration.feign.core.config.FeignConsumerAutoConfiguration.BEAN_DEFAULT_FEIGN_CLIENT;
-import static com.wl4g.infra.integration.feign.core.constant.FeignConsumerConstant.KEY_CONFIG_PREFIX;
+import static com.wl4g.infra.integration.feign.core.config.SpringBootFeignAutoConfiguration.BEAN_DEFAULT_FEIGN_CLIENT;
+import static com.wl4g.infra.integration.feign.core.constant.FeignConsumerConstant.KEY_BASE_PREFIX;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.lang.System.lineSeparator;
@@ -53,6 +53,7 @@ import javax.annotation.Nullable;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
@@ -64,7 +65,7 @@ import com.google.common.io.CharStreams;
 import com.wl4g.infra.common.annotation.Reserved;
 import com.wl4g.infra.common.log.SmartLogger;
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.infra.integration.feign.core.config.FeignConsumerAutoConfiguration;
+import com.wl4g.infra.integration.feign.core.config.SpringBootFeignAutoConfiguration;
 import com.wl4g.infra.integration.feign.core.config.FeignConsumerProperties;
 import com.wl4g.infra.integration.feign.core.context.internal.ConsumerFeignContextFilter.FeignContextDecoder;
 import com.wl4g.infra.integration.feign.core.context.internal.FeignContextBuilder;
@@ -78,6 +79,7 @@ import feign.Logger.Level;
 import feign.MethodMetadata;
 import feign.Request;
 import feign.Request.Options;
+import feign.Target.HardCodedTarget;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import feign.Response;
@@ -137,7 +139,7 @@ class FeignConsumerFactoryBean<T> implements FactoryBean<T>, ApplicationContextA
     @Nullable
     private Boolean followRedirects;
 
-    // Fallback default configuration.
+    // Fall-back default configuration.
     private Class<?>[] defaultConfiguration;
 
     @Override
@@ -234,7 +236,7 @@ class FeignConsumerFactoryBean<T> implements FactoryBean<T>, ApplicationContextA
         // Sets configuration with merge.
         mergeConfigurationSet(builder);
 
-        return builder.target(targetClass, buildRequestUrl());
+        return builder.target(new GenericHardCodedTarget<T>(targetClass, buildRequestUrl()));
     }
 
     private List<RequestInterceptor> obtainFeignRequestInterceptors() {
@@ -251,7 +253,8 @@ class FeignConsumerFactoryBean<T> implements FactoryBean<T>, ApplicationContextA
     }
 
     private Contract obtainDefaultSpringMvcContract() {
-        return (defaultContract = (Contract) applicationContext.getBean(FeignConsumerAutoConfiguration.BEAN_SPRINGMVC_CONTRACT));
+        return (defaultContract = (Contract) applicationContext
+                .getBean(SpringBootFeignAutoConfiguration.BEAN_SPRINGMVC_CONTRACT));
     }
 
     private FeignConsumerProperties obtainFeignConfigProperties() {
@@ -326,8 +329,8 @@ class FeignConsumerFactoryBean<T> implements FactoryBean<T>, ApplicationContextA
 
     private String buildRequestUrl() {
         String url = trimToEmpty(isBlank(this.url) ? config.getDefaultUrl() : this.url);
-        hasText(url, "Feign base url is required, please check configuration: %s.defaultUrl or use @%s#url()", KEY_CONFIG_PREFIX,
-                FeignConsumer.class.getSimpleName());
+        hasText(url, "Feign base url is required, please check configuration: %s.defaultUrl or use @%s#url() or @%s#url()",
+                KEY_BASE_PREFIX, FeignConsumer.class.getSimpleName(), FeignClient.class.getSimpleName());
         return url.concat(cleanPath());
     }
 
@@ -565,6 +568,16 @@ class FeignConsumerFactoryBean<T> implements FactoryBean<T>, ApplicationContextA
          */
         public FeignRpcException(String message, Throwable cause, boolean dumpStackTrace) {
             super(message, cause, false, dumpStackTrace);
+        }
+    }
+
+    public static class GenericHardCodedTarget<T> extends HardCodedTarget<T> {
+        public GenericHardCodedTarget(Class<T> type, String url) {
+            super(type, url);
+        }
+
+        public GenericHardCodedTarget(Class<T> type, String name, String url) {
+            super(type, name, url);
         }
     }
 

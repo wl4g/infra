@@ -16,13 +16,11 @@
 package com.wl4g.infra.integration.feign.core.annotation;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.isEmptyArray;
-import static com.wl4g.infra.common.lang.ClassUtils2.isPresent;
 import static com.wl4g.infra.common.lang.TypeConverts.parseLongOrNull;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static com.wl4g.infra.integration.feign.core.annotation.EnableFeignConsumers.BASE_PACKAGES;
 import static com.wl4g.infra.integration.feign.core.annotation.EnableFeignConsumers.BASE_PACKAGE_CLASSES;
 import static com.wl4g.infra.integration.feign.core.annotation.EnableFeignConsumers.DEFAULT_CONFIGURATION;
-import static com.wl4g.infra.integration.feign.core.constant.FeignConsumerConstant.KEY_CONFIG_ENABLE;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -70,15 +68,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.wl4g.infra.common.log.SmartLogger;
 
 /**
- * {@link FeignConsumersRegistrar}
+ * {@link SpringBootFeignConsumersRegistrar}
  * 
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version v1.0 2020-12-23
  * @sine v1.0
  * @see
  */
-class FeignConsumersRegistrar implements ImportBeanDefinitionRegistrar, ResourceLoaderAware, EnvironmentAware {
-    private static final SmartLogger log = getLogger(FeignConsumersRegistrar.class);
+class SpringBootFeignConsumersRegistrar implements ImportBeanDefinitionRegistrar, ResourceLoaderAware, EnvironmentAware {
+    private static final SmartLogger log = getLogger(SpringBootFeignConsumersRegistrar.class);
 
     @SuppressWarnings("unused")
     private ResourceLoader resourceLoader;
@@ -97,7 +95,7 @@ class FeignConsumersRegistrar implements ImportBeanDefinitionRegistrar, Resource
     @Override
     public void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
         // Check enabled configuration
-        if (!isEnableConfiguration(environment)) {
+        if (!AutoConfigurationRegistrar.isEnableConfiguration(environment)) {
             log.warn("No enabled Spring Boot/Cloud Feign configuration!");
             return;
         }
@@ -116,7 +114,7 @@ class FeignConsumersRegistrar implements ImportBeanDefinitionRegistrar, Resource
                         toSet());
 
                 // Spring Cloud + feign
-                if (hasSpringCloudFeignClass()) {
+                if (AutoConfigurationRegistrar.isSpringCloudFeignEnvironment()) {
                     log.info("The current classpath contains springcloud feign, "
                             + "which automatically enables the SpringCloud + Feign architecture. "
                             + "SpringBoot + Feign has been ignored");
@@ -228,20 +226,6 @@ class FeignConsumersRegistrar implements ImportBeanDefinitionRegistrar, Resource
 
         return environment.resolveRequiredPlaceholders(path);
 
-    }
-
-    public static boolean hasSpringCloudFeignClass() {
-        return isPresent("org.springframework.cloud.openfeign.FeignClientsRegistrar");
-    }
-
-    /**
-     * Check enabled Spring Boot/Cloud Feign configuration.
-     * 
-     * @return
-     */
-    public static boolean isEnableConfiguration(Environment environment) {
-        // Default by true, If want to run in standalone mode, should set false
-        return environment.getProperty(KEY_CONFIG_ENABLE, boolean.class, true);
     }
 
     /**

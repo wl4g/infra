@@ -24,6 +24,7 @@ import java.util.TreeMap;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * Default springboot-feign {@link RpcContextHolder} auto configuration. (Both
@@ -34,83 +35,84 @@ import org.springframework.context.annotation.Bean;
  * @sine v1.0
  * @see
  */
+@Configuration
 public class DefaultFeignContextAutoConfiguration {
 
-	@Bean
-	@ConditionalOnMissingBean // Lower priority
-	public RpcContextHolder defaultFeignRpcContextHolder() {
-		return new DefaultFeignRpcContextHolder();
-	}
+    @Bean
+    @ConditionalOnMissingBean // Lower priority
+    public RpcContextHolder defaultFeignRpcContextHolder() {
+        return new DefaultFeignRpcContextHolder();
+    }
 
-	public static class DefaultFeignRpcContextHolder extends RpcContextHolder {
+    public static class DefaultFeignRpcContextHolder extends RpcContextHolder {
 
-		private static final ThreadLocal<DefaultFeignRpcContextHolder> LOCAL = new InheritableThreadLocal<DefaultFeignRpcContextHolder>() {
-			@Override
-			protected DefaultFeignRpcContextHolder initialValue() {
-				return new DefaultFeignRpcContextHolder();
-			}
-		};
+        private static final ThreadLocal<DefaultFeignRpcContextHolder> LOCAL = new InheritableThreadLocal<DefaultFeignRpcContextHolder>() {
+            @Override
+            protected DefaultFeignRpcContextHolder initialValue() {
+                return new DefaultFeignRpcContextHolder();
+            }
+        };
 
-		private static final ThreadLocal<DefaultFeignRpcContextHolder> SERVER_LOCAL = new InheritableThreadLocal<DefaultFeignRpcContextHolder>() {
-			@Override
-			protected DefaultFeignRpcContextHolder initialValue() {
-				return new DefaultFeignRpcContextHolder();
-			}
-		};
+        private static final ThreadLocal<DefaultFeignRpcContextHolder> SERVER_LOCAL = new InheritableThreadLocal<DefaultFeignRpcContextHolder>() {
+            @Override
+            protected DefaultFeignRpcContextHolder initialValue() {
+                return new DefaultFeignRpcContextHolder();
+            }
+        };
 
-		// Notes: Since feignclient ignores case when setting header, it should
-		// be unified here.
+        // Notes: Since feignclient ignores case when setting header, it should
+        // be unified here.
 
-		/**
-		 * Feign request context attachments store. Thread isolation, thread
-		 * safety
-		 */
-		private final Map<String, String> attachments = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        /**
+         * Feign request context attachments store. Thread isolation, thread
+         * safety
+         */
+        private final Map<String, String> attachments = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
-		@Override
-		public String getAttachment(String key) {
-			return attachments.get(key);
-		}
+        @Override
+        public String getAttachment(String key) {
+            return attachments.get(key);
+        }
 
-		@Override
-		public Map<String, String> getAttachments() {
-			return attachments;
-		}
+        @Override
+        public Map<String, String> getAttachments() {
+            return attachments;
+        }
 
-		@Override
-		public void setAttachment(String key, String value) {
-			attachments.put(key, value);
-		}
+        @Override
+        public void setAttachment(String key, String value) {
+            attachments.put(key, value);
+        }
 
-		@Override
-		public void removeAttachment(String key) {
-			attachments.remove(key);
-		}
+        @Override
+        public void removeAttachment(String key) {
+            attachments.remove(key);
+        }
 
-		@Override
-		public void clearAttachments() {
-			attachments.clear();
-		}
+        @Override
+        public void clearAttachments() {
+            attachments.clear();
+        }
 
-		@Override
-		protected RpcContextHolder getContext0() {
-			return LOCAL.get();
-		}
+        @Override
+        protected RpcContextHolder getContext0() {
+            return LOCAL.get();
+        }
 
-		@Override
-		protected RpcContextHolder getServerContext0() {
-			return SERVER_LOCAL.get();
-		}
+        @Override
+        protected RpcContextHolder getServerContext0() {
+            return SERVER_LOCAL.get();
+        }
 
-		@Override
-		protected void removeContext0() {
-			LOCAL.remove();
-		}
+        @Override
+        protected void removeContext0() {
+            LOCAL.remove();
+        }
 
-		@Override
-		protected void removeServerContext0() {
-			SERVER_LOCAL.remove();
-		}
-	}
+        @Override
+        protected void removeServerContext0() {
+            SERVER_LOCAL.remove();
+        }
+    }
 
 }

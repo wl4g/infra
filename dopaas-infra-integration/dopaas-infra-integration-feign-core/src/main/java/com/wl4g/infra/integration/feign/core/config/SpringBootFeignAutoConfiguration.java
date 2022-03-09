@@ -15,32 +15,22 @@
  */
 package com.wl4g.infra.integration.feign.core.config;
 
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
 import com.wl4g.infra.integration.feign.core.annotation.mvc.SpringMvcContract;
 
-import static com.wl4g.infra.integration.feign.core.constant.FeignConsumerConstant.*;
-
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
 /**
- * {@link FeignConsumerAutoConfiguration}
+ * {@link SpringBootFeignAutoConfiguration}
  * 
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version v1.0 2020-12-23
  * @sine v1.0
  * @see
  */
-@ImportAutoConfiguration({ OkhttpFeignConsumerAutoConfiguration.class, Http2FeignConsumerAutoConfiguration.class })
-public class FeignConsumerAutoConfiguration {
-
-    @Bean
-    @ConfigurationProperties(prefix = KEY_CONFIG_PREFIX)
-    public FeignConsumerProperties feignConsumerProperties() {
-        return new FeignConsumerProperties();
-    }
-
+@ImportAutoConfiguration({ OkhttpSpringBootFeignAutoConfiguration.class, Http2SpringBootFeignAutoConfiguration.class })
+public class SpringBootFeignAutoConfiguration {
+ 
     @Bean(BEAN_SPRINGMVC_CONTRACT)
     public SpringMvcContract springMvcContract() {
         return new SpringMvcContract();
