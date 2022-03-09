@@ -100,6 +100,12 @@ class SpringBootFeignConsumersRegistrar implements ImportBeanDefinitionRegistrar
             return;
         }
 
+        // Check is SpringBoot-Feign environment?
+        if (!AutoConfigurationRegistrar.isSpringBootFeignEnvironment()) {
+            log.info("The current not SpringBoot-Feign environment and automatically skiped configuring.");
+            return;
+        }
+
         AnnotationAttributes attrs = AnnotationAttributes
                 .fromMap(metadata.getAnnotationAttributes(EnableFeignConsumers.class.getName()));
         if (nonNull(attrs)) {
@@ -112,17 +118,7 @@ class SpringBootFeignConsumersRegistrar implements ImportBeanDefinitionRegistrar
                  */
                 Set<String> scanBasePackages = getScanBasePackages(metadata, attrs).stream().filter(pkg -> !isBlank(pkg)).collect(
                         toSet());
-
-                // Spring Cloud + feign
-                if (AutoConfigurationRegistrar.isSpringCloudFeignEnvironment()) {
-                    log.info("The current classpath contains springcloud feign, "
-                            + "which automatically enables the SpringCloud + Feign architecture. "
-                            + "SpringBoot + Feign has been ignored");
-                }
-                // Spring Boot + feign
-                else {
-                    registerSpringBootFeignClients(metadata, registry, attrs, scanBasePackages);
-                }
+                registerSpringBootFeignClients(metadata, registry, attrs, scanBasePackages);
             } else {
                 for (Class<?> clazz : clients) {
                     AnnotatedGenericBeanDefinition definition = new AnnotatedGenericBeanDefinition(clazz);

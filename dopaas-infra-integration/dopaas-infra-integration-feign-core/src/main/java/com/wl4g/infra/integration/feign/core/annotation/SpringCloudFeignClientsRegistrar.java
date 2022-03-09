@@ -71,6 +71,12 @@ class SpringCloudFeignClientsRegistrar implements ImportBeanDefinitionRegistrar,
             return;
         }
 
+        // Check is SpringCloud-Feign environment?
+        if (!AutoConfigurationRegistrar.isSpringCloudFeignEnvironment()) {
+            log.info("The current not SpringCloud-Feign environment and automatically skiped configuring.");
+            return;
+        }
+
         if (AutoConfigurationRegistrar.isSpringCloudFeignEnvironment()) {
             try {
                 Constructor<?> constructor = FEIGNCLIENTS_REGISTRAR_CLASS.getDeclaredConstructor();

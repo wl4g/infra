@@ -57,7 +57,10 @@ server:
   #address: 0.0.0.0
   sessionTimeout: 30
   servlet:
-    contextPath: /${spring.application.name}
+    ## Must only be '/'
+    ## see:org.springframework.cloud.openfeign.loadbalancer.FeignBlockingLoadBalancerClient#execute
+    ## see:org.springframework.cloud.loadbalancer.blocking.client.BlockingLoadBalancerClient.reconstructURI
+    contextPath: /
   tomcat: # see: org.springframework.boot.autoconfigure.web.ServerProperties.Tomcat
     basedir: /tmp/${spring.application.name}
     accesslog:

@@ -18,6 +18,7 @@ package com.wl4g.infra.integration.feign.core.annotation;
 import static com.wl4g.infra.common.lang.ClassUtils2.isPresent;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static com.wl4g.infra.integration.feign.core.constant.FeignConsumerConstant.KEY_CONFIG_ENABLE;
+import static java.lang.String.format;
 import static java.util.Collections.unmodifiableList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -40,6 +41,7 @@ import com.wl4g.infra.common.log.SmartLogger;
 import com.wl4g.infra.integration.feign.core.config.CoreFeignAutoConfiguration;
 import com.wl4g.infra.integration.feign.core.config.SpringBootFeignAutoConfiguration;
 import com.wl4g.infra.integration.feign.core.constant.FeignConsumerConstant;
+import com.wl4g.infra.integration.feign.core.context.DefaultFeignContextAutoConfiguration;
 import com.wl4g.infra.integration.feign.core.context.internal.FeignContextAutoConfiguration;
 import com.wl4g.infra.integration.feign.core.plugin.InsertBeanBindingPluginCoprocessor;
 import com.wl4g.infra.integration.feign.core.plugin.PageBindingPluginCoprocessor;
@@ -74,7 +76,7 @@ class AutoConfigurationRegistrar implements ImportBeanDefinitionRegistrar, Envir
     public void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
         // Check enabled configuration
         if (!isEnableConfiguration(environment)) {
-            log.warn("No enabled SpringBoot and SpringCloud feign auto configurer!");
+            log.warn("No enabled SpringBoot-Feign/SpringBoot-Istio-Feign/SpringCloud-Feign/Dubbo-Feign auto configurer!");
             return;
         }
 
@@ -96,9 +98,14 @@ class AutoConfigurationRegistrar implements ImportBeanDefinitionRegistrar, Envir
         else if (!isApacheDubboFeignEnvironment()) {
             // Ignore, some codes ...
         }
+        // Register SpringBoot-Istio-Feign environment configuration.
+        else if (!isSpringBootIstioFeignEnvironment()) {
+            // Ignore, some codes ...
+        }
         // Register (Default) SpringBoot-Feign environment configuration.
         else {
             registerBeanDefinition(registry, SpringBootFeignAutoConfiguration.class);
+            registerBeanDefinition(registry, DefaultFeignContextAutoConfiguration.class);
         }
 
     }
@@ -141,12 +148,36 @@ class AutoConfigurationRegistrar implements ImportBeanDefinitionRegistrar, Envir
     }
 
     /**
+     * Check if the current SpringBoot-Feign environment.
+     * 
+     * @return
+     */
+    public static boolean isSpringBootFeignEnvironment() {
+        if (isAlibabaDubboFeignEnvironment()) {
+            throw new IllegalStateException(format("Check the existing com.alibaba.dubbo.xx "
+                    + "classes in the current classpath, the new version has been migrated to org.apache.dubbo.xx,"
+                    + "please remove old-version dependency and use the new version!"));
+        }
+        return !isSpringCloudFeignEnvironment() && !isApacheDubboFeignEnvironment();
+    }
+
+    /**
+     * Check if the current SpringBoot-Istio-Feign environment.
+     * 
+     * @return
+     */
+    public static boolean isSpringBootIstioFeignEnvironment() {
+        return isSpringBootFeignEnvironment() && isPresent("com.wl4g.infra.integration.feign.istio.constant.IstioFeignConstant");
+    }
+
+    /**
      * Check if the current SpringCloud-Feign environment.
      * 
      * @return
      */
     public static boolean isSpringCloudFeignEnvironment() {
-        return isPresent("org.springframework.cloud.openfeign.FeignClientsRegistrar");
+        // isPresent("org.springframework.cloud.openfeign.FeignClientsRegistrar")
+        return isPresent("com.wl4g.infra.integration.feign.springcloud.constant.SpringCloudFeignConstant");
     }
 
     /**
@@ -155,7 +186,8 @@ class AutoConfigurationRegistrar implements ImportBeanDefinitionRegistrar, Envir
      * @return
      */
     public static boolean isApacheDubboFeignEnvironment() {
-        return isPresent("org.apache.dubbo.config.spring.beans.factory.annotation.ServiceAnnotationBeanPostProcessor");
+        // isPresent("org.apache.dubbo.config.spring.beans.factory.annotation.ServiceAnnotationBeanPostProcessor")
+        return isPresent("com.wl4g.infra.integration.feign.dubbo.constant.DubboFeignConstant");
     }
 
     /**

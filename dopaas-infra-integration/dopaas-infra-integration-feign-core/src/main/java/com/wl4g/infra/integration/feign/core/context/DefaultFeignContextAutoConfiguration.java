@@ -24,7 +24,6 @@ import java.util.TreeMap;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * Default springboot-feign {@link RpcContextHolder} auto configuration. (Both
@@ -35,11 +34,10 @@ import org.springframework.context.annotation.Configuration;
  * @sine v1.0
  * @see
  */
-@Configuration
 public class DefaultFeignContextAutoConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean // Lower priority
+    @ConditionalOnMissingBean(RpcContextHolder.class) // Lower priority
     public RpcContextHolder defaultFeignRpcContextHolder() {
         return new DefaultFeignRpcContextHolder();
     }
