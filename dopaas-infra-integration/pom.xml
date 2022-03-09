@@ -59,6 +59,7 @@
 		<module>dopaas-infra-integration-feign-common</module>
 		<module>dopaas-infra-integration-feign-core</module>
 		<!-- <module>dopaas-infra-integration-feign-dubbo</module> -->
+		<!-- <module>dopaas-infra-integration-feign-dubbo-example</module> -->
 		<module>dopaas-infra-integration-feign-istio</module>
 		<module>dopaas-infra-integration-feign-istio-example</module>
 		<module>dopaas-infra-integration-feign-springcloud</module>

@@ -8,5 +8,6 @@
 # limitations under the License.
 #
 
-# #### Environment(SpringBoot Feign) configuration. ####
+# #### Environment(SpringBoot Istio Feign) configuration. ####
 #
+provider.serviceId.feign-example-service: istio-feign-example-service

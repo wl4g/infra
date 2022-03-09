@@ -91,21 +91,22 @@ class AutoConfigurationRegistrar implements ImportBeanDefinitionRegistrar, Envir
         registerPlugins(registry);
 
         // Register SpringCloud-Feign environment configuration.
-        if (!isSpringCloudFeignEnvironment()) {
+        if (isSpringCloudFeignEnvironment()) {
             // Ignore, some codes ...
         }
-        // Register ApacheDubbo-Feign environment configuration.
-        else if (!isApacheDubboFeignEnvironment()) {
+        // Register Apache-Dubbo-Feign environment configuration.
+        else if (isApacheDubboFeignEnvironment()) {
             // Ignore, some codes ...
         }
-        // Register SpringBoot-Istio-Feign environment configuration.
-        else if (!isSpringBootIstioFeignEnvironment()) {
-            // Ignore, some codes ...
-        }
-        // Register (Default) SpringBoot-Feign environment configuration.
+        // Register (Default)SpringBoot-Feign or SpringBoot-Istio-Feign
+        // environment configuration.
         else {
-            registerBeanDefinition(registry, SpringBootFeignAutoConfiguration.class);
-            registerBeanDefinition(registry, DefaultFeignContextAutoConfiguration.class);
+            if (isSpringBootFeignEnvironment() || isSpringBootIstioFeignEnvironment()) {
+                registerBeanDefinition(registry, SpringBootFeignAutoConfiguration.class);
+            }
+            if (isSpringBootFeignEnvironment()) {
+                registerBeanDefinition(registry, DefaultFeignContextAutoConfiguration.class);
+            }
         }
 
     }
@@ -158,7 +159,7 @@ class AutoConfigurationRegistrar implements ImportBeanDefinitionRegistrar, Envir
                     + "classes in the current classpath, the new version has been migrated to org.apache.dubbo.xx,"
                     + "please remove old-version dependency and use the new version!"));
         }
-        return !isSpringCloudFeignEnvironment() && !isApacheDubboFeignEnvironment();
+        return !isSpringBootIstioFeignEnvironment() && !isSpringCloudFeignEnvironment() && !isApacheDubboFeignEnvironment();
     }
 
     /**
@@ -167,7 +168,7 @@ class AutoConfigurationRegistrar implements ImportBeanDefinitionRegistrar, Envir
      * @return
      */
     public static boolean isSpringBootIstioFeignEnvironment() {
-        return isSpringBootFeignEnvironment() && isPresent("com.wl4g.infra.integration.feign.istio.constant.IstioFeignConstant");
+        return isPresent("com.wl4g.infra.integration.feign.istio.constant.IstioFeignConstant");
     }
 
     /**

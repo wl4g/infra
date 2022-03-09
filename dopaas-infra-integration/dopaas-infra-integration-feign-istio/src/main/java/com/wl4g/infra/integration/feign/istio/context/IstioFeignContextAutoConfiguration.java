@@ -46,14 +46,14 @@ import com.wl4g.infra.integration.feign.core.context.RpcContextHolder;
 public class IstioFeignContextAutoConfiguration {
 
     @Bean
-    public TracingContextCoprocessor tracingContextCoprocessor(FeignConsumerProperties config) {
-        return new TracingContextCoprocessor(config);
-    }
-
-    @Bean
     @ConditionalOnMissingBean // Lower priority
     public RpcContextHolder istioSpringBootFeignRpcContextHolder() {
         return new IstioSpringBootFeignRpcContextHolder();
+    }
+
+    @Bean
+    public TracingContextCoprocessor tracingContextCoprocessor(FeignConsumerProperties config) {
+        return new TracingContextCoprocessor(config);
     }
 
     @Bean

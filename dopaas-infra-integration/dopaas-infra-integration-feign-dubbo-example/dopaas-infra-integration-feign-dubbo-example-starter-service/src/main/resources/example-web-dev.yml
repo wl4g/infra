@@ -8,16 +8,22 @@
 # limitations under the License.
 #
 
-# #### Environment(SpringBoot Feign for Dev) configuration. ####
+# #### Environment(Dev) configuration. ####
 #
 
 spring:
-  infra:
-    integration:
-      feign:
-        default-url: http://localhost:27002
-        default-log-level: BASIC # NONE|BASIC|HEADERS|FULL
-        client-provider: okhttp3 # http2Client|okhttp3, default to okhttp3
-        max-idle-connections: 520
-        connect-timeout: 11000
-        read-timeout: 12000
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driverClassName: org.h2.Driver
+    hikari:
+      jdbcUrl: 'jdbc:h2:/tmp/h2test;FORBID_CREATION=FALSE'
+      username: sa
+      password: 
+      connectionTimeout: 30000
+      idleTimeout: 600000
+      initializationFailTimeout: 1
+      minimumIdle: 10
+      maxLifetime: 1800000
+      maximumPoolSize: 100
+      validationTimeout: 5000
+      leakDetectionThreshold: 0

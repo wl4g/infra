@@ -16,6 +16,7 @@
 package com.wl4g.infra.integration.feign.core.annotation;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.isEmptyArray;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.lang.TypeConverts.parseLongOrNull;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static com.wl4g.infra.integration.feign.core.annotation.EnableFeignConsumers.BASE_PACKAGES;
@@ -36,6 +37,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
@@ -101,7 +103,8 @@ class SpringBootFeignConsumersRegistrar implements ImportBeanDefinitionRegistrar
         }
 
         // Check is SpringBoot-Feign environment?
-        if (!AutoConfigurationRegistrar.isSpringBootFeignEnvironment()) {
+        if (!(AutoConfigurationRegistrar.isSpringBootFeignEnvironment()
+                || AutoConfigurationRegistrar.isSpringBootIstioFeignEnvironment())) {
             log.info("The current not SpringBoot-Feign environment and automatically skiped configuring.");
             return;
         }
@@ -122,7 +125,7 @@ class SpringBootFeignConsumersRegistrar implements ImportBeanDefinitionRegistrar
             } else {
                 for (Class<?> clazz : clients) {
                     AnnotatedGenericBeanDefinition definition = new AnnotatedGenericBeanDefinition(clazz);
-                    configurerFeignClientPropertyValues(definition, attrs.getClassArray(DEFAULT_CONFIGURATION));
+                    setFeignClientPropertyValues(definition, attrs.getClassArray(DEFAULT_CONFIGURATION));
                     registry.registerBeanDefinition(defaultBeanGenerator.generateBeanName(definition, registry), definition);
                 }
             }
@@ -156,7 +159,7 @@ class SpringBootFeignConsumersRegistrar implements ImportBeanDefinitionRegistrar
         return scanBasePackages;
     }
 
-    private void configurerFeignClientPropertyValues(BeanDefinition definition, @Nullable Class<?>[] defaultConfiguration) {
+    private void setFeignClientPropertyValues(BeanDefinition definition, @Nullable Class<?>[] defaultConfiguration) {
         // First, find springboot feign client definition.
         MergedAnnotation<?> feignClient = ((AnnotatedBeanDefinition) definition).getMetadata().getAnnotations().get(
                 FeignConsumer.class);
@@ -178,7 +181,11 @@ class SpringBootFeignConsumersRegistrar implements ImportBeanDefinitionRegistrar
         propertyValues.add("path", getRequestPath(definition, feignClient));
         propertyValues.add("decode404", feignClient.getBoolean("decode404"));
         propertyValues.add("configuration", feignClient.getClassArray("configuration"));
-        propertyValues.add("primary", feignClient.getBoolean("primary"));
+        // FIXED: Bean property 'primary' is not writable or has an invalid
+        // setter method. Does the parameter type of the setter match the return
+        // type of the getter?
+        ((GenericBeanDefinition) definition).setPrimary(feignClient.getBoolean("primary"));
+        // propertyValues.add("primary", feignClient.getBoolean("primary"));
 
         // It can only work in spring boot feign frameworks.
         propertyValues.add("logLevel", feignClient.getValue("logLevel").orElse(null));
@@ -234,11 +241,15 @@ class SpringBootFeignConsumersRegistrar implements ImportBeanDefinitionRegistrar
      */
     class SpringBootFeignClientScanner extends ClassPathBeanDefinitionScanner {
 
+        @NotNull
+        private final BeanDefinitionRegistry registry;
+
         @Nullable
         private final Class<?>[] defaultConfiguration;
 
         public SpringBootFeignClientScanner(BeanDefinitionRegistry registry, Class<?>[] defaultConfiguration) {
             super(registry, true);
+            this.registry = notNullOf(registry, "registry");
             this.defaultConfiguration = defaultConfiguration;
             registerFilters();
             setBeanNameGenerator(defaultBeanGenerator);
@@ -246,18 +257,19 @@ class SpringBootFeignConsumersRegistrar implements ImportBeanDefinitionRegistrar
 
         @Override
         public Set<BeanDefinitionHolder> doScan(String... basePackages) {
-            Set<BeanDefinitionHolder> beanDefinitions = super.doScan(basePackages);
-            if (beanDefinitions.isEmpty()) {
+            Set<BeanDefinitionHolder> beanDefinitionHolders = super.doScan(basePackages);
+            if (beanDefinitionHolders.isEmpty()) {
                 log.warn("No spring boot feign client is found in package '" + Arrays.toString(basePackages) + "'.");
-                return beanDefinitions;
+                return beanDefinitionHolders;
             }
 
-            for (BeanDefinitionHolder holder : beanDefinitions) {
-                ScannedGenericBeanDefinition definition = (ScannedGenericBeanDefinition) holder.getBeanDefinition();
-                configurerFeignClientPropertyValues(definition, defaultConfiguration);
+            for (BeanDefinitionHolder definitionHolder : beanDefinitionHolders) {
+                ScannedGenericBeanDefinition definition = (ScannedGenericBeanDefinition) definitionHolder.getBeanDefinition();
+                setFeignClientPropertyValues(definition, defaultConfiguration);
+                registerBeanDefinition(definitionHolder, registry);
             }
 
-            return beanDefinitions;
+            return beanDefinitionHolders;
         }
 
         @Override

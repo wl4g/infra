@@ -1,0 +1,94 @@
+# Copyright (c) 2017 ~ 2025, the original author wangl.sir individual Inc,
+# All rights reserved. Contact us <Wanglsir@gmail.com, 983708408@qq.com>
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# #### Environment base configuration. ####
+#
+
+# #### Spring boot configuration. ####
+#
+spring:
+  application.name: springcloud-feign-example-service
+  profiles:
+    active: dev
+  h2.console.enabled: true
+  infra:
+    data:
+      mybatis:
+        configLocation: mybatis/mybatis-config.xml
+        mapperLocations: classpath:mybatis/**/*Mapper.xml
+        typeAliasesPackage: com.wl4g.infra.integration.feign.springcloud.bean.*
+  datasource:
+    schema: classpath*:sql/example.sql
+
+# Logging configuration.
+logging:
+  file:
+    # see:com.wl4g.infra.core.logging.logback.EnhancedLogbackConfigurer#apply
+    # see:org.springframework.boot.logging.LogFile#toString
+    name: ${server.tomcat.basedir}/../log/${spring.application.name}/${spring.application.name}.log
+    clean-history-on-start: false
+    total-size-cap: 200GB # default to 200GB
+    max-size: 1GB # default to 10MB
+    max-history: 30 # default to 7
+  pattern:
+    #console: ${logging.pattern.file}
+    #file: '%d{yy-MM-dd HH:mm:ss.SSS} ${LOG_LEVEL_PATTERN:%4p} ${PID} [%t] [%X{_H_:X-Request-ID}] [%X{_H_:X-Request-Seq}] [%X{_C_:${spring.cloud.devops.iam.cookie.name}}] - %-40.40logger{39} : %m%n${LOG_EXCEPTION_CONVERSION_WORD:%wEx}'
+  root: INFO
+  level:
+    de.codecentric.boot.admin: INFO
+    org:
+      springframework:
+        boot.context: DEBUG # Print load config
+      apache: INFO
+    feign: DEBUG
+    com:
+      wl4g.infra.integration.example: DEBUG
+
+# ### Server configuration. ###
+server:
+  port: 27002
+  #address: 0.0.0.0
+  sessionTimeout: 30
+  servlet:
+    ## Must only be '/'
+    ## see:org.springframework.cloud.openfeign.loadbalancer.FeignBlockingLoadBalancerClient#execute
+    ## see:org.springframework.cloud.loadbalancer.blocking.client.BlockingLoadBalancerClient.reconstructURI
+    contextPath: /
+  tomcat: # see: org.springframework.boot.autoconfigure.web.ServerProperties.Tomcat
+    basedir: /tmp/${spring.application.name}
+    accesslog:
+      enabled: false
+      directory: ${server.tomcat.basedir}/../log/${spring.application.name}/ # Directory in which log files are created. Can be absolute or relative to the Tomcat base dir.
+      requestAttributesEnabled: false # Set request attributes for the IP address, Hostname, protocol, and port used for the request.
+    backgroundProcessorDelay: 1000 # default: 10s
+    thread:
+      # Maximum amount of worker threads. for example 4C 8G, and the empirical value of thread number is 800. The operating system 
+      # has system overhead for switching and scheduling between threads, so not the more the better. The minimum number of idle working threads
+      # is 10 by default. (increase it appropriately to cope with the sudden increase of visits). default: 200
+      max: 50
+      min-spare: 5 # Minimum amount of worker threads. default: 10
+    # Maximum number of connections that the server accepts and processes at any given time. Once the limit has been reached, the
+    # operating system may still accept connections based on the "acceptCount" property. default: 8192
+    maxConnections: 8192
+    # Maximum queue length for incoming connection requests when all possible request processing threads are in use. defualt: 100
+    accept-count: 100
+    # Maximum number of idle processors that will be retained in the cache and reused with a subsequent request. When set to -1 
+    # the cache will be unlimited with a theoretical maximum size equal to the maximum number of connections. default: 200
+    processorCache: 200
+    maxHttpFormPostSize: 2MB # Maximum size of the form content in any HTTP post request.
+    maxSwallowSize: 2MB # Maximum amount of request body to swallow.
+    uri-encoding: UTF-8
+    mbeanregistry:
+      enable: true
+    remoteip:
+      remoteIpHeader: X-Forwarded-For
+      protocolHeader: X-Forwarded-Proto
+      hostHeader: X-Forwarded-Host
+      portHeader: X-Forwarded-Port
