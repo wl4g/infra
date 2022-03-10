@@ -18,25 +18,33 @@ package com.wl4g.infra.integration.feign.core.config;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
+import com.wl4g.infra.integration.feign.core.annotation.FeignTargetFactory;
 import com.wl4g.infra.integration.feign.core.annotation.mvc.SpringMvcContract;
 
 /**
- * {@link SpringBootFeignAutoConfiguration}
+ * {@link FeignSpringBootAutoConfiguration}
  * 
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version v1.0 2020-12-23
  * @sine v1.0
  * @see
  */
-@ImportAutoConfiguration({ OkhttpSpringBootFeignAutoConfiguration.class, Http2SpringBootFeignAutoConfiguration.class })
-public class SpringBootFeignAutoConfiguration {
- 
+@ImportAutoConfiguration({ OkhttpFeignSpringBootAutoConfiguration.class, Http2FeignSpringBootAutoConfiguration.class })
+public class FeignSpringBootAutoConfiguration {
+
     @Bean(BEAN_SPRINGMVC_CONTRACT)
     public SpringMvcContract springMvcContract() {
         return new SpringMvcContract();
     }
 
+    @Bean(BEAN_DEFAULT_FEIGN_TARGET_FACTORY)
+    public FeignTargetFactory defaultFeignTargetFactory() {
+        return new FeignTargetFactory() {
+        };
+    }
+
     public static final String BEAN_SPRINGMVC_CONTRACT = "infraSpringBootFeign.defaultConsumerMvcContract";
+    public static final String BEAN_DEFAULT_FEIGN_TARGET_FACTORY = "infraSpringBootFeign.defaultFeignTargetFactory";
     public static final String BEAN_DEFAULT_FEIGN_CLIENT = "infraSpringBootFeign.defaultFeignClient";
 
 }

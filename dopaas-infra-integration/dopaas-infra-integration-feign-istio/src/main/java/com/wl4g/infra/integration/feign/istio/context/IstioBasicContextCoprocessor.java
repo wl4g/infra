@@ -19,11 +19,7 @@
  */
 package com.wl4g.infra.integration.feign.istio.context;
 
-import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static org.apache.commons.lang3.StringUtils.startsWithIgnoreCase;
-
-import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
@@ -34,43 +30,27 @@ import com.wl4g.infra.integration.feign.core.context.internal.FeignContextCoproc
 import feign.RequestTemplate;
 
 /**
- * {@link TracingContextCoprocessor}
+ * {@link IstioBasicContextCoprocessor}
  * 
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version v1.0 2021-04-27
  * @sine v1.0
- * @see
+ * @see https://github.com/wl4g-k8s/spring-cloud-kubernetes-with-istio#discovery-client-and-istio
  */
-public class TracingContextCoprocessor implements FeignContextCoprocessor {
+public class IstioBasicContextCoprocessor implements FeignContextCoprocessor {
 
+    @SuppressWarnings("unused")
     private FeignConsumerProperties config;
 
-    public TracingContextCoprocessor(FeignConsumerProperties config) {
+    public IstioBasicContextCoprocessor(FeignConsumerProperties config) {
         this.config = notNullOf(config, "config");
     }
 
-    // Notice:https://blog.csdn.net/caoyi1207/article/details/92775211
+    // see:https://github.com/wl4g-k8s/spring-cloud-kubernetes-with-istio#discovery-client-and-istio
+    // see:https://blog.csdn.net/caoyi1207/article/details/92775211
     @Override
     public void prepareConsumerExecution(@NotNull RequestTemplate template, HttpServletRequest request) {
-        // More(eg:Jaeger+Istio) tracing parameter through to the next service.
-        Enumeration<String> e = request.getHeaderNames();
-        if (e != null) {
-            while (e.hasMoreElements()) {
-                String name = e.nextElement();
-                if (isTracingHeaders(name)) {
-                    template.header(name, request.getHeader(name));
-                }
-            }
-        }
-    }
-
-    private boolean isTracingHeaders(String name) {
-        for (String prefix : safeList(config.getTracing().getPrefixHttpHeaders())) {
-            if (startsWithIgnoreCase(name, prefix)) {
-                return true;
-            }
-        }
-        return false;
+        template.header("Host", request.getServerName());
     }
 
 }

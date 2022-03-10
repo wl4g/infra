@@ -17,31 +17,27 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.infra.integration.feign.core.context.internal;
+package com.wl4g.infra.integration.feign.istio.config;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 
-/***
- * Feign context auto configuration.</br>
- * (consumer/client|provider/server)
- *
- * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
- * @version v1.0 2020-12-07
- * @sine v1.0
- * @see
+import com.wl4g.infra.integration.feign.core.annotation.FeignTargetFactory;
+import com.wl4g.infra.integration.feign.istio.constant.IstioFeignConstant;
+
+/**
+ * Auto configuration for Istio.
  */
-@Configuration
-public class FeignContextAutoConfiguration {
+@Configuration(proxyBeanMethods = false)
+@ConditionalOnProperty(value = IstioFeignConstant.KEY_ISTIO_PREFIX + ".enabled", matchIfMissing = true)
+public class IstioAutoConfiguration {
 
     @Bean
-    public ConsumerFeignContextFilter consumerFeignContextFilter() {
-        return new ConsumerFeignContextFilter();
-    }
-
-    @Bean
-    public ProviderFeignContextFilter providerFeignContextFilter() {
-        return new ProviderFeignContextFilter();
+    @Order(-100)
+    public FeignTargetFactory istioFeignTargetFactory() {
+        return new IstioFeignTargetFactory();
     }
 
 }

@@ -14,7 +14,7 @@
 # #### Spring boot configuration. ####
 #
 spring:
-  application.name: feign-example-web
+  application.name: istio-feign-example-web
   profiles:
     active: dev
 

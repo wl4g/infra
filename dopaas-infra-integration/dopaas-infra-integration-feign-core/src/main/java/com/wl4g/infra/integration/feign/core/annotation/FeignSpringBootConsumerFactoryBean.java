@@ -17,14 +17,13 @@ package com.wl4g.infra.integration.feign.core.annotation;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToList;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
-import static com.wl4g.infra.common.lang.Assert2.hasText;
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.lang.ClassUtils2.resolveClassNameNullable;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.findMethodNullable;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.invokeMethod;
-import static com.wl4g.infra.integration.feign.core.config.SpringBootFeignAutoConfiguration.BEAN_DEFAULT_FEIGN_CLIENT;
-import static com.wl4g.infra.integration.feign.core.constant.FeignConsumerConstant.KEY_BASE_PREFIX;
+import static com.wl4g.infra.integration.feign.core.config.FeignSpringBootAutoConfiguration.BEAN_DEFAULT_FEIGN_CLIENT;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.lang.System.lineSeparator;
@@ -34,8 +33,6 @@ import static java.util.Objects.nonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -53,11 +50,9 @@ import javax.annotation.Nullable;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
-import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -65,8 +60,8 @@ import com.google.common.io.CharStreams;
 import com.wl4g.infra.common.annotation.Reserved;
 import com.wl4g.infra.common.log.SmartLogger;
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.infra.integration.feign.core.config.SpringBootFeignAutoConfiguration;
 import com.wl4g.infra.integration.feign.core.config.FeignConsumerProperties;
+import com.wl4g.infra.integration.feign.core.config.FeignSpringBootAutoConfiguration;
 import com.wl4g.infra.integration.feign.core.context.internal.ConsumerFeignContextFilter.FeignContextDecoder;
 import com.wl4g.infra.integration.feign.core.context.internal.FeignContextBuilder;
 
@@ -79,11 +74,11 @@ import feign.Logger.Level;
 import feign.MethodMetadata;
 import feign.Request;
 import feign.Request.Options;
-import feign.Target.HardCodedTarget;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import feign.Response;
 import feign.Retryer;
+import feign.Target;
 import feign.Util;
 import feign.codec.DecodeException;
 import feign.codec.Decoder;
@@ -94,7 +89,7 @@ import feign.jackson.JacksonEncoder;
 import feign.slf4j.Slf4jLogger;
 
 /**
- * {@link FeignConsumerFactoryBean}
+ * {@link FeignSpringBootConsumerFactoryBean}
  * 
  * @param <T>
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
@@ -102,7 +97,7 @@ import feign.slf4j.Slf4jLogger;
  * @sine v1.0
  * @see
  */
-class FeignConsumerFactoryBean<T> implements FactoryBean<T>, ApplicationContextAware {
+class FeignSpringBootConsumerFactoryBean<T> implements FactoryBean<T>, ApplicationContextAware {
 
     /**
      * To be consistent with the {@link feign.slf4j.Slf4jLogger} log prefix.
@@ -114,6 +109,7 @@ class FeignConsumerFactoryBean<T> implements FactoryBean<T>, ApplicationContextA
     private Contract defaultContract;
     private Client client;
     private List<RequestInterceptor> requestInterceptors;
+    private FeignTargetFactory feignTargetFactory;
 
     @Nullable
     private Class<T> targetClass;
@@ -213,6 +209,7 @@ class FeignConsumerFactoryBean<T> implements FactoryBean<T>, ApplicationContextA
         this.defaultContract = obtainDefaultSpringMvcContract();
         this.client = obtainFeignHttpClientInstance();
         this.requestInterceptors = obtainFeignRequestInterceptors();
+        this.feignTargetFactory = obtainFeignTargetFactory();
 
         // Builder feign
         Feign.Builder builder = new FeignContextBuilder().client(client);
@@ -236,7 +233,19 @@ class FeignConsumerFactoryBean<T> implements FactoryBean<T>, ApplicationContextA
         // Sets configuration with merge.
         mergeConfigurationSet(builder);
 
-        return builder.target(new GenericHardCodedTarget<T>(targetClass, buildRequestUrl()));
+        return builder.target(feignTargetFactory.create(config, targetClass, name, url, path));
+    }
+
+    private FeignTargetFactory obtainFeignTargetFactory() {
+        List<FeignTargetFactory> candidates = safeMap(applicationContext.getBeansOfType(FeignTargetFactory.class)).values()
+                .stream()
+                .collect(toList());
+        AnnotationAwareOrderComparator.sort(candidates);
+        // Check target must have only one valid.
+        if (candidates.isEmpty()) {
+            throw new Error(format("Error, shouldn't be here, No found %s feign target factory.", Target.class.getSimpleName()));
+        }
+        return candidates.get(0);
     }
 
     private List<RequestInterceptor> obtainFeignRequestInterceptors() {
@@ -254,7 +263,7 @@ class FeignConsumerFactoryBean<T> implements FactoryBean<T>, ApplicationContextA
 
     private Contract obtainDefaultSpringMvcContract() {
         return (defaultContract = (Contract) applicationContext
-                .getBean(SpringBootFeignAutoConfiguration.BEAN_SPRINGMVC_CONTRACT));
+                .getBean(FeignSpringBootAutoConfiguration.BEAN_SPRINGMVC_CONTRACT));
     }
 
     private FeignConsumerProperties obtainFeignConfigProperties() {
@@ -325,26 +334,6 @@ class FeignConsumerFactoryBean<T> implements FactoryBean<T>, ApplicationContextA
         long readTimeout0 = (nonNull(readTimeout) && readTimeout > 0) ? readTimeout : config.getReadTimeout();
         builder.options(new Options(connectTimeout0, MILLISECONDS, readTimeout0, MILLISECONDS,
                 (nonNull(followRedirects) ? followRedirects : config.isFollowRedirects())));
-    }
-
-    private String buildRequestUrl() {
-        String url = trimToEmpty(isBlank(this.url) ? config.getDefaultUrl() : this.url);
-        hasText(url, "Feign base url is required, please check configuration: %s.defaultUrl or use @%s#url() or @%s#url()",
-                KEY_BASE_PREFIX, FeignConsumer.class.getSimpleName(), FeignClient.class.getSimpleName());
-        return url.concat(cleanPath());
-    }
-
-    private String cleanPath() {
-        String path = trimToEmpty(this.path);
-        if (StringUtils.hasLength(path)) {
-            if (!path.startsWith("/")) {
-                path = "/".concat(path);
-            }
-            if (path.endsWith("/")) {
-                path = path.substring(0, path.length() - 1);
-            }
-        }
-        return path;
     }
 
     class DecorateFeignEncoder implements Encoder {
@@ -568,16 +557,6 @@ class FeignConsumerFactoryBean<T> implements FactoryBean<T>, ApplicationContextA
          */
         public FeignRpcException(String message, Throwable cause, boolean dumpStackTrace) {
             super(message, cause, false, dumpStackTrace);
-        }
-    }
-
-    public static class GenericHardCodedTarget<T> extends HardCodedTarget<T> {
-        public GenericHardCodedTarget(Class<T> type, String url) {
-            super(type, url);
-        }
-
-        public GenericHardCodedTarget(Class<T> type, String name, String url) {
-            super(type, name, url);
         }
     }
 

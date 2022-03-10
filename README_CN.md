@@ -2,10 +2,10 @@
 
 > 企业级微服务基础架构框架，已整合以下框架，支持在以下框架之间无缝切换:
 
-- [**`feign-springboot`**](./dopaas-infra-integration/dopaas-infra-integration-feign-core)
-- [**`feign-springcloud`**](./dopaas-infra-integration/dopaas-infra-integration-feign-springcloud)
-- [**`feign-springboot-istio`**](./dopaas-infra-integration/dopaas-infra-integration-feign-istio)
-- [**`feign-springboot-dubbo`**](./dopaas-infra-integration/dopaas-infra-integration-feign-dubbo)
+- [**`feign+springboot`**](./dopaas-infra-integration/dopaas-infra-integration-feign-core)
+- [**`feign+springcloud`**](./dopaas-infra-integration/dopaas-infra-integration-feign-springcloud)
+- [**`feign+springboot+istio`**](./dopaas-infra-integration/dopaas-infra-integration-feign-istio)
+- [**`feign+springboot+dubbo`**](./dopaas-infra-integration/dopaas-infra-integration-feign-dubbo)
 
 ## 目录说明
 

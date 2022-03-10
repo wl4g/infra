@@ -44,7 +44,7 @@ import feign.Retryer;
 @Documented
 // 排除@FeignConsumer的接口,如:facade层启动需注入的是data层feign实例这个场景(不需要创建facade层接口的feign实例).
 @EnableSmartRequestMapping(packagePatternsUseForInclude = false)
-@Import({ AutoConfigurationRegistrar.class, SpringBootFeignConsumersRegistrar.class, SpringCloudFeignClientsRegistrar.class })
+@Import({ AutoConfigurationRegistrar.class, FeignSpringBootConsumersRegistrar.class, FeignSpringCloudClientsRegistrar.class })
 public @interface EnableFeignConsumers {
 
     @AliasFor(annotation = EnableSmartRequestMapping.class, attribute = PACKAGE_PATTERNS)
@@ -74,7 +74,7 @@ public @interface EnableFeignConsumers {
      * </br>
      * 
      * The if empty, default refer to
-     * {@link FeignConsumerFactoryBean#mergeFeignConfigurationSet()}
+     * {@link FeignSpringBootConsumerFactoryBean#mergeFeignConfigurationSet()}
      * 
      * @see {@link org.springframework.cloud.openfeign.FeignClientsConfiguration}
      *      for the defaults

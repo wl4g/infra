@@ -38,7 +38,7 @@ import feign.Retryer;
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version v1.0 2020-12-23
  * @sine v1.0
- * @see {@link com.wl4g.infra.integration.feign.core.annotation.SpringBootFeignConsumersRegistrar#configurerFeignClientPropertyValues}
+ * @see {@link com.wl4g.infra.integration.feign.core.annotation.FeignSpringBootConsumersRegistrar#configurerFeignClientPropertyValues}
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -50,19 +50,8 @@ import feign.Retryer;
 public @interface FeignConsumer {
 
     // ---------------------------------------------------------------------
-    // It works in both spring boot feign and spring cloud feign frameworks.
+    // It works in both Feign+SpringBoot and Feign+SpringCloud frameworks.
     // ---------------------------------------------------------------------
-
-    /**
-     * The name of the service with optional protocol prefix. Synonym for
-     * {@link #name() name}. A name must be specified for all clients, whether
-     * or not a url is provided. Can be specified as property key, eg:
-     * ${propertyKey}.
-     * 
-     * @return the name of the service with optional protocol prefix
-     */
-    @AliasFor(annotation = FeignClient.class, attribute = "value")
-    String value() default "";
 
     /**
      * The service id with optional protocol prefix. Synonym for {@link #value()
@@ -72,7 +61,7 @@ public @interface FeignConsumer {
     String name() default "";
 
     /**
-     * An absolute base URL or resolvable hostname (the protocol is optional).
+     * An absolute base URL or resolvable host-name (the protocol is optional).
      */
     @AliasFor(annotation = FeignClient.class, attribute = "url")
     String url() default "";
@@ -114,7 +103,7 @@ public @interface FeignConsumer {
     boolean primary() default true;
 
     // ---------------------------------------------------------
-    // --- It can only work in spring boot feign frameworks. ---
+    // --- It can only work in Feign+SpringBoot frameworks. ---
     // ---------------------------------------------------------
 
     /**
@@ -158,8 +147,19 @@ public @interface FeignConsumer {
     String followRedirects() default FeignConsumerProperties.DEFAULT_FOLLOWREDIRECTS + "";
 
     // ----------------------------------------------------------
-    // --- It can only work in spring cloud feign frameworks. ---
+    // --- It can only work in Feign+SpringCloud frameworks. ---
     // ----------------------------------------------------------
+
+    /**
+     * The name of the service with optional protocol prefix. Synonym for
+     * {@link #name() name}. A name must be specified for all clients, whether
+     * or not a url is provided. Can be specified as property key, eg:
+     * ${propertyKey}.
+     * 
+     * @return the name of the service with optional protocol prefix
+     */
+    @AliasFor(annotation = FeignClient.class, attribute = "value")
+    String value() default "";
 
     /**
      * The service id with optional protocol prefix. Synonym for {@link #value()

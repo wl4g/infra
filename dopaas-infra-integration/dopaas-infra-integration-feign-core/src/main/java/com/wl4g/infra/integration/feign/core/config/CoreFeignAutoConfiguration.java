@@ -20,6 +20,8 @@ import static com.wl4g.infra.integration.feign.core.constant.FeignConsumerConsta
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 
 /**
  * {@link CoreFeignAutoConfiguration}
@@ -29,10 +31,12 @@ import org.springframework.context.annotation.Bean;
  * @sine v1.0
  * @see
  */
-@ImportAutoConfiguration({ OkhttpSpringBootFeignAutoConfiguration.class, Http2SpringBootFeignAutoConfiguration.class })
+@Configuration
+@ImportAutoConfiguration({ OkhttpFeignSpringBootAutoConfiguration.class, Http2FeignSpringBootAutoConfiguration.class })
 public class CoreFeignAutoConfiguration {
 
     @Bean
+    @Order(0)
     @ConfigurationProperties(prefix = KEY_BASE_PREFIX)
     public FeignConsumerProperties feignConsumerProperties() {
         return new FeignConsumerProperties();

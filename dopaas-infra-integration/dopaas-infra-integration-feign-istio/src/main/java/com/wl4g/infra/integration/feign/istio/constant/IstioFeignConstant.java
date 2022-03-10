@@ -27,8 +27,10 @@ import com.wl4g.infra.integration.feign.core.constant.FeignConsumerConstant;
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version v1.0 2021-01-14
  * @sine v1.0
- * @see
+ * @see https://github.com/wl4g-k8s/spring-cloud-kubernetes-with-istio
  */
 public abstract class IstioFeignConstant extends FeignConsumerConstant {
+
+    public static final String KEY_ISTIO_PREFIX = KEY_BASE_PREFIX + ".istio";
 
 }

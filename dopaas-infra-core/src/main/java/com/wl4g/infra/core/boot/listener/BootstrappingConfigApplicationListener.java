@@ -315,7 +315,8 @@ public class BootstrappingConfigApplicationListener implements GenericApplicatio
         // Load launcher classes.
         List<Class<?>> classes = emptyList();
         try (GroovyClassLoader gcl = new GroovyClassLoader()) {
-            ClassPathResourcePatternResolver resolver = new ClassPathResourcePatternResolver();
+            ClassPathResourcePatternResolver resolver = new ClassPathResourcePatternResolver(
+                    Thread.currentThread().getContextClassLoader());
             Set<StreamResource> ress = resolver.getResources(BOOTSTRAPPING_RESOURCE_NAME);
             classes = ress.stream().map(r -> {
                 try {

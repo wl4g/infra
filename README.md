@@ -2,10 +2,10 @@
 
 > An enterprise-grade microservice infrastructure framework, The following frameworks have been integrated, support seamless in switching between :
 
-- [**`feign-springboot`**](./dopaas-infra-integration/dopaas-infra-integration-feign-core)
-- [**`feign-springcloud`**](./dopaas-infra-integration/dopaas-infra-integration-feign-springcloud)
-- [**`feign-springboot-istio`**](./dopaas-infra-integration/dopaas-infra-integration-feign-istio)
-- [**`feign-springboot-dubbo`**](./dopaas-infra-integration/dopaas-infra-integration-feign-dubbo)
+- [**`feign+springboot`**](./dopaas-infra-integration/dopaas-infra-integration-feign-core)
+- [**`feign+springcloud`**](./dopaas-infra-integration/dopaas-infra-integration-feign-springcloud)
+- [**`feign+springboot+istio`**](./dopaas-infra-integration/dopaas-infra-integration-feign-istio)
+- [**`feign+springboot+dubbo`**](./dopaas-infra-integration/dopaas-infra-integration-feign-dubbo)
 
 ## Directories structure
 

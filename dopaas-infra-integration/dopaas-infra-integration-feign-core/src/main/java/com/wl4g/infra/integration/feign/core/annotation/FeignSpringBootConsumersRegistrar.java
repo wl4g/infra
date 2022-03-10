@@ -70,15 +70,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.wl4g.infra.common.log.SmartLogger;
 
 /**
- * {@link SpringBootFeignConsumersRegistrar}
+ * {@link FeignSpringBootConsumersRegistrar}
  * 
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version v1.0 2020-12-23
  * @sine v1.0
  * @see
  */
-class SpringBootFeignConsumersRegistrar implements ImportBeanDefinitionRegistrar, ResourceLoaderAware, EnvironmentAware {
-    private static final SmartLogger log = getLogger(SpringBootFeignConsumersRegistrar.class);
+class FeignSpringBootConsumersRegistrar implements ImportBeanDefinitionRegistrar, ResourceLoaderAware, EnvironmentAware {
+    private static final SmartLogger log = getLogger(FeignSpringBootConsumersRegistrar.class);
 
     @SuppressWarnings("unused")
     private ResourceLoader resourceLoader;
@@ -98,14 +98,15 @@ class SpringBootFeignConsumersRegistrar implements ImportBeanDefinitionRegistrar
     public void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
         // Check enabled configuration
         if (!AutoConfigurationRegistrar.isEnableConfiguration(environment)) {
-            log.warn("No enabled Spring Boot/Cloud Feign configuration!");
+            log.warn("No enabled Feign+SpringBoot / Feign+SpringBoot+Istio / Feign+SpringCloud / Feign+SpringBoot+Dubbo"
+                    + " auto configurer !");
             return;
         }
 
         // Check is SpringBoot-Feign environment?
-        if (!(AutoConfigurationRegistrar.isSpringBootFeignEnvironment()
-                || AutoConfigurationRegistrar.isSpringBootIstioFeignEnvironment())) {
-            log.info("The current not SpringBoot-Feign environment and automatically skiped configuring.");
+        if (!(FrameworkType.FEIGN_SPRINGBOOT.isActive() || FrameworkType.FEIGN_SPRINGBOOT_ISTIO.isActive())) {
+            log.info("The current not Feign+SpringBoot and Feign+SpringBoot+Istio environment"
+                    + " and automatically skiped configuring.");
             return;
         }
 
@@ -172,11 +173,12 @@ class SpringBootFeignConsumersRegistrar implements ImportBeanDefinitionRegistrar
         }
 
         String beanClassName = definition.getBeanClassName();
-        ((GenericBeanDefinition) definition).setBeanClass(FeignConsumerFactoryBean.class);
+        ((GenericBeanDefinition) definition).setBeanClass(FeignSpringBootConsumerFactoryBean.class);
         MutablePropertyValues propertyValues = definition.getPropertyValues();
         propertyValues.add("targetClass", beanClassName);
 
         // It works in both spring boot feign and spring cloud feign frameworks.
+        propertyValues.add("name", environment.resolveRequiredPlaceholders(feignClient.getString("name")));// serviceId
         propertyValues.add("url", environment.resolveRequiredPlaceholders(feignClient.getString("url")));// baseUrl
         propertyValues.add("path", getRequestPath(definition, feignClient));
         propertyValues.add("decode404", feignClient.getBoolean("decode404"));

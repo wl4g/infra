@@ -24,8 +24,9 @@ import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -43,17 +44,23 @@ import com.wl4g.infra.integration.feign.core.context.RpcContextHolder;
  * @sine v1.0
  * @see
  */
+@Configuration
 public class IstioFeignContextAutoConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean // Lower priority
+    @Primary
     public RpcContextHolder istioSpringBootFeignRpcContextHolder() {
         return new IstioSpringBootFeignRpcContextHolder();
     }
 
     @Bean
-    public TracingContextCoprocessor tracingContextCoprocessor(FeignConsumerProperties config) {
-        return new TracingContextCoprocessor(config);
+    public IstioBasicContextCoprocessor istioBasicContextCoprocessor(FeignConsumerProperties config) {
+        return new IstioBasicContextCoprocessor(config);
+    }
+
+    @Bean
+    public IstioTracingContextCoprocessor istioTracingContextCoprocessor(FeignConsumerProperties config) {
+        return new IstioTracingContextCoprocessor(config);
     }
 
     @Bean

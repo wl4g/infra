@@ -34,7 +34,7 @@ package com.wl4g.infra.integration.feign.core.config;
 //
 //@ConditionalOnExpression("'http2'.equalsIgnoreCase('${" + KEY_CLIENT_PRIVODER + ":http2}')")
 // @ConditionalOnClass(HttpClient.class)
-public class Http2SpringBootFeignAutoConfiguration {
+public class Http2FeignSpringBootAutoConfiguration {
 
     // @Bean(BEAN_DEFAULT_FEIGN_CLIENT)
     // @ConditionalOnJava(JavaVersion.ELEVEN)
