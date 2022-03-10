@@ -66,7 +66,10 @@ class AutoConfigurationRegistrar implements ImportBeanDefinitionRegistrar, Envir
     }
 
     /**
-     * Spring cloud auto configuration should not be affected.
+     * Automatic adaptation register configuration classes bean. </br>
+     * </br>
+     * </br>
+     * The following SpringCloud auto configuration should not be affected.
      * 
      * {@link org.springframework.cloud.openfeign.ribbon.DefaultFeignLoadBalancedConfiguration}
      * {@link org.springframework.cloud.openfeign.ribbon.HttpClientFeignLoadBalancedConfiguration}
@@ -82,8 +85,8 @@ class AutoConfigurationRegistrar implements ImportBeanDefinitionRegistrar, Envir
 
         // Register core(requires) configuration.
         //
-        registerBeanDefinition(registry, CoreFeignAutoConfiguration.class);
-        registerBeanDefinition(registry, FeignContextAutoConfiguration.class);
+        registerBeanDefinition0(registry, CoreFeignAutoConfiguration.class);
+        registerBeanDefinition0(registry, FeignContextAutoConfiguration.class);
 
         // Register plug-in's configuration.
         //
@@ -92,25 +95,30 @@ class AutoConfigurationRegistrar implements ImportBeanDefinitionRegistrar, Envir
 
         // Register SpringCloud-Feign environment configuration.
         if (isSpringCloudFeignEnvironment()) {
-            // Ignore, some codes ...
+            // Nothing to-do, some codes ...
         }
         // Register Apache-Dubbo-Feign environment configuration.
         else if (isApacheDubboFeignEnvironment()) {
-            // Ignore, some codes ...
+            // Nothing to-do, some codes ...
         }
         // Register (Default)SpringBoot-Feign or SpringBoot-Istio-Feign
         // environment configuration.
         else {
             if (isSpringBootFeignEnvironment() || isSpringBootIstioFeignEnvironment()) {
-                registerBeanDefinition(registry, SpringBootFeignAutoConfiguration.class);
+                registerBeanDefinition0(registry, SpringBootFeignAutoConfiguration.class);
             }
             if (isSpringBootFeignEnvironment()) {
-                registerBeanDefinition(registry, DefaultFeignContextAutoConfiguration.class);
+                registerBeanDefinition0(registry, DefaultFeignContextAutoConfiguration.class);
             }
         }
 
     }
 
+    /**
+     * Register the feign context coprocessing plug-in's.
+     * 
+     * @param registry
+     */
     private void registerPlugins(BeanDefinitionRegistry registry) {
         List<String> plugins = DEFAULT_PLUGINS;
 
@@ -123,17 +131,17 @@ class AutoConfigurationRegistrar implements ImportBeanDefinitionRegistrar, Envir
             }
         }
 
-        // Register plug-in's configuration.
-        for (String pluginClass : plugins) {
+        // Register plug-in's bean.
+        for (String cls : plugins) {
             try {
-                registerBeanDefinition(registry, ClassUtils.forName(pluginClass, Thread.currentThread().getContextClassLoader()));
+                registerBeanDefinition0(registry, ClassUtils.forName(cls, Thread.currentThread().getContextClassLoader()));
             } catch (ClassNotFoundException | LinkageError e) {
-                throw new IllegalStateException(e);
+                throw new IllegalStateException(format("Failed to register coprocessing for '%s'", cls), e);
             }
         }
     }
 
-    private void registerBeanDefinition(BeanDefinitionRegistry registry, Class<?> configurationClass) {
+    private void registerBeanDefinition0(BeanDefinitionRegistry registry, Class<?> configurationClass) {
         AbstractBeanDefinition definition = BeanDefinitionBuilder.genericBeanDefinition(configurationClass).getBeanDefinition();
         registry.registerBeanDefinition(AnnotationBeanNameGenerator.INSTANCE.generateBeanName(definition, registry), definition);
     }

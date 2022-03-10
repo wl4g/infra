@@ -39,7 +39,7 @@ import com.wl4g.infra.integration.feign.springcloud.example.bean.OrderInfo;
  * @sine v1.0
  * @see
  */
-@FeignConsumer("${provider.serviceId.feign-example-service}")
+@FeignConsumer("${spring.application.name}")
 @RequestMapping("/order-service")
 public interface OrderService {
 

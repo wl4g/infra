@@ -1,6 +1,13 @@
-# 一个基于Spring Boot/Cloud企业级通用组件。
+# Infra
 
-### 目录说明
+> 企业级微服务基础架构框架，已整合以下框架，支持在以下框架之间无缝切换:
+
+- [**`feign-springboot`**](./dopaas-infra-integration/dopaas-infra-integration-feign-core)
+- [**`feign-springcloud`**](./dopaas-infra-integration/dopaas-infra-integration-feign-springcloud)
+- [**`feign-springboot-istio`**](./dopaas-infra-integration/dopaas-infra-integration-feign-istio)
+- [**`feign-springboot-dubbo`**](./dopaas-infra-integration/dopaas-infra-integration-feign-dubbo)
+
+## 目录说明
 
 ```
 ├── dopaas-infra-bom # dopass-infra公共依赖
@@ -23,3 +30,6 @@
 └── dopaas-infra-support # 常用springboot应用组件封装, 如redisOperator(支持单机集群并存)、支持超时的分布式命令行器等
 ```
 
+## Stargazers over time
+
+[![Stargazers over time](https://starchart.cc/wl4g/dopaas-infra.svg)](https://starchart.cc/wl4g/dopaas-infra)
