@@ -15,25 +15,19 @@
  */
 package com.wl4g.infra.common.web.rest;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.annotations.Beta;
-
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import com.wl4g.infra.common.annotation.Stable;
-import com.wl4g.infra.common.collection.CollectionUtils2;
-import com.wl4g.infra.common.remoting.standard.HttpStatus;
-
 import static com.wl4g.infra.common.lang.Assert2.hasText;
 import static com.wl4g.infra.common.lang.Assert2.state;
-import static com.wl4g.infra.common.remoting.standard.HttpStatus.*;
 import static com.wl4g.infra.common.lang.Exceptions.getRootCausesString;
+import static com.wl4g.infra.common.remoting.standard.HttpStatus.BAD_REQUEST;
+import static com.wl4g.infra.common.remoting.standard.HttpStatus.EXPECTATION_FAILED;
+import static com.wl4g.infra.common.remoting.standard.HttpStatus.FORBIDDEN;
+import static com.wl4g.infra.common.remoting.standard.HttpStatus.LOCKED;
+import static com.wl4g.infra.common.remoting.standard.HttpStatus.NOT_FOUND;
+import static com.wl4g.infra.common.remoting.standard.HttpStatus.NOT_IMPLEMENTED;
+import static com.wl4g.infra.common.remoting.standard.HttpStatus.PRECONDITION_FAILED;
+import static com.wl4g.infra.common.remoting.standard.HttpStatus.SERVICE_UNAVAILABLE;
+import static com.wl4g.infra.common.remoting.standard.HttpStatus.UNAUTHORIZED;
+import static com.wl4g.infra.common.remoting.standard.HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS;
 import static com.wl4g.infra.common.serialize.JacksonUtils.convertBean;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static com.wl4g.infra.common.web.rest.RespBase.RetCode.newCode;
@@ -46,7 +40,24 @@ import static java.util.Collections.unmodifiableMap;
 import static java.util.Locale.US;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.annotations.Beta;
+import com.wl4g.infra.common.annotation.Stable;
+import com.wl4g.infra.common.collection.CollectionUtils2;
+import com.wl4g.infra.common.lang.FastTimeClock;
+import com.wl4g.infra.common.remoting.standard.HttpStatus;
 
 /**
  * Generic restful response base model wrapper.
@@ -63,6 +74,7 @@ public class RespBase<D> implements Serializable {
     private RetCode code = RetCode.OK;
     private String status = DEFAULT_STATUS; // [Extensible]
     private String requestId = DEFAULT_REQUESTID; // [Extensible]
+    private Long timestamp = FastTimeClock.currentTimeMillis();
     private String message = EMPTY;
     @SuppressWarnings("unchecked")
     private D data = (D) DEFAULT_DATA;
@@ -206,6 +218,36 @@ public class RespBase<D> implements Serializable {
     @JsonIgnore
     public RespBase<D> withRequestId(String requestId) {
         setRequestId(requestId);
+        return this;
+    }
+
+    /**
+     * Gets current timestamp.
+     * 
+     * @return
+     */
+    public Long getTimestamp() {
+        return timestamp;
+    }
+
+    /**
+     * Sets current requestId.
+     * 
+     * @param requestId
+     */
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    /**
+     * Sets current requestId.
+     * 
+     * @param requestId
+     * @return
+     */
+    @JsonIgnore
+    public RespBase<D> withTimestamp(Long timestamp) {
+        setTimestamp(timestamp);
         return this;
     }
 

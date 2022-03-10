@@ -16,6 +16,7 @@
 package com.wl4g.infra.common.lang;
 
 import static java.lang.String.format;
+import static java.lang.System.out;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -65,14 +66,48 @@ public class FastTimeClockTests {
                         assert (fastCurrentTimeMillis - currentTimeMillis) < 2 : "Wrong fast current time millis";
                     }
                 } catch (Exception e) {
-                    latch.countDown();
                     e.printStackTrace();
+                } finally {
+                    latch.countDown();
                 }
             });
         }
 
         latch.await(2L, TimeUnit.MINUTES);
         System.out.println("successful pass tested and finished!");
+    }
+
+    @Test
+    public void testNativeCurrentTimeMillis() {
+        int count = 1_000_000_000; // 100亿次
+        long begin = System.nanoTime();
+        for (int i = 0; i < count; i++) {
+            System.currentTimeMillis();
+        }
+        long cost = (long) (Math.abs(System.nanoTime() - begin) / 1e6);
+        out.println(format("Testing currentTimeMillis() (%s) completed. cost: %sms", count, cost));
+    }
+
+    @Test
+    public void testNativeNanotime() {
+        int count = 1_000_000_000; // 100亿次
+        long begin = System.nanoTime();
+        for (int i = 0; i < count; i++) {
+            System.nanoTime();
+        }
+        long cost = (long) (Math.abs(System.nanoTime() - begin) / 1e6);
+        out.println(format("Testing nanoTime() (%s) completed. cost: %sms", count, cost));
+    }
+
+    @Test
+    public void testFastTime() {
+        int count = 1_000_000_000; // 100亿次
+        long begin = System.nanoTime();
+        for (int i = 0; i < count; i++) {
+            FastTimeClock.currentTimeMillis();
+        }
+        long cost = (long) (Math.abs(System.nanoTime() - begin) / 1e6);
+        out.println(format("Testing fastTime() (%s) completed. cost: %sms", count, cost));
     }
 
 }

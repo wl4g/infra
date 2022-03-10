@@ -39,7 +39,7 @@ import com.wl4g.infra.integration.feign.istio.example.bean.OrderInfo;
  * @sine v1.0
  * @see
  */
-@FeignConsumer("${provider.serviceId.feign-example-service}")
+@FeignConsumer("${provider.serviceId}")
 @RequestMapping("/order-service")
 public interface OrderService {
 
