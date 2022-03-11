@@ -18,7 +18,7 @@ package com.wl4g.infra.integration.feign.core.config;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
-import com.wl4g.infra.integration.feign.core.annotation.FeignTargetFactory;
+import com.wl4g.infra.integration.feign.core.annotation.FeignSpringBootTargetFactory;
 import com.wl4g.infra.integration.feign.core.annotation.mvc.SpringMvcContract;
 
 /**
@@ -38,13 +38,13 @@ public class FeignSpringBootAutoConfiguration {
     }
 
     @Bean(BEAN_DEFAULT_FEIGN_TARGET_FACTORY)
-    public FeignTargetFactory defaultFeignTargetFactory() {
-        return new FeignTargetFactory() {
+    public FeignSpringBootTargetFactory feignSpringBootTargetFactory() {
+        return new FeignSpringBootTargetFactory() {
         };
     }
 
-    public static final String BEAN_SPRINGMVC_CONTRACT = "infraSpringBootFeign.defaultConsumerMvcContract";
-    public static final String BEAN_DEFAULT_FEIGN_TARGET_FACTORY = "infraSpringBootFeign.defaultFeignTargetFactory";
-    public static final String BEAN_DEFAULT_FEIGN_CLIENT = "infraSpringBootFeign.defaultFeignClient";
+    public static final String BEAN_SPRINGMVC_CONTRACT = "infraFeignSpringBoot.springMvcContract";
+    public static final String BEAN_DEFAULT_FEIGN_TARGET_FACTORY = "infraFeignSpringBoot.feignSpringBootTargetFactory";
+    public static final String BEAN_DEFAULT_FEIGN_CLIENT = "infraFeignSpringBoot.feignClient";
 
 }

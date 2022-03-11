@@ -38,12 +38,12 @@ import okhttp3.OkHttpClient;
 public class OkhttpFeignSpringBootAutoConfiguration {
 
     @Bean(BEAN_OKHTTP3_POOL)
-    public ConnectionPool okHttp3ConnectionPool(FeignConsumerProperties config) {
+    public ConnectionPool okHttp3ConnectionPool(FeignSpringBootProperties config) {
         return new ConnectionPool(config.getMaxIdleConnections(), config.getKeepAliveDuration(), MINUTES);
     }
 
     @Bean(BEAN_DEFAULT_FEIGN_CLIENT)
-    public Client feignOkHttp3Client(FeignConsumerProperties config, @Qualifier(BEAN_OKHTTP3_POOL) ConnectionPool pool) {
+    public Client feignOkHttp3Client(FeignSpringBootProperties config, @Qualifier(BEAN_OKHTTP3_POOL) ConnectionPool pool) {
         OkHttpClient delegate = new OkHttpClient().newBuilder()
                 .connectionPool(pool)
                 .connectTimeout(config.getConnectTimeout(), MILLISECONDS)
@@ -53,6 +53,6 @@ public class OkhttpFeignSpringBootAutoConfiguration {
         return new feign.okhttp.OkHttpClient(delegate);
     }
 
-    private static final String BEAN_OKHTTP3_POOL = "infraSpringBootFeign.okhttp3Pool";
+    private static final String BEAN_OKHTTP3_POOL = "infraFeignSpringboot.okhttp3Pool";
 
 }

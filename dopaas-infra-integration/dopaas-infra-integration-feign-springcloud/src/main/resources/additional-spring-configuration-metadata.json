@@ -2,13 +2,13 @@
 	"groups": [],
 	"properties": [
 		{
-			"name": "spring.xcloud.component.rpc.feign.loadbalancer.random.enabled",
+			"name": "spring.infra.integration.feign.loadbalancer.random.enabled",
 			"type": "java.lang.Boolean",
 			"description": "If true, the random load balancer for feign remote calls is enabled",
 			"defaultValue": false
 		},
 		{
-			"name": "spring.xcloud.component.rpc.feign.loadbalancer.gray.enabled",
+			"name": "spring.infra.integration.feign.loadbalancer.gray.enabled",
 			"type": "java.lang.Boolean",
 			"description": "If true, the gray load balancer for feign remote calls is enabled. (If both the random load balancer and the random load balancer are enabled, only the random load balancer is enabled first)",
 			"defaultValue": false

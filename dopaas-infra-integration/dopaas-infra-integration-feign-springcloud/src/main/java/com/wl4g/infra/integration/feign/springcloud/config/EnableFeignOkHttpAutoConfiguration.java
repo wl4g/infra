@@ -115,9 +115,9 @@ public class EnableFeignOkHttpAutoConfiguration {
         return new RetryableFeignBlockingLoadBalancerClient(feignOkHttpClient, loadBalancerClient, lbRetryFactories.get(0));
     }
 
-    private static final String BEAN_OKHTTP3_POOL = "infraSpringCloudFeign.okhttp3Pool";
-    private static final String BEAN_OKHTTP3_CLIENT = "infraSpringCloudFeign.okhttp3Client";
-    private static final String BEAN_FEIGN_OKHTTP3_CLIENT = "infraSpringCloudFeign.okhttp3FeignClient";
-    private static final String BEAN_FEIGN_LB_CLIENT = "infraSpringCloudFeign.loadBalancerClient";
+    private static final String BEAN_OKHTTP3_POOL = "infraFeignSpringCloud.okhttp3Pool";
+    private static final String BEAN_OKHTTP3_CLIENT = "infraFeignSpringCloud.okhttp3Client";
+    private static final String BEAN_FEIGN_OKHTTP3_CLIENT = "infraFeignSpringCloud.okhttp3FeignClient";
+    private static final String BEAN_FEIGN_LB_CLIENT = "infraFeignSpringCloud.loadBalancerClient";
 
 }

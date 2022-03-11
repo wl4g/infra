@@ -20,7 +20,6 @@
 package com.wl4g.infra.integration.feign.core.context.internal;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /***
  * Feign context auto configuration.</br>
@@ -31,7 +30,6 @@ import org.springframework.context.annotation.Configuration;
  * @sine v1.0
  * @see
  */
-@Configuration
 public class FeignContextAutoConfiguration {
 
     @Bean

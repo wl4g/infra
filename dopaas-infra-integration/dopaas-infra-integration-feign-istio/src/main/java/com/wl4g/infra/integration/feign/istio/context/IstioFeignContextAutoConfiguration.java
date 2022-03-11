@@ -31,9 +31,9 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.wl4g.infra.integration.feign.core.config.FeignConsumerProperties;
 import com.wl4g.infra.integration.feign.core.context.DefaultFeignContextAutoConfiguration.DefaultFeignRpcContextHolder;
 import com.wl4g.infra.integration.feign.core.context.RpcContextHolder;
+import com.wl4g.infra.integration.feign.istio.config.FeignSpringBootIstioProperties;
 
 /**
  * Istio SpringBoot feign {@link RpcContextHolder} auto configuration. (Both the
@@ -54,12 +54,12 @@ public class IstioFeignContextAutoConfiguration {
     }
 
     @Bean
-    public IstioBasicContextCoprocessor istioBasicContextCoprocessor(FeignConsumerProperties config) {
+    public IstioBasicContextCoprocessor istioBasicContextCoprocessor(FeignSpringBootIstioProperties config) {
         return new IstioBasicContextCoprocessor(config);
     }
 
     @Bean
-    public IstioTracingContextCoprocessor istioTracingContextCoprocessor(FeignConsumerProperties config) {
+    public IstioTracingContextCoprocessor istioTracingContextCoprocessor(FeignSpringBootIstioProperties config) {
         return new IstioTracingContextCoprocessor(config);
     }
 

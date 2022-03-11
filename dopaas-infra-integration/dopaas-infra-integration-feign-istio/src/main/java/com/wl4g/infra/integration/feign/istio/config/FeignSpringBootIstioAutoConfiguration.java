@@ -20,11 +20,12 @@
 package com.wl4g.infra.integration.feign.istio.config;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 
-import com.wl4g.infra.integration.feign.core.annotation.FeignTargetFactory;
+import com.wl4g.infra.integration.feign.core.annotation.FeignSpringBootTargetFactory;
 import com.wl4g.infra.integration.feign.istio.constant.IstioFeignConstant;
 
 /**
@@ -32,12 +33,18 @@ import com.wl4g.infra.integration.feign.istio.constant.IstioFeignConstant;
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnProperty(value = IstioFeignConstant.KEY_ISTIO_PREFIX + ".enabled", matchIfMissing = true)
-public class IstioAutoConfiguration {
+public class FeignSpringBootIstioAutoConfiguration {
+
+    @Bean
+    @ConfigurationProperties(value = IstioFeignConstant.KEY_ISTIO_PREFIX)
+    public FeignSpringBootIstioProperties feignSpringBootIstioProperties() {
+        return new FeignSpringBootIstioProperties();
+    }
 
     @Bean
     @Order(-100)
-    public FeignTargetFactory istioFeignTargetFactory() {
-        return new IstioFeignTargetFactory();
+    public FeignSpringBootTargetFactory feignSpringBootIstioTargetFactory(FeignSpringBootIstioProperties config) {
+        return new FeignSpringBootIstioTargetFactory(config);
     }
 
 }

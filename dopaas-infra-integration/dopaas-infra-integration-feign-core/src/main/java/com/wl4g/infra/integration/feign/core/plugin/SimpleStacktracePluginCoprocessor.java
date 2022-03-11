@@ -26,7 +26,7 @@ import static com.wl4g.infra.common.web.WebUtils2.isStacktraceRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 
-import com.wl4g.infra.integration.feign.core.config.FeignConsumerProperties;
+import com.wl4g.infra.integration.feign.core.config.FeignSpringBootProperties;
 import com.wl4g.infra.integration.feign.core.context.RpcContextHolder;
 import com.wl4g.infra.integration.feign.core.context.internal.FeignContextCoprocessor;
 
@@ -43,9 +43,9 @@ import feign.RequestTemplate;
 public class SimpleStacktracePluginCoprocessor implements FeignContextCoprocessor {
 
     @SuppressWarnings("unused")
-    private FeignConsumerProperties config;
+    private FeignSpringBootProperties config;
 
-    public SimpleStacktracePluginCoprocessor(FeignConsumerProperties config) {
+    public SimpleStacktracePluginCoprocessor(FeignSpringBootProperties config) {
         this.config = notNullOf(config, "config");
     }
 

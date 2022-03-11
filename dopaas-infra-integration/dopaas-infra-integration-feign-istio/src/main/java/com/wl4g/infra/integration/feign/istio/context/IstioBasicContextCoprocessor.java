@@ -24,8 +24,8 @@ import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 
-import com.wl4g.infra.integration.feign.core.config.FeignConsumerProperties;
 import com.wl4g.infra.integration.feign.core.context.internal.FeignContextCoprocessor;
+import com.wl4g.infra.integration.feign.istio.config.FeignSpringBootIstioProperties;
 
 import feign.RequestTemplate;
 
@@ -40,9 +40,9 @@ import feign.RequestTemplate;
 public class IstioBasicContextCoprocessor implements FeignContextCoprocessor {
 
     @SuppressWarnings("unused")
-    private FeignConsumerProperties config;
+    private FeignSpringBootIstioProperties config;
 
-    public IstioBasicContextCoprocessor(FeignConsumerProperties config) {
+    public IstioBasicContextCoprocessor(FeignSpringBootIstioProperties config) {
         this.config = notNullOf(config, "config");
     }
 

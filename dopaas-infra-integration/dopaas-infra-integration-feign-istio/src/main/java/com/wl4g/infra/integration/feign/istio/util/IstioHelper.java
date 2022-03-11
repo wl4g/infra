@@ -32,6 +32,10 @@
 //
 ///**
 // * Utility class to work with meshes.
+// * 
+// * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+// * @version 2022-03-11 v1.0.0
+// * @see https://github.com/wl4g-k8s/spring-cloud-kubernetes-with-istio#istio-initial-startup-networking
 // */
 //public class IstioHelper {
 //    private static final Logger log = LoggerFactory.getLogger(IstioHelper.class);
@@ -48,6 +52,7 @@
 //        return probeIstioSidecar();
 //    }
 //
+//    // https://github.com/wl4g-k8s/spring-cloud-kubernetes-with-istio#istio-initial-startup-networking
 //    private synchronized boolean probeIstioSidecar() {
 //        try {
 //            // Check if Istio Envoy proxy is installed. Notice that the check is

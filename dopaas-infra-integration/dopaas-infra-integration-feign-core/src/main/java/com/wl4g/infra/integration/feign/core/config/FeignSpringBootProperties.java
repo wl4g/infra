@@ -15,11 +15,6 @@
  */
 package com.wl4g.infra.integration.feign.core.config;
 
-import static java.util.Collections.unmodifiableList;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import com.wl4g.infra.integration.feign.core.annotation.FeignConsumer;
 
 import feign.Logger;
@@ -28,7 +23,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * {@link FeignConsumerProperties}
+ * {@link FeignSpringBootProperties}
  * 
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version v1.0 2020-12-23
@@ -38,7 +33,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class FeignConsumerProperties {
+public class FeignSpringBootProperties {
     public static final long DEFAULT_CONNECT_TIMEOUT = 3 * 1000L;
     public static final long DEFAULT_READ_TIMEOUT = 6 * 1000L;
     public static final long DEFAULT_WRITE_TIMEOUT = 6 * 1000L;
@@ -58,6 +53,7 @@ public class FeignConsumerProperties {
      */
     private Logger.Level defaultLogLevel = Logger.Level.NONE;
 
+    /** Max Idle time of connections */
     private int maxIdleConnections = 200;
 
     /** The keep alive default is 5 minutes. */
@@ -74,28 +70,5 @@ public class FeignConsumerProperties {
 
     /** follow Redirects. */
     private boolean followRedirects;
-
-    /** Feign tracing configuration. */
-    private FeignTracingProperties tracing = new FeignTracingProperties();
-
-    @Getter
-    @Setter
-    @ToString
-    public static class FeignTracingProperties {
-        public static final List<String> DEFAULT_PREFIX_TRACING_HEADERS = unmodifiableList(new ArrayList<String>() {
-            private static final long serialVersionUID = 8480190950467098205L;
-            {
-                add("X-Forwarded-");
-                add("X-Request-");
-                // see: Jaeger+Istio(envoy)
-                // see:https://www.servicemesher.com/envoy/configuration/http_filters/router_filter.html
-                // see:https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/router_filter
-                add("X-B3-");
-                add("X-Envoy-");
-            }
-        });
-
-        private List<String> prefixHttpHeaders = DEFAULT_PREFIX_TRACING_HEADERS;
-    }
 
 }

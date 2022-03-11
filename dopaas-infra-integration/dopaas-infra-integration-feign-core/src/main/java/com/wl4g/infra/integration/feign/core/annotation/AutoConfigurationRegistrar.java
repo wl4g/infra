@@ -37,9 +37,11 @@ import org.springframework.util.ClassUtils;
 
 import com.google.common.base.Splitter;
 import com.wl4g.infra.common.log.SmartLogger;
+import com.wl4g.infra.integration.feign.core.config.CoreFeignAutoConfiguration;
 import com.wl4g.infra.integration.feign.core.config.FeignSpringBootAutoConfiguration;
 import com.wl4g.infra.integration.feign.core.constant.FeignConsumerConstant;
 import com.wl4g.infra.integration.feign.core.context.DefaultFeignContextAutoConfiguration;
+import com.wl4g.infra.integration.feign.core.context.internal.FeignContextAutoConfiguration;
 //import com.wl4g.infra.integration.feign.core.config.CoreFeignAutoConfiguration;
 //import com.wl4g.infra.integration.feign.core.context.internal.FeignContextAutoConfiguration;
 import com.wl4g.infra.integration.feign.core.plugin.InsertBeanBindingPluginCoprocessor;
@@ -83,15 +85,9 @@ class AutoConfigurationRegistrar implements ImportBeanDefinitionRegistrar, Envir
             return;
         }
 
-        // Register core(requires) configuration.
+        // Register core requires configuration.
         //
-        // registerBeanDefinition0(registry,CoreFeignAutoConfiguration.class);
-        // registerBeanDefinition0(registry,FeignContextAutoConfiguration.class);
-
-        // Register plug-in's configuration.
-        //
-        // registerBeanDefinition(registry,FeignPluginsAutoConfiguration.class);
-        registerPlugins(registry);
+        registerBeanDefinition0(registry, CoreFeignAutoConfiguration.class);
 
         // Register SpringCloud-Feign environment configuration.
         if (FrameworkType.FEIGN_SPRINGCLOUD.isActive()) {
@@ -112,6 +108,14 @@ class AutoConfigurationRegistrar implements ImportBeanDefinitionRegistrar, Envir
             }
         }
 
+        // Register build-in feign-context configuration.
+        //
+        registerBeanDefinition0(registry, FeignContextAutoConfiguration.class);
+
+        // Register plug-in's configuration.
+        //
+        // registerBeanDefinition(registry,FeignPluginsAutoConfiguration.class);
+        registerPlugins(registry);
     }
 
     /**

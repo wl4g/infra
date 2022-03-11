@@ -25,21 +25,21 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.util.StringUtils;
 
-import com.wl4g.infra.integration.feign.core.config.FeignConsumerProperties;
+import com.wl4g.infra.integration.feign.core.config.FeignSpringBootProperties;
 
 import feign.Request;
 import feign.RequestTemplate;
 
 /**
- * {@link FeignTargetFactory}
+ * {@link FeignSpringBootTargetFactory}
  * 
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version 2022-03-10 v1.0.0
  * @since v1.0.0
  */
-public interface FeignTargetFactory {
+public interface FeignSpringBootTargetFactory {
 
-    default <T> feign.Target<T> create(FeignConsumerProperties config, Class<T> type, String name, String url, String path) {
+    default <T> feign.Target<T> create(FeignSpringBootProperties config, Class<T> type, String name, String url, String path) {
         return new DefaultFeignUrlTarget<T>(config, type, name, url, path);
     }
 
@@ -48,13 +48,13 @@ public interface FeignTargetFactory {
      */
     public static class DefaultFeignUrlTarget<T> implements feign.Target<T> {
 
-        private final FeignConsumerProperties config;
+        private final FeignSpringBootProperties config;
         private final Class<T> type;
         private final String name;
         private final String url;
         private final String path;
 
-        public DefaultFeignUrlTarget(@NotNull FeignConsumerProperties config, @NotNull Class<T> type, @Nullable String name,
+        public DefaultFeignUrlTarget(@NotNull FeignSpringBootProperties config, @NotNull Class<T> type, @Nullable String name,
                 @Nullable String url, @Nullable String path) {
             this.config = notNullOf(config, "config");
             this.type = notNullOf(type, "type");

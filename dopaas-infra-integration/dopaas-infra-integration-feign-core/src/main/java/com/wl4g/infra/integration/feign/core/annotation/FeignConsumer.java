@@ -27,7 +27,7 @@ import org.springframework.core.annotation.AliasFor;
 import org.springframework.stereotype.Indexed;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wl4g.infra.integration.feign.core.config.FeignConsumerProperties;
+import com.wl4g.infra.integration.feign.core.config.FeignSpringBootProperties;
 
 import feign.Logger;
 import feign.Retryer;
@@ -119,7 +119,7 @@ public @interface FeignConsumer {
      * 
      * @return
      */
-    String connectTimeout() default FeignConsumerProperties.DEFAULT_CONNECT_TIMEOUT + "";
+    String connectTimeout() default FeignSpringBootProperties.DEFAULT_CONNECT_TIMEOUT + "";
 
     /**
      * The request read timeout(ms)</br>
@@ -127,7 +127,7 @@ public @interface FeignConsumer {
      * 
      * @return
      */
-    String readTimeout() default FeignConsumerProperties.DEFAULT_READ_TIMEOUT + "";
+    String readTimeout() default FeignSpringBootProperties.DEFAULT_READ_TIMEOUT + "";
 
     /**
      * The request write timeout(ms)</br>
@@ -136,7 +136,7 @@ public @interface FeignConsumer {
      * @return
      */
     @Deprecated
-    String writeTimeout() default FeignConsumerProperties.DEFAULT_WRITE_TIMEOUT + "";
+    String writeTimeout() default FeignSpringBootProperties.DEFAULT_WRITE_TIMEOUT + "";
 
     /**
      * The request support 3xx redirection.</br>
@@ -144,7 +144,7 @@ public @interface FeignConsumer {
      * 
      * @return
      */
-    String followRedirects() default FeignConsumerProperties.DEFAULT_FOLLOWREDIRECTS + "";
+    String followRedirects() default FeignSpringBootProperties.DEFAULT_FOLLOWREDIRECTS + "";
 
     // ----------------------------------------------------------
     // --- It can only work in Feign+SpringCloud frameworks. ---

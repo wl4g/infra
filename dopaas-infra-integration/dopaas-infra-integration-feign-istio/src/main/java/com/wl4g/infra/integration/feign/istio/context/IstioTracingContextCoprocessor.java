@@ -28,8 +28,8 @@ import java.util.Enumeration;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 
-import com.wl4g.infra.integration.feign.core.config.FeignConsumerProperties;
 import com.wl4g.infra.integration.feign.core.context.internal.FeignContextCoprocessor;
+import com.wl4g.infra.integration.feign.istio.config.FeignSpringBootIstioProperties;
 
 import feign.RequestTemplate;
 
@@ -44,9 +44,9 @@ import feign.RequestTemplate;
  */
 public class IstioTracingContextCoprocessor implements FeignContextCoprocessor {
 
-    private FeignConsumerProperties config;
+    private FeignSpringBootIstioProperties config;
 
-    public IstioTracingContextCoprocessor(FeignConsumerProperties config) {
+    public IstioTracingContextCoprocessor(FeignSpringBootIstioProperties config) {
         this.config = notNullOf(config, "config");
     }
 

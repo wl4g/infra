@@ -60,7 +60,7 @@ import com.google.common.io.CharStreams;
 import com.wl4g.infra.common.annotation.Reserved;
 import com.wl4g.infra.common.log.SmartLogger;
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.infra.integration.feign.core.config.FeignConsumerProperties;
+import com.wl4g.infra.integration.feign.core.config.FeignSpringBootProperties;
 import com.wl4g.infra.integration.feign.core.config.FeignSpringBootAutoConfiguration;
 import com.wl4g.infra.integration.feign.core.context.internal.ConsumerFeignContextFilter.FeignContextDecoder;
 import com.wl4g.infra.integration.feign.core.context.internal.FeignContextBuilder;
@@ -105,11 +105,11 @@ class FeignSpringBootConsumerFactoryBean<T> implements FactoryBean<T>, Applicati
     private final SmartLogger log = getLogger(feign.Logger.class);
 
     private ApplicationContext applicationContext;
-    private FeignConsumerProperties config;
+    private FeignSpringBootProperties config;
     private Contract defaultContract;
     private Client client;
     private List<RequestInterceptor> requestInterceptors;
-    private FeignTargetFactory feignTargetFactory;
+    private FeignSpringBootTargetFactory feignTargetFactory;
 
     @Nullable
     private Class<T> targetClass;
@@ -236,8 +236,8 @@ class FeignSpringBootConsumerFactoryBean<T> implements FactoryBean<T>, Applicati
         return builder.target(feignTargetFactory.create(config, targetClass, name, url, path));
     }
 
-    private FeignTargetFactory obtainFeignTargetFactory() {
-        List<FeignTargetFactory> candidates = safeMap(applicationContext.getBeansOfType(FeignTargetFactory.class)).values()
+    private FeignSpringBootTargetFactory obtainFeignTargetFactory() {
+        List<FeignSpringBootTargetFactory> candidates = safeMap(applicationContext.getBeansOfType(FeignSpringBootTargetFactory.class)).values()
                 .stream()
                 .collect(toList());
         AnnotationAwareOrderComparator.sort(candidates);
@@ -266,11 +266,11 @@ class FeignSpringBootConsumerFactoryBean<T> implements FactoryBean<T>, Applicati
                 .getBean(FeignSpringBootAutoConfiguration.BEAN_SPRINGMVC_CONTRACT));
     }
 
-    private FeignConsumerProperties obtainFeignConfigProperties() {
+    private FeignSpringBootProperties obtainFeignConfigProperties() {
         if (nonNull(config)) {
             return config;
         }
-        return (config = applicationContext.getBean(FeignConsumerProperties.class));
+        return (config = applicationContext.getBean(FeignSpringBootProperties.class));
     }
 
     private Client obtainFeignHttpClientInstance() {
