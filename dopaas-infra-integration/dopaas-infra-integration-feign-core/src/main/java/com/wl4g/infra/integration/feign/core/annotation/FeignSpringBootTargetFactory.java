@@ -40,13 +40,13 @@ import feign.RequestTemplate;
 public interface FeignSpringBootTargetFactory {
 
     default <T> feign.Target<T> create(FeignSpringBootProperties config, Class<T> type, String name, String url, String path) {
-        return new DefaultFeignUrlTarget<T>(config, type, name, url, path);
+        return new FeignSpringBootUrlTarget<T>(config, type, name, url, path);
     }
 
     /**
      * Cached discoverable URL feign target.
      */
-    public static class DefaultFeignUrlTarget<T> implements feign.Target<T> {
+    public static class FeignSpringBootUrlTarget<T> implements feign.Target<T> {
 
         private final FeignSpringBootProperties config;
         private final Class<T> type;
@@ -54,7 +54,7 @@ public interface FeignSpringBootTargetFactory {
         private final String url;
         private final String path;
 
-        public DefaultFeignUrlTarget(@NotNull FeignSpringBootProperties config, @NotNull Class<T> type, @Nullable String name,
+        public FeignSpringBootUrlTarget(@NotNull FeignSpringBootProperties config, @NotNull Class<T> type, @Nullable String name,
                 @Nullable String url, @Nullable String path) {
             this.config = notNullOf(config, "config");
             this.type = notNullOf(type, "type");
@@ -90,8 +90,8 @@ public interface FeignSpringBootTargetFactory {
         @SuppressWarnings("unchecked")
         @Override
         public boolean equals(Object obj) {
-            if (obj instanceof DefaultFeignUrlTarget) {
-                DefaultFeignUrlTarget<T> other = (DefaultFeignUrlTarget<T>) obj;
+            if (obj instanceof FeignSpringBootUrlTarget) {
+                FeignSpringBootUrlTarget<T> other = (FeignSpringBootUrlTarget<T>) obj;
                 return type.equals(other.type) && name.equals(other.name) && url.equals(other.url);
             }
             return false;

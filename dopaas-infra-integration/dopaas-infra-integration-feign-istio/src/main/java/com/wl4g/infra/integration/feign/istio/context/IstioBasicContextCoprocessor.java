@@ -19,6 +19,7 @@
  */
 package com.wl4g.infra.integration.feign.istio.context;
 
+import static com.wl4g.infra.common.lang.Assert2.isInstanceOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +27,7 @@ import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.integration.feign.core.context.internal.FeignContextCoprocessor;
 import com.wl4g.infra.integration.feign.istio.config.FeignSpringBootIstioProperties;
+import com.wl4g.infra.integration.feign.istio.config.FeignSpringBootIstioTargetFactory.IstioFeignUrlTarget;
 
 import feign.RequestTemplate;
 
@@ -50,7 +52,15 @@ public class IstioBasicContextCoprocessor implements FeignContextCoprocessor {
     // see:https://blog.csdn.net/caoyi1207/article/details/92775211
     @Override
     public void prepareConsumerExecution(@NotNull RequestTemplate template, HttpServletRequest request) {
-        template.header("Host", request.getServerName());
+        // Must be of this type
+        // see:FeignSpringBootIstioTargetFactory
+        IstioFeignUrlTarget<?> feignTarget = isInstanceOf(IstioFeignUrlTarget.class, template.feignTarget());
+
+        // Notice: This must not be the headers['Host'] of the current
+        // request, otherwise it will cause the istio-sidecar to redirect to
+        // itself again, an infinite loop.
+        String feignRequestHost = feignTarget.getStdKubernetesSvcDomain();
+        template.header("Host", feignRequestHost);
     }
 
 }

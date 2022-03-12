@@ -16,7 +16,11 @@
 package com.wl4g.infra.integration.feign.istio.config;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.infra.integration.feign.istio.config.FeignSpringBootIstioProperties.DEFAULT_SVC_NAMESPACE;
+import static com.wl4g.infra.integration.feign.istio.config.FeignSpringBootIstioProperties.DEFAULT_SVC_SCHEMA;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
+import java.net.URI;
 import java.util.Iterator;
 
 import javax.validation.constraints.NotNull;
@@ -44,36 +48,64 @@ public class FeignSpringBootIstioTargetFactory implements FeignSpringBootTargetF
 
     @Override
     public <T> Target<T> create(FeignSpringBootProperties config, Class<T> type, String name, String url, String path) {
-        return new IstioFeignUrlTarget<T>(config, type, name, url, path);
+        return new IstioFeignUrlTarget<T>(istioConfig, config, type, name, url, path);
     }
 
-    class IstioFeignUrlTarget<T> extends DefaultFeignUrlTarget<T> {
+    public static class IstioFeignUrlTarget<T> extends FeignSpringBootUrlTarget<T> {
+        private FeignSpringBootIstioProperties istioConfig;
+        private String actualStdKubernetesSvcDomain;
 
-        public IstioFeignUrlTarget(@NotNull FeignSpringBootProperties config, @NotNull Class<T> type, String name, String url,
-                String path) {
+        public IstioFeignUrlTarget(@NotNull FeignSpringBootIstioProperties istioConfig, @NotNull FeignSpringBootProperties config,
+                @NotNull Class<T> type, String name, String url, String path) {
             super(config, type, name, url, path);
+            this.istioConfig = istioConfig;
         }
 
         // see:https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#namespaces-of-services
         @Override
         protected String buildByName() {
+            // Because it will be intercepted and enhanced by sidecar, you can
+            // use http fixedly.
+            return DEFAULT_SVC_SCHEMA.concat(getStdKubernetesSvcDomain()).concat(cleanPath());
+        }
+
+        public String getStdKubernetesSvcDomain() {
+            if (isBlank(actualStdKubernetesSvcDomain)) {
+                synchronized (this) {
+                    if (isBlank(actualStdKubernetesSvcDomain)) {
+                        actualStdKubernetesSvcDomain = obtainStdKubernetesSvcDomain();
+                    }
+                }
+            }
+            return actualStdKubernetesSvcDomain;
+        }
+
+        private String obtainStdKubernetesSvcDomain() {
             String clusterDomain = istioConfig.getKubeConfig().getClusterDomain();
-            String parts = name();
-            String namespace = "default";
-            String serviceId = parts;
-            if (parts.contains(":")) {
-                Iterator<String> it = Splitter.on(":").omitEmptyStrings().trimResults().split(parts).iterator();
+            String urlStr = name();
+
+            // Define defaults
+            String namespace = DEFAULT_SVC_NAMESPACE;
+            String serviceId = urlStr;
+
+            // Remove to schema
+            URI resolved = URI.create(urlStr);
+            if (!isBlank(resolved.getScheme())) {
+                urlStr = urlStr.substring(0, resolved.getScheme().length());
+            }
+
+            // Splitting to namespace and serviceId.
+            if (urlStr.contains(":")) {
+                Iterator<String> it = Splitter.on(":").omitEmptyStrings().trimResults().split(urlStr).iterator();
                 if (it.hasNext()) {
                     namespace = it.next();
                 }
             }
-            return new StringBuffer(64).append("http://")
-                    .append(serviceId)
+            return new StringBuffer(64).append(serviceId)
                     .append(".")
                     .append(namespace)
                     .append(".svc.")
                     .append(clusterDomain)
-                    .append(cleanPath())
                     .toString();
         }
 

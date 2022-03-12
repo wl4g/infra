@@ -71,4 +71,7 @@ public class FeignSpringBootIstioProperties {
         private String clusterDomain = "cluster.local";
     }
 
+    public static final String DEFAULT_SVC_SCHEMA = "http://";
+    public static final String DEFAULT_SVC_NAMESPACE = "default";
+
 }
