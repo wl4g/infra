@@ -25,6 +25,7 @@ import static com.wl4g.infra.common.reflect.TypeUtils2.isSimpleType;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.startsWithAny;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -170,7 +171,13 @@ public abstract class BeanUtils2 {
         // Recursive traversal matching and processing
         Class<?> sourceClass = src.getClass();
         for (Field tf : hierarchyDestClass.getDeclaredFields()) {
-            if (Modifier.isFinal(tf.getModifiers())) { // Must be filtered
+            // Must be filtered over.
+            // [BUGFIX]: for example when recursively getting
+            // java.nio.charset.Charset, there will be an infinite loop stack
+            // overflow (jvm8 defaults to 1024)
+            if (Modifier.isFinal(tf.getModifiers())
+                    || startsWithAny(tf.getDeclaringClass().getName(), "java.nio", "java.util", "org.apache.commons.lang",
+                            "org.springframework.util", "org.springframework.web.util", "org.springframework.boot.util")) {
                 continue;
             }
 

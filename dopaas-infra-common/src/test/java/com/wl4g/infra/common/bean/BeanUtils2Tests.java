@@ -20,14 +20,12 @@ import static com.wl4g.infra.common.bean.BeanUtils2.deepCopyFieldState;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.makeAccessible;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 
+import org.junit.Test;
+
 public class BeanUtils2Tests {
 
-    public static void main(String[] args) throws Exception {
-        test1();
-        // test2();
-    }
-
-    public static void test1() throws Exception {
+    @Test
+    public void testDeepCopyFieldStateFieldProcess() throws Exception {
         TestRole r = new TestRole(2, "jack");
         r.setId(1);
         r.setName("tom");
@@ -44,7 +42,8 @@ public class BeanUtils2Tests {
         System.out.println(toJSONString(r));
     }
 
-    public static void test2() throws Exception {
+    @Test
+    public void testDeepCopyFieldStateFieldFilterAndProcess() throws Exception {
         B b1 = new B();
         b1.bb = "22";
         A a1 = new A();

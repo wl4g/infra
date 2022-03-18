@@ -15,18 +15,17 @@
  */
 package com.wl4g.infra.common.reflect;
 
-import java.util.Map;
+import static com.wl4g.infra.common.reflect.ReflectionUtils2.findField;
 
 import org.junit.Test;
 
-import com.wl4g.infra.common.reflect.TypeUtils2;
+import com.wl4g.infra.common.remoting.uri.UriComponentsBuilder;
 
-public class TypeUtils2Tests {
+public class ReflectionUtils2Tests {
 
     @Test
-    public void testInstantiate() {
-        System.out.println(TypeUtils2.instantiateSimpleType(1, int.class));
-        System.out.println(TypeUtils2.instantiateCollectionType(null, Map.class));
+    public void testFindFieldWithTreeObjectUriComponentsBuilder() {
+        System.out.println(findField(UriComponentsBuilder.class, "host"));
     }
 
 }
