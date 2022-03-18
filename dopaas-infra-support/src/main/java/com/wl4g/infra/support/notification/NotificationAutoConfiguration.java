@@ -15,7 +15,7 @@
  */
 package com.wl4g.infra.support.notification;
 
-import static com.wl4g.infra.support.constant.SupportConfigConstant.KEY_SUPPORT_NOTIFY_PREFIX;
+import static com.wl4g.infra.support.constant.SupportInfraConstant.CONF_PREFIX_INFRA_SUPPORT_NOTIFY;
 import static com.wl4g.infra.support.notification.NoOpMessageNotifier.DefaultNoOp;
 import static java.util.stream.Collectors.toList;
 
@@ -62,71 +62,71 @@ public class NotificationAutoConfiguration {
     // --- Notify properties. ---
 
     @Bean(name = "apnsNotifyProperties")
-    @ConditionalOnProperty(name = KEY_SUPPORT_NOTIFY_PREFIX + ".apns.enabled", matchIfMissing = false)
-    @ConfigurationProperties(prefix = KEY_SUPPORT_NOTIFY_PREFIX + ".apns")
+    @ConditionalOnProperty(name = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".apns.enabled", matchIfMissing = false)
+    @ConfigurationProperties(prefix = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".apns")
     public ApnsNotifyProperties apnsNotifyProperties() {
         return new ApnsNotifyProperties();
     }
 
     @Bean(name = "barkNotifyProperties")
-    @ConditionalOnProperty(name = KEY_SUPPORT_NOTIFY_PREFIX + ".bark.enabled", matchIfMissing = false)
-    @ConfigurationProperties(prefix = KEY_SUPPORT_NOTIFY_PREFIX + ".bark")
+    @ConditionalOnProperty(name = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".bark.enabled", matchIfMissing = false)
+    @ConfigurationProperties(prefix = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".bark")
     public BarkNotifyProperties barkNotifyProperties() {
         return new BarkNotifyProperties();
     }
 
     @Bean(name = "dingtalkNotifyProperties")
-    @ConditionalOnProperty(name = KEY_SUPPORT_NOTIFY_PREFIX + ".dingtalk.enabled", matchIfMissing = false)
-    @ConfigurationProperties(prefix = KEY_SUPPORT_NOTIFY_PREFIX + ".dingtalk")
+    @ConditionalOnProperty(name = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".dingtalk.enabled", matchIfMissing = false)
+    @ConfigurationProperties(prefix = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".dingtalk")
     public DingtalkNotifyProperties dingtalkNotifyProperties() {
         return new DingtalkNotifyProperties();
     }
 
     @Bean(name = "facebookNotifyProperties")
-    @ConditionalOnProperty(name = KEY_SUPPORT_NOTIFY_PREFIX + ".facebook.enabled", matchIfMissing = false)
-    @ConfigurationProperties(prefix = KEY_SUPPORT_NOTIFY_PREFIX + ".facebook")
+    @ConditionalOnProperty(name = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".facebook.enabled", matchIfMissing = false)
+    @ConfigurationProperties(prefix = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".facebook")
     public FacebookNotifyProperties facebookNotifyProperties() {
         return new FacebookNotifyProperties();
     }
 
     @Bean(name = "mailNotifyProperties")
-    @ConditionalOnProperty(name = KEY_SUPPORT_NOTIFY_PREFIX + ".mail.enabled", matchIfMissing = false)
-    @ConfigurationProperties(prefix = KEY_SUPPORT_NOTIFY_PREFIX + ".mail")
+    @ConditionalOnProperty(name = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".mail.enabled", matchIfMissing = false)
+    @ConfigurationProperties(prefix = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".mail")
     public MailNotifyProperties mailNotifyProperties() {
         return new MailNotifyProperties();
     }
 
     @Bean(name = "qqNotifyProperties")
-    @ConditionalOnProperty(name = KEY_SUPPORT_NOTIFY_PREFIX + ".qq.enabled", matchIfMissing = false)
-    @ConfigurationProperties(prefix = KEY_SUPPORT_NOTIFY_PREFIX + ".qq")
+    @ConditionalOnProperty(name = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".qq.enabled", matchIfMissing = false)
+    @ConfigurationProperties(prefix = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".qq")
     public QqNotifyProperties qqNotifyProperties() {
         return new QqNotifyProperties();
     }
 
     @Bean(name = "smsNotifyProperties")
-    @ConditionalOnProperty(name = KEY_SUPPORT_NOTIFY_PREFIX + ".sms.enabled", matchIfMissing = false)
-    @ConfigurationProperties(prefix = KEY_SUPPORT_NOTIFY_PREFIX + ".sms")
+    @ConditionalOnProperty(name = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".sms.enabled", matchIfMissing = false)
+    @ConfigurationProperties(prefix = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".sms")
     public SmsNotifyProperties smsNotifyProperties() {
         return new SmsNotifyProperties();
     }
 
     @Bean(name = "vmsNotifyProperties")
-    @ConditionalOnProperty(name = KEY_SUPPORT_NOTIFY_PREFIX + ".vms.enabled", matchIfMissing = false)
-    @ConfigurationProperties(prefix = KEY_SUPPORT_NOTIFY_PREFIX + ".vms")
+    @ConditionalOnProperty(name = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".vms.enabled", matchIfMissing = false)
+    @ConfigurationProperties(prefix = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".vms")
     public VmsNotifyProperties vmsNotifyProperties() {
         return new VmsNotifyProperties();
     }
 
     @Bean(name = "wechatNotifyProperties")
-    @ConditionalOnProperty(name = KEY_SUPPORT_NOTIFY_PREFIX + ".wechat.enabled", matchIfMissing = false)
-    @ConfigurationProperties(prefix = KEY_SUPPORT_NOTIFY_PREFIX + ".wechat")
+    @ConditionalOnProperty(name = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".wechat.enabled", matchIfMissing = false)
+    @ConfigurationProperties(prefix = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".wechat")
     public WechatNotifyProperties wechatNotifyProperties() {
         return new WechatNotifyProperties();
     }
 
     @Bean(name = "twitterNotifyProperties")
-    @ConditionalOnProperty(name = KEY_SUPPORT_NOTIFY_PREFIX + ".twitter.enabled", matchIfMissing = false)
-    @ConfigurationProperties(prefix = KEY_SUPPORT_NOTIFY_PREFIX + ".twitter")
+    @ConditionalOnProperty(name = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".twitter.enabled", matchIfMissing = false)
+    @ConfigurationProperties(prefix = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".twitter")
     public TwitterNotifyProperties twitterNotifyProperties() {
         return new TwitterNotifyProperties();
     }

@@ -15,7 +15,7 @@
  */
 package com.wl4g.infra.support.cli;
 
-import static com.wl4g.infra.support.constant.SupportConfigConstant.KEY_SUPPORT_CLI_PREFIX;
+import static com.wl4g.infra.support.constant.SupportInfraConstant.CONF_PREFIX_INFRA_SUPPORT_CLI;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -30,7 +30,7 @@ import com.wl4g.infra.support.cli.repository.ProcessRepository;
  * @version v1.0.0 2019-10-20
  * @since
  */
-@ConditionalOnProperty(name = KEY_SUPPORT_CLI_PREFIX + ".enabled", matchIfMissing = false)
+@ConditionalOnProperty(name = CONF_PREFIX_INFRA_SUPPORT_CLI + ".enabled", matchIfMissing = false)
 public class CommandLineAutoConfiguration {
 
     @Bean

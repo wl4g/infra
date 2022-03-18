@@ -17,7 +17,7 @@ package com.wl4g.infra.support.cache.jedis;
 
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
-import static com.wl4g.infra.support.constant.SupportConfigConstant.KEY_SUPPORT_JEDIS_PREFIX;
+import static com.wl4g.infra.support.constant.SupportInfraConstant.CONF_PREFIX_INFRA_SUPPORT_JEDIS;
 import static redis.clients.jedis.HostAndPort.parseString;
 
 import java.io.Serializable;
@@ -51,13 +51,13 @@ import redis.clients.jedis.exceptions.JedisException;
  * @version v1.0 2018年9月16日
  * @since
  */
-@ConditionalOnProperty(name = KEY_SUPPORT_JEDIS_PREFIX + ".enabled", matchIfMissing = true)
+@ConditionalOnProperty(name = CONF_PREFIX_INFRA_SUPPORT_JEDIS + ".enabled", matchIfMissing = true)
 public class JedisClientAutoConfiguration {
     protected final SmartLogger log = getLogger(getClass());
 
     // Optional
     @Bean
-    @ConfigurationProperties(prefix = KEY_SUPPORT_JEDIS_PREFIX)
+    @ConfigurationProperties(prefix = CONF_PREFIX_INFRA_SUPPORT_JEDIS)
     @ConditionalOnClass({ JedisCluster.class, JedisPool.class }) // or-relationship
     @ConditionalOnMissingBean({ JedisCluster.class, JedisPool.class }) // or-relationship
     public JedisProperties jedisProperties() {

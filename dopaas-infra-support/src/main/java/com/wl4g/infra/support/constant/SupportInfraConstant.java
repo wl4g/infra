@@ -19,24 +19,24 @@
  */
 package com.wl4g.infra.support.constant;
 
-import com.wl4g.infra.core.constant.BaseConstants;
+import com.wl4g.infra.core.constant.CoreInfraConstants;
 
 /**
- * {@link SupportConfigConstant}
+ * {@link SupportInfraConstant}
  * 
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version v1.0 2021-01-20
  * @sine v1.0
  * @see
  */
-public abstract class SupportConfigConstant extends BaseConstants {
+public abstract class SupportInfraConstant extends CoreInfraConstants {
 
-    public static final String KEY_PREFIX_MODULE_SUPPORT = "spring.infra.support.";
+    public static final String CONF_PREFIX_INFRA_SUPPORT = CONF_PREFIX_INFRA + ".support";
 
-    public static final String KEY_SUPPORT_CLI_PREFIX = KEY_PREFIX_MODULE_SUPPORT + "cli";
+    public static final String CONF_PREFIX_INFRA_SUPPORT_CLI = CONF_PREFIX_INFRA_SUPPORT + ".cli";
 
-    public static final String KEY_SUPPORT_NOTIFY_PREFIX = KEY_PREFIX_MODULE_SUPPORT + "notification";
+    public static final String CONF_PREFIX_INFRA_SUPPORT_NOTIFY = CONF_PREFIX_INFRA_SUPPORT + ".notification";
 
-    public static final String KEY_SUPPORT_JEDIS_PREFIX = KEY_PREFIX_MODULE_SUPPORT + "jedis";
+    public static final String CONF_PREFIX_INFRA_SUPPORT_JEDIS = CONF_PREFIX_INFRA_SUPPORT + ".jedis";
 
 }
