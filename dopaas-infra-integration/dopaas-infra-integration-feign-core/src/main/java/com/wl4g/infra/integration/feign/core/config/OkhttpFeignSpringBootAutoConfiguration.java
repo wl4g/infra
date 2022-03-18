@@ -20,7 +20,7 @@
 package com.wl4g.infra.integration.feign.core.config;
 
 import static com.wl4g.infra.integration.feign.core.config.FeignSpringBootAutoConfiguration.BEAN_DEFAULT_FEIGN_CLIENT;
-import static com.wl4g.infra.integration.feign.core.constant.FeignConsumerConstant.CONFIG_PREFIX_FEIGN_CLIENT_PRIVODER;
+import static com.wl4g.infra.integration.feign.core.constant.FeignConsumerConstant.CONF_PREFIX_INFRA_FEIGN_CLIENT_PRIVODER;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.MINUTES;
 
@@ -33,7 +33,7 @@ import feign.Client;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 
-@ConditionalOnExpression("'okhttp3'.equalsIgnoreCase('${" + CONFIG_PREFIX_FEIGN_CLIENT_PRIVODER + ":okhttp3}')")
+@ConditionalOnExpression("'okhttp3'.equalsIgnoreCase('${" + CONF_PREFIX_INFRA_FEIGN_CLIENT_PRIVODER + ":okhttp3}')")
 @ConditionalOnClass(OkHttpClient.class)
 public class OkhttpFeignSpringBootAutoConfiguration {
 

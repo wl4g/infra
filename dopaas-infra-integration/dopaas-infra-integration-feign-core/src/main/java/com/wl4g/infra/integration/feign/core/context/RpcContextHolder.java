@@ -27,7 +27,7 @@ import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static com.wl4g.infra.common.reflect.TypeUtils2.isSimpleType;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
-import static com.wl4g.infra.integration.feign.core.constant.FeignConsumerConstant.RPC_ATTACTMENT_MAX_BYTES;
+import static com.wl4g.infra.integration.feign.core.constant.FeignConsumerConstant.CONF_INFRA_FEIGN_RPC_ATTACTMENT_MAX_BYTES;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -120,10 +120,10 @@ public abstract class RpcContextHolder {
                 valStr = toJSONString(value);
             }
             // Check safe max bytes limit
-            if (valStr.getBytes(UTF_8).length > RPC_ATTACTMENT_MAX_BYTES) {
+            if (valStr.getBytes(UTF_8).length > CONF_INFRA_FEIGN_RPC_ATTACTMENT_MAX_BYTES) {
                 throw new IllegalArgumentException(format(
                         "Too large (%sbytes) attachment object, It is recommended to use parameters in the form of %s. - key: %s, value: %s",
-                        RPC_ATTACTMENT_MAX_BYTES, ReferenceKey.class.getSimpleName(), key, value));
+                        CONF_INFRA_FEIGN_RPC_ATTACTMENT_MAX_BYTES, ReferenceKey.class.getSimpleName(), key, value));
             }
             // Encode attachemnts value(http header safe)
             setAttachment(key, getCompressCodec().encode(valStr));
