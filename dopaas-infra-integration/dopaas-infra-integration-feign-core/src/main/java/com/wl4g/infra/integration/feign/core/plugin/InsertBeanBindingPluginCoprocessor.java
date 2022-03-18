@@ -43,22 +43,22 @@ import feign.Response;
  */
 public class InsertBeanBindingPluginCoprocessor implements FeignContextCoprocessor {
 
-	@Override
-	public void beforeConsumerExecution(@NotNull Object proxy, @NotNull Method method, @Nullable Object[] args) {
-		if (!isEmptyArray(args)) {
-			for (Object arg : args) {
-				if (nonNull(arg) && BaseBean.class.isAssignableFrom(arg.getClass())) {
-					BaseBean.Util.bind((BaseBean) arg);
-					break;
-				}
-			}
-		}
-	}
+    @Override
+    public void beforeConsumerExecution(@NotNull Object proxy, @NotNull Method method, @Nullable Object[] args) {
+        if (!isEmptyArray(args)) {
+            for (Object arg : args) {
+                if (nonNull(arg) && BaseBean.class.isAssignableFrom(arg.getClass())) {
+                    BaseBean.Util.bind((BaseBean) arg);
+                    break;
+                }
+            }
+        }
+    }
 
-	@Override
-	public void afterConsumerExecution(@NotNull Response response, Type type) {
-		// Update current inserted bean id.
-		BaseBean.Util.update();
-	}
+    @Override
+    public void afterConsumerExecution(@NotNull Response response, Type type) {
+        // Update current inserted bean id.
+        BaseBean.Util.update();
+    }
 
 }

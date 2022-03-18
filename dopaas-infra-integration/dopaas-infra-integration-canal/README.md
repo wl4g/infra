@@ -1,8 +1,11 @@
 # DoPaaS Infra for Canal Server
 
-> This is an enhanced server integrating Alibaba canal.
+This is an enhanced server integrating Alibaba canal.
 
-## 1. Compile building
+- [Refer to: Canal-Server for MySQL configuration](https://github.com/alibaba/canal/wiki/QuickStart)
+- [Refer to: Canal-Server for Docker docs](https://github.com/alibaba/canal/wiki/Docker-QuickStart)
+
+## 1. Compiling
 
 - Step1: First, building of [`canal`](https://github.com/alibaba/canal.git)
 
@@ -21,4 +24,3 @@ cd dopass-infra
 mvn clean install -DskipTests -Dmaven.test.skip=true -T 2C
 ```
 
-TODO

@@ -24,7 +24,7 @@ import static com.wl4g.infra.common.lang.ClassUtils2.resolveClassNameNullable;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.findFieldNullable;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.getField;
-import static com.wl4g.infra.core.constant.CoreConfigConstant.KEY_SMART_PROXY;
+import static com.wl4g.infra.core.constant.CoreInfraConstants.CONF_PREFIX_INFRA_CORE_SMART_PROXY;
 import static java.lang.String.format;
 import static java.lang.reflect.Modifier.isFinal;
 import static java.util.Arrays.asList;
@@ -69,14 +69,14 @@ import com.wl4g.infra.common.log.SmartLogger;
  * @sine v1.0
  * @see
  */
-@ConditionalOnProperty(name = KEY_SMART_PROXY + ".enabled", matchIfMissing = true)
+@ConditionalOnProperty(name = CONF_PREFIX_INFRA_CORE_SMART_PROXY + ".enabled", matchIfMissing = true)
 @Order(Ordered.LOWEST_PRECEDENCE - 1)
 public class SmartProxyAutoConfiguration implements InitializingBean, BeanPostProcessor {
 	protected final SmartLogger log = getLogger(getClass());
 
 	private final Map<Class<?>, List<SmartProxyFilter>> knownProxiedMapping = new ConcurrentHashMap<>(4);
 
-	@Value("${" + KEY_SMART_PROXY + ".base-packages:}")
+	@Value("${" + CONF_PREFIX_INFRA_CORE_SMART_PROXY + ".base-packages:}")
 	private String[] basePackages;
 	@Autowired
 	private DefaultListableBeanFactory beanFactory;

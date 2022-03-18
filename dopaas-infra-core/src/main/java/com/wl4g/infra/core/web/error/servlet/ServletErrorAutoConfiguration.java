@@ -15,7 +15,7 @@
  */
 package com.wl4g.infra.core.web.error.servlet;
 
-import static com.wl4g.infra.core.constant.CoreConfigConstant.KEY_WEB_GLOBAL_ERROR;
+import static com.wl4g.infra.core.constant.CoreInfraConstants.CONF_PREFIX_INFRA_CORE_WEB_GLOBAL_ERROR;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -32,7 +32,7 @@ import com.wl4g.infra.core.web.error.CompositeErrorConfigurer;
  * @version v1.0 2019年1月10日
  * @since
  */
-@ConditionalOnProperty(value = KEY_WEB_GLOBAL_ERROR + ".enabled", matchIfMissing = true)
+@ConditionalOnProperty(value = CONF_PREFIX_INFRA_CORE_WEB_GLOBAL_ERROR + ".enabled", matchIfMissing = true)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 public class ServletErrorAutoConfiguration extends AbstractErrorAutoConfiguration {
 

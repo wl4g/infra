@@ -32,11 +32,11 @@ import com.wl4g.infra.integration.feign.istio.constant.IstioFeignConstant;
  * Auto configuration for Istio.
  */
 @Configuration(proxyBeanMethods = false)
-@ConditionalOnProperty(value = IstioFeignConstant.KEY_ISTIO_PREFIX + ".enabled", matchIfMissing = true)
+@ConditionalOnProperty(value = IstioFeignConstant.CONFIG_PREFIX_FEIGN_ISTIO + ".enabled", matchIfMissing = true)
 public class FeignSpringBootIstioAutoConfiguration {
 
     @Bean
-    @ConfigurationProperties(value = IstioFeignConstant.KEY_ISTIO_PREFIX)
+    @ConfigurationProperties(value = IstioFeignConstant.CONFIG_PREFIX_FEIGN_ISTIO)
     public FeignSpringBootIstioProperties feignSpringBootIstioProperties() {
         return new FeignSpringBootIstioProperties();
     }

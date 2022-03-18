@@ -19,7 +19,7 @@ import static java.lang.reflect.Modifier.*;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 
-import static com.wl4g.infra.core.constant.CoreConfigConstant.KEY_GENERIC_OPERATOR;
+import static com.wl4g.infra.core.constant.CoreInfraConstants.CONF_PREFIX_INFRA_CORE_OPERATOR;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -42,78 +42,79 @@ import org.springframework.context.annotation.Bean;
  * @version v1.0 2020年2月20日
  * @since
  */
-@ConditionalOnProperty(name = KEY_GENERIC_OPERATOR + ".enabled", matchIfMissing = true)
+@ConditionalOnProperty(name = CONF_PREFIX_INFRA_CORE_OPERATOR + ".enabled", matchIfMissing = true)
 public class GenericOperatorAutoConfiguration {
 
-	@Bean
-	@ConditionalOnMissingBean(Operator.class)
-	public Operator<Enum<?>> emptyOperator() {
-		return new EmptyOperator();
-	}
+    @Bean
+    @ConditionalOnMissingBean(Operator.class)
+    public Operator<Enum<?>> emptyOperator() {
+        return new EmptyOperator();
+    }
 
-	@Bean
-	@ConditionalOnBean(Operator.class)
-	public OperatorAutoHandlerInterceptor operatorAutoHandlerInterceptor() {
-		return new OperatorAutoHandlerInterceptor();
-	}
+    @Bean
+    @ConditionalOnBean(Operator.class)
+    public OperatorAutoHandlerInterceptor operatorAutoHandlerInterceptor() {
+        return new OperatorAutoHandlerInterceptor();
+    }
 
-	@Bean
-	@ConditionalOnBean(OperatorAutoHandlerInterceptor.class)
-	public PointcutAdvisor compositeOperatorAspectJExpressionPointcutAdvisor(OperatorAutoHandlerInterceptor advice) {
-		AbstractGenericPointcutAdvisor advisor = new AbstractGenericPointcutAdvisor() {
-			final private static long serialVersionUID = 1L;
+    @Bean
+    @ConditionalOnBean(OperatorAutoHandlerInterceptor.class)
+    public PointcutAdvisor compositeOperatorAspectJExpressionPointcutAdvisor(OperatorAutoHandlerInterceptor advice) {
+        AbstractGenericPointcutAdvisor advisor = new AbstractGenericPointcutAdvisor() {
+            final private static long serialVersionUID = 1L;
 
-			@Override
-			public Pointcut getPointcut() {
-				return new Pointcut() {
+            @Override
+            public Pointcut getPointcut() {
+                return new Pointcut() {
 
-					final private List<String> EXCLUDE_METHODS = new ArrayList<String>(4) {
-						private static final long serialVersionUID = 3369346948736795743L;
-						{
-							addAll(asList(Operator.class.getDeclaredMethods()).stream().map(m -> m.getName()).collect(toList()));
-							addAll(asList(GenericOperatorAdapter.class.getDeclaredMethods()).stream().map(m -> m.getName())
-									.collect(toList()));
-							addAll(asList(Object.class.getDeclaredMethods()).stream().map(m -> m.getName()).collect(toList()));
-						}
-					};
+                    final private List<String> EXCLUDE_METHODS = new ArrayList<String>(4) {
+                        private static final long serialVersionUID = 3369346948736795743L;
+                        {
+                            addAll(asList(Operator.class.getDeclaredMethods()).stream().map(m -> m.getName()).collect(toList()));
+                            addAll(asList(GenericOperatorAdapter.class.getDeclaredMethods()).stream()
+                                    .map(m -> m.getName())
+                                    .collect(toList()));
+                            addAll(asList(Object.class.getDeclaredMethods()).stream().map(m -> m.getName()).collect(toList()));
+                        }
+                    };
 
-					@Override
-					public MethodMatcher getMethodMatcher() {
-						return new MethodMatcher() {
+                    @Override
+                    public MethodMatcher getMethodMatcher() {
+                        return new MethodMatcher() {
 
-							@Override
-							public boolean matches(Method method, Class<?> targetClass) {
-								Class<?> declareClass = method.getDeclaringClass();
-								int mod = method.getModifiers();
-								String name = method.getName();
-								return !isAbstract(mod) && isPublic(mod) && !isInterface(declareClass.getModifiers())
-										&& !EXCLUDE_METHODS.contains(name);
-							}
+                            @Override
+                            public boolean matches(Method method, Class<?> targetClass) {
+                                Class<?> declareClass = method.getDeclaringClass();
+                                int mod = method.getModifiers();
+                                String name = method.getName();
+                                return !isAbstract(mod) && isPublic(mod) && !isInterface(declareClass.getModifiers())
+                                        && !EXCLUDE_METHODS.contains(name);
+                            }
 
-							@Override
-							public boolean isRuntime() {
-								return false;
-							}
+                            @Override
+                            public boolean isRuntime() {
+                                return false;
+                            }
 
-							@Override
-							public boolean matches(Method method, Class<?> targetClass, Object... args) {
-								throw new Error("Shouldn't be here");
-							}
-						};
-					}
+                            @Override
+                            public boolean matches(Method method, Class<?> targetClass, Object... args) {
+                                throw new Error("Shouldn't be here");
+                            }
+                        };
+                    }
 
-					@Override
-					public ClassFilter getClassFilter() {
-						return clazz -> {
-							return Operator.class.isAssignableFrom(clazz) && !GenericOperatorAdapter.class.isAssignableFrom(clazz)
-									&& !isAbstract(clazz.getModifiers()) && !isInterface(clazz.getModifiers());
-						};
-					}
-				};
-			}
-		};
-		advisor.setAdvice(advice);
-		return advisor;
-	}
+                    @Override
+                    public ClassFilter getClassFilter() {
+                        return clazz -> {
+                            return Operator.class.isAssignableFrom(clazz) && !GenericOperatorAdapter.class.isAssignableFrom(clazz)
+                                    && !isAbstract(clazz.getModifiers()) && !isInterface(clazz.getModifiers());
+                        };
+                    }
+                };
+            }
+        };
+        advisor.setAdvice(advice);
+        return advisor;
+    }
 
 }

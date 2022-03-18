@@ -15,8 +15,8 @@
  */
 package com.wl4g.infra.data.config;
 
-import static com.wl4g.infra.data.constant.DataConfigConstant.KEY_HOTSPOT_LOADER_PREFIX;
-import static com.wl4g.infra.data.constant.DataConfigConstant.KEY_MYBATIS_PREFIX;
+import static com.wl4g.infra.data.constant.DataInfraConstants.CONF_PREFIX_INFRA_DATA_HOTSPOT_LOADER;
+import static com.wl4g.infra.data.constant.DataInfraConstants.CONF_PREFIX_INFRA_DATA_MYBATIS;
 
 import java.util.Properties;
 
@@ -50,7 +50,7 @@ import com.wl4g.infra.data.mybatis.mapper.PreparedBeanMapperInterceptor;
 public class MybatisAutoConfiguration {
 
     @Bean
-    @ConfigurationProperties(prefix = KEY_MYBATIS_PREFIX)
+    @ConfigurationProperties(prefix = CONF_PREFIX_INFRA_DATA_MYBATIS)
     public MybatisProperties mybatisProperties() {
         return new MybatisProperties();
     }
@@ -58,8 +58,8 @@ public class MybatisAutoConfiguration {
     // --- Hotspot loader. ---
 
     @Bean
-    @ConditionalOnJdwpDebug(enableProperty = KEY_HOTSPOT_LOADER_PREFIX + ".enabled")
-    @ConfigurationProperties(prefix = KEY_HOTSPOT_LOADER_PREFIX)
+    @ConditionalOnJdwpDebug(enableProperty = CONF_PREFIX_INFRA_DATA_HOTSPOT_LOADER + ".enabled")
+    @ConfigurationProperties(prefix = CONF_PREFIX_INFRA_DATA_HOTSPOT_LOADER)
     // @ConditionalOnBean(SmartSqlSessionFactoryBean.class)
     public HotspotLoaderProperties hotspotLoaderProperties() {
         return new HotspotLoaderProperties();

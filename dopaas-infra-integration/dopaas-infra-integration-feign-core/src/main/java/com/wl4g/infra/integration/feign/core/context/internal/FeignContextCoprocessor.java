@@ -49,75 +49,81 @@ import feign.Response;
  */
 public interface FeignContextCoprocessor extends Ordered {
 
-	@Override
-	default int getOrder() {
-		return 0;
-	}
+    @Override
+    default int getOrder() {
+        return 0;
+    }
 
-	default void prepareConsumerExecution(@NotNull RequestTemplate template, @Nullable HttpServletRequest request) {
-	}
+    default void prepareConsumerExecution(@NotNull RequestTemplate template, @Nullable HttpServletRequest request) {
+    }
 
-	default void beforeConsumerExecution(@NotNull Object proxy, @NotNull Method method, @Nullable Object[] args) {
-	}
+    default void beforeConsumerExecution(@NotNull Object proxy, @NotNull Method method, @Nullable Object[] args) {
+    }
 
-	default void afterConsumerExecution(@NotNull Response response, Type type) {
-	}
+    default void afterConsumerExecution(@NotNull Response response, Type type) {
+    }
 
-	default void beforeProviderExecution(@Nullable HttpServletRequest request, @NotNull Object target, @NotNull Method method,
-			Object[] parameters) {
-	}
+    default void beforeProviderExecution(
+            @Nullable HttpServletRequest request,
+            @NotNull Object target,
+            @NotNull Method method,
+            Object[] parameters) {
+    }
 
-	default void afterProviderExecution(@NotNull Object target, @NotNull Method method, Object[] args) {
-	};
+    default void afterProviderExecution(@NotNull Object target, @NotNull Method method, Object[] args) {
+    };
 
-	static final class Invokers {
-		private static final FeignContextCoprocessor[] DEFAULT = new FeignContextCoprocessor[0];
-		private static volatile FeignContextCoprocessor[] coprocessors;
+    static final class Invokers {
+        private static final FeignContextCoprocessor[] DEFAULT = new FeignContextCoprocessor[0];
+        private static volatile FeignContextCoprocessor[] coprocessors;
 
-		public static void prepareConsumerExecution(@NotNull RequestTemplate template, @Nullable HttpServletRequest request) {
-			for (FeignContextCoprocessor c : obtainCoprocessors()) {
-				c.prepareConsumerExecution(template, request);
-			}
-		}
+        public static void prepareConsumerExecution(@NotNull RequestTemplate template, @Nullable HttpServletRequest request) {
+            for (FeignContextCoprocessor c : obtainCoprocessors()) {
+                c.prepareConsumerExecution(template, request);
+            }
+        }
 
-		public static void beforeConsumerExecution(@NotNull Object proxy, @NotNull Method method, @Nullable Object[] args) {
-			for (FeignContextCoprocessor c : obtainCoprocessors()) {
-				c.beforeConsumerExecution(proxy, method, args);
-			}
-		}
+        public static void beforeConsumerExecution(@NotNull Object proxy, @NotNull Method method, @Nullable Object[] args) {
+            for (FeignContextCoprocessor c : obtainCoprocessors()) {
+                c.beforeConsumerExecution(proxy, method, args);
+            }
+        }
 
-		public static void afterConsumerExecution(@NotNull Response response, Type type) {
-			for (FeignContextCoprocessor c : obtainCoprocessors()) {
-				c.afterConsumerExecution(response, type);
-			}
-		}
+        public static void afterConsumerExecution(@NotNull Response response, Type type) {
+            for (FeignContextCoprocessor c : obtainCoprocessors()) {
+                c.afterConsumerExecution(response, type);
+            }
+        }
 
-		public static void beforeProviderExecution(@Nullable HttpServletRequest request, @NotNull Object target,
-				@NotNull Method method, Object[] parameters) {
-			for (FeignContextCoprocessor c : obtainCoprocessors()) {
-				c.beforeProviderExecution(request, target, method, parameters);
-			}
-		}
+        public static void beforeProviderExecution(
+                @Nullable HttpServletRequest request,
+                @NotNull Object target,
+                @NotNull Method method,
+                Object[] parameters) {
+            for (FeignContextCoprocessor c : obtainCoprocessors()) {
+                c.beforeProviderExecution(request, target, method, parameters);
+            }
+        }
 
-		public static void afterProviderExecution(@NotNull Object target, @NotNull Method method, Object[] args) {
-			for (FeignContextCoprocessor c : obtainCoprocessors()) {
-				c.afterProviderExecution(target, method, args);
-			}
-		}
+        public static void afterProviderExecution(@NotNull Object target, @NotNull Method method, Object[] args) {
+            for (FeignContextCoprocessor c : obtainCoprocessors()) {
+                c.afterProviderExecution(target, method, args);
+            }
+        }
 
-		private static final FeignContextCoprocessor[] obtainCoprocessors() {
-			if (isNull(coprocessors)) {
-				synchronized (Invokers.class) {
-					if (isNull(coprocessors)) {
-						Map<String, FeignContextCoprocessor> beans = SpringContextHolder.getBeans(FeignContextCoprocessor.class);
-						coprocessors = safeMap(beans).values().stream().toArray(FeignContextCoprocessor[]::new);
-						AnnotationAwareOrderComparator.sort(coprocessors);
-					}
-				}
-			}
-			return (isEmptyArray(coprocessors)) ? DEFAULT : coprocessors;
-		}
+        private static final FeignContextCoprocessor[] obtainCoprocessors() {
+            if (isNull(coprocessors)) {
+                synchronized (Invokers.class) {
+                    if (isNull(coprocessors)) {
+                        Map<String, FeignContextCoprocessor> beans = SpringContextHolder.getBeans(FeignContextCoprocessor.class);
+                        coprocessors = safeMap(beans).values().stream().toArray(FeignContextCoprocessor[]::new);
+                        AnnotationAwareOrderComparator.sort(coprocessors);
+                    }
+                }
+            }
+            return (isEmptyArray(coprocessors)) ? DEFAULT : coprocessors;
+        }
 
-	}
+    }
 
 }

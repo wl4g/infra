@@ -31,6 +31,6 @@ import com.wl4g.infra.integration.feign.core.constant.FeignConsumerConstant;
  */
 public abstract class IstioFeignConstant extends FeignConsumerConstant {
 
-    public static final String KEY_ISTIO_PREFIX = KEY_BASE_PREFIX + ".istio";
+    public static final String CONFIG_PREFIX_FEIGN_ISTIO = CONFIG_PREFIX_FEIGN + ".istio";
 
 }

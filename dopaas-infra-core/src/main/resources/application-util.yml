@@ -14,7 +14,7 @@
 spring:
   infra:
     core:
-      remote: # RestTemplate configuration.
+      http-remote: # RestTemplate configuration.
         read-timeout: 60_000
         connect-timeout: 10_000
         max-response-size: 10485760

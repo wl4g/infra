@@ -19,7 +19,7 @@
  */
 package com.wl4g.infra.support.constant;
 
-import com.wl4g.infra.core.constant.BaseConstant;
+import com.wl4g.infra.core.constant.BaseConstants;
 
 /**
  * {@link SupportConfigConstant}
@@ -29,7 +29,7 @@ import com.wl4g.infra.core.constant.BaseConstant;
  * @sine v1.0
  * @see
  */
-public abstract class SupportConfigConstant extends BaseConstant {
+public abstract class SupportConfigConstant extends BaseConstants {
 
     public static final String KEY_PREFIX_MODULE_SUPPORT = "spring.infra.support.";
 

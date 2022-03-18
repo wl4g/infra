@@ -237,9 +237,8 @@ class FeignSpringBootConsumerFactoryBean<T> implements FactoryBean<T>, Applicati
     }
 
     private FeignSpringBootTargetFactory obtainFeignTargetFactory() {
-        List<FeignSpringBootTargetFactory> candidates = safeMap(applicationContext.getBeansOfType(FeignSpringBootTargetFactory.class)).values()
-                .stream()
-                .collect(toList());
+        List<FeignSpringBootTargetFactory> candidates = safeMap(
+                applicationContext.getBeansOfType(FeignSpringBootTargetFactory.class)).values().stream().collect(toList());
         AnnotationAwareOrderComparator.sort(candidates);
         // Check target must have only one valid.
         if (candidates.isEmpty()) {

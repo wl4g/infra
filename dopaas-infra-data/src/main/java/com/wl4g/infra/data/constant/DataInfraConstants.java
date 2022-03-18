@@ -19,22 +19,22 @@
  */
 package com.wl4g.infra.data.constant;
 
-import com.wl4g.infra.core.constant.BaseConstant;
+import com.wl4g.infra.core.constant.CoreInfraConstants;
 
 /**
- * {@link DataConfigConstant}
+ * {@link DataInfraConstants}
  * 
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version v1.0 2021-01-20
  * @sine v1.0
  * @see
  */
-public abstract class DataConfigConstant extends BaseConstant {
+public abstract class DataInfraConstants extends CoreInfraConstants {
 
-    public static final String KEY_PREFIX_MODULE_DATA = "spring.infra.data.";
+    public static final String CONF_PREFIX_INFRA_DATA = CONF_PREFIX_INFRA + ".data";
 
-    public static final String KEY_MYBATIS_PREFIX = KEY_PREFIX_MODULE_DATA + "mybatis";
+    public static final String CONF_PREFIX_INFRA_DATA_MYBATIS = CONF_PREFIX_INFRA_DATA + ".mybatis";
 
-    public static final String KEY_HOTSPOT_LOADER_PREFIX = KEY_PREFIX_MODULE_DATA + "mybatis-loader";
+    public static final String CONF_PREFIX_INFRA_DATA_HOTSPOT_LOADER = CONF_PREFIX_INFRA_DATA + ".mybatis-loader";
 
 }

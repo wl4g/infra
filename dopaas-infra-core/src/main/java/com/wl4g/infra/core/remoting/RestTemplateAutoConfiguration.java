@@ -35,7 +35,7 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.Netty4ClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
-import com.wl4g.infra.core.constant.CoreConfigConstant;
+import com.wl4g.infra.core.constant.CoreInfraConstants;
 
 import io.netty.handler.ssl.ClientAuth;
 import io.netty.handler.ssl.SslContext;
@@ -57,7 +57,7 @@ import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 public class RestTemplateAutoConfiguration {
 
     @Bean
-    @ConfigurationProperties(prefix = CoreConfigConstant.KEY_REMOTE_CLIENT)
+    @ConfigurationProperties(prefix = CoreInfraConstants.CONF_PREFIX_INFRA_CORE_HTTP_REMOTE)
     public ClientHttpProperties remoteProperties() {
         return new ClientHttpProperties();
     }

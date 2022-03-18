@@ -47,59 +47,59 @@ import feign.RequestTemplate;
  */
 public final class FeignRpcContextBinders {
 
-	// --- Feign Client(Consumer). ---
+    // --- Feign Client(Consumer). ---
 
-	public static void writeAttachmentsToFeignRequest(@NotNull RequestTemplate template) {
-		notNullOf(template, "template");
-		safeMap(RpcContextHolder.getContext().getAttachments())
-				.forEach((name, value) -> template.header(ATTACHMENT_HEADER_PREFIX.concat(name), value));
-	}
+    public static void writeAttachmentsToFeignRequest(@NotNull RequestTemplate template) {
+        notNullOf(template, "template");
+        safeMap(RpcContextHolder.getContext().getAttachments())
+                .forEach((name, value) -> template.header(ATTACHMENT_HEADER_PREFIX.concat(name), value));
+    }
 
-	public static void bindAttachmentsFromFeignResposne(@NotNull feign.Response response) {
-		notNullOf(response, "response");
-		// Bind feign response attachments to current rpcContext.
-		if (!isEmpty(response.headers())) {
-			response.headers().forEach((name, values) -> {
-				if (startsWithIgnoreCase(name, ATTACHMENT_HEADER_PREFIX)) {
-					if (nonNull(values) && !values.isEmpty()) {
-						String firstValue = values.iterator().next();
-						RpcContextHolder.getServerContext().getAttachments()
-								.put(name.substring(ATTACHMENT_HEADER_PREFIX_LEN, name.length()), firstValue);
-					}
-				}
-			});
-		}
-	}
+    public static void bindAttachmentsFromFeignResposne(@NotNull feign.Response response) {
+        notNullOf(response, "response");
+        // Bind feign response attachments to current rpcContext.
+        if (!isEmpty(response.headers())) {
+            response.headers().forEach((name, values) -> {
+                if (startsWithIgnoreCase(name, ATTACHMENT_HEADER_PREFIX)) {
+                    if (nonNull(values) && !values.isEmpty()) {
+                        String firstValue = values.iterator().next();
+                        RpcContextHolder.getServerContext().getAttachments().put(
+                                name.substring(ATTACHMENT_HEADER_PREFIX_LEN, name.length()), firstValue);
+                    }
+                }
+            });
+        }
+    }
 
-	// --- Feign Server(Provider). ---
+    // --- Feign Server(Provider). ---
 
-	public static void bindAttachmentsFromRequest(@NotNull HttpServletRequest request) {
-		notNullOf(request, "request");
+    public static void bindAttachmentsFromRequest(@NotNull HttpServletRequest request) {
+        notNullOf(request, "request");
 
-		// Find request attachments by headers.
-		Map<String, String> requestAttachments = getRequestHeaders(request,
-				name -> startsWithIgnoreCase(name, ATTACHMENT_HEADER_PREFIX));
+        // Find request attachments by headers.
+        Map<String, String> requestAttachments = getRequestHeaders(request,
+                name -> startsWithIgnoreCase(name, ATTACHMENT_HEADER_PREFIX));
 
-		// Clear FIXED header prefix.
-		Map<String, String> attachments = new HashMap<>();
-		requestAttachments.forEach((name, value) -> {
-			if (startsWithIgnoreCase(name, ATTACHMENT_HEADER_PREFIX)) {
-				attachments.put(name.substring(ATTACHMENT_HEADER_PREFIX_LEN, name.length()), value);
-			} else {
-				attachments.put(name, value);
-			}
-		});
+        // Clear FIXED header prefix.
+        Map<String, String> attachments = new HashMap<>();
+        requestAttachments.forEach((name, value) -> {
+            if (startsWithIgnoreCase(name, ATTACHMENT_HEADER_PREFIX)) {
+                attachments.put(name.substring(ATTACHMENT_HEADER_PREFIX_LEN, name.length()), value);
+            } else {
+                attachments.put(name, value);
+            }
+        });
 
-		RpcContextHolder.getContext().setAttachments(attachments);
-	}
+        RpcContextHolder.getContext().setAttachments(attachments);
+    }
 
-	public static void writeAttachemntsToResponse(@NotNull HttpServletResponse response) {
-		notNullOf(response, "response");
-		safeMap(RpcContextHolder.getServerContext().getAttachments())
-				.forEach((name, value) -> response.setHeader(ATTACHMENT_HEADER_PREFIX.concat(name), value));
-	}
+    public static void writeAttachemntsToResponse(@NotNull HttpServletResponse response) {
+        notNullOf(response, "response");
+        safeMap(RpcContextHolder.getServerContext().getAttachments())
+                .forEach((name, value) -> response.setHeader(ATTACHMENT_HEADER_PREFIX.concat(name), value));
+    }
 
-	public static final String ATTACHMENT_HEADER_PREFIX = "X-Rpc-Attach-";
-	public static final int ATTACHMENT_HEADER_PREFIX_LEN = ATTACHMENT_HEADER_PREFIX.length();
+    public static final String ATTACHMENT_HEADER_PREFIX = "X-Rpc-Attach-";
+    public static final int ATTACHMENT_HEADER_PREFIX_LEN = ATTACHMENT_HEADER_PREFIX.length();
 
 }

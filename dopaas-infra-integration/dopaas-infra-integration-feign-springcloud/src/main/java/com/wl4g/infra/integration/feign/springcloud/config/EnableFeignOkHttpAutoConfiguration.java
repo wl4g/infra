@@ -69,14 +69,17 @@ import feign.Client;
 public class EnableFeignOkHttpAutoConfiguration {
 
     @Bean(BEAN_OKHTTP3_POOL)
-    public okhttp3.ConnectionPool okHttp3ConnectionPool(FeignHttpClientProperties config,
+    public okhttp3.ConnectionPool okHttp3ConnectionPool(
+            FeignHttpClientProperties config,
             OkHttpClientConnectionPoolFactory factory) {
         return factory.create(config.getMaxConnections(), config.getTimeToLive(), config.getTimeToLiveUnit());
     }
 
     @Bean(BEAN_OKHTTP3_CLIENT)
-    public okhttp3.OkHttpClient okhttp3Client(OkHttpClientFactory factory,
-            @Qualifier(BEAN_OKHTTP3_POOL) okhttp3.ConnectionPool pool, FeignHttpClientProperties config) {
+    public okhttp3.OkHttpClient okhttp3Client(
+            OkHttpClientFactory factory,
+            @Qualifier(BEAN_OKHTTP3_POOL) okhttp3.ConnectionPool pool,
+            FeignHttpClientProperties config) {
         return factory.createBuilder(config.isDisableSslValidation())
                 .connectTimeout((long) config.getConnectionTimeout(), TimeUnit.MILLISECONDS)
                 .followRedirects(config.isFollowRedirects())
@@ -95,7 +98,8 @@ public class EnableFeignOkHttpAutoConfiguration {
     @Bean(BEAN_FEIGN_LB_CLIENT)
     @Primary
     @Conditional(OnRetryNotEnabledCondition.class)
-    public Client feignLoadBalancerClient(@Qualifier(BEAN_FEIGN_OKHTTP3_CLIENT) feign.Client feignClient,
+    public Client feignLoadBalancerClient(
+            @Qualifier(BEAN_FEIGN_OKHTTP3_CLIENT) feign.Client feignClient,
             BlockingLoadBalancerClient loadBalancerClient) {
         return new FeignBlockingLoadBalancerClient(feignClient, loadBalancerClient);
     }
@@ -109,7 +113,9 @@ public class EnableFeignOkHttpAutoConfiguration {
     @ConditionalOnClass(name = "org.springframework.retry.support.RetryTemplate")
     @ConditionalOnBean(LoadBalancedRetryFactory.class)
     @ConditionalOnProperty(value = "spring.cloud.loadbalancer.retry.enabled", havingValue = "true", matchIfMissing = true)
-    public Client feignRetryClient(BlockingLoadBalancerClient loadBalancerClient, feign.okhttp.OkHttpClient feignOkHttpClient,
+    public Client feignRetryClient(
+            BlockingLoadBalancerClient loadBalancerClient,
+            feign.okhttp.OkHttpClient feignOkHttpClient,
             List<LoadBalancedRetryFactory> lbRetryFactories) {
         AnnotationAwareOrderComparator.sort(lbRetryFactories);
         return new RetryableFeignBlockingLoadBalancerClient(feignOkHttpClient, loadBalancerClient, lbRetryFactories.get(0));

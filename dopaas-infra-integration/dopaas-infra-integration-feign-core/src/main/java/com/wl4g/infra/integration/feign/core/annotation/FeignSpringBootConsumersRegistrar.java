@@ -133,8 +133,11 @@ class FeignSpringBootConsumersRegistrar implements ImportBeanDefinitionRegistrar
         }
     }
 
-    private void registerSpringBootFeignClients(AnnotationMetadata metadata, BeanDefinitionRegistry registry,
-            AnnotationAttributes attrs, Set<String> scanBasePackages) {
+    private void registerSpringBootFeignClients(
+            AnnotationMetadata metadata,
+            BeanDefinitionRegistry registry,
+            AnnotationAttributes attrs,
+            Set<String> scanBasePackages) {
         new SpringBootFeignClientScanner(registry, attrs.getClassArray(DEFAULT_CONFIGURATION))
                 .doScan(StringUtils.toStringArray(scanBasePackages));
     }
@@ -296,7 +299,8 @@ class FeignSpringBootConsumersRegistrar implements ImportBeanDefinitionRegistrar
         }
     }
 
-    public static final BeanNameGenerator defaultBeanGenerator = (definition,
+    public static final BeanNameGenerator defaultBeanGenerator = (
+            definition,
             registry) -> AnnotationBeanNameGenerator.INSTANCE.generateBeanName(definition, registry) + ".SpringBootFeignClient";
 
 }

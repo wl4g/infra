@@ -15,7 +15,7 @@
  */
 package com.wl4g.infra.core.boot;
 
-import static com.wl4g.infra.core.constant.CoreConfigConstant.KEY_BOOTSTRAPPING;
+import static com.wl4g.infra.core.constant.CoreInfraConstants.CONF_PREFIX_INFRA_CORE_BOOTSTRAPPING;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +41,7 @@ import com.wl4g.infra.core.logging.TraceLoggingMDCFilter;
  * @version v1.0 2020年2月20日
  * @since
  */
-@ConditionalOnProperty(name = KEY_BOOTSTRAPPING + ".enabled", matchIfMissing = true)
+@ConditionalOnProperty(name = CONF_PREFIX_INFRA_CORE_BOOTSTRAPPING + ".enabled", matchIfMissing = true)
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE)

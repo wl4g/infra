@@ -19,7 +19,7 @@ import com.wl4g.infra.common.log.SmartLogger;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
-import static com.wl4g.infra.core.constant.CoreConfigConstant.KEY_NAMING_PROTOYPE_FACTORY;
+import static com.wl4g.infra.core.constant.CoreInfraConstants.CONF_PREFIX_INFRA_CORE_NAMING_PROTOYPE;
 import static java.util.Objects.nonNull;
 
 import java.util.List;
@@ -53,7 +53,7 @@ import org.springframework.util.MultiValueMap;
  * @version v1.0.0 2019-10-09
  * @since
  */
-@ConditionalOnProperty(name = KEY_NAMING_PROTOYPE_FACTORY + ".enabled", matchIfMissing = true)
+@ConditionalOnProperty(name = CONF_PREFIX_INFRA_CORE_NAMING_PROTOYPE + ".enabled", matchIfMissing = true)
 public class NamingPrototypeBeanAutoConfiguration {
 
 	@Bean

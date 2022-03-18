@@ -102,9 +102,10 @@ public class EnhanceSpringCloudLoadbalancerAutoConfiguration {
      * {@link org.springframework.cloud.loadbalancer.blocking.client.BlockingLoadBalancerClient#choose}
      */
     @Bean
-    @ConditionalOnProperty(name = KEY_LOADBALANCER_RANDOM + ".enabled", matchIfMissing = false)
+    @ConditionalOnProperty(name = CONFIG_PREFIX_LB_RANDOM + ".enabled", matchIfMissing = false)
     @ConditionalOnMissingClass("org.springframework.cloud.loadbalancer.core.RandomLoadBalancer") // spring-cloud-loadbalancer-3.0.0.jar
-    public RandomLoadBalancer randomReactorServiceInstanceLoadBalancer(Environment environment,
+    public RandomLoadBalancer randomReactorServiceInstanceLoadBalancer(
+            Environment environment,
             LoadBalancerClientFactory loadBalancerClientFactory) {
         String name = environment.getProperty(LoadBalancerClientFactory.PROPERTY_NAME);
         return new RandomLoadBalancer(loadBalancerClientFactory.getLazyProvider(name, ServiceInstanceListSupplier.class), name);
@@ -115,11 +116,12 @@ public class EnhanceSpringCloudLoadbalancerAutoConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean({ RandomLoadBalancer.class })
-    @ConditionalOnProperty(name = KEY_LOADBALANCER_GRAY + ".enabled", matchIfMissing = false)
-    public GrayLoadBalancer grayReactorServiceInstanceLoadBalancer(Environment environment,
+    @ConditionalOnProperty(name = CONFIG_PREFIX_LB_GRAY + ".enabled", matchIfMissing = false)
+    public GrayLoadBalancer grayReactorServiceInstanceLoadBalancer(
+            Environment environment,
             LoadBalancerClientFactory loadBalancerClientFactory) {
         String name = environment.getProperty(LoadBalancerClientFactory.PROPERTY_NAME);
-        String chooseExpression = environment.getProperty(KEY_LOADBALANCER_GRAY + ".chooseExpression", "");
+        String chooseExpression = environment.getProperty(CONFIG_PREFIX_LB_GRAY + ".chooseExpression", "");
         chooseExpression = isBlank(chooseExpression) ? "#{true}" : chooseExpression; // by-default
         return new GrayLoadBalancer(loadBalancerClientFactory.getLazyProvider(name, ServiceInstanceListSupplier.class), name,
                 chooseExpression);
@@ -130,7 +132,8 @@ public class EnhanceSpringCloudLoadbalancerAutoConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean({ GrayLoadBalancer.class, RandomLoadBalancer.class })
-    public RoundRobinLoadBalancer reactorServiceInstanceLoadBalancer(Environment environment,
+    public RoundRobinLoadBalancer reactorServiceInstanceLoadBalancer(
+            Environment environment,
             LoadBalancerClientFactory loadBalancerClientFactory) {
         String name = environment.getProperty(LoadBalancerClientFactory.PROPERTY_NAME);
         return new RoundRobinLoadBalancer(loadBalancerClientFactory.getLazyProvider(name, ServiceInstanceListSupplier.class),
@@ -276,8 +279,10 @@ public class EnhanceSpringCloudLoadbalancerAutoConfiguration {
         @Bean
         @ConditionalOnBean(ReactiveDiscoveryClient.class)
         @ConditionalOnMissingBean
-        public ServiceInstanceSupplier discoveryClientServiceInstanceSupplier(ReactiveDiscoveryClient discoveryClient,
-                Environment env, ApplicationContext context) {
+        public ServiceInstanceSupplier discoveryClientServiceInstanceSupplier(
+                ReactiveDiscoveryClient discoveryClient,
+                Environment env,
+                ApplicationContext context) {
             DiscoveryClientServiceInstanceSupplier delegate = new DiscoveryClientServiceInstanceSupplier(discoveryClient, env);
             ObjectProvider<LoadBalancerCacheManager> cacheManagerProvider = context
                     .getBeanProvider(LoadBalancerCacheManager.class);
@@ -324,7 +329,9 @@ public class EnhanceSpringCloudLoadbalancerAutoConfiguration {
         @Bean
         @ConditionalOnBean(DiscoveryClient.class)
         @ConditionalOnMissingBean
-        public ServiceInstanceSupplier discoveryClientServiceInstanceSupplier(DiscoveryClient discoveryClient, Environment env,
+        public ServiceInstanceSupplier discoveryClientServiceInstanceSupplier(
+                DiscoveryClient discoveryClient,
+                Environment env,
                 ApplicationContext context) {
             DiscoveryClientServiceInstanceSupplier delegate = new DiscoveryClientServiceInstanceSupplier(discoveryClient, env);
             ObjectProvider<LoadBalancerCacheManager> cacheManagerProvider = context

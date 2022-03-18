@@ -31,14 +31,14 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 /**
- * {@link BaseConstant}
+ * {@link BaseConstants}
  * 
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version v1.0 2021-01-05
  * @sine v1.0
  * @see
  */
-public abstract class BaseConstant {
+public abstract class BaseConstants {
 
     /** OS environment map cache. */
     public static final Map<String, String> ENV = Collections.unmodifiableMap(System.getenv());

@@ -1,6 +1,7 @@
 # SpringCloud Eureka Integrated Project
 
-### Local mode 
+### Local mode
+
 | method | url | desc |  
 | :--- |:---|:---|   
 | GET | http://localhost:8761 | Register Center for singleton |  
@@ -12,7 +13,8 @@ With `--spring.profiles.active=local` start eureka server.
 ---
 
 
-### HA Cluster mode 
+### HA Cluster mode
+
 - Configure the system hosts file: `C:\Windows\System32\drivers\etc\hosts` or `/etc/hosts`
 
 ```

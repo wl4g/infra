@@ -120,7 +120,8 @@ class FeignSpringCloudClientsRegistrar implements ImportBeanDefinitionRegistrar,
                         }
 
                         @Override
-                        public MultiValueMap<String, Object> getAllAnnotationAttributes(String annotationName,
+                        public MultiValueMap<String, Object> getAllAnnotationAttributes(
+                                String annotationName,
                                 boolean classValuesAsString) {
                             return metadata.getAllAnnotationAttributes(annotationName, classValuesAsString);
                         }

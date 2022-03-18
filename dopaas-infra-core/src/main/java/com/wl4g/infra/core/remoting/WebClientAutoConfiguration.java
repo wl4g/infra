@@ -31,7 +31,7 @@ import org.springframework.http.client.reactive.ClientHttpConnector;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.http.client.reactive.ReactorResourceFactory;
 
-import com.wl4g.infra.core.constant.CoreConfigConstant;
+import com.wl4g.infra.core.constant.CoreInfraConstants;
 
 import static com.wl4g.infra.common.lang.TypeConverts.safeLongToInt;
 import static io.netty.channel.ChannelOption.*;
@@ -52,7 +52,7 @@ import reactor.netty.tcp.TcpClient;
 public class WebClientAutoConfiguration {
 
     @Bean
-    @ConfigurationProperties(prefix = CoreConfigConstant.KEY_REMOTE_CLIENT)
+    @ConfigurationProperties(prefix = CoreInfraConstants.CONF_PREFIX_INFRA_CORE_HTTP_REMOTE)
     public ClientHttpProperties remoteProperties() {
         return new ClientHttpProperties();
     }

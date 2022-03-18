@@ -15,7 +15,7 @@
  */
 package com.wl4g.infra.core.web.error.reactive;
 
-import static com.wl4g.infra.core.constant.CoreConfigConstant.KEY_WEB_GLOBAL_ERROR;
+import static com.wl4g.infra.core.constant.CoreInfraConstants.CONF_PREFIX_INFRA_CORE_WEB_GLOBAL_ERROR;
 import static java.util.stream.Collectors.toList;
 
 import org.springframework.beans.factory.ObjectProvider;
@@ -38,7 +38,7 @@ import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration;
  * @version v1.0 2019年1月10日
  * @since
  */
-@ConditionalOnProperty(value = KEY_WEB_GLOBAL_ERROR + ".enabled", matchIfMissing = true)
+@ConditionalOnProperty(value = CONF_PREFIX_INFRA_CORE_WEB_GLOBAL_ERROR + ".enabled", matchIfMissing = true)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
 @ConditionalOnClass(ViewResolver.class)
 public class ReactiveErrorAutoConfiguration extends AbstractErrorAutoConfiguration {

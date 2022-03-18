@@ -15,7 +15,7 @@
  */
 package com.wl4g.infra.integration.feign.core.config;
 
-import static com.wl4g.infra.integration.feign.core.constant.FeignConsumerConstant.KEY_BASE_PREFIX;
+import static com.wl4g.infra.integration.feign.core.constant.FeignConsumerConstant.CONFIG_PREFIX_FEIGN;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -33,9 +33,9 @@ public class CoreFeignAutoConfiguration {
 
     @Bean
     @Order(0)
-    @ConfigurationProperties(prefix = KEY_BASE_PREFIX)
+    @ConfigurationProperties(prefix = CONFIG_PREFIX_FEIGN)
     public FeignSpringBootProperties feignSpringBootProperties() {
         return new FeignSpringBootProperties();
     }
- 
+
 }

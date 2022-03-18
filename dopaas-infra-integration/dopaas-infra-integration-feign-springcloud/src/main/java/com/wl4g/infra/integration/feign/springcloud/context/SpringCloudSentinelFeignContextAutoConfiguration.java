@@ -54,41 +54,41 @@ import feign.RequestTemplate;
 @ConditionalOnWebApplication(type = Type.SERVLET)
 @AutoConfigureBefore(DefaultFeignContextAutoConfiguration.class)
 public class SpringCloudSentinelFeignContextAutoConfiguration implements WebMvcConfigurer {
-	protected final SmartLogger log = getLogger(getClass());
+    protected final SmartLogger log = getLogger(getClass());
 
-	@Bean
-	public SentinelFeignContextServletInterceptor sentinelFeignContextServletInterceptor() {
-		return new SentinelFeignContextServletInterceptor();
-	}
+    @Bean
+    public SentinelFeignContextServletInterceptor sentinelFeignContextServletInterceptor() {
+        return new SentinelFeignContextServletInterceptor();
+    }
 
-	@Override
-	public void addInterceptors(InterceptorRegistry registry) {
-		registry.addInterceptor(sentinelFeignContextServletInterceptor()).addPathPatterns("/**");
-	}
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(sentinelFeignContextServletInterceptor()).addPathPatterns("/**");
+    }
 
-	/**
-	 * Sentinel servlet request context handler interceptor.
-	 */
-	static class SentinelFeignContextServletInterceptor implements RequestInterceptor, HandlerInterceptor {
+    /**
+     * Sentinel servlet request context handler interceptor.
+     */
+    static class SentinelFeignContextServletInterceptor implements RequestInterceptor, HandlerInterceptor {
 
-		@Override
-		public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-			// TODO Auto-generated method stub
-			return true;
-		}
+        @Override
+        public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+            // TODO Auto-generated method stub
+            return true;
+        }
 
-		@Override
-		public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
-				throws Exception {
-			// TODO Auto-generated method stub
-		}
+        @Override
+        public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
+                throws Exception {
+            // TODO Auto-generated method stub
+        }
 
-		@Override
-		public void apply(RequestTemplate template) {
-			// TODO Auto-generated method stub
+        @Override
+        public void apply(RequestTemplate template) {
+            // TODO Auto-generated method stub
 
-		}
+        }
 
-	}
+    }
 
 }

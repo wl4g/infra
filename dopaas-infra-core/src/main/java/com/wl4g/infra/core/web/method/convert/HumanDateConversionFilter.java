@@ -19,7 +19,7 @@
  */
 package com.wl4g.infra.core.web.method.convert;
 
-import static com.wl4g.infra.core.constant.CoreConfigConstant.KEY_WEB_HUMAN_DATE_CONVERTER;
+import static com.wl4g.infra.core.constant.CoreInfraConstants.CONF_PREFIX_INFRA_CORE_WEB_HUMAN_DATE_CONVERTER;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.springframework.core.annotation.AnnotatedElementUtils.hasAnnotation;
@@ -135,7 +135,7 @@ public class HumanDateConversionFilter implements SmartProxyFilter {
 	private static final PeriodFormatter defaultFormatter = PeriodFormatter.getDefault().ignoreLowerDate(true);
 
 	@Configuration
-	@ConditionalOnProperty(name = KEY_WEB_HUMAN_DATE_CONVERTER + ".enabled", matchIfMissing = true)
+	@ConditionalOnProperty(name = CONF_PREFIX_INFRA_CORE_WEB_HUMAN_DATE_CONVERTER + ".enabled", matchIfMissing = true)
 	static class HumanDateConversionAutoConfiguration {
 		@Bean
 		public HumanDateConversionFilter humanDateConversionProcessor() {

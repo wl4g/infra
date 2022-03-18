@@ -16,7 +16,7 @@
 package com.wl4g.infra.integration.feign.core.annotation;
 
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
-import static com.wl4g.infra.integration.feign.core.constant.FeignConsumerConstant.KEY_CONFIG_ENABLE;
+import static com.wl4g.infra.integration.feign.core.constant.FeignConsumerConstant.CONFIG_PREFIX_FEIGN_ENABLE;
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -127,7 +127,7 @@ class AutoConfigurationRegistrar implements ImportBeanDefinitionRegistrar, Envir
         List<String> plugins = DEFAULT_PLUGINS;
 
         // Gets from configuration.
-        String pluginValue = environment.getProperty(FeignConsumerConstant.KEY_PLUGIN_CLASSES);
+        String pluginValue = environment.getProperty(FeignConsumerConstant.CONFIG_PREFIX_FEIGN_PLUGIN_CLASSES);
         if (!isBlank(pluginValue)) {
             List<String> plugins0 = Splitter.on(",").omitEmptyStrings().trimResults().splitToList(pluginValue);
             if (!isEmpty(plugins0)) {
@@ -157,7 +157,7 @@ class AutoConfigurationRegistrar implements ImportBeanDefinitionRegistrar, Envir
      */
     public static boolean isEnableConfiguration(Environment environment) {
         // Default by true, If want to run in Stand-alone mode, should set false
-        return environment.getProperty(KEY_CONFIG_ENABLE, boolean.class, true);
+        return environment.getProperty(CONFIG_PREFIX_FEIGN_ENABLE, boolean.class, true);
     }
 
     private static List<String> DEFAULT_PLUGINS = unmodifiableList(

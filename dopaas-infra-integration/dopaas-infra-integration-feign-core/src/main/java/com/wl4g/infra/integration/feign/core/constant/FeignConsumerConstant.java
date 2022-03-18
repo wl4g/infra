@@ -19,7 +19,7 @@
  */
 package com.wl4g.infra.integration.feign.core.constant;
 
-import com.wl4g.infra.core.constant.BaseConstant;
+import com.wl4g.infra.core.constant.BaseConstants;
 
 /**
  * {@link FeignConsumerConstant}
@@ -29,20 +29,19 @@ import com.wl4g.infra.core.constant.BaseConstant;
  * @sine v1.0
  * @see
  */
-public abstract class FeignConsumerConstant extends BaseConstant {
+public abstract class FeignConsumerConstant extends BaseConstants {
 
-    public static final String KEY_BASE_PREFIX = "spring.infra.integration.feign";
+    public static final String CONFIG_PREFIX_FEIGN = "spring.infra.integration.feign";
 
-    // Default by true.
-    public static final String KEY_CONFIG_ENABLE = KEY_BASE_PREFIX + ".enabled";
+    public static final String CONFIG_PREFIX_FEIGN_ENABLE = CONFIG_PREFIX_FEIGN + ".enabled";
 
-    public static final String KEY_CLIENT_PRIVODER = KEY_BASE_PREFIX + ".client-provider";
+    public static final String CONFIG_PREFIX_FEIGN_CLIENT_PRIVODER = CONFIG_PREFIX_FEIGN + ".client-provider";
 
-    public static final String KEY_PLUGIN_CLASSES = KEY_BASE_PREFIX + ".plugin-classes";
+    public static final String CONFIG_PREFIX_FEIGN_PLUGIN_CLASSES = CONFIG_PREFIX_FEIGN + ".plugin-classes";
 
     // For example, Tomcat 8.0 allows a maximum of 8KB of HTTP request headers
     // by default
-    public static final long RPC_ATTACTMENT_MAX_BYTES = getLongProperty(KEY_BASE_PREFIX + ".context.attachments-max-bytes",
+    public static final long RPC_ATTACTMENT_MAX_BYTES = getLongProperty(CONFIG_PREFIX_FEIGN + ".context.attachments-max-bytes",
             6144L);
 
 }
