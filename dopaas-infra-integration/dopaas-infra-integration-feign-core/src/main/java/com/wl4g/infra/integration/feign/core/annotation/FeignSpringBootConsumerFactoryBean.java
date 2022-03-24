@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
@@ -60,8 +61,8 @@ import com.google.common.io.CharStreams;
 import com.wl4g.infra.common.annotation.Reserved;
 import com.wl4g.infra.common.log.SmartLogger;
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.infra.integration.feign.core.config.FeignSpringBootProperties;
 import com.wl4g.infra.integration.feign.core.config.FeignSpringBootAutoConfiguration;
+import com.wl4g.infra.integration.feign.core.config.FeignSpringBootProperties;
 import com.wl4g.infra.integration.feign.core.context.internal.ConsumerFeignContextFilter.FeignContextDecoder;
 import com.wl4g.infra.integration.feign.core.context.internal.FeignContextBuilder;
 
@@ -321,29 +322,35 @@ class FeignSpringBootConsumerFactoryBean<T> implements FactoryBean<T>, Applicati
         @SuppressWarnings("unchecked")
         @Override
         public Object decode(Response response, Type type) throws IOException, DecodeException, FeignException {
-            Response wrapResponse = wrapRepeatableResponseIfNecessary(response);
+            Response resp = wrapRepeatableResponse(response);
             try {
-                return decoder.decode(wrapResponse, type);
+                // see:feign.jackson.JacksonDecoder#decode()
+                return decoder.decode(resp, type);
             } catch (Exception e) {
-                String errmsg = format("Failed to decode feign RPC called. - ReturnType: %s\n----->>>\n%s\n<<<-----\n%s", type,
-                        printRequestAsString(response.request()), wrapResponse);
+                String errmsg = format("Failed to decode feign RPC called. - ReturnType: %s\n--->>\n%s\n<<---\n%s", type,
+                        printRequestAsString(response.request()), resp);
                 // High concurrency performance optimizing throw exception.
                 boolean dumpStackTrace = (getLogLevel() != Level.NONE);
                 throw new FeignRpcException(errmsg, (log.isDebugEnabled() ? e : null), dumpStackTrace);
             } finally {
                 // Actual close response.
-                ((RepeatableResponseBody) wrapResponse.body()).actualClose();
+                if (nonNull(resp.body())) {
+                    ((RepeatableResponseBody) resp.body()).actualClose();
+                }
             }
         }
 
-        private Response wrapRepeatableResponseIfNecessary(Response response) throws IOException {
-            // Wrap response.
+        private Response wrapRepeatableResponse(Response response) throws IOException {
+            Response.Body body = null;
+            if (nonNull(response.body())) {
+                body = new RepeatableResponseBody(response.body());
+            }
             return Response.builder()
                     .status(response.status())
                     .reason(response.reason())
                     .request(response.request())
                     .headers(response.headers())
-                    .body(new RepeatableResponseBody(response.body()))
+                    .body(body)
                     .build();
         }
 
@@ -444,11 +451,12 @@ class FeignSpringBootConsumerFactoryBean<T> implements FactoryBean<T>, Applicati
         private final feign.Response.Body orig;
         private final Reader reader;
 
-        RepeatableResponseBody(feign.Response.Body orig) throws IOException {
-            this.orig = notNullOf(orig, "originalBody");
-            Reader reader0 = orig.asReader(Util.UTF_8);
-            if (!reader0.markSupported()) {
-                reader0 = new BufferedReader(reader0, 1) {
+        RepeatableResponseBody(@NotNull feign.Response.Body orig) throws IOException {
+            this.orig = notNullOf(orig, "origBody");
+            Reader r = this.orig.asReader(Util.UTF_8);
+            if (!r.markSupported()) {
+                // Make sure it can be read again.
+                r = new BufferedReader(r, 1) {
                     @Override
                     public void close() throws IOException {
                         // Ignore defer close, see:
@@ -456,7 +464,7 @@ class FeignSpringBootConsumerFactoryBean<T> implements FactoryBean<T>, Applicati
                     }
                 };
             }
-            this.reader = reader0;
+            this.reader = r;
         }
 
         final void actualClose() throws IOException {
