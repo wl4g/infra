@@ -146,6 +146,17 @@ public @interface FeignConsumer {
      */
     String followRedirects() default FeignSpringBootProperties.DEFAULT_FOLLOWREDIRECTS + "";
 
+    // ---------------------------------------------------------
+    // --- It can only work in Feign+SpringBoot+Istio frameworks. ---
+    // ---------------------------------------------------------
+
+    /**
+     * Feign Istio service of namespace.
+     * 
+     * @return
+     */
+    String namespace() default "default";
+
     // ----------------------------------------------------------
     // --- It can only work in Feign+SpringCloud frameworks. ---
     // ----------------------------------------------------------

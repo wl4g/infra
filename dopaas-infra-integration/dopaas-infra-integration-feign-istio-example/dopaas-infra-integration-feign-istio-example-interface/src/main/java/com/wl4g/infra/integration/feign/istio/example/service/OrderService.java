@@ -32,15 +32,42 @@ import com.wl4g.infra.integration.feign.core.annotation.FeignConsumer;
 import com.wl4g.infra.integration.feign.istio.example.bean.OrderInfo;
 
 /**
- * {@link OrderService}
+ * {@link OrderService} </br>
+ * 
+ * <p>
+ * The priorities for building the calling URL are: </br>
+ * 
+ * Priority-as-1: </br>
+ * See the source code:
+ * {@link com.wl4g.infra.integration.feign.core.annotation.FeignSpringBootTargetFactory.FeignSpringBootUrlTarget#buildByUrl}
+ * </br>
+ * 
+ * Priority-as-2: </br>
+ * See the source code:
+ * {@link com.wl4g.infra.integration.feign.core.annotation.FeignSpringBootTargetFactory.FeignSpringBootUrlTarget#buildByName}
+ * </br>
+ * 
+ * Priority-as-3: </br>
+ * See the source code:
+ * {@link com.wl4g.infra.integration.feign.core.annotation.FeignSpringBootTargetFactory.FeignSpringBootUrlTarget#buildByDefaultUrl}
+ * </br>
+ *
+ * </p>
  * 
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version v1.0 2021-03-18
  * @sine v1.0
  * @see
  */
-@FeignConsumer("${provider.serviceId}")
-@RequestMapping("/order-service")
+//
+// Priority-as-1: (for example)
+// @FeignConsumer(url="http://order-service.default.svc.cluster.local:27002")
+// @FeignConsumer(url="order-service.default.svc.cluster.local:27002")
+//
+// Priority-as-2: (for example)
+// @FeignConsumer(name = "${provider.serviceId}")
+@FeignConsumer(name = "${provider.serviceId}")
+@RequestMapping("/order")
 public interface OrderService {
 
     // Notes: Cannot be used @GetMapping, because feign convention does not

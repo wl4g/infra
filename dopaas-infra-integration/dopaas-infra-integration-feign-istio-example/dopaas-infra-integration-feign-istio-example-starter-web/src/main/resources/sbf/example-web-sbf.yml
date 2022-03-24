@@ -10,4 +10,4 @@
 
 # #### Environment(SpringBoot Istio Feign) configuration. ####
 #
-provider.serviceId: istio-feign-example-service
+provider.serviceId: istio-feign-example-service:27002

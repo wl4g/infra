@@ -180,7 +180,8 @@ class FeignSpringBootConsumersRegistrar implements ImportBeanDefinitionRegistrar
         MutablePropertyValues propertyValues = definition.getPropertyValues();
         propertyValues.add("targetClass", beanClassName);
 
-        // It works in both spring boot feign and spring cloud feign frameworks.
+        // It works in both feign+springboot/feign+springcloud environment
+        // takes effect.
         propertyValues.add("name", environment.resolveRequiredPlaceholders(feignClient.getString("name")));// serviceId
         propertyValues.add("url", environment.resolveRequiredPlaceholders(feignClient.getString("url")));// baseUrl
         propertyValues.add("path", getRequestPath(definition, feignClient));
@@ -192,14 +193,17 @@ class FeignSpringBootConsumersRegistrar implements ImportBeanDefinitionRegistrar
         ((GenericBeanDefinition) definition).setPrimary(feignClient.getBoolean("primary"));
         // propertyValues.add("primary", feignClient.getBoolean("primary"));
 
-        // It can only work in spring boot feign frameworks.
+        // It can only work in spring boot feign environment takes effect.
         propertyValues.add("logLevel", feignClient.getValue("logLevel").orElse(null));
         propertyValues.add("connectTimeout", resolveNullableLong(feignClient, "connectTimeout"));
         propertyValues.add("readTimeout", resolveNullableLong(feignClient, "readTimeout"));
         propertyValues.add("writeTimeout", resolveNullableLong(feignClient, "writeTimeout"));
         propertyValues.add("followRedirects", resolveNullableBoolean(feignClient, "followRedirects"));
 
-        // It can only work in spring cloud feign frameworks.
+        // It can only work in feign+springboot+istio environment takes effect.
+        propertyValues.add("namespace", environment.resolveRequiredPlaceholders(feignClient.getString("namespace")));
+
+        // It can only work in feign+springcloud environment takes effect.
         propertyValues.add("defaultConfiguration", defaultConfiguration);
     }
 

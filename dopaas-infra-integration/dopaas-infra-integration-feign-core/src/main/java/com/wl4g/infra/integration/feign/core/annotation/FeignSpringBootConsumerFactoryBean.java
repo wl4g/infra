@@ -87,6 +87,8 @@ import feign.codec.Encoder;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import feign.slf4j.Slf4jLogger;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * {@link FeignSpringBootConsumerFactoryBean}
@@ -97,6 +99,8 @@ import feign.slf4j.Slf4jLogger;
  * @sine v1.0
  * @see
  */
+@Setter
+@ToString
 class FeignSpringBootConsumerFactoryBean<T> implements FactoryBean<T>, ApplicationContextAware {
 
     /**
@@ -134,6 +138,8 @@ class FeignSpringBootConsumerFactoryBean<T> implements FactoryBean<T>, Applicati
     private Long writeTimeout;
     @Nullable
     private Boolean followRedirects;
+    @Nullable
+    private String namespace;
 
     // Fall-back default configuration.
     private Class<?>[] defaultConfiguration;
@@ -141,54 +147,6 @@ class FeignSpringBootConsumerFactoryBean<T> implements FactoryBean<T>, Applicati
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
-    }
-
-    public void setTargetClass(Class<T> targetClass) {
-        this.targetClass = targetClass;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    public void setDecode404(Boolean decode404) {
-        this.decode404 = decode404;
-    }
-
-    public void setLogLevel(Logger.Level logLevel) {
-        this.logLevel = logLevel;
-    }
-
-    public void setConfiguration(Class<?>[] configuration) {
-        this.configuration = configuration;
-    }
-
-    public void setConnectTimeout(Long connectTimeout) {
-        this.connectTimeout = connectTimeout;
-    }
-
-    public void setReadTimeout(Long readTimeout) {
-        this.readTimeout = readTimeout;
-    }
-
-    public void setWriteTimeout(Long writeTimeout) {
-        this.writeTimeout = writeTimeout;
-    }
-
-    public void setFollowRedirects(Boolean followRedirects) {
-        this.followRedirects = followRedirects;
-    }
-
-    public void setDefaultConfiguration(Class<?>[] defaultConfiguration) {
-        this.defaultConfiguration = defaultConfiguration;
     }
 
     @Override
@@ -233,7 +191,7 @@ class FeignSpringBootConsumerFactoryBean<T> implements FactoryBean<T>, Applicati
         // Sets configuration with merge.
         mergeConfigurationSet(builder);
 
-        return builder.target(feignTargetFactory.create(config, targetClass, name, url, path));
+        return builder.target(feignTargetFactory.create(config, targetClass, name, namespace, url, path));
     }
 
     private FeignSpringBootTargetFactory obtainFeignTargetFactory() {

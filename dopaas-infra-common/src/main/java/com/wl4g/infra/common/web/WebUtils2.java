@@ -137,7 +137,10 @@ public abstract class WebUtils2 {
      * @param body
      * @throws IOException
      */
-    public static void write(@NotNull HttpServletResponse response, int status, @NotBlank String contentType,
+    public static void write(
+            @NotNull HttpServletResponse response,
+            int status,
+            @NotBlank String contentType,
             @Nullable byte[] body) throws IOException {
         notNullOf(response, "response");
         hasTextOf(contentType, "contentType");
@@ -302,7 +305,10 @@ public abstract class WebUtils2 {
      * @param methods
      * @throws UnsupportedOperationException
      */
-    public static void rejectRequestMethod(boolean allowMode, @NotNull ServletRequest request, @NotNull ServletResponse response,
+    public static void rejectRequestMethod(
+            boolean allowMode,
+            @NotNull ServletRequest request,
+            @NotNull ServletResponse response,
             String... methods) throws UnsupportedOperationException {
         notNullOf(request, "request");
         notNullOf(response, "response");
@@ -876,7 +882,6 @@ public abstract class WebUtils2 {
         // Obtain baseURI with default port.
         final String baseURI = getBaseURIForDefault(scheme, serverName, port).concat(ctxPath);
 
-        // Debugging.
         if (JvmRuntimeTool.isJvmInDebugging) {
             Map<String, String> headers = new HashMap<>();
             Enumeration<String> en = request.getHeaderNames();
@@ -884,7 +889,7 @@ public abstract class WebUtils2 {
                 String name = en.nextElement();
                 headers.put(name, request.getHeader(name));
             }
-            log.info("Debug print ::: Got the request RFC baseurl of proxied: {}, from headers: {}", baseURI, headers);
+            log.info("::: Got the request RFC base URI: {}, by headers: {}", baseURI, headers);
         }
 
         return baseURI;

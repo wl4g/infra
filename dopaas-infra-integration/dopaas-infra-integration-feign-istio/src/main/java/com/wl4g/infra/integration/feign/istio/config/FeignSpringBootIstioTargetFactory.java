@@ -15,17 +15,18 @@
  */
 package com.wl4g.infra.integration.feign.istio.config;
 
+import static com.wl4g.infra.common.lang.Assert2.hasText;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static com.wl4g.infra.integration.feign.istio.config.FeignSpringBootIstioProperties.DEFAULT_SVC_NAMESPACE;
-import static com.wl4g.infra.integration.feign.istio.config.FeignSpringBootIstioProperties.DEFAULT_SVC_SCHEMA;
+import static com.wl4g.infra.integration.feign.istio.config.FeignSpringBootIstioProperties.FeignServiceProperties.DEFAULT_SVC_SCHEMA;
+import static java.lang.String.valueOf;
+import static org.apache.commons.lang3.StringUtils.contains;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.net.URI;
-import java.util.Iterator;
 
 import javax.validation.constraints.NotNull;
 
-import com.google.common.base.Splitter;
+import com.wl4g.infra.integration.feign.core.annotation.FeignConsumer;
 import com.wl4g.infra.integration.feign.core.annotation.FeignSpringBootTargetFactory;
 import com.wl4g.infra.integration.feign.core.config.FeignSpringBootProperties;
 
@@ -47,8 +48,14 @@ public class FeignSpringBootIstioTargetFactory implements FeignSpringBootTargetF
     }
 
     @Override
-    public <T> Target<T> create(FeignSpringBootProperties config, Class<T> type, String name, String url, String path) {
-        return new IstioFeignUrlTarget<T>(istioConfig, config, type, name, url, path);
+    public <T> Target<T> create(
+            FeignSpringBootProperties config,
+            Class<T> type,
+            String name,
+            String namespace,
+            String url,
+            String path) {
+        return new IstioFeignUrlTarget<T>(istioConfig, config, type, name, namespace, url, path);
     }
 
     public static class IstioFeignUrlTarget<T> extends FeignSpringBootUrlTarget<T> {
@@ -56,9 +63,9 @@ public class FeignSpringBootIstioTargetFactory implements FeignSpringBootTargetF
         private String actualStdKubernetesSvcDomain;
 
         public IstioFeignUrlTarget(@NotNull FeignSpringBootIstioProperties istioConfig, @NotNull FeignSpringBootProperties config,
-                @NotNull Class<T> type, String name, String url, String path) {
-            super(config, type, name, url, path);
-            this.istioConfig = istioConfig;
+                @NotNull Class<T> type, String name, String namespace, String url, String path) {
+            super(config, type, name, namespace, url, path);
+            this.istioConfig = notNullOf(istioConfig, "istioConfig");
         }
 
         // see:https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#namespaces-of-services
@@ -66,46 +73,73 @@ public class FeignSpringBootIstioTargetFactory implements FeignSpringBootTargetF
         protected String buildByName() {
             // Because it will be intercepted and enhanced by sidecar, you can
             // use http fixedly.
-            return DEFAULT_SVC_SCHEMA.concat(getStdKubernetesSvcDomain()).concat(cleanPath());
+            return DEFAULT_SVC_SCHEMA.concat(obtainStdKubernetesSvcDomainUri()).concat(cleanPath());
         }
 
-        public String getStdKubernetesSvcDomain() {
+        public String obtainStdKubernetesSvcDomainUri() {
+            actualStdKubernetesSvcDomain = buildStdKubernetesSvcDomain();
             if (isBlank(actualStdKubernetesSvcDomain)) {
                 synchronized (this) {
                     if (isBlank(actualStdKubernetesSvcDomain)) {
-                        actualStdKubernetesSvcDomain = obtainStdKubernetesSvcDomain();
+                        actualStdKubernetesSvcDomain = buildStdKubernetesSvcDomain();
                     }
                 }
             }
             return actualStdKubernetesSvcDomain;
         }
 
-        private String obtainStdKubernetesSvcDomain() {
+        private String buildStdKubernetesSvcDomain() {
             String clusterDomain = istioConfig.getKubeConfig().getClusterDomain();
-            String urlStr = name();
+            String str = hasText(name(), "Feign service '%s' @%s name is required.", type(), FeignConsumer.class.getSimpleName());
 
-            // Define defaults
-            String namespace = DEFAULT_SVC_NAMESPACE;
-            String serviceId = urlStr;
-
-            // Remove to schema
-            URI resolved = URI.create(urlStr);
-            if (!isBlank(resolved.getScheme())) {
-                urlStr = urlStr.substring(0, resolved.getScheme().length());
+            // make sure it can be parsed.
+            URI uri = URI.create(str);
+            if (!contains(str, "://")) {
+                uri = URI.create(DEFAULT_SVC_SCHEMA.concat(str));
+            }
+            
+            // Gets serviceId(host)
+            String serviceId = str;
+            if (!isBlank(uri.getHost())) {
+                serviceId = uri.getHost();
             }
 
-            // Splitting to namespace and serviceId.
-            if (urlStr.contains(":")) {
-                Iterator<String> it = Splitter.on(":").omitEmptyStrings().trimResults().split(urlStr).iterator();
-                if (it.hasNext()) {
-                    namespace = it.next();
-                }
+            // Gets port info
+            String portInfo = "";
+            if (uri.getPort() > 0) {
+                portInfo = ":".concat(valueOf(uri.getPort()));
             }
+
+            // // Resolve to namespace and serviceId.
+            /// **
+            // * <pre>
+            // * &#64;FeignConsumer(name = "mynamespace(order-service)")
+            // * &#64;RequestMapping("/order")
+            // * public interface OrderService {
+            // * }
+            // * </pre>
+            // */
+            // int start = str.indexOf("(");
+            // int end = str.indexOf(")");
+            // int lstart = str.lastIndexOf("(");
+            // int lend = str.indexOf(")");
+            // if (start != lstart || end != lend) {
+            // throw new IllegalArgumentException(format(
+            // "Syntax error for @%s(name = \"%s\") configuration, because there
+            // are multiple '(' or ')' characters",
+            // FeignConsumer.class.getSimpleName(), str, start, lstart));
+            // }
+            // if (start >= 0 && start < end) {
+            // namespace = str.substring(0, start);
+            // serviceId = str.substring(start + 1, end);
+            // }
+
             return new StringBuffer(64).append(serviceId)
                     .append(".")
-                    .append(namespace)
+                    .append(namespace())
                     .append(".svc.")
                     .append(clusterDomain)
+                    .append(portInfo)
                     .toString();
         }
 

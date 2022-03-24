@@ -36,11 +36,20 @@ import lombok.ToString;
 public class FeignSpringBootIstioProperties {
 
     private KubeConfigProperties kubeConfig = new KubeConfigProperties();
+    private FeignTracingProperties tracing = new FeignTracingProperties();
+    private FeignServiceProperties service = new FeignServiceProperties();
 
     // private Integer envoyPort = 15090;
     // private String envoyProbePath = "stats/prometheus";
 
-    private FeignTracingProperties tracing = new FeignTracingProperties();
+    @Getter
+    @Setter
+    @SuppressWarnings("deprecation")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true, allowGetters = true, allowSetters = true)
+    public static class KubeConfigProperties extends io.fabric8.kubernetes.client.Config {
+        private String clusterDomain = "cluster.local";
+    }
 
     @Getter
     @Setter
@@ -64,14 +73,9 @@ public class FeignSpringBootIstioProperties {
 
     @Getter
     @Setter
-    @SuppressWarnings("deprecation")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    @JsonIgnoreProperties(ignoreUnknown = true, allowGetters = true, allowSetters = true)
-    public static class KubeConfigProperties extends io.fabric8.kubernetes.client.Config {
-        private String clusterDomain = "cluster.local";
+    @ToString
+    public static class FeignServiceProperties {
+        public static final String DEFAULT_SVC_SCHEMA = "http://";
     }
-
-    public static final String DEFAULT_SVC_SCHEMA = "http://";
-    public static final String DEFAULT_SVC_NAMESPACE = "default";
 
 }

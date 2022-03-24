@@ -10,14 +10,3 @@
 
 # #### Environment(SpringBoot Feign for Uat) configuration. ####
 #
-
-spring:
-  infra:
-    integration:
-      feign:
-        default-url: http://localhost:27002
-        default-log-level: BASIC # NONE|BASIC|HEADERS|FULL
-        client-provider: okhttp3 # http2Client|okhttp3, default to okhttp3
-        max-idle-connections: 520
-        connect-timeout: 11000
-        read-timeout: 12000

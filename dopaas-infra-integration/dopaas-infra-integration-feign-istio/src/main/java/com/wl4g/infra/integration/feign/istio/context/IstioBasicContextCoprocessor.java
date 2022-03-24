@@ -54,12 +54,12 @@ public class IstioBasicContextCoprocessor implements FeignContextCoprocessor {
     public void prepareConsumerExecution(@NotNull RequestTemplate template, HttpServletRequest request) {
         // Must be of this type
         // see:FeignSpringBootIstioTargetFactory
-        IstioFeignUrlTarget<?> feignTarget = isInstanceOf(IstioFeignUrlTarget.class, template.feignTarget());
+        IstioFeignUrlTarget<?> target = isInstanceOf(IstioFeignUrlTarget.class, template.feignTarget());
 
         // Notice: This must not be the headers['Host'] of the current
         // request, otherwise it will cause the istio-sidecar to redirect to
         // itself again, an infinite loop.
-        String feignRequestHost = feignTarget.getStdKubernetesSvcDomain();
+        String feignRequestHost = target.obtainStdKubernetesSvcDomainUri();
         template.header("Host", feignRequestHost);
     }
 

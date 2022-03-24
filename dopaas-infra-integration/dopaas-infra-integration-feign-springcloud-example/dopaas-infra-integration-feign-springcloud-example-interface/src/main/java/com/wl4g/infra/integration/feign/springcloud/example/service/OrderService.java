@@ -40,7 +40,7 @@ import com.wl4g.infra.integration.feign.springcloud.example.bean.OrderInfo;
  * @see
  */
 @FeignConsumer("${provider.serviceId}")
-@RequestMapping("/order-service")
+@RequestMapping("/order")
 public interface OrderService {
 
     // Notes: Cannot be used @GetMapping, because feign convention does not

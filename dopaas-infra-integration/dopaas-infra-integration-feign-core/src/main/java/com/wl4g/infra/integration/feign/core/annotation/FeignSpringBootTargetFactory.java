@@ -39,8 +39,14 @@ import feign.RequestTemplate;
  */
 public interface FeignSpringBootTargetFactory {
 
-    default <T> feign.Target<T> create(FeignSpringBootProperties config, Class<T> type, String name, String url, String path) {
-        return new FeignSpringBootUrlTarget<T>(config, type, name, url, path);
+    default <T> feign.Target<T> create(
+            FeignSpringBootProperties config,
+            Class<T> type,
+            String name,
+            String namespace,
+            String url,
+            String path) {
+        return new FeignSpringBootUrlTarget<T>(config, type, name, namespace, url, path);
     }
 
     /**
@@ -51,14 +57,16 @@ public interface FeignSpringBootTargetFactory {
         private final FeignSpringBootProperties config;
         private final Class<T> type;
         private final String name;
+        private final String namespace;
         private final String url;
         private final String path;
 
         public FeignSpringBootUrlTarget(@NotNull FeignSpringBootProperties config, @NotNull Class<T> type, @Nullable String name,
-                @Nullable String url, @Nullable String path) {
+                @Nullable String namespace, @Nullable String url, @Nullable String path) {
             this.config = notNullOf(config, "config");
             this.type = notNullOf(type, "type");
             this.name = name;
+            this.namespace = namespace;
             this.url = url;
             this.path = path;
         }
@@ -71,6 +79,10 @@ public interface FeignSpringBootTargetFactory {
         @Override
         public String name() {
             return this.name;
+        }
+
+        public String namespace() {
+            return this.namespace;
         }
 
         @Override
@@ -115,15 +127,15 @@ public interface FeignSpringBootTargetFactory {
         }
 
         protected String buildRequestUrl() {
-            // Gets first by absolute URL
+            // priority1: by codes annotation absolute URL
             if (!isBlank(this.url)) {
                 return buildByUrl();
             }
-            // Gets secondary by serviceId(name)
+            // priority2: by codes annotation serviceId(name)
             else if (!isBlank(name)) {
                 return buildByName();
             }
-            // Gets fall-back by default URL.
+            // priority3: by configuration default URL.
             return buildByDefaultUrl();
         }
 
