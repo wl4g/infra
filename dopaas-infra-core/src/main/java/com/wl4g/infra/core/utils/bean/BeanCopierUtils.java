@@ -39,128 +39,128 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public abstract class BeanCopierUtils {
 
-	/***
-	 * Copy bean object the properties of new objects. Note: only when there is
-	 * a corresponding setter method can be copied.
-	 * 
-	 * @param src
-	 *            source object
-	 * @param <O>
-	 * @param <T>
-	 * @return return target dst object.
-	 */
-	@SuppressWarnings("unchecked")
-	public static <O> O clone(O src) {
-		notNull(src, "Mapper bean source object is required");
-		checkSupport(src, null);
-		try {
-			O newObj = (O) objenesis.newInstance(src.getClass());
-			return (O) mapper(src, newObj, null);
-		} catch (Exception e) {
-			throw new IllegalStateException(e);
-		}
-	}
+    /***
+     * Copy bean object the properties of new objects. Note: only when there is
+     * a corresponding setter method can be copied.
+     * 
+     * @param src
+     *            source object
+     * @param <O>
+     * @param <T>
+     * @return return target dst object.
+     */
+    @SuppressWarnings("unchecked")
+    public static <O> O clone(O src) {
+        notNull(src, "Mapper bean source object is required");
+        checkSupport(src, null);
+        try {
+            O newObj = (O) objenesis.newInstance(src.getClass());
+            return (O) mapper(src, newObj, null);
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
-	/***
-	 * Copy the properties of class objects. Note: only when the properties are
-	 * the same and there is a corresponding setter method can you copy them
-	 * 
-	 * @param src
-	 *            source object
-	 * @param dst
-	 *            target new object
-	 * @param <O>
-	 * @param <T>
-	 * @return return target dst object.
-	 */
-	public static <O, T> T mapper(O src, T dst) {
-		return mapper(src, dst, null);
-	}
+    /***
+     * Copy the properties of class objects. Note: only when the properties are
+     * the same and there is a corresponding setter method can you copy them
+     * 
+     * @param src
+     *            source object
+     * @param dst
+     *            target new object
+     * @param <O>
+     * @param <T>
+     * @return return target dst object.
+     */
+    public static <O, T> T mapper(O src, T dst) {
+        return mapper(src, dst, null);
+    }
 
-	/***
-	 * Copy the properties of class objects. Note: only when the properties are
-	 * the same and there is a corresponding setter method can you copy them
-	 * 
-	 * @param src
-	 *            source object
-	 * @param dst
-	 *            target new object
-	 * @param converter
-	 *            copier fields converter
-	 * @param <O>
-	 * @param <T>
-	 * @return return target dst object.
-	 */
-	public static <O, T> T mapper(O src, T dst, Converter converter) {
-		return doBeanMapper(src, dst, converter);
-	}
+    /***
+     * Copy the properties of class objects. Note: only when the properties are
+     * the same and there is a corresponding setter method can you copy them
+     * 
+     * @param src
+     *            source object
+     * @param dst
+     *            target new object
+     * @param converter
+     *            copier fields converter
+     * @param <O>
+     * @param <T>
+     * @return return target dst object.
+     */
+    public static <O, T> T mapper(O src, T dst, Converter converter) {
+        return doBeanMapper(src, dst, converter);
+    }
 
-	/**
-	 * Do bean copying fields mapper
-	 * 
-	 * @param src
-	 * @param dst
-	 * @param converter
-	 * @return
-	 */
-	private static <O, T> T doBeanMapper(O src, T dst, Converter converter) {
-		notNull(src, "Mapper bean source object is required");
-		notNull(dst, "Mapper bean target object is required");
-		checkSupport(src, dst);
+    /**
+     * Do bean copying fields mapper
+     * 
+     * @param src
+     * @param dst
+     * @param converter
+     * @return
+     */
+    private static <O, T> T doBeanMapper(O src, T dst, Converter converter) {
+        notNull(src, "Mapper bean source object is required");
+        notNull(dst, "Mapper bean target object is required");
+        checkSupport(src, dst);
 
-		// Gets cache key.
-		String baseKey = generateKey(src.getClass(), dst.getClass());
+        // Gets cache key.
+        String baseKey = generateKey(src.getClass(), dst.getClass());
 
-		// Gets BeanCopier
-		BeanCopier copier = mapCaches.get(baseKey);
-		if (isNull(copier)) {
-			mapCaches.put(baseKey, (copier = create(src.getClass(), dst.getClass(), nonNull(converter))));
-		}
+        // Gets BeanCopier
+        BeanCopier copier = mapCaches.get(baseKey);
+        if (isNull(copier)) {
+            mapCaches.put(baseKey, (copier = create(src.getClass(), dst.getClass(), nonNull(converter))));
+        }
 
-		copier.copy(src, dst, converter);
-		return dst;
-	}
+        copier.copy(src, dst, converter);
+        return dst;
+    }
 
-	/**
-	 * Gets generate Key
-	 * 
-	 * @param src
-	 * @param dst
-	 * @return
-	 */
-	private static String generateKey(Class<?> src, Class<?> dst) {
-		return src.toString() + dst.toString();
-	}
+    /**
+     * Gets generate Key
+     * 
+     * @param src
+     * @param dst
+     * @return
+     */
+    private static String generateKey(Class<?> src, Class<?> dst) {
+        return src.toString().concat("-").concat(dst.toString());
+    }
 
-	/**
-	 * Check is supported input type of src and dest.
-	 * 
-	 * @param src
-	 * @param dst
-	 */
-	private static void checkSupport(Object src, Object dst) {
-		if (!isNull(src)) {
-			Class<?> clazz = src.getClass();
-			if (Collection.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)) {
-				throw new IllegalArgumentException(format("Not supported copier input type source: %s", clazz));
-			}
-		}
-		if (!isNull(dst)) {
-			Class<?> clazz = dst.getClass();
-			if (Collection.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)) {
-				throw new IllegalArgumentException(format("Not supported copier input type target: %s", clazz));
-			}
-		}
-	}
+    /**
+     * Check is supported input type of src and dest.
+     * 
+     * @param src
+     * @param dst
+     */
+    private static void checkSupport(Object src, Object dst) {
+        if (!isNull(src)) {
+            Class<?> clazz = src.getClass();
+            if (Collection.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)) {
+                throw new IllegalArgumentException(format("Not supported copier input type source: %s", clazz));
+            }
+        }
+        if (!isNull(dst)) {
+            Class<?> clazz = dst.getClass();
+            if (Collection.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)) {
+                throw new IllegalArgumentException(format("Not supported copier input type target: %s", clazz));
+            }
+        }
+    }
 
-	/**
-	 * Use cache to improve efficiency
-	 */
-	final private static Map<String, BeanCopier> mapCaches = new ConcurrentHashMap<>();
+    /**
+     * Use cache to improve efficiency
+     */
+    private static final Map<String, BeanCopier> mapCaches = new ConcurrentHashMap<>(64);
 
-	/**
-	 * Object instantiator
-	 */
-	final private static Objenesis objenesis = new ObjenesisStd(true);
+    /**
+     * Object instantiator
+     */
+    private static final Objenesis objenesis = new ObjenesisStd(true);
 
 }

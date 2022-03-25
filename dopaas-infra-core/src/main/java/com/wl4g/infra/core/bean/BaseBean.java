@@ -30,7 +30,9 @@ import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiModelProperty.AccessMode;
 import io.swagger.annotations.ApiParam;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 /**
  * DB based bean entity.
@@ -41,11 +43,13 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@SuperBuilder
+@NoArgsConstructor
 public abstract class BaseBean implements Serializable {
     private static final long serialVersionUID = 8940373806493080114L;
 
     /**
-     * Bean unqiue ID.</br>
+     * Unique primary key ID
      */
     @ApiModelProperty(readOnly = true, accessMode = AccessMode.READ_ONLY)
     @ApiParam(readOnly = true, hidden = true)
@@ -55,24 +59,15 @@ public abstract class BaseBean implements Serializable {
     // @JsonIgnoreProperties(allowGetters = true, allowSetters = true)
     private Long id;
 
-    /**
-     * Is enabled
-     */
     private Integer enable;
 
     /**
-     * For data permission, associated Organization (tree) code query
+     * for control queries data permission scope.
      */
     private String organizationCode;
 
-    /**
-     * Bean info remark desciprtion.
-     */
     private String remark;
 
-    /**
-     * Bean info create user.
-     */
     @ApiModelProperty(readOnly = true, accessMode = AccessMode.READ_ONLY)
     @ApiParam(readOnly = true, hidden = true)
     // Because feign remote call requires readability and writability, while
@@ -81,9 +76,6 @@ public abstract class BaseBean implements Serializable {
     // @JsonIgnoreProperties(allowGetters = true, allowSetters = false)
     private Long createBy;
 
-    /**
-     * Bean info create date.
-     */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(readOnly = true, accessMode = AccessMode.READ_ONLY)
     @ApiParam(readOnly = true, hidden = true)
@@ -93,24 +85,6 @@ public abstract class BaseBean implements Serializable {
     // @JsonIgnoreProperties(allowGetters = true, allowSetters = false)
     private Date createDate;
 
-    /**
-     * Human creation date.</br>
-     * </br>
-     * Note: In order to be compatible with the different usages of the
-     * annotations of swagger 2.x and 3.x, the safest way is to add all possible
-     * ways that will work.
-     */
-    @ApiModelProperty(readOnly = true, accessMode = AccessMode.READ_ONLY)
-    @ApiParam(readOnly = true, hidden = true)
-    // Because feign remote call requires readability and writability, while
-    // swagger requires read-only, there is a conflict, so we should solve this
-    // problem on the swagger side.
-    // @JsonIgnoreProperties(allowGetters = true, allowSetters = false)
-    private String humanCreateDate;
-
-    /**
-     * Bean info update user.
-     */
     @ApiModelProperty(readOnly = true, accessMode = AccessMode.READ_ONLY)
     @ApiParam(readOnly = true, hidden = true)
     // Because feign remote call requires readability and writability, while
@@ -119,9 +93,6 @@ public abstract class BaseBean implements Serializable {
     // @JsonIgnoreProperties(allowGetters = true, allowSetters = false)
     private Long updateBy;
 
-    /**
-     * Bean info update date.
-     */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(readOnly = true, accessMode = AccessMode.READ_ONLY)
     @ApiParam(readOnly = true, hidden = true)
@@ -130,21 +101,6 @@ public abstract class BaseBean implements Serializable {
     // problem on the swagger side.
     // @JsonIgnoreProperties(allowGetters = true, allowSetters = false)
     private Date updateDate;
-
-    /**
-     * Human updation date.</br>
-     * </br>
-     * Note: In order to be compatible with the different usages of the
-     * annotations of swagger 2.x and 3.x, the safest way is to add all possible
-     * ways that will work.
-     */
-    @ApiModelProperty(readOnly = true, accessMode = AccessMode.READ_ONLY)
-    @ApiParam(readOnly = true, hidden = true)
-    // Because feign remote call requires readability and writability, while
-    // swagger requires read-only, there is a conflict, so we should solve this
-    // problem on the swagger side.
-    // @JsonIgnoreProperties(allowGetters = true, allowSetters = false)
-    private String humanUpdateDate;
 
     /**
      * Logistic delete status. </br>
@@ -161,6 +117,40 @@ public abstract class BaseBean implements Serializable {
     // problem on the swagger side.
     // @JsonIgnoreProperties(allowGetters = false, allowSetters = false)
     private Integer delFlag;
+
+    //
+    // --- Temporary fields. ---
+    //
+
+    /**
+     * Human creation date.</br>
+     * </br>
+     * Note: In order to be compatible with the different usages of the
+     * annotations of swagger 2.x and 3.x, the safest way is to add all possible
+     * ways that will work.
+     */
+    @ApiModelProperty(readOnly = true, accessMode = AccessMode.READ_ONLY)
+    @ApiParam(readOnly = true, hidden = true)
+    // Because feign remote call requires readability and writability, while
+    // swagger requires read-only, there is a conflict, so we should solve this
+    // problem on the swagger side.
+    // @JsonIgnoreProperties(allowGetters = true, allowSetters = false)
+    private transient String humanCreateDate;
+
+    /**
+     * Human update date.</br>
+     * </br>
+     * Note: In order to be compatible with the different usages of the
+     * annotations of swagger 2.x and 3.x, the safest way is to add all possible
+     * ways that will work.
+     */
+    @ApiModelProperty(readOnly = true, accessMode = AccessMode.READ_ONLY)
+    @ApiParam(readOnly = true, hidden = true)
+    // Because feign remote call requires readability and writability, while
+    // swagger requires read-only, there is a conflict, so we should solve this
+    // problem on the swagger side.
+    // @JsonIgnoreProperties(allowGetters = true, allowSetters = false)
+    private transient String humanUpdateDate;
 
     /**
      * Execute method before inserting, need to call manually
