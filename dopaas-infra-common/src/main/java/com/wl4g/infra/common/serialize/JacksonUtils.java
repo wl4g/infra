@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -162,7 +163,7 @@ public abstract class JacksonUtils {
     }
 
     /**
-     * Parse object from JSON strings.
+     * Parse object string from JSON strings.
      * 
      * @param content
      * @param valueTypeRef
@@ -175,6 +176,60 @@ public abstract class JacksonUtils {
         }
         try {
             return defaultObjectMapper.readValue(content, valueTypeRef);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    /**
+     * Parse array parameterized map string from JSON strings.
+     * 
+     * @param content
+     * @param valueTypeRef
+     * @return
+     */
+    public static List<String> parseArrayString(@Nullable String content) {
+        if (isNull(content)) {
+            return null;
+        }
+        try {
+            return defaultObjectMapper.readValue(content, listStringTypeRef);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    /**
+     * Parse array parameterized map string from JSON strings.
+     * 
+     * @param content
+     * @param valueTypeRef
+     * @return
+     */
+    public static List<Map<String, String>> parseArrayMapString(@Nullable String content) {
+        if (isNull(content)) {
+            return null;
+        }
+        try {
+            return defaultObjectMapper.readValue(content, listMapStringTypeRef);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    /**
+     * Parse array parameterized map object from JSON strings.
+     * 
+     * @param content
+     * @param valueTypeRef
+     * @return
+     */
+    public static List<Map<String, Object>> parseArrayMapObject(@Nullable String content) {
+        if (isNull(content)) {
+            return null;
+        }
+        try {
+            return defaultObjectMapper.readValue(content, listMapObjectTypeRef);
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
@@ -316,6 +371,13 @@ public abstract class JacksonUtils {
      * Default {@link ObjectMapper} instance.
      */
     private static final ObjectMapper defaultObjectMapper = new ObjectMapper();
+
+    private static final TypeReference<List<String>> listStringTypeRef = new TypeReference<List<String>>() {
+    };
+    private static final TypeReference<List<Map<String, String>>> listMapStringTypeRef = new TypeReference<List<Map<String, String>>>() {
+    };
+    private static final TypeReference<List<Map<String, Object>>> listMapObjectTypeRef = new TypeReference<List<Map<String, Object>>>() {
+    };
 
     static {
         getDefaultObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

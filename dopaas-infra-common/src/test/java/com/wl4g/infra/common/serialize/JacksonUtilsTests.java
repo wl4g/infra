@@ -16,6 +16,8 @@
 package com.wl4g.infra.common.serialize;
 
 import static com.wl4g.infra.common.serialize.JacksonUtils.deepClone;
+import static com.wl4g.infra.common.serialize.JacksonUtils.parseArrayMapString;
+import static com.wl4g.infra.common.serialize.JacksonUtils.parseArrayString;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.lang.System.out;
@@ -26,9 +28,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Test;
+
 public class JacksonUtilsTests {
 
-    public static void main(String[] args) {
+    @Test
+    public void testDirectParseArray() {
+        List<Map<String, String>> parsed1 = parseArrayMapString("[{\"key1\":\"value1\"}]");
+        System.out.println(parsed1);
+
+        List<String> parsed2 = parseArrayString("[\"value1\",\"value2\"]");
+        System.out.println(parsed2);
+    }
+
+    @Test
+    public void testDeepClone() {
         TestBar bar = new TestBar("myBar");
         TestBean1 bean1 = new TestBean1(1313466574534868992L, "jack", singletonMap("foo", toJSONString(bar)));
 
