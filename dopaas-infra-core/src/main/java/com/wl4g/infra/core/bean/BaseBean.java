@@ -232,6 +232,16 @@ public abstract class BaseBean implements Serializable {
         return this;
     }
 
+    public BaseBean deleted() {
+        setDelFlag(DEL_FLAG_DELETE);
+        return this;
+    }
+
+    public BaseBean undelete() {
+        setDelFlag(DEL_FLAG_NORMAL);
+        return this;
+    }
+
     // --- Function's. ---
 
     @Override
