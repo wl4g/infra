@@ -17,6 +17,7 @@ package com.wl4g.infra.common.web;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.isEmptyArray;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
+import static com.wl4g.infra.common.lang.Assert2.hasText;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
@@ -402,7 +403,7 @@ public abstract class WebUtils2 {
             }
         }
         if (required) {
-            hasTextOf(cleanedValue, paramName);
+            hasText(cleanedValue, format("Request parameter '%s' is missing", paramName));
         }
         return cleanedValue;
     }
@@ -479,6 +480,29 @@ public abstract class WebUtils2 {
      */
     public static Map<String, String> getRequestHeaders(@NotNull HttpServletRequest request) {
         return getRequestHeaders(request, null);
+    }
+
+    /**
+     * Gets request header value by name
+     * 
+     * @param request
+     * @param headerName
+     * @param required
+     * @return
+     */
+    public static String getHeader(HttpServletRequest request, String headerName, boolean required) {
+        String headerValue = request.getHeader(headerName);
+        String cleanedValue = headerValue;
+        if (headerValue != null) {
+            cleanedValue = headerValue.trim();
+            if (cleanedValue.equals(EMPTY)) {
+                cleanedValue = null;
+            }
+        }
+        if (required) {
+            hasText(cleanedValue, format("Request header '%s' is missing", headerName));
+        }
+        return cleanedValue;
     }
 
     /**
@@ -725,13 +749,13 @@ public abstract class WebUtils2 {
      * Extract domain text from {@link URI}. </br>
      * Uri resolution cannot be used here because it may fail when there are
      * wildcards, e.g,
-     * {@link URI#create}("http://*.aa.domain.com/api/v2/).gethost() is
+     * {@link URI#create}("http://*.aa.domain.com/api/v2/).getHost() is
      * null.</br>
      * 
      * <pre>
-     * {@link #extractWildcardHostName}("http://*.domain.com/v2/xx") == *.domain.com
-     * {@link #extractWildcardHostName}("http://*.aa.domain.com:*") == *.aa.domain.com
-     * {@link #extractWildcardHostName}("http://*.bb.domain.com:8080/v2/xx") == *.bb.domain.com
+     * {@link #extractWildcardHostName}("http://*.domain.com/v2/xx") --> *.domain.com
+     * {@link #extractWildcardHostName}("http://*.aa.domain.com:*") --> *.aa.domain.com
+     * {@link #extractWildcardHostName}("http://*.bb.domain.com:8080/v2/xx") --> *.bb.domain.com
      * </pre>
      * 
      * @param wildcardUri
@@ -749,10 +773,11 @@ public abstract class WebUtils2 {
             serverName = noPrefix.substring(0, slashIndex);
         }
 
-        // Check domain illegal?
-        // e.g, http://*.domain.com:8080[allow]
-        // http://*.domain.com:*[allow]
-        // http://*.aa.*.domain.com[noallow]
+        // Check domain valid
+        // e.g:
+        // http://*.domain.com:8080 [allow]
+        // http://*.domain.com:* [allow]
+        // http://*.aa.*.domain.com [not allow]
         String hostname = serverName;
         if (serverName.contains(URL_SEPAR_COLON)) {
             hostname = serverName.substring(0, serverName.indexOf(URL_SEPAR_COLON));
