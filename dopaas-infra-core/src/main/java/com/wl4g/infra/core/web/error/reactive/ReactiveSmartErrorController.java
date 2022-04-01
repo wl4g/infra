@@ -40,7 +40,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
 import com.wl4g.infra.common.log.SmartLogger;
-import com.wl4g.infra.common.web.WebUtils2.RequestExtractor;
+import com.wl4g.infra.common.web.WebUtils.RequestExtractor;
 import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration.ErrorController;
 import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration.ErrorHandlerProperties;
 import com.wl4g.infra.core.web.error.handler.AbstractSmartErrorHandler;

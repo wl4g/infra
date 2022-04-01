@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.wl4g.infra.common.log.SmartLogger;
-import com.wl4g.infra.common.web.WebUtils2.RequestExtractor;
+import com.wl4g.infra.common.web.WebUtils.RequestExtractor;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration.ErrorController;
 import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration.ErrorHandlerProperties;

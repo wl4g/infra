@@ -22,7 +22,6 @@ import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.lang.Exceptions.getStackTraceAsString;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static com.wl4g.infra.common.web.WebUtils2.ResponseType.isRespJSON;
-import static com.wl4g.infra.common.web.rest.RespBase.RetCode.newCode;
 import static java.util.Collections.emptyMap;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -52,7 +51,7 @@ import org.springframework.validation.FieldError;
 
 import com.wl4g.infra.common.log.SmartLogger;
 import com.wl4g.infra.common.view.Freemarkers;
-import com.wl4g.infra.common.web.WebUtils2.RequestExtractor;
+import com.wl4g.infra.common.web.WebUtils.RequestExtractor;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration.ErrorHandlerProperties;
 
@@ -153,7 +152,7 @@ public abstract class AbstractSmartErrorHandler implements InitializingBean {
             // When the client is not a browser or the exception rendering
             // configuration is empty, the JSON message is returned by default.
             if (isNull(uriOrTpl) || isRespJSON(extractor, null)) {
-                RespBase<Object> resp = new RespBase<>(newCode(status, errmsg));
+                RespBase<Object> resp = new RespBase<>(RespBase.RetCode.newCode(status, errmsg));
                 if (!(uriOrTpl instanceof Template)) {
                     resp.forMap().put(DEFAULT_REDIRECT_KEY, uriOrTpl);
                 }
@@ -178,10 +177,6 @@ public abstract class AbstractSmartErrorHandler implements InitializingBean {
                     getStackTraceAsString(th));
         }
         return null;
-    }
-
-    protected Object get() {
-        return config;
     }
 
     /**
