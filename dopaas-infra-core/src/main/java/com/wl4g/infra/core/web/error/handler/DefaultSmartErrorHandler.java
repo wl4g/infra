@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.core.web.error;
+package com.wl4g.infra.core.web.error.handler;
 
-import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
-import static com.wl4g.infra.common.web.rest.RespBase.*;
-import static com.wl4g.infra.common.web.rest.RespBase.RetCode.*;
+import static com.wl4g.infra.common.web.rest.RespBase.getRestfulCode;
+import static com.wl4g.infra.common.web.rest.RespBase.RetCode.BAD_PARAMS;
+import static com.wl4g.infra.common.web.rest.RespBase.RetCode.UNSUPPORTED;
 import static java.util.Objects.isNull;
 
 import java.util.Map;
@@ -25,24 +25,22 @@ import java.util.Map;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
-import com.wl4g.infra.common.log.SmartLogger;
+import com.wl4g.infra.common.web.rest.RespBase.RetCode;
 import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration.ErrorHandlerProperties;
 
 /**
- * Default basic error configure.
+ * Default smart error handler.
  * 
  * @author Wangl.sir <wanglsir@gmail.com, 983708408@qq.com>
- * @version v1.0 2019年11月1日
+ * @version v1.0 2019-11-01
  * @since
  */
 @Order(Ordered.LOWEST_PRECEDENCE)
-public class DefaultErrorConfigurer extends ErrorConfigurer {
+public class DefaultSmartErrorHandler extends AbstractSmartErrorHandler {
 
-    public DefaultErrorConfigurer(ErrorHandlerProperties config) {
+    public DefaultSmartErrorHandler(ErrorHandlerProperties config) {
         super(config);
     }
-
-    final protected SmartLogger log = getLogger(getClass());
 
     @Override
     public Integer getStatus(Map<String, Object> model, Throwable th) {

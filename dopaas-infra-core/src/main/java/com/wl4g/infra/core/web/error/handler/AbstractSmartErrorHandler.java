@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.core.web.error;
+package com.wl4g.infra.core.web.error.handler;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
@@ -22,12 +22,18 @@ import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.lang.Exceptions.getStackTraceAsString;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static com.wl4g.infra.common.web.WebUtils2.ResponseType.isRespJSON;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.startsWithIgnoreCase;
-import static org.springframework.ui.freemarker.FreeMarkerTemplateUtils.processTemplateIntoString;
+import static com.wl4g.infra.common.web.rest.RespBase.RetCode.newCode;
 import static java.util.Collections.emptyMap;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.startsWithIgnoreCase;
+import static org.springframework.boot.web.error.ErrorAttributeOptions.of;
+import static org.springframework.boot.web.error.ErrorAttributeOptions.Include.BINDING_ERRORS;
+import static org.springframework.boot.web.error.ErrorAttributeOptions.Include.EXCEPTION;
+import static org.springframework.boot.web.error.ErrorAttributeOptions.Include.MESSAGE;
+import static org.springframework.boot.web.error.ErrorAttributeOptions.Include.STACK_TRACE;
+import static org.springframework.ui.freemarker.FreeMarkerTemplateUtils.processTemplateIntoString;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,14 +42,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
 import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
-import org.springframework.boot.web.error.ErrorAttributeOptions;
-import static org.springframework.boot.web.error.ErrorAttributeOptions.of;
-import static org.springframework.boot.web.error.ErrorAttributeOptions.Include.*;
 
 import com.wl4g.infra.common.log.SmartLogger;
 import com.wl4g.infra.common.view.Freemarkers;
@@ -51,22 +56,20 @@ import com.wl4g.infra.common.web.WebUtils2.RequestExtractor;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration.ErrorHandlerProperties;
 
-import static com.wl4g.infra.common.web.rest.RespBase.RetCode.newCode;
-
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import reactor.core.publisher.Mono;
 
 /**
- * Error configuration adapter.
+ * Abstract smart error handler.
  * 
  * @author Wangl.sir <wanglsir@gmail.com, 983708408@qq.com>
- * @version v1.0 2019年11月1日
+ * @version v1.0 2019-11-01
  * @since
  * @see https://http.cat
  */
-public abstract class ErrorConfigurer implements InitializingBean {
+public abstract class AbstractSmartErrorHandler implements InitializingBean {
 
     protected final SmartLogger log = getLogger(getClass());
 
@@ -76,7 +79,7 @@ public abstract class ErrorConfigurer implements InitializingBean {
     /** Errors {@link Template} cache. */
     protected final Map<Integer, Template> errorTplMappingCache;
 
-    public ErrorConfigurer(ErrorHandlerProperties config) {
+    public AbstractSmartErrorHandler(ErrorHandlerProperties config) {
         this.config = notNullOf(config, "config");
         this.errorTplMappingCache = new ConcurrentHashMap<>(4);
     }
@@ -136,8 +139,11 @@ public abstract class ErrorConfigurer implements InitializingBean {
      * @param errorHandler
      * @return handle errors result(if necessary). for example: {@link Mono}
      */
-    public Object handleErrorRendering(@NotNull RequestExtractor extractor, @NotNull Map<String, Object> model,
-            @NotNull Throwable th, @NotNull RenderingErrorHandler errorHandler) {
+    public Object rendering(
+            @NotNull RequestExtractor extractor,
+            @NotNull Map<String, Object> model,
+            @NotNull Throwable th,
+            @NotNull RenderingErrorHandler errorHandler) {
         try {
             // Obtain custom extension response status.
             int status = getStatus(model, th);
@@ -148,31 +154,31 @@ public abstract class ErrorConfigurer implements InitializingBean {
 
             // When the client is not a browser or the exception rendering
             // configuration is empty, the JSON message is returned by default.
-            if (isNull(uriOrTpl) || isRespJSON(extractor, null)) { // Resp json
+            if (isNull(uriOrTpl) || isRespJSON(extractor, null)) {
                 RespBase<Object> resp = new RespBase<>(newCode(status, errmsg));
                 if (!(uriOrTpl instanceof Template)) {
                     resp.forMap().put(DEFAULT_REDIRECT_KEY, uriOrTpl);
                 }
-                log.error("Resp err json => {}", resp.asJson());
+                log.error("resp:error - {}", resp.asJson());
                 return errorHandler.renderingWithJson(model, resp);
             }
-            // Rendering errview
+            // Rendering error view
             else {
                 if (uriOrTpl instanceof Template) {
-                    log.error("Redirect errview => http({})", status);
+                    log.error("redirect:error - {}", status);
                     // Merge configuration to model.
                     model.putAll(config.asMap());
                     // Rendering
                     String renderString = processTemplateIntoString((Template) uriOrTpl, model);
                     return errorHandler.renderingWithView(model, status, renderString);
                 } else {
-                    log.error("Redirect errview => {}", uriOrTpl);
+                    log.error("redirect:error - {}", uriOrTpl);
                     return errorHandler.redirectError(model, (String) uriOrTpl);
                 }
             }
         } catch (Throwable th0) {
-            log.error("Unable to handle global errors, origin cause: \n{} at causes:\n{}", getStackTraceAsString(th),
-                    getStackTraceAsString(th0));
+            log.error("Failed to handle global errors, at cause: \n{} and root causes:\n{}", getStackTraceAsString(th0),
+                    getStackTraceAsString(th));
         }
 
         return null;
@@ -195,7 +201,7 @@ public abstract class ErrorConfigurer implements InitializingBean {
         // error redirect URI
         String errorRedirectUri = config.getRenderingMapping().get(status);
         if (isBlank(errorRedirectUri)) {
-            log.debug("No render template or redirection URI found for error status: %s", status);
+            log.debug("No found render template or redirection uri for error status: %s", status);
             return null;
         }
         return errorRedirectUri.substring(DEFAULT_REDIRECT_PREFIX.length());
@@ -295,7 +301,7 @@ public abstract class ErrorConfigurer implements InitializingBean {
 
     }
 
-    final private static String DEFAULT_REDIRECT_PREFIX = "redirect:";
-    final private static String DEFAULT_REDIRECT_KEY = "redirectUrl";
+    private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
+    private static final String DEFAULT_REDIRECT_KEY = "redirectUrl";
 
 }

@@ -23,7 +23,7 @@ import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.context.annotation.Bean;
 
 import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration;
-import com.wl4g.infra.core.web.error.CompositeErrorConfigurer;
+import com.wl4g.infra.core.web.error.handler.CompositeSmartErrorHandler;
 
 /**
  * Global error controller handler auto configuration.
@@ -42,9 +42,9 @@ public class ServletErrorAutoConfiguration extends AbstractErrorAutoConfiguratio
 	 * @see {@link de.codecentric.boot.admin.server.config.AdminServerWebConfiguration.ServletRestApiConfirguation}
 	 */
 	@Bean
-	public ServletSmartErrorHandler servletSmartErrorHandler(ErrorHandlerProperties config, ErrorAttributes errorAttrs,
-			CompositeErrorConfigurer adapter) {
-		return new ServletSmartErrorHandler(config, errorAttrs, adapter);
+	public ServletSmartErrorController servletSmartErrorController(ErrorHandlerProperties config, ErrorAttributes errorAttrs,
+			CompositeSmartErrorHandler adapter) {
+		return new ServletSmartErrorController(config, errorAttrs, adapter);
 	}
 
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.core.web.error;
+package com.wl4g.infra.core.web.error.handler;
 
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.state;
@@ -40,14 +40,11 @@ import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration.ErrorHandler
  * @version v1.0 2019年11月1日
  * @since
  */
-public class CompositeErrorConfigurer extends ErrorConfigurer {
+public class CompositeSmartErrorHandler extends AbstractSmartErrorHandler {
 
-    /**
-     * Error configures.
-     */
-    protected final List<ErrorConfigurer> configures = new OnceUnmodifiableList<>(new ArrayList<>());
+    protected final List<AbstractSmartErrorHandler> errorHandlers = new OnceUnmodifiableList<>(new ArrayList<>());
 
-    public CompositeErrorConfigurer(ErrorHandlerProperties config, List<ErrorConfigurer> configures) {
+    public CompositeSmartErrorHandler(ErrorHandlerProperties config, List<AbstractSmartErrorHandler> configures) {
         super(config);
         state(!isEmpty(configures), "Error configures has at least one.");
         // Sort by order.
@@ -61,12 +58,12 @@ public class CompositeErrorConfigurer extends ErrorConfigurer {
                     order1.value(), o2.getClass(), order2.value()));
             return compare;
         });
-        this.configures.addAll(configures);
+        this.errorHandlers.addAll(configures);
     }
 
     @Override
     public Integer getStatus(Map<String, Object> model, Throwable th) {
-        for (ErrorConfigurer c : configures) {
+        for (AbstractSmartErrorHandler c : errorHandlers) {
             Integer status = c.getStatus(model, th);
             if (nonNull(status)) {
                 return status;
@@ -78,7 +75,7 @@ public class CompositeErrorConfigurer extends ErrorConfigurer {
 
     @Override
     public String getRootCause(Map<String, Object> model, Throwable th) {
-        for (ErrorConfigurer c : configures) {
+        for (AbstractSmartErrorHandler c : errorHandlers) {
             String errmsg = c.getRootCause(model, th);
             if (!isBlank(errmsg)) {
                 return errmsg;

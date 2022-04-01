@@ -18,7 +18,7 @@ package com.wl4g.infra.core.web.error.reactive;
 import static com.wl4g.infra.common.lang.StringUtils2.isTrue;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static com.wl4g.infra.common.web.WebUtils2.PARAM_STACKTRACE;
-import static com.wl4g.infra.core.web.error.ErrorConfigurer.obtainErrorAttributeOptions;
+import static com.wl4g.infra.core.web.error.handler.AbstractSmartErrorHandler.obtainErrorAttributeOptions;
 import static java.util.Locale.US;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.springframework.http.HttpStatus.TEMPORARY_REDIRECT;
@@ -49,9 +49,9 @@ import com.wl4g.infra.common.web.WebUtils2.RequestExtractor;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration.ErrorController;
 import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration.ErrorHandlerProperties;
-import com.wl4g.infra.core.web.error.CompositeErrorConfigurer;
-import com.wl4g.infra.core.web.error.ErrorConfigurer;
-import com.wl4g.infra.core.web.error.ErrorConfigurer.RenderingErrorHandler;
+import com.wl4g.infra.core.web.error.handler.AbstractSmartErrorHandler;
+import com.wl4g.infra.core.web.error.handler.CompositeSmartErrorHandler;
+import com.wl4g.infra.core.web.error.handler.AbstractSmartErrorHandler.RenderingErrorHandler;
 
 import reactor.core.publisher.Mono;
 
@@ -66,26 +66,24 @@ import reactor.core.publisher.Mono;
 @ErrorController
 @ControllerAdvice
 @ConditionalOnBean(ReactiveErrorAutoConfiguration.class)
-public class ReactiveSmartErrorHandler extends AbstractErrorWebExceptionHandler implements InitializingBean {
+public class ReactiveSmartErrorController extends AbstractErrorWebExceptionHandler implements InitializingBean {
 
     protected final SmartLogger log = getLogger(getClass());
 
     /** {@link ErrorHandlerProperties} */
-    @Autowired
-    protected ErrorHandlerProperties config;
+    protected @Autowired ErrorHandlerProperties config;
 
-    /** {@link ErrorConfigurer} */
-    @Autowired
-    protected CompositeErrorConfigurer configurer;
+    /** {@link AbstractSmartErrorHandler} */
+    protected @Autowired CompositeSmartErrorHandler errorHandler;
 
-    public ReactiveSmartErrorHandler(ErrorAttributes errorAttributes, ResourceProperties resourceProperties,
+    public ReactiveSmartErrorController(ErrorAttributes errorAttributes, ResourceProperties resourceProperties,
             ApplicationContext actx) {
         super(errorAttributes, resourceProperties, actx);
     }
 
     @Override
     protected RouterFunction<ServerResponse> getRoutingFunction(final ErrorAttributes errorAttributes) {
-        return RouterFunctions.route(RequestPredicates.all(), this::renderErrorResponse);
+        return RouterFunctions.route(RequestPredicates.all(), this::handleRendering);
     }
 
     @Override
@@ -97,23 +95,23 @@ public class ReactiveSmartErrorHandler extends AbstractErrorWebExceptionHandler 
         }
 
         // Correct replacement using meaningful status codes.
-        model.put("status", configurer.getStatus(model, getError(request)));
+        model.put("status", errorHandler.getStatus(model, getError(request)));
         // Correct replacement with meaningful status messages.
-        model.put("message", configurer.getRootCause(model, getError(request)));
+        model.put("message", errorHandler.getRootCause(model, getError(request)));
         return model;
     }
 
     /**
-     * Rendering error response.
+     * Rendering error response handle.
      * 
      * @param request
      * @return
      */
     @SuppressWarnings("unchecked")
-    private Mono<ServerResponse> renderErrorResponse(final ServerRequest request) {
+    private Mono<ServerResponse> handleRendering(final ServerRequest request) {
         Map<String, Object> model = getErrorAttributes(request, false);
 
-        return (Mono<ServerResponse>) configurer.handleErrorRendering(new RequestExtractor() {
+        return (Mono<ServerResponse>) errorHandler.rendering(new RequestExtractor() {
             @Override
             public String getQueryParam(String name) {
                 return request.queryParam(name).orElse(null);
@@ -143,7 +141,6 @@ public class ReactiveSmartErrorHandler extends AbstractErrorWebExceptionHandler 
                         .build();
             }
         });
-
     }
 
     /**

@@ -15,6 +15,9 @@
  */
 package com.wl4g.infra.core.web.error;
 
+import com.wl4g.infra.core.web.error.handler.AbstractSmartErrorHandler;
+import com.wl4g.infra.core.web.error.handler.CompositeSmartErrorHandler;
+import com.wl4g.infra.core.web.error.handler.DefaultSmartErrorHandler;
 import com.wl4g.infra.core.web.mapping.PrefixHandlerMappingSupport;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.serialize.JacksonUtils.convertBean;
@@ -44,24 +47,26 @@ import org.springframework.http.HttpStatus;
 public abstract class AbstractErrorAutoConfiguration extends PrefixHandlerMappingSupport {
 
     @Bean
+    public Object errorHandlerPrefixHandlerMapping() {
+        return super.newPrefixHandlerMapping("/", ErrorController.class);
+    }
+
+    @Bean
     @ConfigurationProperties(prefix = CONF_PREFIX_INFRA_CORE_WEB_GLOBAL_ERROR)
     public ErrorHandlerProperties errorHandlerProperties() {
         return new ErrorHandlerProperties();
     }
 
     @Bean
-    public DefaultErrorConfigurer defaultErrorConfigurer(ErrorHandlerProperties config) {
-        return new DefaultErrorConfigurer(config);
+    public DefaultSmartErrorHandler defaultSmartErrorHandler(ErrorHandlerProperties config) {
+        return new DefaultSmartErrorHandler(config);
     }
 
     @Bean
-    public CompositeErrorConfigurer compositeErrorConfigurer(ErrorHandlerProperties config, List<ErrorConfigurer> configures) {
-        return new CompositeErrorConfigurer(config, configures);
-    }
-
-    @Bean
-    public Object errorHandlerPrefixHandlerMapping() {
-        return super.newPrefixHandlerMapping("/", ErrorController.class);
+    public CompositeSmartErrorHandler compositeSmartErrorHandler(
+            ErrorHandlerProperties config,
+            List<AbstractSmartErrorHandler> configures) {
+        return new CompositeSmartErrorHandler(config, configures);
     }
 
     /**

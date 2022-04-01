@@ -48,10 +48,10 @@ public class ReactiveErrorAutoConfiguration extends AbstractErrorAutoConfigurati
 	 */
 	@Bean
 	@Order(-2) // Takes precedence over the default handler
-	public ReactiveSmartErrorHandler reactiveSmartErrorHandler(
+	public ReactiveSmartErrorController reactiveSmartErrorController(
 			org.springframework.boot.web.reactive.error.ErrorAttributes errorAttributes, ResourceProperties resourceProperties,
 			ObjectProvider<ViewResolver> viewResolvers, ServerCodecConfigurer codecConfigurer, ApplicationContext actx) {
-		ReactiveSmartErrorHandler errorHandler = new ReactiveSmartErrorHandler(errorAttributes, resourceProperties, actx);
+		ReactiveSmartErrorController errorHandler = new ReactiveSmartErrorController(errorAttributes, resourceProperties, actx);
 		errorHandler.setViewResolvers(viewResolvers.orderedStream().collect(toList()));
 		errorHandler.setMessageWriters(codecConfigurer.getWriters());
 		errorHandler.setMessageReaders(codecConfigurer.getReaders());
