@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.core.logging;
+package com.wl4g.infra.core.logging.servlet;
 
 import org.slf4j.Logger;
 import org.slf4j.MDC;
@@ -31,7 +31,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.startsWithIgnoreCase;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
-import static com.wl4g.infra.core.logging.TraceLoggingMDCFilter.TraceMDCDefinition.*;
+import static com.wl4g.infra.core.logging.servlet.TraceLoggingMDCFilter.TraceMDCDefinition.*;
 
 import java.io.IOException;
 import java.util.Enumeration;

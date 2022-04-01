@@ -20,19 +20,14 @@ import static com.wl4g.infra.core.constant.CoreInfraConstants.CONF_PREFIX_INFRA_
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 
 import com.wl4g.infra.common.web.rest.RespBase.ErrorPromptMessageBuilder;
-import com.wl4g.infra.core.logging.TraceLoggingMDCFilter;
 
 /**
  * System boot defaults auto configuration.
@@ -41,10 +36,10 @@ import com.wl4g.infra.core.logging.TraceLoggingMDCFilter;
  * @version v1.0 2020年2月20日
  * @since
  */
-@ConditionalOnProperty(name = CONF_PREFIX_INFRA_CORE_BOOTSTRAPPING + ".enabled", matchIfMissing = true)
-@EnableAspectJAutoProxy(proxyTargetClass = true)
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE)
+@EnableAspectJAutoProxy(proxyTargetClass = true)
+@ConditionalOnProperty(name = CONF_PREFIX_INFRA_CORE_BOOTSTRAPPING + ".enabled", matchIfMissing = true)
 public class BootstrappingAutoConfiguration implements InitializingBean {
 
     private @Autowired ApplicationContext applicationContext;
@@ -66,26 +61,6 @@ public class BootstrappingAutoConfiguration implements InitializingBean {
         } else {
             ErrorPromptMessageBuilder.setPrompt(appName.substring(0, 4));
         }
-    }
-
-    // --- C U S T O M A T I O N _ L O G G I N G _ M D C. ---
-
-    @Bean
-    @ConditionalOnMissingBean(TraceLoggingMDCFilter.class)
-    public TraceLoggingMDCFilter defaultTraceLoggingMDCFilter(ApplicationContext context) {
-        return new TraceLoggingMDCFilter(context) {
-        };
-    }
-
-    @Bean
-    @ConditionalOnBean(TraceLoggingMDCFilter.class)
-    public FilterRegistrationBean<TraceLoggingMDCFilter> defaultTraceLoggingMDCFilterBean(TraceLoggingMDCFilter filter) {
-        FilterRegistrationBean<TraceLoggingMDCFilter> filterBean = new FilterRegistrationBean<>(filter);
-        filterBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
-        // Cannot use '/*' or it will not be added to the container chain (only
-        // '/**')
-        filterBean.addUrlPatterns("/*");
-        return filterBean;
     }
 
     // --- C U S T O M A T I O N _ S E R V L E T _ C O N T A I N E R. ---

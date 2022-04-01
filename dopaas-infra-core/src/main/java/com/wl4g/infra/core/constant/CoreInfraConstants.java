@@ -37,6 +37,8 @@ public abstract class CoreInfraConstants extends BaseConstants {
 
     public static final String CONF_PREFIX_INFRA_CORE_BOOTSTRAPPING = CONF_PREFIX_INFRA_CORE + ".bootstrapping";
 
+    public static final String CONF_PREFIX_INFRA_CORE_MDC_LOGGING = CONF_PREFIX_INFRA_CORE + ".mdc-logging";
+
     public static final String CONF_PREFIX_INFRA_CORE_NAMING_PROTOYPE = CONF_PREFIX_INFRA_CORE + ".naming-beanfactory";
 
     public static final String CONF_PREFIX_INFRA_CORE_OPERATOR = CONF_PREFIX_INFRA_CORE + ".generic-operator";
