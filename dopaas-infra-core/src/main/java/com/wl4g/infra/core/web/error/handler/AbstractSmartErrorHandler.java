@@ -136,21 +136,19 @@ public abstract class AbstractSmartErrorHandler implements InitializingBean {
      * @param extractor
      * @param model
      * @param th
-     * @param errorHandler
+     * @param errorRender
      * @return handle errors result(if necessary). for example: {@link Mono}
      */
     public Object rendering(
             @NotNull RequestExtractor extractor,
             @NotNull Map<String, Object> model,
             @NotNull Throwable th,
-            @NotNull RenderingErrorHandler errorHandler) {
+            @NotNull ErrorRender errorRender) {
         try {
             // Obtain custom extension response status.
             int status = getStatus(model, th);
             String errmsg = getRootCause(model, th);
-
-            // Gets redirectUrl or rendering template.
-            Object uriOrTpl = getRedirectUriOrRenderErrorView(status);
+            Object uriOrTpl = loadRedirectUriOrRenderView(status);
 
             // When the client is not a browser or the exception rendering
             // configuration is empty, the JSON message is returned by default.
@@ -160,39 +158,41 @@ public abstract class AbstractSmartErrorHandler implements InitializingBean {
                     resp.forMap().put(DEFAULT_REDIRECT_KEY, uriOrTpl);
                 }
                 log.error("resp:error - {}", resp.asJson());
-                return errorHandler.renderingWithJson(model, resp);
+                errorRender.renderingJson(model, resp);
             }
-            // Rendering error view
+            // Rendering error to HTML/Location
             else {
                 if (uriOrTpl instanceof Template) {
                     log.error("redirect:error - {}", status);
-                    // Merge configuration to model.
+                    // Merge configuration.
                     model.putAll(config.asMap());
-                    // Rendering
                     String renderString = processTemplateIntoString((Template) uriOrTpl, model);
-                    return errorHandler.renderingWithView(model, status, renderString);
+                    errorRender.renderingTemplate(model, status, renderString);
                 } else {
                     log.error("redirect:error - {}", uriOrTpl);
-                    return errorHandler.redirectError(model, (String) uriOrTpl);
+                    errorRender.redirectLocation(model, (String) uriOrTpl);
                 }
             }
         } catch (Throwable th0) {
             log.error("Failed to handle global errors, at cause: \n{} and root causes:\n{}", getStackTraceAsString(th0),
                     getStackTraceAsString(th));
         }
-
         return null;
     }
 
+    protected Object get() {
+        return config;
+    }
+
     /**
-     * Gets redirectUri rendering errors page view.
+     * Load redirect URI rendering errors page view.
      * 
      * @param status
      * @return
      * @throws TemplateException
      * @throws IOException
      */
-    private Object getRedirectUriOrRenderErrorView(int status) throws IOException, TemplateException {
+    private Object loadRedirectUriOrRenderView(int status) throws IOException, TemplateException {
         Template tpl = errorTplMappingCache.get(status);
         if (nonNull(tpl)) { // error template?
             return tpl;
@@ -282,23 +282,22 @@ public abstract class AbstractSmartErrorHandler implements InitializingBean {
         return isStacktrace ? of(STACK_TRACE, MESSAGE, BINDING_ERRORS, EXCEPTION) : of(MESSAGE, BINDING_ERRORS, EXCEPTION);
     }
 
-    /**
-     * {@link RenderingErrorHandler}
-     */
-    public static interface RenderingErrorHandler {
-
-        default Object renderingWithJson(Map<String, Object> model, RespBase<Object> resp) throws Exception {
+    public static interface ErrorRender {
+        default void renderingJson(Map<String, Object> model, RespBase<Object> resp) throws Exception {
             throw new UnsupportedOperationException();
         }
 
-        default Object renderingWithView(Map<String, Object> model, int status, String renderString) throws Exception {
+        default void renderingTemplate(Map<String, Object> model, int status, String templateString) throws Exception {
             throw new UnsupportedOperationException();
         }
 
-        default Object redirectError(Map<String, Object> model, String errorRedirectURI) throws Exception {
+        default void redirectLocation(Map<String, Object> model, String errorRedirectUri) throws Exception {
             throw new UnsupportedOperationException();
         }
 
+        default Object getHttpResponse() {
+            throw new UnsupportedOperationException();
+        }
     }
 
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";

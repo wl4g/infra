@@ -65,8 +65,8 @@ public abstract class AbstractErrorAutoConfiguration extends PrefixHandlerMappin
     @Bean
     public CompositeSmartErrorHandler compositeSmartErrorHandler(
             ErrorHandlerProperties config,
-            List<AbstractSmartErrorHandler> configures) {
-        return new CompositeSmartErrorHandler(config, configures);
+            List<AbstractSmartErrorHandler> handlers) {
+        return new CompositeSmartErrorHandler(config, handlers);
     }
 
     /**

@@ -22,7 +22,6 @@ import static java.util.Objects.isNull;
 
 import java.util.Map;
 
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
 import com.wl4g.infra.common.web.rest.RespBase.RetCode;
@@ -35,7 +34,7 @@ import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration.ErrorHandler
  * @version v1.0 2019-11-01
  * @since
  */
-@Order(Ordered.LOWEST_PRECEDENCE)
+@Order(DefaultSmartErrorHandler.ORDER_DEFAULT_SMART_ERROR_HANDLER)
 public class DefaultSmartErrorHandler extends AbstractSmartErrorHandler {
 
     public DefaultSmartErrorHandler(ErrorHandlerProperties config) {
@@ -73,5 +72,7 @@ public class DefaultSmartErrorHandler extends AbstractSmartErrorHandler {
     public String getRootCause(Map<String, Object> model, Throwable th) {
         return extractValidErrorsMessage(model);
     }
+
+    public static final int ORDER_DEFAULT_SMART_ERROR_HANDLER = 1000;
 
 }

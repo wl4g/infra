@@ -15,14 +15,10 @@
  */
 package com.wl4g.infra.core.web.error.servlet;
 
-import static com.google.common.base.Charsets.UTF_8;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static com.wl4g.infra.common.web.WebUtils2.isStacktraceRequest;
-import static com.wl4g.infra.common.web.WebUtils2.write;
-import static com.wl4g.infra.common.web.WebUtils2.writeJson;
 import static com.wl4g.infra.core.web.error.handler.AbstractSmartErrorHandler.obtainErrorAttributeOptions;
-import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
 
 import java.util.Map;
 
@@ -45,8 +41,8 @@ import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration.ErrorController;
 import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration.ErrorHandlerProperties;
 import com.wl4g.infra.core.web.error.handler.AbstractSmartErrorHandler;
+import com.wl4g.infra.core.web.error.handler.AbstractSmartErrorHandler.ErrorRender;
 import com.wl4g.infra.core.web.error.handler.CompositeSmartErrorHandler;
-import com.wl4g.infra.core.web.error.handler.AbstractSmartErrorHandler.RenderingErrorHandler;
 
 /**
  * Servlet smart global error controller.
@@ -60,19 +56,18 @@ import com.wl4g.infra.core.web.error.handler.AbstractSmartErrorHandler.Rendering
 @ControllerAdvice
 @ConditionalOnBean(ServletErrorAutoConfiguration.class)
 public class ServletSmartErrorController extends AbstractErrorController {
+
     protected final SmartLogger log = getLogger(getClass());
-
-    /** {@link ErrorHandlerProperties} */
     protected final ErrorHandlerProperties config;
-
-    /** {@link AbstractSmartErrorHandler} */
     protected final CompositeSmartErrorHandler errorHandler;
+    protected final AbstractSmartErrorHandler.ErrorRender errorRender;
 
     public ServletSmartErrorController(ErrorHandlerProperties config, ErrorAttributes errorAttributes,
-            CompositeSmartErrorHandler errorHandler) {
+            CompositeSmartErrorHandler errorHandler, AbstractSmartErrorHandler.ErrorRender errorRender) {
         super(errorAttributes);
         this.config = notNullOf(config, "config");
         this.errorHandler = notNullOf(errorHandler, "errorHandler");
+        this.errorRender = notNullOf(errorRender, "errorRender");
     }
 
     /**
@@ -110,23 +105,25 @@ public class ServletSmartErrorController extends AbstractErrorController {
             public String getHeader(String name) {
                 return request.getHeader(name);
             }
-        }, model, th, new RenderingErrorHandler() {
+        }, model, th, new ErrorRender() {
             @Override
-            public Object renderingWithJson(Map<String, Object> model, RespBase<Object> resp) throws Exception {
-                writeJson(response, resp.asJson());
-                return null;
+            public void renderingJson(Map<String, Object> model, RespBase<Object> resp) throws Exception {
+                errorRender.renderingJson(model, resp);
             }
 
             @Override
-            public Object renderingWithView(Map<String, Object> model, int status, String renderString) throws Exception {
-                write(response, status, TEXT_HTML_VALUE, renderString.getBytes(UTF_8));
-                return null;
+            public void renderingTemplate(Map<String, Object> model, int status, String templateString) throws Exception {
+                errorRender.renderingTemplate(model, status, templateString);
             }
 
             @Override
-            public Object redirectError(Map<String, Object> model, String errorRedirectURI) throws Exception {
-                response.sendRedirect(errorRedirectURI);
-                return null;
+            public void redirectLocation(Map<String, Object> model, String errorRedirectUri) throws Exception {
+                errorRender.redirectLocation(model, errorRedirectUri);
+            }
+
+            @Override
+            public Object getHttpResponse() {
+                return response;
             }
         });
 

@@ -15,22 +15,18 @@
  */
 package com.wl4g.infra.core.web.error.reactive;
 
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.lang.StringUtils2.isTrue;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
+import static com.wl4g.infra.common.runtime.JvmRuntimeTool.isJvmInDebugging;
 import static com.wl4g.infra.common.web.WebUtils2.PARAM_STACKTRACE;
 import static com.wl4g.infra.core.web.error.handler.AbstractSmartErrorHandler.obtainErrorAttributeOptions;
 import static java.util.Locale.US;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.springframework.http.HttpStatus.TEMPORARY_REDIRECT;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.MediaType.TEXT_HTML;
-import static org.springframework.web.reactive.function.BodyInserters.fromValue;
 
-import java.net.URI;
 import java.util.Map;
 
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.web.ResourceProperties;
 import org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler;
@@ -43,15 +39,12 @@ import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
-import static com.wl4g.infra.common.runtime.JvmRuntimeTool.isJvmInDebugging;
 import com.wl4g.infra.common.log.SmartLogger;
 import com.wl4g.infra.common.web.WebUtils2.RequestExtractor;
-import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration.ErrorController;
 import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration.ErrorHandlerProperties;
 import com.wl4g.infra.core.web.error.handler.AbstractSmartErrorHandler;
 import com.wl4g.infra.core.web.error.handler.CompositeSmartErrorHandler;
-import com.wl4g.infra.core.web.error.handler.AbstractSmartErrorHandler.RenderingErrorHandler;
 
 import reactor.core.publisher.Mono;
 
@@ -69,16 +62,17 @@ import reactor.core.publisher.Mono;
 public class ReactiveSmartErrorController extends AbstractErrorWebExceptionHandler implements InitializingBean {
 
     protected final SmartLogger log = getLogger(getClass());
-
-    /** {@link ErrorHandlerProperties} */
-    protected @Autowired ErrorHandlerProperties config;
-
-    /** {@link AbstractSmartErrorHandler} */
-    protected @Autowired CompositeSmartErrorHandler errorHandler;
+    protected final ErrorHandlerProperties config;
+    protected final CompositeSmartErrorHandler errorHandler;
+    protected final AbstractSmartErrorHandler.ErrorRender errorRender;
 
     public ReactiveSmartErrorController(ErrorAttributes errorAttributes, ResourceProperties resourceProperties,
-            ApplicationContext actx) {
+            ApplicationContext actx, ErrorHandlerProperties config, CompositeSmartErrorHandler errorHandler,
+            AbstractSmartErrorHandler.ErrorRender errorRender) {
         super(errorAttributes, resourceProperties, actx);
+        this.config = notNullOf(config, "config");
+        this.errorHandler = notNullOf(errorHandler, "errorHandler");
+        this.errorRender = notNullOf(errorRender, "errorRender");
     }
 
     @Override
@@ -121,26 +115,7 @@ public class ReactiveSmartErrorController extends AbstractErrorWebExceptionHandl
             public String getHeader(String name) {
                 return request.headers().asHttpHeaders().getFirst(name);
             }
-        }, model, getError(request), new RenderingErrorHandler() {
-
-            @Override
-            public Object renderingWithJson(Map<String, Object> model, RespBase<Object> resp) throws Exception {
-                return ServerResponse.ok().contentType(APPLICATION_JSON).body(fromValue(resp));
-            }
-
-            @Override
-            public Object renderingWithView(Map<String, Object> model, int status, String renderString) throws Exception {
-                return ServerResponse.status(status).contentType(TEXT_HTML).body(fromValue(renderString));
-            }
-
-            @Override
-            public Object redirectError(Map<String, Object> model, String errorRedirectURI) throws Exception {
-                return ServerResponse.status(TEMPORARY_REDIRECT.value())
-                        .contentType(TEXT_HTML)
-                        .location(URI.create(errorRedirectURI))
-                        .build();
-            }
-        });
+        }, model, getError(request), errorRender);
     }
 
     /**

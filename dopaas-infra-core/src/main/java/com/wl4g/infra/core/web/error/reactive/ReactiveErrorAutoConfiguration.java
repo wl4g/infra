@@ -18,8 +18,17 @@ package com.wl4g.infra.core.web.error.reactive;
 import static com.wl4g.infra.core.constant.CoreInfraConstants.CONF_PREFIX_INFRA_CORE_WEB_GLOBAL_ERROR;
 import static java.util.stream.Collectors.toList;
 
+import java.net.URI;
+import java.util.Map;
+
+import static org.springframework.http.HttpStatus.TEMPORARY_REDIRECT;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.TEXT_HTML;
+import static org.springframework.web.reactive.function.BodyInserters.fromValue;
+
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.web.ResourceProperties;
@@ -27,9 +36,13 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.codec.ServerCodecConfigurer;
+import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.reactive.result.view.ViewResolver;
 
+import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration;
+import com.wl4g.infra.core.web.error.handler.AbstractSmartErrorHandler;
+import com.wl4g.infra.core.web.error.handler.CompositeSmartErrorHandler;
 
 /**
  * Global error controller handler auto configuration.
@@ -43,19 +56,50 @@ import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration;
 @ConditionalOnClass(ViewResolver.class)
 public class ReactiveErrorAutoConfiguration extends AbstractErrorAutoConfiguration {
 
-	/**
-	 * @see {@link org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration#errorWebExceptionHandler}
-	 */
-	@Bean
-	@Order(-2) // Takes precedence over the default handler
-	public ReactiveSmartErrorController reactiveSmartErrorController(
-			org.springframework.boot.web.reactive.error.ErrorAttributes errorAttributes, ResourceProperties resourceProperties,
-			ObjectProvider<ViewResolver> viewResolvers, ServerCodecConfigurer codecConfigurer, ApplicationContext actx) {
-		ReactiveSmartErrorController errorHandler = new ReactiveSmartErrorController(errorAttributes, resourceProperties, actx);
-		errorHandler.setViewResolvers(viewResolvers.orderedStream().collect(toList()));
-		errorHandler.setMessageWriters(codecConfigurer.getWriters());
-		errorHandler.setMessageReaders(codecConfigurer.getReaders());
-		return errorHandler;
-	}
+    @Bean
+    @ConditionalOnMissingBean
+    public AbstractSmartErrorHandler.ErrorRender defaultReactiveSmartErrorRender(ErrorHandlerProperties config) {
+        return new AbstractSmartErrorHandler.ErrorRender() {
+            @Override
+            public void renderingJson(Map<String, Object> model, RespBase<Object> resp) throws Exception {
+                ServerResponse.ok().contentType(APPLICATION_JSON).body(fromValue(resp));
+            }
+
+            @Override
+            public void renderingTemplate(Map<String, Object> model, int status, String templateString) throws Exception {
+                ServerResponse.status(status).contentType(TEXT_HTML).body(fromValue(templateString));
+            }
+
+            @Override
+            public void redirectLocation(Map<String, Object> model, String errorRedirectUri) throws Exception {
+                ServerResponse.status(TEMPORARY_REDIRECT.value())
+                        .contentType(TEXT_HTML)
+                        .location(URI.create(errorRedirectUri))
+                        .build();
+            }
+        };
+    }
+
+    /**
+     * @see {@link org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration#errorWebExceptionHandler}
+     */
+    @Bean
+    @Order(-2) // Takes precedence over the default handler
+    public ReactiveSmartErrorController reactiveSmartErrorController(
+            org.springframework.boot.web.reactive.error.ErrorAttributes errorAttributes,
+            ResourceProperties resourceProperties,
+            ObjectProvider<ViewResolver> viewResolvers,
+            ServerCodecConfigurer codecConfigurer,
+            ApplicationContext actx,
+            ErrorHandlerProperties config,
+            CompositeSmartErrorHandler errorHandler,
+            AbstractSmartErrorHandler.ErrorRender errorRender) {
+        ReactiveSmartErrorController errorController = new ReactiveSmartErrorController(errorAttributes, resourceProperties, actx,
+                config, errorHandler, errorRender);
+        errorController.setViewResolvers(viewResolvers.orderedStream().collect(toList()));
+        errorController.setMessageWriters(codecConfigurer.getWriters());
+        errorController.setMessageReaders(codecConfigurer.getReaders());
+        return errorController;
+    }
 
 }

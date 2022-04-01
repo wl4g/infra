@@ -18,6 +18,7 @@ package com.wl4g.infra.core.web.error.handler;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.state;
 import static com.wl4g.infra.common.web.rest.RespBase.RetCode.SYS_ERR;
+import static java.lang.String.format;
 import static java.util.Collections.sort;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
@@ -34,31 +35,32 @@ import com.wl4g.infra.common.collection.OnceUnmodifiableList;
 import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration.ErrorHandlerProperties;
 
 /**
- * Composite error configure adapter.
+ * Composite smart error handler adapter.
  * 
  * @author Wangl.sir <wanglsir@gmail.com, 983708408@qq.com>
- * @version v1.0 2019年11月1日
+ * @version v1.0 2019-11-01
  * @since
  */
 public class CompositeSmartErrorHandler extends AbstractSmartErrorHandler {
 
     protected final List<AbstractSmartErrorHandler> errorHandlers = new OnceUnmodifiableList<>(new ArrayList<>());
 
-    public CompositeSmartErrorHandler(ErrorHandlerProperties config, List<AbstractSmartErrorHandler> configures) {
+    public CompositeSmartErrorHandler(ErrorHandlerProperties config, List<AbstractSmartErrorHandler> handlers) {
         super(config);
-        state(!isEmpty(configures), "Error configures has at least one.");
+        state(!isEmpty(handlers), "Error handlers has at least one.");
         // Sort by order.
-        sort(configures, (o1, o2) -> {
+        sort(handlers, (o1, o2) -> {
             Order order1 = findAnnotation(o1.getClass(), Order.class);
             Order order2 = findAnnotation(o2.getClass(), Order.class);
             notNull(order1, "ErrorConfigure implements must Order must be annotated.");
             notNull(order2, "ErrorConfigure implements must Order must be annotated.");
             int compare = order1.value() - order2.value();
-            state(compare != 0, String.format("ErrorConfigure implements %s:%s and %s:%s order conflict!", o1.getClass(),
-                    order1.value(), o2.getClass(), order2.value()));
+            state(compare != 0,
+                    format("%s implements %s:%s and %s:%s order conflict!", AbstractSmartErrorHandler.class.getSimpleName(),
+                            o1.getClass(), order1.value(), o2.getClass(), order2.value()));
             return compare;
         });
-        this.errorHandlers.addAll(configures);
+        this.errorHandlers.addAll(handlers);
     }
 
     @Override
@@ -69,8 +71,7 @@ public class CompositeSmartErrorHandler extends AbstractSmartErrorHandler {
                 return status;
             }
         }
-        // Fallback.
-        return SYS_ERR.getErrcode();
+        return SYS_ERR.getErrcode(); // fall-back
     }
 
     @Override
@@ -81,8 +82,7 @@ public class CompositeSmartErrorHandler extends AbstractSmartErrorHandler {
                 return errmsg;
             }
         }
-        // Fallback.
-        return "Unknown error";
+        return "Unknown or Servers internal error"; // fall-back
     }
 
 }
