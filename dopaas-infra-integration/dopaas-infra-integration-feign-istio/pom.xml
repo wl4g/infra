@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>dopaas-infra-integration-feign-istio</artifactId>
 	<packaging>jar</packaging>
-	<name>DoPaaS Infra Integration SpringBoot-Feign-Istio</name>
+	<name>DoPaaS Infra Integration SpringBoot Feign Istio</name>
 	<url>http://infra.dopaas.wl4g.com</url>
 	<description>A DoPaaS Infra Integration Framework based on integrating SpringBoot + Feign + Istio.</description>
 	<organization>

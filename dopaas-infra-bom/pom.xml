@@ -58,9 +58,9 @@
 		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- spring -->
-		<spring-boot-dependencies.version>2.3.2.RELEASE</spring-boot-dependencies.version>
-		<spring-cloud-dependencies.version>Hoxton.SR9</spring-cloud-dependencies.version>
-		<spring-cloud.version>2.2.6.RELEASE</spring-cloud.version>
+		<spring-boot-dependencies.version>2.6.6</spring-boot-dependencies.version>
+		<spring-cloud-dependencies.version>2021.0.1</spring-cloud-dependencies.version>
+		<spring-cloud.version>2.2.10.RELEASE</spring-cloud.version>
 		<spring-cloud-alibaba.version>2.2.3.RELEASE</spring-cloud-alibaba.version>
 		<resilience4j-spring-boot2.version>1.6.1</resilience4j-spring-boot2.version>
 		<!-- groovy(springboot-2.3.2) -->
@@ -294,8 +294,8 @@
 				<artifactId>jsr305</artifactId>
 				<version>${jsr305.version}</version>
 			</dependency>
-			<!-- Validation, Note: that the use of '$NO-MVN-MAN-VER$' is valid for the current dependency. When this project is referenced 
-				externally, the indirect dependency will fail, possibly leading to dependency incompatible versions. -->
+			<!-- Validation, Note: that the use of '$NO-MVN-MAN-VER$' is valid for the current dependency. When this project is referenced externally, 
+				the indirect dependency will fail, possibly leading to dependency incompatible versions. -->
 			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-validator</artifactId>

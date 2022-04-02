@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>dopaas-infra-integration-feign-common</artifactId>
 	<packaging>jar</packaging>
-	<name>DoPaaS Infra Integration SpringBoot-Feign Common</name>
+	<name>DoPaaS Infra Integration SpringBoot Feign Common</name>
 	<url>http://infra.dopaas.wl4g.com</url>
 	<description>A DoPaaS Infra Integration Framework based on integrating share part of SpringBoot/Cloud/Dubbo + Feign.</description>
 	<organization>

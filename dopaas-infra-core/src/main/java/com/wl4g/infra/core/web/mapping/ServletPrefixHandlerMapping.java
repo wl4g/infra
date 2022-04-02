@@ -80,6 +80,7 @@ public class ServletPrefixHandlerMapping extends RequestMappingHandlerMapping {
         super.registerHandlerMethod(handler, method, withPrefix(mapping));
     }
 
+    @SuppressWarnings("deprecation")
     private RequestMappingInfo withPrefix(RequestMappingInfo mapping) {
         List<String> newPatterns = withNewPatterns(mapping);
 

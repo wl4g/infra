@@ -54,6 +54,7 @@ import java.util.function.Function;
 
 import org.codehaus.groovy.control.CompilationFailedException;
 import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationContextFactory;
 import org.springframework.boot.Banner;
 import org.springframework.boot.DefaultApplicationArguments;
 import org.springframework.boot.SpringApplication;
@@ -64,7 +65,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.GenericApplicationListener;
 import org.springframework.core.Ordered;
 import org.springframework.core.ResolvableType;
@@ -88,6 +88,7 @@ import groovy.lang.GroovyClassLoader;
  * @version v1.0 2020年5月20日
  * @since
  */
+@SuppressWarnings("deprecation")
 public class BootstrappingConfigApplicationListener implements GenericApplicationListener {
     protected final SmartLogger log = getLogger(getClass());
 
@@ -172,8 +173,12 @@ public class BootstrappingConfigApplicationListener implements GenericApplicatio
      * @param configurers
      * @throws Exception
      */
-    protected void presetDefaultProperties(boolean isDebug, ApplicationArguments args, ApplicationStartingEvent event,
-            SpringApplication application, List<IBootstrappingConfigurer> configurers) throws Exception {
+    protected void presetDefaultProperties(
+            boolean isDebug,
+            ApplicationArguments args,
+            ApplicationStartingEvent event,
+            SpringApplication application,
+            List<IBootstrappingConfigurer> configurers) throws Exception {
         Properties presetProperties = new Properties();
         // defaultProperties.put("spring.main.allow-bean-definition-overriding","true");
 
@@ -212,8 +217,12 @@ public class BootstrappingConfigApplicationListener implements GenericApplicatio
         application.setDefaultProperties(presetProperties);
     }
 
-    protected void presetAdditionalProfiles(boolean isDebug, ApplicationArguments args, ApplicationStartingEvent event,
-            SpringApplication application, List<IBootstrappingConfigurer> configurers) throws Exception {
+    protected void presetAdditionalProfiles(
+            boolean isDebug,
+            ApplicationArguments args,
+            ApplicationStartingEvent event,
+            SpringApplication application,
+            List<IBootstrappingConfigurer> configurers) throws Exception {
         String[] currentAdditionalProfiles = null;
         for (IBootstrappingConfigurer configure : configurers) {
             currentAdditionalProfiles = configure.additionalProfiles(currentAdditionalProfiles);
@@ -229,8 +238,12 @@ public class BootstrappingConfigApplicationListener implements GenericApplicatio
         }
     }
 
-    protected void presetOtherProperties(boolean isDebug, ApplicationArguments args, ApplicationStartingEvent event,
-            SpringApplication application, List<IBootstrappingConfigurer> configurers) throws Exception {
+    protected void presetOtherProperties(
+            boolean isDebug,
+            ApplicationArguments args,
+            ApplicationStartingEvent event,
+            SpringApplication application,
+            List<IBootstrappingConfigurer> configurers) throws Exception {
         Boolean currentHeadless = null;
         Boolean currentLogStartupInfo = null;
         Banner currentBanner = null;
@@ -239,7 +252,7 @@ public class BootstrappingConfigApplicationListener implements GenericApplicatio
         Boolean currentCommandLineProperties = null;
         Boolean currentAddCommandLineProperties = null;
         Boolean currentLazyInitialization = null;
-        Class<? extends ConfigurableApplicationContext> currentApplicationContextClass = null;
+        ApplicationContextFactory currentApplicationContextFactory = null;
         Collection<? extends ApplicationContextInitializer<?>> currentInitializers = null;
         Collection<? extends ApplicationListener<?>> currentListeners = null;
         ApplicationListener<?>[] currentAddListeners = null;
@@ -251,7 +264,7 @@ public class BootstrappingConfigApplicationListener implements GenericApplicatio
             currentAllowBeanDefinitionOverriding = configure.allowBeanDefinitionOverriding(currentAllowBeanDefinitionOverriding);
             currentCommandLineProperties = configure.addCommandLineProperties(currentCommandLineProperties);
             currentLazyInitialization = configure.lazyInitialization(currentLazyInitialization);
-            currentApplicationContextClass = configure.applicationContextClass(currentApplicationContextClass);
+            currentApplicationContextFactory = configure.setApplicationContextFactory(currentApplicationContextFactory);
             currentInitializers = configure.initializers(currentInitializers);
             currentListeners = configure.listeners(currentListeners);
             currentAddListeners = configure.addListeners(currentAddListeners);
@@ -277,8 +290,8 @@ public class BootstrappingConfigApplicationListener implements GenericApplicatio
         if (nonNull(currentLazyInitialization)) {
             application.setLazyInitialization(currentLazyInitialization);
         }
-        if (nonNull(currentApplicationContextClass)) {
-            application.setApplicationContextClass(currentApplicationContextClass);
+        if (nonNull(currentApplicationContextFactory)) {
+            application.setApplicationContextFactory(currentApplicationContextFactory);
         }
         if (nonNull(currentInitializers)) {
             application.setInitializers(currentInitializers);
@@ -297,7 +310,7 @@ public class BootstrappingConfigApplicationListener implements GenericApplicatio
             log.debug("Preset SpringApplication#setAllowBeanDefinitionOverriding: {}", currentAllowBeanDefinitionOverriding);
             log.debug("Preset SpringApplication#setAddCommandLineProperties: {}", currentAddCommandLineProperties);
             log.debug("Preset SpringApplication#setLazyInitialization: {}", currentLazyInitialization);
-            log.debug("Preset SpringApplication#setApplicationContextClass: {}", currentApplicationContextClass);
+            log.debug("Preset SpringApplication#setApplicationContextFactory: {}", currentApplicationContextFactory);
             log.debug("Preset SpringApplication#setInitializers: {}", currentInitializers);
             log.debug("Preset SpringApplication#setListeners: {}", currentListeners);
             log.debug("Preset SpringApplication#addListeners: {}", asList(currentAddListeners));

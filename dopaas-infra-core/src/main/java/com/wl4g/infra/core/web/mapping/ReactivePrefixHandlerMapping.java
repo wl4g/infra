@@ -81,6 +81,7 @@ public class ReactivePrefixHandlerMapping extends RequestMappingHandlerMapping {
         super.registerHandlerMethod(handler, method, withPrefix(mapping));
     }
 
+    @SuppressWarnings("deprecation")
     private RequestMappingInfo withPrefix(RequestMappingInfo mapping) {
         PatternsRequestCondition patterns = new PatternsRequestCondition(
                 withNewPatterns(mapping.getPatternsCondition().getPatterns()));

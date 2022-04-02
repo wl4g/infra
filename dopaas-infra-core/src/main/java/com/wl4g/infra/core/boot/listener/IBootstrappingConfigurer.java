@@ -22,11 +22,11 @@ package com.wl4g.infra.core.boot.listener;
 import java.util.Collection;
 import java.util.Properties;
 
+import org.springframework.boot.ApplicationContextFactory;
 import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.Ordered;
 
 /**
@@ -102,8 +102,7 @@ public interface IBootstrappingConfigurer extends Ordered {
      * @param prevApplicationContextClass
      * @return
      */
-    default Class<? extends ConfigurableApplicationContext> applicationContextClass(
-            Class<? extends ConfigurableApplicationContext> prevApplicationContextClass) {
+    default ApplicationContextFactory setApplicationContextFactory(ApplicationContextFactory applicationContextFactory) {
         return null;
     }
 
