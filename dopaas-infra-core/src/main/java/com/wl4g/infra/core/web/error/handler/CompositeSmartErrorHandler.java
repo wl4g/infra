@@ -82,7 +82,7 @@ public class CompositeSmartErrorHandler extends AbstractSmartErrorHandler {
                 return errmsg;
             }
         }
-        return "Unknown or Servers internal error"; // fall-back
+        return "Unknown or Servers internal error, Please to contact the platform customer services or administrator."; // fall-back
     }
 
 }

@@ -61,18 +61,18 @@ public class ReactiveErrorAutoConfiguration extends AbstractErrorAutoConfigurati
     public AbstractSmartErrorHandler.ErrorRender defaultReactiveSmartErrorRender(ErrorHandlerProperties config) {
         return new AbstractSmartErrorHandler.ErrorRender() {
             @Override
-            public void renderingJson(Map<String, Object> model, RespBase<Object> resp) throws Exception {
-                ServerResponse.ok().contentType(APPLICATION_JSON).body(fromValue(resp));
+            public Object renderingJson(Map<String, Object> model, RespBase<Object> resp) throws Exception {
+                return ServerResponse.ok().contentType(APPLICATION_JSON).body(fromValue(resp));
             }
 
             @Override
-            public void renderingTemplate(Map<String, Object> model, int status, String templateString) throws Exception {
-                ServerResponse.status(status).contentType(TEXT_HTML).body(fromValue(templateString));
+            public Object renderingTemplate(Map<String, Object> model, int status, String templateString) throws Exception {
+                return ServerResponse.status(status).contentType(TEXT_HTML).body(fromValue(templateString));
             }
 
             @Override
-            public void redirectLocation(Map<String, Object> model, String errorRedirectUri) throws Exception {
-                ServerResponse.status(TEMPORARY_REDIRECT.value())
+            public Object redirectLocation(Map<String, Object> model, String errorRedirectUri) throws Exception {
+                return ServerResponse.status(TEMPORARY_REDIRECT.value())
                         .contentType(TEXT_HTML)
                         .location(URI.create(errorRedirectUri))
                         .build();

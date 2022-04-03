@@ -107,18 +107,18 @@ public class ServletSmartErrorController extends AbstractErrorController {
             }
         }, model, th, new ErrorRender() {
             @Override
-            public void renderingJson(Map<String, Object> model, RespBase<Object> resp) throws Exception {
-                errorRender.renderingJson(model, resp);
+            public Object renderingJson(Map<String, Object> model, RespBase<Object> resp) throws Exception {
+                return errorRender.renderingJson(model, resp);
             }
 
             @Override
-            public void renderingTemplate(Map<String, Object> model, int status, String templateString) throws Exception {
-                errorRender.renderingTemplate(model, status, templateString);
+            public Object renderingTemplate(Map<String, Object> model, int status, String templateString) throws Exception {
+                return errorRender.renderingTemplate(model, status, templateString);
             }
 
             @Override
-            public void redirectLocation(Map<String, Object> model, String errorRedirectUri) throws Exception {
-                errorRender.redirectLocation(model, errorRedirectUri);
+            public Object redirectLocation(Map<String, Object> model, String errorRedirectUri) throws Exception {
+                return errorRender.redirectLocation(model, errorRedirectUri);
             }
 
             @Override
