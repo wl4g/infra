@@ -31,13 +31,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
+import javax.validation.constraints.NotNull;
+
 import com.google.common.base.Charsets;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.wl4g.infra.common.lang.StringUtils2;
 import com.wl4g.infra.common.log.SmartLogger;
 import com.wl4g.infra.common.serialize.JdkSerializeUtils;
 import com.wl4g.infra.common.serialize.ProtostuffUtils;
+import com.wl4g.infra.support.cache.bloomfilter.BloomFilterConfig;
 import com.wl4g.infra.support.cache.jedis.ScanCursor.ClusterScanParams;
 
 /**
@@ -467,6 +471,45 @@ public class JedisService {
             }
             log.debug("delSetMember {}", key);
             return result;
+        });
+    }
+
+    // --- Bloom filter---
+
+    /**
+     * Add value based on given bloom filter configuration.
+     * 
+     * @param bfConfig
+     * @param key
+     * @param value
+     */
+    public <T> void bloomFilterAdd(@NotNull BloomFilterConfig<T> bfConfig, String key, T value) {
+        Preconditions.checkArgument(bfConfig != null, "bloomFilter config is required");
+        doExecuteWithRedis(adapter -> {
+            log.debug("bloomFilterAdd {}: {}", key, value);
+            int[] offset = bfConfig.murmurHashOffset(value);
+            for (int i : offset) {
+                adapter.setbit(key, i, true);
+            }
+            return null;
+        });
+    }
+
+    /**
+     * Determines whether a value exists based on the given bloom filter
+     * configuration.
+     */
+    public <T> boolean bloomFilterExist(@NotNull BloomFilterConfig<T> bfConfig, String key, T value) {
+        Preconditions.checkArgument(bfConfig != null, "bloomFilter config is required");
+        return doExecuteWithRedis(adapter -> {
+            log.debug("bloomFilterExist {}: {}", key, value);
+            int[] offset = bfConfig.murmurHashOffset(value);
+            for (int i : offset) {
+                if (!adapter.getbit(key, i)) {
+                    return false;
+                }
+            }
+            return true;
         });
     }
 
