@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.support.cache.bloomfilter;
+package com.wl4g.infra.support.cache.bloom;
+
+import static com.google.common.base.Charsets.UTF_8;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 
 import javax.validation.constraints.NotNull;
 
-import com.google.common.base.Preconditions;
 import com.google.common.hash.Funnel;
 import com.google.common.hash.Hashing;
 
-import lombok.AllArgsConstructor;
-
 /**
- * {@link BloomFilterConfig}
+ * {@link BloomConfig}
  * 
  * <p>
  * 1. What is the definition of Bloom-filter?
@@ -72,19 +72,14 @@ import lombok.AllArgsConstructor;
  * set to 0 directly, which may affect the judgment of other elements. break.
  * Counting Bloom Filter can be used
  * </p>
- * 
- * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
- * @version 2022-04-04 v3.0.0
- * @since v3.0.0
  */
-@AllArgsConstructor
-public class BloomFilterConfig<T> {
+public class BloomConfig<T> {
+    private final Funnel<T> funnel;
     private final int numHashFunctions;
     private final int bitSize;
-    private final Funnel<T> funnel;
 
     /**
-     * Build of {@link BloomFilterConfig} instance.
+     * Build of {@link BloomConfig} instance.
      * 
      * @param funnel
      * @param expectedInsertions
@@ -92,9 +87,8 @@ public class BloomFilterConfig<T> {
      * @param fpp
      *            error tolerance rate
      */
-    public BloomFilterConfig(@NotNull Funnel<T> funnel, int expectedInsertions, double fpp) {
-        Preconditions.checkArgument(funnel != null, "funnel is required");
-        this.funnel = funnel;
+    public BloomConfig(@NotNull Funnel<T> funnel, int expectedInsertions, double fpp) {
+        this.funnel = notNullOf(funnel, "funnel");
         this.bitSize = optimalNumOfBits(expectedInsertions, fpp);
         this.numHashFunctions = optimalNumOfHashFunctions(expectedInsertions, bitSize);
     }
@@ -139,4 +133,6 @@ public class BloomFilterConfig<T> {
         return Math.max(1, (int) Math.round((double) m / n * Math.log(2)));
     }
 
+    public static final BloomConfig<String> DEFAULT_BLOOM_CONFIG = new BloomConfig<>(
+            (Funnel<String>) (from, into) -> into.putString(from, UTF_8).putString(from, UTF_8), Integer.MAX_VALUE, 0.01);
 }
