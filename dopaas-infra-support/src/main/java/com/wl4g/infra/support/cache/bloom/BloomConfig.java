@@ -133,6 +133,10 @@ public class BloomConfig<T> {
         return Math.max(1, (int) Math.round((double) m / n * Math.log(2)));
     }
 
+    /**
+     * Default bloom filter configuration. For safety, for example, the maximum
+     * value of redis setbit offset is 2^32
+     */
     public static final BloomConfig<String> DEFAULT_BLOOM_CONFIG = new BloomConfig<>(
-            (Funnel<String>) (from, into) -> into.putString(from, UTF_8).putString(from, UTF_8), Integer.MAX_VALUE, 0.01);
+            (Funnel<String>) (from, into) -> into.putString(from, UTF_8), Integer.MAX_VALUE, 0.01);
 }
