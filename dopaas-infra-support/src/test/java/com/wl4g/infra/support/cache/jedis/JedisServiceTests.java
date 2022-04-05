@@ -60,15 +60,15 @@ public class JedisServiceTests {
 
         // Add test orders ID to bloom.
         for (int i = 0; i < 100; i++) {
-            jedisService.bloomFilterAdd(bfConfig, key, "id_" + i);
+            jedisService.bloomAdd(bfConfig, key, "id_" + i);
         }
 
         // Check if an order id exists in the bloom filter.
-        boolean result1 = jedisService.bloomFilterExist(bfConfig, key, "id_31");
+        boolean result1 = jedisService.bloomExist(bfConfig, key, "id_31");
         System.out.println(result1);
         assert result1;
 
-        boolean result2 = jedisService.bloomFilterExist(bfConfig, key, "id_123");
+        boolean result2 = jedisService.bloomExist(bfConfig, key, "id_123");
         System.out.println(result2);
         assert !result2;
     }
@@ -83,15 +83,15 @@ public class JedisServiceTests {
 
         // Add test orders ID to bloom.
         for (int i = 0; i < 100; i++) {
-            jedisService.bloomFilterAdd(bfConfig, key, "id_" + i);
+            jedisService.bloomAdd(bfConfig, key, "id_" + i);
         }
 
         // Check if an order id exists in the bloom filter.
-        boolean result1 = jedisService.bloomFilterExist(bfConfig, key, "id_31");
+        boolean result1 = jedisService.bloomExist(bfConfig, key, "id_31");
         System.out.println(result1);
         assert result1;
 
-        boolean result2 = jedisService.bloomFilterExist(bfConfig, key, "id_123");
+        boolean result2 = jedisService.bloomExist(bfConfig, key, "id_123");
         System.out.println(result2);
         assert !result2;
     }

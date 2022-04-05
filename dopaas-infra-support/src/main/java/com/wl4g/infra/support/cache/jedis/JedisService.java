@@ -483,7 +483,7 @@ public class JedisService {
      * @param key
      * @param value
      */
-    public <T> void bloomFilterAdd(@NotNull BloomConfig<T> bfConfig, String key, T value) {
+    public <T> void bloomAdd(@NotNull BloomConfig<T> bfConfig, String key, T value) {
         Preconditions.checkArgument(bfConfig != null, "bloomFilter config is required");
         doExecuteWithRedis(adapter -> {
             log.debug("bloomFilterAdd {}: {}", key, value);
@@ -499,7 +499,7 @@ public class JedisService {
      * Determines whether a value exists based on the given bloom filter
      * configuration.
      */
-    public <T> boolean bloomFilterExist(@NotNull BloomConfig<T> bfConfig, String key, T value) {
+    public <T> boolean bloomExist(@NotNull BloomConfig<T> bfConfig, String key, T value) {
         Preconditions.checkArgument(bfConfig != null, "bloomFilter config is required");
         return doExecuteWithRedis(adapter -> {
             log.debug("bloomFilterExist {}: {}", key, value);
