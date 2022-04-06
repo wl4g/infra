@@ -22,7 +22,9 @@ import static com.wl4g.infra.common.runtime.JvmRuntimeTool.isJvmInDebugging;
 import static com.wl4g.infra.common.web.WebUtils2.PARAM_STACKTRACE;
 import static com.wl4g.infra.core.web.error.handler.AbstractSmartErrorHandler.obtainErrorAttributeOptions;
 import static java.util.Locale.US;
+import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 import java.util.Map;
 
@@ -32,6 +34,8 @@ import org.springframework.boot.autoconfigure.web.ResourceProperties;
 import org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler;
 import org.springframework.boot.web.reactive.error.ErrorAttributes;
 import org.springframework.context.ApplicationContext;
+import org.springframework.http.HttpCookie;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -133,7 +137,13 @@ public class ReactiveSmartErrorController extends AbstractErrorWebExceptionHandl
             stacktrace = request.headers().firstHeader(PARAM_STACKTRACE);
         }
         if (isBlank(stacktrace)) {
-            stacktrace = request.cookies().getFirst(PARAM_STACKTRACE).getValue();
+            MultiValueMap<String, HttpCookie> cookies = request.cookies();
+            if (isEmpty(cookies)) {
+                HttpCookie value = cookies.getFirst(PARAM_STACKTRACE);
+                if (nonNull(value)) {
+                    stacktrace = value.getValue();
+                }
+            }
         }
         if (isBlank(stacktrace)) {
             return false;
