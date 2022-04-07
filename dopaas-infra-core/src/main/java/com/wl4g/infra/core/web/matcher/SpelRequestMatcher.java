@@ -16,6 +16,7 @@
 package com.wl4g.infra.core.web.matcher;
 
 import static com.wl4g.infra.common.lang.Assert2.hasText;
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.util.Collections.emptyMap;
@@ -72,6 +73,9 @@ public class SpelRequestMatcher {
     }
 
     public boolean matches(@NotNull RequestExtractor extractor, @NotBlank String expression) {
+        notNullOf(extractor, "extractor");
+        hasTextOf(expression, "expression");
+
         Map<String, Object> model = Maps.newHashMap(definitions);
         model.put("definitions", definitions);
         model.put("request", extractor);
