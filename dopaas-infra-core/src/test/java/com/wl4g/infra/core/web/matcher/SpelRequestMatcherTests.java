@@ -39,19 +39,25 @@ public class SpelRequestMatcherTests {
     public void testAndRequestMatches() {
         Map<String, MatchHttpRequest> definitions = Maps.newHashMap();
 
-        definitions.put("header-label-based-canary",
+        // [Note]: Define a name that conforms to the java method naming
+        // specification, which can be used directly in SPEL expressions,
+        // otherwise only the method obtained in definitions can be used, for
+        // example: definitions.get('my-matcher')
+        definitions.put("headerLabelBasedCanaryMacher",
                 MatchHttpRequest.builder()
                         .host("portal.example.com")
                         .header(new MatchProperty(MatchSymbol.EQ, "X-User-Group", "group1"))
                         .build());
 
-        definitions.put("query-version-based-canary",
+        definitions.put("query-version-based-canary-matcher",
                 MatchHttpRequest.builder()
                         .host("portal.example.com")
                         .query(new MatchProperty(MatchSymbol.EQ, "version", "v1"))
                         .build());
 
-        String expression = "#{definitions.get('header-label-based-canary').and(definitions.get('query-version-based-canary')).test(request)}";
+        // [Note]: Names that meet the java method naming convention can be used
+        // directly.
+        String expression = "#{headerLabelBasedCanaryMacher.and(definitions.get('query-version-based-canary-matcher')).test(request)}";
         SpelRequestMatcher matcher = new SpelRequestMatcher(definitions);
 
         boolean result = matcher.matches(new RequestExtractor() {

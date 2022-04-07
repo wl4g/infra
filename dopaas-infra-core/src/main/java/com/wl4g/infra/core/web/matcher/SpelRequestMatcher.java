@@ -72,7 +72,7 @@ public class SpelRequestMatcher {
     }
 
     public boolean matches(@NotNull RequestExtractor extractor, @NotBlank String expression) {
-        Map<String, Object> model = Maps.newHashMap();
+        Map<String, Object> model = Maps.newHashMap(definitions);
         model.put("definitions", definitions);
         model.put("request", extractor);
         return spel.resolve(expression, model);
