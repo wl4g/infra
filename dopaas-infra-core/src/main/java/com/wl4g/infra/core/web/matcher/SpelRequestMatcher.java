@@ -15,13 +15,17 @@
  */
 package com.wl4g.infra.core.web.matcher;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.hasText;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.contains;
 import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.endsWith;
@@ -33,6 +37,7 @@ import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
@@ -43,7 +48,6 @@ import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.google.common.collect.Maps;
 import com.wl4g.infra.core.utils.expression.SpelExpressions;
 
 import lombok.AllArgsConstructor;
@@ -63,29 +67,40 @@ import lombok.experimental.SuperBuilder;
  */
 public class SpelRequestMatcher {
 
-    private @Nullable final Map<String, MatchHttpRequest> definitions;
+    private @Nullable final List<MatchHttpRequestRule> ruleDefinitions;
     private @NotBlank final SpelExpressions spel = SpelExpressions.create();
 
-    public SpelRequestMatcher(Map<String, MatchHttpRequest> definitions) {
-        this.definitions = isEmpty(definitions) ? emptyMap() : definitions;
-        // Validation
-        this.definitions.forEach((name, match) -> {
-            if (nonNull(match.getHeader())) {
-                match.getHeader().validate();
-            }
-            if (nonNull(match.getQuery())) {
-                match.getQuery().validate();
-            }
-        });
+    public SpelRequestMatcher(List<MatchHttpRequestRule> ruleDefinitions) {
+        this.ruleDefinitions = isEmpty(ruleDefinitions) ? emptyList() : ruleDefinitions;
+        this.ruleDefinitions.forEach(rule -> rule.validate()); // Validation
+    }
+
+    public List<MatchHttpRequestRule> find(@NotNull RequestExtractor extractor, @NotBlank String expression) {
+        notNullOf(extractor, "extractor");
+        hasTextOf(expression, "expression");
+
+        // Make model.
+        Map<String, Object> model = safeList(ruleDefinitions).stream().collect(toMap(r -> "$".concat(r.getName()), r -> r));
+        model.put("$request", extractor);
+
+        // find resolve.
+        List<MatchHttpRequestRule> result = ruleDefinitions.stream().filter(e -> {
+            model.put("$rule", e);
+            return spel.resolve(expression, model);
+        }).collect(toList());
+
+        return unmodifiableList(result);
     }
 
     public boolean matches(@NotNull RequestExtractor extractor, @NotBlank String expression) {
         notNullOf(extractor, "extractor");
         hasTextOf(expression, "expression");
 
-        Map<String, Object> model = Maps.newHashMap(definitions);
-        model.put("definitions", definitions);
-        model.put("request", extractor);
+        // Add '$' prefix to all key.
+        Map<String, Object> model = ruleDefinitions.stream().collect(toMap(r -> "$".concat(r.getName()), r -> r));
+        model.put("$request", extractor);
+        model.put("$rules", ruleDefinitions.stream().collect(toMap(r -> r.getName(), r -> r)));
+
         return spel.resolve(expression, model);
     }
 
@@ -132,7 +147,12 @@ public class SpelRequestMatcher {
     @ToString
     @SuperBuilder
     @AllArgsConstructor
-    public static class MatchHttpRequest implements Predicate<RequestExtractor> {
+    public static class MatchHttpRequestRule implements Predicate<RequestExtractor> {
+
+        /**
+         * The name of the matching rule (required).
+         */
+        private @NotBlank String name;
 
         /**
          * This option is used to specify the way to combine the matching result
@@ -141,7 +161,7 @@ public class SpelRequestMatcher {
          * It does not affect the use of this merge result with schema, host,
          * port, etc. and the final merge method.
          */
-        private boolean orMatchHeaderQuery;
+        // private boolean orMatchHeaderQuery;
 
         /**
          * (Optional) The value used to match the current request HTTP schema.
@@ -183,9 +203,9 @@ public class SpelRequestMatcher {
          */
         private @Nullable MatchProperty query;
 
-        public MatchHttpRequest() {
-            this.orMatchHeaderQuery = true;
-        }
+        // public MatchHttpRequestRule() {
+        // this.orMatchHeaderQuery = true;
+        // }
 
         @Override
         public boolean test(RequestExtractor extractor) {
@@ -223,14 +243,26 @@ public class SpelRequestMatcher {
             }
             // Matches HTTP query parameter.
             boolean flagQuery = isNull(getQuery());
-            if (!flagQuery && getHeader().getSymbol().getFunction().apply(
+            if (!flagQuery && getQuery().getSymbol().getFunction().apply(
                     trimToEmpty(extractor.getQueryValue(getQuery().getKey())), getQuery().getValue())) {
                 flagQuery = true;
             }
-            if (isOrMatchHeaderQuery()) {
-                return flagSchema && flagHost && flagPort && flagMethod && (flagHeader || flagQuery);
-            }
+            // if (isOrMatchHeaderQuery()) {
+            // return flagSchema && flagHost && flagPort && flagMethod &&
+            // (flagHeader || flagQuery);
+            // }
             return flagSchema && flagHost && flagPort && flagMethod && flagHeader && flagQuery;
+        }
+
+        public MatchHttpRequestRule validate() {
+            notNull(getName(), "rule name is required");
+            if (nonNull(getHeader())) {
+                getHeader().validate();
+            }
+            if (nonNull(getQuery())) {
+                getQuery().validate();
+            }
+            return this;
         }
     }
 
