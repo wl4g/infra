@@ -70,6 +70,11 @@ public class SpelRequestMatcher {
 
     public SpelRequestMatcher(Map<String, MatchHttpRequest> definitions) {
         this.definitions = isEmpty(definitions) ? emptyMap() : definitions;
+        // Validation
+        this.definitions.forEach((name, match) -> {
+            match.getHeader().validate();
+            match.getQuery().validate();
+        });
     }
 
     public boolean matches(@NotNull RequestExtractor extractor, @NotBlank String expression) {
