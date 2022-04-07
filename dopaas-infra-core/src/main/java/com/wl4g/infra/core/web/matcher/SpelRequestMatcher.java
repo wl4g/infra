@@ -21,6 +21,7 @@ import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.util.Collections.emptyMap;
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.contains;
 import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.endsWith;
@@ -66,14 +67,18 @@ import lombok.experimental.SuperBuilder;
 public class SpelRequestMatcher {
 
     private @Nullable final Map<String, MatchHttpRequest> definitions;
-    private @NotBlank final SpelExpressions spel = SpelExpressions.create(MatchHttpRequest.class, RequestExtractor.class);
+    private @NotBlank final SpelExpressions spel = SpelExpressions.create();
 
     public SpelRequestMatcher(Map<String, MatchHttpRequest> definitions) {
         this.definitions = isEmpty(definitions) ? emptyMap() : definitions;
         // Validation
         this.definitions.forEach((name, match) -> {
-            match.getHeader().validate();
-            match.getQuery().validate();
+            if (nonNull(match.getHeader())) {
+                match.getHeader().validate();
+            }
+            if (nonNull(match.getQuery())) {
+                match.getQuery().validate();
+            }
         });
     }
 
