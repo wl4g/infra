@@ -146,6 +146,7 @@ public class SpelRequestMatcher {
     @Setter
     @ToString
     @SuperBuilder
+    @NoArgsConstructor
     @AllArgsConstructor
     public static class MatchHttpRequestRule implements Predicate<RequestExtractor> {
 
