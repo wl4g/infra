@@ -61,9 +61,6 @@ import lombok.experimental.SuperBuilder;
  * @version 2022-04-07 v3.0.0
  * @since v3.0.0
  */
-@Getter
-@Setter
-@ToString
 public class SpelRequestMatcher {
 
     private @Nullable final Map<String, MatchHttpRequest> definitions;
