@@ -47,7 +47,7 @@ import org.springframework.http.HttpStatus;
 
 import com.wl4g.infra.common.log.SmartLogger;
 import com.wl4g.infra.common.view.Freemarkers;
-import com.wl4g.infra.common.web.WebUtils.RequestExtractor;
+import com.wl4g.infra.common.web.WebUtils.WebRequestExtractor;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration.ErrorHandlerProperties;
 
@@ -135,7 +135,7 @@ public abstract class AbstractSmartErrorHandler implements InitializingBean {
      * @return handle errors result(if necessary). for example: {@link Mono}
      */
     public Object rendering(
-            @NotNull RequestExtractor extractor,
+            @NotNull WebRequestExtractor extractor,
             @NotNull Map<String, Object> model,
             @NotNull Throwable th,
             @NotNull ErrorRender errorRender) {

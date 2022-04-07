@@ -44,7 +44,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
 import com.wl4g.infra.common.log.SmartLogger;
-import com.wl4g.infra.common.web.WebUtils.RequestExtractor;
+import com.wl4g.infra.common.web.WebUtils.WebRequestExtractor;
 import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration.ErrorController;
 import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration.ErrorHandlerProperties;
 import com.wl4g.infra.core.web.error.handler.AbstractSmartErrorHandler;
@@ -109,7 +109,7 @@ public class ReactiveSmartErrorController extends AbstractErrorWebExceptionHandl
     private Mono<ServerResponse> handleRendering(final ServerRequest request) {
         Map<String, Object> model = getErrorAttributes(request, false);
 
-        return (Mono<ServerResponse>) errorHandler.rendering(new RequestExtractor() {
+        return (Mono<ServerResponse>) errorHandler.rendering(new WebRequestExtractor() {
             @Override
             public String getQueryParam(String name) {
                 return request.queryParam(name).orElse(null);

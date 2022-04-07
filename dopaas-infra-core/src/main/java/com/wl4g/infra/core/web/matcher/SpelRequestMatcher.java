@@ -106,7 +106,7 @@ public class SpelRequestMatcher {
             return null;
         }
 
-        default String getPort() {
+        default Integer getPort() {
             return null;
         }
 
@@ -211,7 +211,7 @@ public class SpelRequestMatcher {
                 flagHost = true;
             }
             // Matches HTTP port
-            boolean flagPort = isNull(getPort());
+            boolean flagPort = (isNull(getPort()) || getPort() <= 0);
             if (!flagPort && equalsIgnoreCase(extractor.getPort() + "", getPort() + "")) {
                 flagPort = true;
             }

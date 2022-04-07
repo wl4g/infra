@@ -377,7 +377,7 @@ public abstract class WebUtils2 extends WebUtils {
      */
     public static boolean isXHRRequest(@NotNull HttpServletRequest request) {
         notNullOf(request, "request");
-        return isXHRRequest(new RequestExtractor() {
+        return isXHRRequest(new WebRequestExtractor() {
             @Override
             public String getHeader(String name) {
                 return request.getHeader("X-Requested-With");
@@ -559,7 +559,7 @@ public abstract class WebUtils2 extends WebUtils {
          * @return
          */
         public static boolean isRespJSON(@NotBlank final String respTypeValue, @NotNull final HttpServletRequest request) {
-            return determineResponseWithJson(safeOf(respTypeValue), new RequestExtractor() {
+            return determineResponseWithJson(safeOf(respTypeValue), new WebRequestExtractor() {
                 @Override
                 public String getQueryParam(String name) {
                     return request.getParameter(name);
@@ -579,7 +579,7 @@ public abstract class WebUtils2 extends WebUtils {
          * @return
          */
         public static boolean isRespJSON(@NotNull final HttpServletRequest request) {
-            return isRespJSON(new RequestExtractor() {
+            return isRespJSON(new WebRequestExtractor() {
                 @Override
                 public String getQueryParam(String name) {
                     return request.getParameter(name);
@@ -601,7 +601,7 @@ public abstract class WebUtils2 extends WebUtils {
          *            response type paremter name.
          * @return
          */
-        public static boolean isRespJSON(@NotNull RequestExtractor extractor, @Nullable String respTypeName) {
+        public static boolean isRespJSON(@NotNull WebRequestExtractor extractor, @Nullable String respTypeName) {
             notNullOf(extractor, "request");
 
             List<String> respTypeNames = asList(RESPTYPE_NAMES);
@@ -628,7 +628,7 @@ public abstract class WebUtils2 extends WebUtils {
          * @param extractor
          * @return
          */
-        private static boolean determineResponseWithJson(ResponseType respType, @NotNull RequestExtractor extractor) {
+        private static boolean determineResponseWithJson(ResponseType respType, @NotNull WebRequestExtractor extractor) {
             notNullOf(extractor, "request");
 
             // Using default strategy

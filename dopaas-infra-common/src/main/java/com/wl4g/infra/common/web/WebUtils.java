@@ -606,13 +606,13 @@ public abstract class WebUtils {
      * @param extractor
      * @return
      */
-    public static boolean isXHRRequest(@NotNull RequestExtractor extractor) {
+    public static boolean isXHRRequest(@NotNull WebRequestExtractor extractor) {
         notNullOf(extractor, "extractor");
         return equalsIgnoreCase(extractor.getHeader("X-Requested-With"), "XMLHttpRequest");
     }
 
     /**
-     * Request extractor wrapper, It is mainly to solve the request types of
+     * Web Request extractor wrapper, It is mainly to solve the request types of
      * different models or protocols, such as:
      * Xxx{@link javax.servlet.ServletRequest} or {@link HttpServletRequest} or
      * {@link org.springframework.web.servlet.function.ServerRequest}(reactive)
@@ -622,7 +622,7 @@ public abstract class WebUtils {
      * @version v1.0 2020-09-15
      * @since
      */
-    public static interface RequestExtractor {
+    public static interface WebRequestExtractor {
         /**
          * Gets query parameter by name.
          * 
@@ -740,7 +740,7 @@ public abstract class WebUtils {
     /**
      * Unified exception handling stack trace parameter name.
      */
-    public static final String PARAM_STACKTRACE = getenv().getOrDefault("DOPAAS_INFRA_REQUEST_STACKTRACE_PARAM", "x-stacktrace");
+    public static final String PARAM_STACKTRACE = getenv().getOrDefault("INFRA_REQUEST_STACKTRACE_PARAM", "x-stacktrace");
 
     public static final Predicate<String> defaultStringAnyFilter = name -> true;
 
