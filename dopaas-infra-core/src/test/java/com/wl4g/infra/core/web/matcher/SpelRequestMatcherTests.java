@@ -15,6 +15,8 @@
  */
 package com.wl4g.infra.core.web.matcher;
 
+import static org.springframework.util.CollectionUtils.isEmpty;
+
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -36,7 +38,7 @@ import com.wl4g.infra.core.web.matcher.SpelRequestMatcher.RequestExtractor;
 public class SpelRequestMatcherTests {
 
     @Test
-    public void testRequestMatcherByFail2InvalidName() {
+    public void testFailRequestMatcherByFail2InvalidName() {
         List<MatchHttpRequestRule> ruleDefinitions = Lists.newArrayList();
 
         // Invalid for 'request'
@@ -68,7 +70,7 @@ public class SpelRequestMatcherTests {
     }
 
     @Test
-    public void testAndRequestMatches() {
+    public void testSuccessAndRequestMatches() {
         RequestExtractor mockRequest = new RequestExtractor() {
             @Override
             public String getHost() {
@@ -104,25 +106,150 @@ public class SpelRequestMatcherTests {
                 .build());
 
         ruleDefinitions.add(MatchHttpRequestRule.builder()
-                .name("query-version-based-canary-rule")
+                .name("query-v2-based-canary-rule")
                 .host("portal.example.com")
                 .query(new MatchProperty(MatchSymbol.EQ, "version", "v2"))
                 .build());
 
         // [Note]: Names that meet the java method naming convention can be used
         // directly.
-        String expression = "#{$userLabelBasedCanaryRule.and($rules.get('query-version-based-canary-rule')).test($request)}";
+        String expression = "#{$userLabelBasedCanaryRule.and($rules.get('query-v2-based-canary-rule')).test($request)}";
         SpelRequestMatcher matcher = new SpelRequestMatcher(ruleDefinitions);
 
         boolean result = matcher.matches(mockRequest, expression);
-
         System.out.println(result);
 
         assert result;
     }
 
     @Test
-    public void testFindRequestMatches() {
+    public void testSuccessComplexRequestMatches() {
+        RequestExtractor mockRequest = new RequestExtractor() {
+            @Override
+            public String getMethod() {
+                return "POST";
+            }
+
+            @Override
+            public String getHost() {
+                return "portal.example.com";
+            }
+
+            @Override
+            public String getHeaderValue(String name) {
+                if (StringUtils.equals(name, "X-User-Label")) {
+                    return "Beta";
+                }
+                return null;
+            }
+
+            @Override
+            public String getQueryValue(String name) {
+                if (StringUtils.equals(name, "version")) {
+                    return "v2";
+                }
+                return null;
+            }
+        };
+
+        List<MatchHttpRequestRule> ruleDefinitions = Lists.newArrayList();
+        ruleDefinitions.add(
+                MatchHttpRequestRule.builder().name("methodBasedCanaryRule").method("GET").host("portal.example.com").build());
+
+        ruleDefinitions.add(MatchHttpRequestRule.builder()
+                .name("userLabelBasedCanaryRule")
+                .host("portal.example.com")
+                .header(new MatchProperty(MatchSymbol.EQ, "X-User-Label", "Beta"))
+                .build());
+
+        ruleDefinitions.add(MatchHttpRequestRule.builder()
+                .name("headerV2BasedCanaryRule")
+                .host("portal.example.com")
+                .header(new MatchProperty(MatchSymbol.EQ, "version", "v2"))
+                .build());
+
+        ruleDefinitions.add(MatchHttpRequestRule.builder()
+                .name("queryV2BasedCanaryRule")
+                .host("portal.example.com")
+                .query(new MatchProperty(MatchSymbol.EQ, "version", "v2"))
+                .build());
+
+        // [Note]: Names that meet the java method naming convention can be used
+        // directly.
+        String expression = "#{$userLabelBasedCanaryRule.and($headerV2BasedCanaryRule.or($queryV2BasedCanaryRule)).or($methodBasedCanaryRule).test($request)}";
+        SpelRequestMatcher matcher = new SpelRequestMatcher(ruleDefinitions);
+
+        boolean result = matcher.matches(mockRequest, expression);
+        System.out.println(result);
+
+        assert result;
+    }
+
+    @Test
+    public void testFailComplexRequestMatches() {
+        RequestExtractor mockRequest = new RequestExtractor() {
+            @Override
+            public String getMethod() {
+                return "POST";
+            }
+
+            @Override
+            public String getHost() {
+                return "portal.example.com";
+            }
+
+            @Override
+            public String getHeaderValue(String name) {
+                if (StringUtils.equals(name, "X-User-Label")) {
+                    return "Beta";
+                }
+                return null;
+            }
+
+            @Override
+            public String getQueryValue(String name) {
+                if (StringUtils.equals(name, "version")) {
+                    return "v2";
+                }
+                return null;
+            }
+        };
+
+        List<MatchHttpRequestRule> ruleDefinitions = Lists.newArrayList();
+        ruleDefinitions.add(
+                MatchHttpRequestRule.builder().name("methodBasedCanaryRule").method("GET").host("portal.example.com").build());
+
+        ruleDefinitions.add(MatchHttpRequestRule.builder()
+                .name("userLabelBasedCanaryRule")
+                .host("portal.example.com")
+                .header(new MatchProperty(MatchSymbol.EQ, "X-User-Label", "Beta"))
+                .build());
+
+        ruleDefinitions.add(MatchHttpRequestRule.builder()
+                .name("headerV2BasedCanaryRule")
+                .host("portal.example.com")
+                .header(new MatchProperty(MatchSymbol.EQ, "version", "v2"))
+                .build());
+
+        ruleDefinitions.add(MatchHttpRequestRule.builder()
+                .name("queryV2BasedCanaryRule")
+                .host("portal.example.com")
+                .query(new MatchProperty(MatchSymbol.EQ, "version", "v2"))
+                .build());
+
+        // [Note]: Names that meet the java method naming convention can be used
+        // directly.
+        String expression = "#{$userLabelBasedCanaryRule.and($headerV2BasedCanaryRule.or($queryV2BasedCanaryRule)).and($methodBasedCanaryRule).test($request)}";
+        SpelRequestMatcher matcher = new SpelRequestMatcher(ruleDefinitions);
+
+        boolean result = matcher.matches(mockRequest, expression);
+        System.out.println(result);
+
+        assert !result;
+    }
+
+    @Test
+    public void testSuccessFindRequestMatches() {
         RequestExtractor mockRequest = new RequestExtractor() {
             @Override
             public String getHost() {
@@ -169,8 +296,9 @@ public class SpelRequestMatcherTests {
         SpelRequestMatcher matcher = new SpelRequestMatcher(ruleDefinitions);
 
         List<MatchHttpRequestRule> result = matcher.find(mockRequest, expression);
-
         System.out.println(result);
+
+        assert !isEmpty(result);
     }
 
 }
