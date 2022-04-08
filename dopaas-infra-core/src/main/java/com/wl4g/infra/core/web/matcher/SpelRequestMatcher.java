@@ -18,6 +18,7 @@ package com.wl4g.infra.core.web.matcher;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.hasText;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static com.wl4g.infra.common.lang.Assert2.isTrue;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.util.Collections.emptyList;
@@ -30,6 +31,7 @@ import static org.apache.commons.lang3.StringUtils.contains;
 import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.endsWith;
 import static org.apache.commons.lang3.StringUtils.endsWithIgnoreCase;
+import static org.apache.commons.lang3.StringUtils.equalsAny;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.startsWith;
@@ -82,11 +84,11 @@ public class SpelRequestMatcher {
 
         // Make model.
         Map<String, Object> model = safeList(ruleDefinitions).stream().collect(toMap(r -> "$".concat(r.getName()), r -> r));
-        model.put("$request", extractor);
+        model.put("$".concat(SPEL_KEYWORDS_REQUEST), extractor);
 
         // find resolve.
         List<MatchHttpRequestRule> result = ruleDefinitions.stream().filter(e -> {
-            model.put("$rule", e);
+            model.put("$".concat(SPEL_KEYWORDS_RULE), e);
             return spel.resolve(expression, model);
         }).collect(toList());
 
@@ -99,8 +101,8 @@ public class SpelRequestMatcher {
 
         // Add '$' prefix to all key.
         Map<String, Object> model = ruleDefinitions.stream().collect(toMap(r -> "$".concat(r.getName()), r -> r));
-        model.put("$request", extractor);
-        model.put("$rules", ruleDefinitions.stream().collect(toMap(r -> r.getName(), r -> r)));
+        model.put("$".concat(SPEL_KEYWORDS_REQUEST), extractor);
+        model.put("$".concat(SPEL_KEYWORDS_RULES), ruleDefinitions.stream().collect(toMap(r -> r.getName(), r -> r)));
 
         return spel.resolve(expression, model);
     }
@@ -273,10 +275,15 @@ public class SpelRequestMatcher {
         }
 
         public MatchHttpRequestRule validate() {
-            notNull(getName(), "rule name is required");
+            // Validation for name.
+            hasTextOf(getName(), "rule name is required");
+            isTrue(!equalsAny(getName(), SPEL_KEYWORDS_REQUEST, SPEL_KEYWORDS_RULES, SPEL_KEYWORDS_RULE),
+                    "Invalid rule name '%s', Cannot conflict with built-in keywords", getName());
+            // Validation for header.
             if (nonNull(getHeader())) {
                 getHeader().validate();
             }
+            // Validation for query.
             if (nonNull(getQuery())) {
                 getQuery().validate();
             }
@@ -337,5 +344,9 @@ public class SpelRequestMatcher {
 
         private final BiFunction<String, String, Boolean> function;
     }
+
+    public static final String SPEL_KEYWORDS_REQUEST = "request";
+    public static final String SPEL_KEYWORDS_RULES = "rules";
+    public static final String SPEL_KEYWORDS_RULE = "rule";
 
 }

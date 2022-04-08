@@ -36,6 +36,38 @@ import com.wl4g.infra.core.web.matcher.SpelRequestMatcher.RequestExtractor;
 public class SpelRequestMatcherTests {
 
     @Test
+    public void testRequestMatcherByFail2InvalidName() {
+        List<MatchHttpRequestRule> ruleDefinitions = Lists.newArrayList();
+
+        // Invalid for 'request'
+        ruleDefinitions.add(MatchHttpRequestRule.builder().name("request").build());
+        try {
+            new SpelRequestMatcher(ruleDefinitions);
+            throw new IllegalStateException("Assertion fail of illegal name for 'request'");
+        } catch (IllegalArgumentException e) {
+            // Ignore for success
+        }
+
+        // Invalid for 'rules'
+        ruleDefinitions.add(MatchHttpRequestRule.builder().name("rule").build());
+        try {
+            new SpelRequestMatcher(ruleDefinitions);
+            throw new IllegalStateException("Assertion fail of illegal name for 'rules'");
+        } catch (IllegalArgumentException e) {
+            // Ignore for success
+        }
+
+        // Invalid for 'rule'
+        ruleDefinitions.add(MatchHttpRequestRule.builder().name("rule").build());
+        try {
+            new SpelRequestMatcher(ruleDefinitions);
+            throw new IllegalStateException("Assertion fail of illegal name for 'rule'");
+        } catch (IllegalArgumentException e) {
+            // Ignore for success
+        }
+    }
+
+    @Test
     public void testAndRequestMatches() {
         RequestExtractor mockRequest = new RequestExtractor() {
             @Override
