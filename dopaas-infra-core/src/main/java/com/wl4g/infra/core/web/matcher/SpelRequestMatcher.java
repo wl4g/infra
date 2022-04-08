@@ -36,7 +36,6 @@ import static org.apache.commons.lang3.StringUtils.startsWith;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -47,9 +46,11 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.AntPathMatcher;
 
 import com.wl4g.infra.core.utils.expression.SpelExpressions;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -105,11 +106,8 @@ public class SpelRequestMatcher {
     }
 
     public static interface RequestExtractor {
-        default String getMethod() {
-            return null;
-        }
 
-        default URI getURI() {
+        default String getMethod() {
             return null;
         }
 
@@ -122,6 +120,10 @@ public class SpelRequestMatcher {
         }
 
         default Integer getPort() {
+            return null;
+        }
+
+        default String getPath() {
             return null;
         }
 
@@ -146,7 +148,6 @@ public class SpelRequestMatcher {
     @Setter
     @ToString
     @SuperBuilder
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class MatchHttpRequestRule implements Predicate<RequestExtractor> {
 
@@ -156,8 +157,8 @@ public class SpelRequestMatcher {
         private @NotBlank String name;
 
         /**
-         * This option is used to specify the way to combine the matching result
-         * of the header with the matching result of the query parameter. By
+         * This option is to specify the way to combine the matching result of
+         * the header with the matching result of the query parameter. By
          * default, or is used. </br>
          * It does not affect the use of this merge result with schema, host,
          * port, etc. and the final merge method.
@@ -165,31 +166,34 @@ public class SpelRequestMatcher {
         // private boolean orMatchHeaderQuery;
 
         /**
-         * (Optional) The value used to match the current request HTTP schema.
-         * </br>
-         * for example: https://
-         */
-        private @Nullable String scheme;
-
-        /**
-         * (Optional)The value used to match the current request HTTP method.
-         * </br>
+         * (Optional)The used to match the current request HTTP method. </br>
          * for example: POST
          */
         private @Nullable String method;
 
         /**
-         * (Optional) The value used to match the current request HTTP host.
-         * </br>
+         * (Optional) The used to match the current request HTTP schema. </br>
+         * for example: https://
+         */
+        private @Nullable String scheme;
+
+        /**
+         * (Optional) The used to match the current request HTTP host. </br>
          * for example: example.com
          */
         private @Nullable String host;
 
         /**
-         * (Optional)The name used to match the current request HTTP port. </br>
+         * (Optional)The used to match the current request HTTP port. </br>
          * for example: 443
          */
         private @Nullable Integer port;
+
+        /**
+         * (Optional)The used to match the current request HTTP path. </br>
+         * for example: /foo/bar/list
+         */
+        private @Nullable String pathPattern;
 
         /**
          * (Optional) The name-value used to match the current request HTTP
@@ -204,9 +208,17 @@ public class SpelRequestMatcher {
          */
         private @Nullable MatchProperty query;
 
-        // public MatchHttpRequestRule() {
-        // this.orMatchHeaderQuery = true;
-        // }
+        //
+        // Temporary fields.
+        //
+        @Getter(AccessLevel.NONE)
+        @Setter(AccessLevel.NONE)
+        private AntPathMatcher pathMatcher;
+
+        public MatchHttpRequestRule() {
+            // this.orMatchHeaderQuery = true;
+            this.pathMatcher = new AntPathMatcher("/");
+        }
 
         @Override
         public boolean test(RequestExtractor extractor) {
@@ -216,43 +228,48 @@ public class SpelRequestMatcher {
         private boolean doMatchRequest(@NotNull RequestExtractor extractor) {
             notNullOf(extractor, "extractor");
 
-            // Matches HTTP schema
-            boolean flagSchema = isBlank(getScheme());
-            if (!flagSchema && equalsIgnoreCase(extractor.getScheme(), getScheme())) {
-                flagSchema = true;
-            }
-            // Matches HTTP method
+            // Match HTTP method
             boolean flagMethod = isBlank(getMethod());
             if (!flagMethod && equalsIgnoreCase(extractor.getMethod(), getMethod())) {
                 flagMethod = true;
             }
-            // Matches HTTP host
+            // Match HTTP schema
+            boolean flagSchema = isBlank(getScheme());
+            if (!flagSchema && equalsIgnoreCase(extractor.getScheme(), getScheme())) {
+                flagSchema = true;
+            }
+            // Match HTTP host
             boolean flagHost = isBlank(getHost());
             if (!flagHost && equalsIgnoreCase(extractor.getHost(), getHost())) {
                 flagHost = true;
             }
-            // Matches HTTP port
+            // Match HTTP port
             boolean flagPort = (isNull(getPort()) || getPort() <= 0);
             if (!flagPort && equalsIgnoreCase(extractor.getPort() + "", getPort() + "")) {
                 flagPort = true;
             }
-            // Matches HTTP headers.
+            // Match HTTP path
+            boolean flagPath = isBlank(getPathPattern());
+            if (!flagPath && pathMatcher.matchStart(getPathPattern(), extractor.getPath())) {
+                flagPath = true;
+            }
+            // Match HTTP headers.
             boolean flagHeader = isNull(getHeader());
             if (!flagHeader && getHeader().getSymbol().getFunction().apply(
                     trimToEmpty(extractor.getHeaderValue(getHeader().getKey())), getHeader().getValue())) {
                 flagHeader = true;
             }
-            // Matches HTTP query parameter.
+            // Match HTTP query parameter.
             boolean flagQuery = isNull(getQuery());
             if (!flagQuery && getQuery().getSymbol().getFunction().apply(
                     trimToEmpty(extractor.getQueryValue(getQuery().getKey())), getQuery().getValue())) {
                 flagQuery = true;
             }
             // if (isOrMatchHeaderQuery()) {
-            // return flagSchema && flagHost && flagPort && flagMethod &&
-            // (flagHeader || flagQuery);
+            // return flagMethod && flagSchema && flagHost && flagPort &&
+            // flagPath && (flagHeader || flagQuery);
             // }
-            return flagSchema && flagHost && flagPort && flagMethod && flagHeader && flagQuery;
+            return flagMethod && flagSchema && flagHost && flagPort && flagPath && flagHeader && flagQuery;
         }
 
         public MatchHttpRequestRule validate() {

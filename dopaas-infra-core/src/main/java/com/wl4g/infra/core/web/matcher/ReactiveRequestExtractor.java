@@ -18,8 +18,6 @@ package com.wl4g.infra.core.web.matcher;
 import static java.util.Objects.nonNull;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
-import java.net.URI;
-
 import org.springframework.http.HttpCookie;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.util.MultiValueMap;
@@ -46,11 +44,6 @@ public class ReactiveRequestExtractor implements RequestExtractor {
     }
 
     @Override
-    public URI getURI() {
-        return request.getURI();
-    }
-
-    @Override
     public String getScheme() {
         return request.getURI().getScheme();
     }
@@ -63,6 +56,11 @@ public class ReactiveRequestExtractor implements RequestExtractor {
     @Override
     public Integer getPort() {
         return request.getURI().getPort();
+    }
+
+    @Override
+    public String getPath() {
+        return request.getURI().getPath();
     }
 
     @Override

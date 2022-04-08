@@ -15,8 +15,6 @@
  */
 package com.wl4g.infra.core.web.matcher;
 
-import java.net.URI;
-
 import javax.servlet.http.HttpServletRequest;
 
 import com.wl4g.infra.common.web.CookieUtils;
@@ -42,8 +40,8 @@ public class ServletRequsetExtractor implements RequestExtractor {
     }
 
     @Override
-    public URI getURI() {
-        return URI.create(request.getRequestURI());
+    public String getPath() {
+        return request.getRequestURI();
     }
 
     @Override
