@@ -21,6 +21,7 @@ import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.isTrue;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.isNull;
@@ -48,6 +49,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.expression.EvaluationException;
 import org.springframework.util.AntPathMatcher;
 
 import com.wl4g.infra.core.utils.expression.SpelExpressions;
@@ -60,6 +62,7 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.With;
 import lombok.experimental.SuperBuilder;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * {@link SpelRequestMatcher}
@@ -68,6 +71,7 @@ import lombok.experimental.SuperBuilder;
  * @version 2022-04-07 v3.0.0
  * @since v3.0.0
  */
+@Slf4j
 public class SpelRequestMatcher {
 
     private @Nullable final List<MatchHttpRequestRule> ruleDefinitions;
@@ -104,7 +108,13 @@ public class SpelRequestMatcher {
         model.put("$".concat(SPEL_KEYWORDS_REQUEST), extractor);
         model.put("$".concat(SPEL_KEYWORDS_RULES), ruleDefinitions.stream().collect(toMap(r -> r.getName(), r -> r)));
 
-        return spel.resolve(expression, model);
+        try {
+            return spel.resolve(expression, model);
+        } catch (EvaluationException e) {
+            String errmsg = format("Cannot evaluate expression: '%s'", expression);
+            log.error(errmsg, e);
+            throw new EvaluationException(errmsg, e);
+        }
     }
 
     public static interface RequestExtractor {
