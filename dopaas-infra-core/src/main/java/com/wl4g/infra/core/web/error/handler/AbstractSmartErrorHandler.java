@@ -192,7 +192,7 @@ public abstract class AbstractSmartErrorHandler implements InitializingBean {
     private Object loadRenderTemplate(int status) throws IOException, TemplateException {
         Template tpl = errorTemplateCache.get(status);
         if (isNull(tpl)) { // error template?
-            log.warn("No found render template for error status: %s", status);
+            log.warn("No found render template for error status: {}", status);
             return null;
         }
         return tpl;
@@ -209,7 +209,7 @@ public abstract class AbstractSmartErrorHandler implements InitializingBean {
     private Object loadRedirectUri(int status) throws IOException, TemplateException {
         String errorRedirectUri = config.getRenderingMapping().get(status);
         if (isBlank(errorRedirectUri)) {
-            log.warn("No found render redirect uri for error status: %s", status);
+            log.warn("No found render redirect uri for error status: {}", status);
             return null;
         }
         // Only the 'redirect:' prefix indicates the redirect URI, otherwise it
