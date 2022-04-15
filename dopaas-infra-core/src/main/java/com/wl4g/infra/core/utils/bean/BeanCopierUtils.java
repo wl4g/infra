@@ -20,6 +20,8 @@ import org.springframework.cglib.core.Converter;
 import org.springframework.objenesis.Objenesis;
 import org.springframework.objenesis.ObjenesisStd;
 
+import com.wl4g.infra.common.bean.BeanUtils2;
+
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -38,6 +40,17 @@ import java.util.concurrent.ConcurrentHashMap;
  * @see
  */
 public abstract class BeanCopierUtils {
+
+    public static <O> O deepCopyWithDefault(O targetConfig, O defaultConfig)
+            throws IllegalArgumentException, IllegalAccessException {
+        // clone copy to target.
+        O orignalTarget = clone(targetConfig);
+        // copy default override to target.
+        BeanUtils2.deepCopyFieldState(targetConfig, defaultConfig);
+        // copy target override to target clone.
+        BeanUtils2.deepCopyFieldState(targetConfig, orignalTarget);
+        return targetConfig;
+    }
 
     /***
      * Copy bean object the properties of new objects. Note: only when there is
