@@ -202,16 +202,23 @@ public class SpelRequestMatcher {
         private @Nullable Integer port;
 
         /**
-         * (Optional)The used to match the current request HTTP path. </br>
+         * (Optional)The used to match the current request HTTP ant path
+         * pattern. </br>
          * for example: /foo/bar/list
          */
-        private @Nullable String pathPattern;
+        private @Nullable String path;
 
         /**
          * (Optional) The name-value used to match the current request HTTP
          * header.
          */
         private @Nullable MatchProperty header;
+
+        /**
+         * (Optional) The name-value used to match the current request HTTP
+         * cookie.
+         */
+        private @Nullable MatchProperty cookie;
 
         /**
          * (Optional) The name-value used to match the current request HTTP
@@ -261,8 +268,8 @@ public class SpelRequestMatcher {
                 flagPort = true;
             }
             // Match HTTP path
-            boolean flagPath = isBlank(getPathPattern());
-            if (!flagPath && pathMatcher.matchStart(getPathPattern(), extractor.getPath())) {
+            boolean flagPath = isBlank(getPath());
+            if (!flagPath && pathMatcher.matchStart(getPath(), extractor.getPath())) {
                 flagPath = true;
             }
             // Match HTTP headers.
@@ -270,6 +277,12 @@ public class SpelRequestMatcher {
             if (!flagHeader && getHeader().getSymbol().getFunction().apply(
                     trimToEmpty(extractor.getHeaderValue(getHeader().getKey())), getHeader().getValue())) {
                 flagHeader = true;
+            }
+            // Match HTTP cookies.
+            boolean flagCookie = isNull(getCookie());
+            if (!flagCookie && getCookie().getSymbol().getFunction().apply(
+                    trimToEmpty(extractor.getCookieValue(getCookie().getKey())), getCookie().getValue())) {
+                flagCookie = true;
             }
             // Match HTTP query parameter.
             boolean flagQuery = isNull(getQuery());
@@ -281,7 +294,7 @@ public class SpelRequestMatcher {
             // return flagMethod && flagSchema && flagHost && flagPort &&
             // flagPath && (flagHeader || flagQuery);
             // }
-            return flagMethod && flagSchema && flagHost && flagPort && flagPath && flagHeader && flagQuery;
+            return flagMethod && flagSchema && flagHost && flagPort && flagPath && flagHeader && flagCookie && flagQuery;
         }
 
         public MatchHttpRequestRule validate() {
