@@ -623,14 +623,27 @@ public abstract class WebUtils {
      * @since
      */
     public static interface WebRequestExtractor {
+
+        /**
+         * Gets current request ID. </br>
+         * 
+         * Spring reactor HTTP request refer to:
+         * {@link org.springframework.web.server.ServerWebExchange.LOG_ID}
+         * 
+         * @return
+         */
+        default @Nullable String getRequestId() {
+            return null;
+        }
+
         /**
          * Gets query parameter by name.
          * 
          * @param name
          * @return
          */
-        default String getQueryParam(String name) {
-            throw new UnsupportedOperationException();
+        default @Nullable String getQueryParam(String name) {
+            return null;
         }
 
         /**
@@ -639,8 +652,8 @@ public abstract class WebUtils {
          * @param name
          * @return
          */
-        default String getHeader(String name) {
-            throw new UnsupportedOperationException();
+        default @Nullable String getHeader(String name) {
+            return null;
         }
     }
 

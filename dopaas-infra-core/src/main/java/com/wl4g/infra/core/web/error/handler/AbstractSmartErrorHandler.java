@@ -23,11 +23,12 @@ import static com.wl4g.infra.common.lang.Exceptions.getStackTraceAsString;
 import static com.wl4g.infra.common.lang.StringUtils2.startsWithIgnoreCase;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static com.wl4g.infra.common.web.WebUtils2.ResponseType.isRespJSON;
+import static com.wl4g.infra.common.web.rest.RespBase.RetCode.newCode;
+import static com.wl4g.infra.core.constant.CoreInfraConstants.TRACE_REQUEST_ID_HEADER_NAME;
 import static java.util.Collections.emptyMap;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.startsWithIgnoreCase;
 import static org.springframework.boot.web.error.ErrorAttributeOptions.of;
 import static org.springframework.boot.web.error.ErrorAttributeOptions.Include.BINDING_ERRORS;
 import static org.springframework.boot.web.error.ErrorAttributeOptions.Include.EXCEPTION;
@@ -143,11 +144,13 @@ public abstract class AbstractSmartErrorHandler implements InitializingBean {
             // Obtain custom extension response status.
             int status = getStatus(model, th);
             String errmsg = getRootCause(model, th);
+            String requestId = extractor.getRequestId();
+            model.put(TRACE_REQUEST_ID_HEADER_NAME, requestId);
 
             // When the client is not a browser or the exception rendering
             // configuration is empty, the JSON message is returned by default.
             if (isRespJSON(extractor, null)) {
-                RespBase<Object> resp = new RespBase<>(RespBase.RetCode.newCode(status, errmsg));
+                RespBase<Object> resp = new RespBase<>(newCode(status, errmsg)).withRequestId(requestId);
                 Object redirectUri = loadRedirectUri(status);
                 if (nonNull(redirectUri)) {
                     resp.forMap().put(DEFAULT_REDIRECT_KEY, redirectUri);
@@ -155,7 +158,7 @@ public abstract class AbstractSmartErrorHandler implements InitializingBean {
                 log.error("resp:error - {}", resp.asJson());
                 return errorRender.renderingJson(model, resp);
             }
-            // Rendering to error HTML
+            // Rendering to error HTML.
             else {
                 Object tpl = loadRenderTemplate(status);
                 if (nonNull(tpl)) {
@@ -165,7 +168,7 @@ public abstract class AbstractSmartErrorHandler implements InitializingBean {
                     String renderString = processTemplateIntoString((Template) tpl, model);
                     return errorRender.renderingTemplate(model, status, renderString);
                 }
-                // Rendering to error Location
+                // Rendering to error location.
                 else {
                     Object redirectUri = loadRedirectUri(status);
                     if (nonNull(redirectUri)) {

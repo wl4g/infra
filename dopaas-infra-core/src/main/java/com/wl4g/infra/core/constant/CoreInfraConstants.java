@@ -29,6 +29,8 @@ package com.wl4g.infra.core.constant;
  */
 public abstract class CoreInfraConstants extends BaseConstants {
 
+    // Configuration key.
+
     public static final String CONF_PREFIX_INFRA = "spring.infra";
 
     public static final String CONF_PREFIX_INFRA_CORE = CONF_PREFIX_INFRA + ".core";
@@ -51,5 +53,9 @@ public abstract class CoreInfraConstants extends BaseConstants {
     public static final String CONF_PREFIX_INFRA_CORE_WEB_GLOBAL_ERROR = CONF_PREFIX_INFRA_CORE + ".web.global-error";
 
     public static final String CONF_PREFIX_INFRA_CORE_WEB_EMBED_WEBAPP = CONF_PREFIX_INFRA_CORE + ".web.embedded-webapps";
+
+    // Trace(Request) ID
+
+    public static final String TRACE_REQUEST_ID_HEADER_NAME = "X-Request-Id";
 
 }

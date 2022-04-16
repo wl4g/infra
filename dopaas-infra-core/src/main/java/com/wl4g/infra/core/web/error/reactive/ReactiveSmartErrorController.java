@@ -20,6 +20,7 @@ import static com.wl4g.infra.common.lang.StringUtils2.isTrue;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static com.wl4g.infra.common.runtime.JvmRuntimeTool.isJvmInDebugging;
 import static com.wl4g.infra.common.web.WebUtils2.PARAM_STACKTRACE;
+import static com.wl4g.infra.core.constant.CoreInfraConstants.TRACE_REQUEST_ID_HEADER_NAME;
 import static com.wl4g.infra.core.web.error.handler.AbstractSmartErrorHandler.obtainErrorAttributeOptions;
 import static java.util.Locale.US;
 import static java.util.Objects.nonNull;
@@ -35,6 +36,7 @@ import org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWe
 import org.springframework.boot.web.reactive.error.ErrorAttributes;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpCookie;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.reactive.function.server.RequestPredicates;
@@ -110,6 +112,11 @@ public class ReactiveSmartErrorController extends AbstractErrorWebExceptionHandl
         Map<String, Object> model = getErrorAttributes(request, false);
 
         return (Mono<ServerResponse>) errorHandler.rendering(new WebRequestExtractor() {
+            @Override
+            public String getRequestId() {
+                return ((ServerHttpRequest) (request)).getHeaders().getFirst(TRACE_REQUEST_ID_HEADER_NAME);
+            }
+
             @Override
             public String getQueryParam(String name) {
                 return request.queryParam(name).orElse(null);
