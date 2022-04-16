@@ -15,27 +15,40 @@
  */
 package com.wl4g.infra.core.logging.servlet;
 
-import org.slf4j.Logger;
-import org.slf4j.MDC;
-import org.springframework.context.ApplicationContext;
-
-import javax.servlet.*;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.infra.common.lang.FastTimeClock.currentTimeMillis;
+import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
+import static com.wl4g.infra.core.logging.servlet.TraceLoggingMDCFilter.TraceMDCDefinition.KEY_NEXT_REQUEST_SEQ;
+import static com.wl4g.infra.core.logging.servlet.TraceLoggingMDCFilter.TraceMDCDefinition.KEY_PREFIX_COOKIE;
+import static com.wl4g.infra.core.logging.servlet.TraceLoggingMDCFilter.TraceMDCDefinition.KEY_PREFIX_HEADER;
+import static com.wl4g.infra.core.logging.servlet.TraceLoggingMDCFilter.TraceMDCDefinition.KEY_PREFIX_PARAMETER;
+import static com.wl4g.infra.core.logging.servlet.TraceLoggingMDCFilter.TraceMDCDefinition.KEY_REQUEST_ID;
+import static com.wl4g.infra.core.logging.servlet.TraceLoggingMDCFilter.TraceMDCDefinition.KEY_REQUEST_SEQ;
+import static com.wl4g.infra.core.logging.servlet.TraceLoggingMDCFilter.TraceMDCDefinition.KEY_TIMESTAMP;
+import static com.wl4g.infra.core.logging.servlet.TraceLoggingMDCFilter.TraceMDCDefinition.KEY_URI;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
-import static java.lang.System.currentTimeMillis;
 import static org.apache.commons.lang3.StringUtils.contains;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.startsWithIgnoreCase;
-import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
-import static com.wl4g.infra.core.logging.servlet.TraceLoggingMDCFilter.TraceMDCDefinition.*;
 
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.concurrent.atomic.AtomicLong;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.MDC;
+import org.springframework.context.ApplicationContext;
+
+import com.wl4g.infra.common.log.SmartLogger;
 
 /**
  * Add the MDC parameter option to the logback log output. Note that this filter
@@ -72,11 +85,10 @@ red>[%X{_H_:X-Request-ID}] [%X{_H_:X-Request-Seq}] [%X{_C_:${spring.infra.dopaas
  */
 public abstract class TraceLoggingMDCFilter implements Filter {
 
-    public static final long DEFAULT_CACHE_REFRESH_MS = 1_000L;
+    public static final SmartLogger log = getLogger(TraceLoggingMDCFilter.class);
+    public static final long DEFAULT_CACHE_REFRESH_MS = 2_000L;
     public static final String HEADER_REQUEST_ID = "X-Request-ID";
     public static final String HEADER_REQUEST_SEQ = "X-Request-Seq";
-
-    protected final Logger log = getLogger(getClass());
 
     /**
      * Spring application context.
@@ -86,7 +98,7 @@ public abstract class TraceLoggingMDCFilter implements Filter {
     /**
      * Cache refresh timestamp.
      */
-    private final AtomicLong cacheRefreshLastTime = new AtomicLong(0);
+    protected final AtomicLong cacheRefreshTime = new AtomicLong(0);
 
     /**
      * Whether to enable the headers mapping. for example:
@@ -109,7 +121,6 @@ public abstract class TraceLoggingMDCFilter implements Filter {
     public TraceLoggingMDCFilter(ApplicationContext context) {
         notNullOf(context, "applicationContext");
         this.context = context;
-        // Initial mapped MDC configuration
         refreshMDCMapped();
     }
 
@@ -123,9 +134,7 @@ public abstract class TraceLoggingMDCFilter implements Filter {
         HttpServletRequest req = (HttpServletRequest) request;
 
         try {
-            // Refreshing MDC mapped(If necessary).
             refreshMDCMapped();
-
             setupLoggingMDC(req);
         } catch (Exception e) {
             log.error(format("Could't set logging MDC. uri: %s", req.getRequestURI()), e);
@@ -175,7 +184,6 @@ public abstract class TraceLoggingMDCFilter implements Filter {
                 }
             }
         }
-
         // Sets cookies to MDC
         if (enableMappedCookies) {
             Cookie[] cookies = req.getCookies();
@@ -188,7 +196,6 @@ public abstract class TraceLoggingMDCFilter implements Filter {
                 }
             }
         }
-
         // Sets parameters to MDC
         if (enableMappedParameters) {
             Enumeration<String> e = req.getParameterNames();
@@ -201,18 +208,17 @@ public abstract class TraceLoggingMDCFilter implements Filter {
                 }
             }
         }
-
     }
 
     /**
-     * Refreshing MDC mapped via patterns, When the logging configuration is
+     * Refresh MDC mapped via patterns, When the logging configuration is
      * modified, it can be updated in time
      * 
      * @return
      */
     protected boolean refreshMDCMapped() {
         long now = currentTimeMillis();
-        if ((now - cacheRefreshLastTime.get()) < DEFAULT_CACHE_REFRESH_MS) {
+        if ((now - cacheRefreshTime.get()) < DEFAULT_CACHE_REFRESH_MS) {
             return false;
         }
         String consolePattern = context.getEnvironment().getProperty("logging.pattern.console");
@@ -220,7 +226,7 @@ public abstract class TraceLoggingMDCFilter implements Filter {
         this.enableMappedCookies = isMappedMDCField(consolePattern, filePattern, KEY_PREFIX_COOKIE);
         this.enableMappedHeaders = isMappedMDCField(consolePattern, filePattern, KEY_PREFIX_HEADER);
         this.enableMappedParameters = isMappedMDCField(consolePattern, filePattern, KEY_PREFIX_PARAMETER);
-        cacheRefreshLastTime.set(now);
+        cacheRefreshTime.set(now);
         return true;
     }
 
