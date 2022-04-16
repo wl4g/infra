@@ -43,7 +43,7 @@ public abstract class ApplicationTaskRunner<C extends RunnerProperties> extends 
         implements ApplicationRunner, DisposableBean {
 
     protected final SmartLogger log = getLogger(getClass());
-    private final AtomicBoolean running = new AtomicBoolean(false);
+    private final AtomicBoolean started = new AtomicBoolean(false);
 
     public ApplicationTaskRunner() {
         super();
@@ -60,7 +60,7 @@ public abstract class ApplicationTaskRunner<C extends RunnerProperties> extends 
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        if (running.compareAndSet(false, true)) {
+        if (started.compareAndSet(false, true)) {
             super.start();
             onApplicationStarted(args, getWorker());
         }
