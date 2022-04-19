@@ -51,7 +51,7 @@ public abstract class GenericTaskRunner<C extends RunnerProperties> implements C
     private final C config;
 
     /** Runner master thread. */
-    private Thread header;
+    private Thread masterThread;
 
     /** Runner worker thread group pool. */
     private SafeScheduledTaskPoolExecutor worker;
@@ -95,8 +95,8 @@ public abstract class GenericTaskRunner<C extends RunnerProperties> implements C
                 run(); // Sync execution.
                 break;
             case ASYNC:
-                header = new NamedThreadFactory(getThreadNamePrefix().concat("-header")).newThread(this);
-                header.start();
+                masterThread = new NamedThreadFactory(getThreadNamePrefix().concat("-header")).newThread(this);
+                masterThread.start();
                 break;
             default:
                 break;
@@ -161,7 +161,7 @@ public abstract class GenericTaskRunner<C extends RunnerProperties> implements C
      * @return
      */
     public boolean isActive() {
-        return nonNull(header) && !header.isInterrupted() && isStarted();
+        return nonNull(masterThread) && !masterThread.isInterrupted() && isStarted();
     }
 
     /**
@@ -231,9 +231,9 @@ public abstract class GenericTaskRunner<C extends RunnerProperties> implements C
 
             // Close for thread-boss.
             try {
-                if (!isNull(header)) {
-                    header.interrupt();
-                    header = null;
+                if (!isNull(masterThread)) {
+                    masterThread.interrupt();
+                    masterThread = null;
                 }
             } catch (Exception e) {
                 log.error("Runner boss interrupt failed!", e);
