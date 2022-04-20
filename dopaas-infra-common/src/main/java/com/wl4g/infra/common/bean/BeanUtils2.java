@@ -30,6 +30,9 @@ import static org.apache.commons.lang3.StringUtils.startsWithAny;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+
 import com.wl4g.infra.common.reflect.ReflectionUtils2.FieldFilter;
 
 /**
@@ -46,27 +49,28 @@ public abstract class BeanUtils2 {
     /**
      * Calls the given callback on all fields of the target class, recursively
      * running the class hierarchy up to copy all declared fields.</br>
-     * It will contain all the fields defined by all parent or superclasses. At
+     * It will contain all the fields defined by all parent or super classes. At
      * the same time, the target and the source object must be compatible.
      * 
-     * @param dest
+     * @param target
      *            The target object to copy to
      * @param src
      *            Source object
      * @throws IllegalArgumentException
      * @throws IllegalAccessException
      */
-    public static void deepCopyFieldState(Object dest, Object src) throws IllegalArgumentException, IllegalAccessException {
-        deepCopyFieldState(dest, src, DEFAULT_FIELD_FILTER, DEFAULT_FIELD_COPYER);
+    public static void deepCopyFieldState(@NotNull Object target, @NotNull Object src)
+            throws IllegalArgumentException, IllegalAccessException {
+        deepCopyFieldState(target, src, DEFAULT_FIELD_FILTER, DEFAULT_FIELD_COPYER);
     }
 
     /**
      * Calls the given callback on all fields of the target class, recursively
      * running the class hierarchy up to copy all declared fields.</br>
-     * It will contain all the fields defined by all parent or superclasses. At
+     * It will contain all the fields defined by all parent or super classes. At
      * the same time, the target and the source object must be compatible.
      * 
-     * @param dest
+     * @param target
      *            The target object to copy to
      * @param src
      *            Source object
@@ -75,18 +79,18 @@ public abstract class BeanUtils2 {
      * @throws IllegalArgumentException
      * @throws IllegalAccessException
      */
-    public static void deepCopyFieldState(Object dest, Object src, FieldFilter ff)
+    public static void deepCopyFieldState(@NotNull Object target, @NotNull Object src, @NotNull FieldFilter ff)
             throws IllegalArgumentException, IllegalAccessException {
-        deepCopyFieldState(dest, src, ff, DEFAULT_FIELD_COPYER);
+        deepCopyFieldState(target, src, ff, DEFAULT_FIELD_COPYER);
     }
 
     /**
      * Calls the given callback on all fields of the target class, recursively
      * running the class hierarchy up to copy all declared fields.</br>
-     * It will contain all the fields defined by all parent or superclasses. At
+     * It will contain all the fields defined by all parent or super classes. At
      * the same time, the target and the source object must be compatible.
      *
-     * @param dest
+     * @param target
      *            The target object to copy to
      * @param src
      *            Source object
@@ -95,18 +99,18 @@ public abstract class BeanUtils2 {
      * @throws IllegalArgumentException
      * @throws IllegalAccessException
      */
-    public static void deepCopyFieldState(Object dest, Object src, FieldProcessor fc)
+    public static void deepCopyFieldState(@NotNull Object target, @NotNull Object src, @NotNull FieldProcessor fc)
             throws IllegalArgumentException, IllegalAccessException {
-        deepCopyFieldState(dest, src, DEFAULT_FIELD_FILTER, fc);
+        deepCopyFieldState(target, src, DEFAULT_FIELD_FILTER, fc);
     }
 
     /**
      * Calls the given callback on all fields of the target class, recursively
      * running the class hierarchy up to copy all declared fields.</br>
-     * It will contain all the fields defined by all parent or superclasses. At
+     * It will contain all the fields defined by all parent or super classes. At
      * the same time, the target and the source object must be compatible.
      * 
-     * @param dest
+     * @param target
      *            The target object to copy to
      * @param src
      *            Source object
@@ -117,22 +121,25 @@ public abstract class BeanUtils2 {
      * @throws IllegalArgumentException
      * @throws IllegalAccessException
      */
-    public static void deepCopyFieldState(Object dest, Object src, FieldFilter ff, FieldProcessor fp)
-            throws IllegalArgumentException, IllegalAccessException {
-        if (!(dest != null && src != null && ff != null && fp != null)) {
+    public static void deepCopyFieldState(
+            @NotNull Object target,
+            @NotNull Object src,
+            @NotNull FieldFilter ff,
+            @NotNull FieldProcessor fp) throws IllegalArgumentException, IllegalAccessException {
+        if (!(target != null && src != null && ff != null && fp != null)) {
             throw new IllegalArgumentException("Target and source FieldFilter and FieldProcessor must not be null");
         }
 
         // Check if the target is compatible with the source object
-        Class<?> targetClass = dest.getClass(), sourceClass = src.getClass();
-        if (!isCompatibleType(dest.getClass(), src.getClass())) {
+        Class<?> targetClass = target.getClass(), sourceClass = src.getClass();
+        if (!isCompatibleType(target.getClass(), src.getClass())) {
             throw new IllegalArgumentException(
-                    format("Incompatible two objects, target class: %s, source class: %s", targetClass, sourceClass));
+                    format("Incompatible the objects, target class: %s, source class: %s", targetClass, sourceClass));
         }
 
-        Class<?> targetCls = dest.getClass(); // [MARK0]
+        Class<?> targetCls = target.getClass(); // [MARK0]
         do {
-            doDeepCopyFields(targetCls, dest, src, ff, fp);
+            doDeepCopyFields(targetCls, target, src, ff, fp);
         } while ((targetCls = targetCls.getSuperclass()) != Object.class);
     }
 
@@ -144,9 +151,9 @@ public abstract class BeanUtils2 {
      * compatible.</br>
      * Note: Attribute fields of parent and superclass are not included
      * 
-     * @param hierarchyDestClass
+     * @param currentTargetClass
      *            The level of the class currently copied to (upward recursion)
-     * @param dest
+     * @param target
      *            The target object to copy to
      * @param src
      *            Source object
@@ -157,20 +164,25 @@ public abstract class BeanUtils2 {
      * @throws IllegalArgumentException
      * @throws IllegalAccessException
      */
-    private static void doDeepCopyFields(Class<?> hierarchyDestClass, Object dest, Object src, FieldFilter ff, FieldProcessor fp)
-            throws IllegalArgumentException, IllegalAccessException {
-        if (isNull(hierarchyDestClass) || isNull(ff) || isNull(fp)) {
-            throw new IllegalArgumentException("Hierarchy target class or source FieldFilter and FieldProcessor can't null");
-        }
+    private static void doDeepCopyFields(
+            Class<?> currentTargetClass,
+            @NotNull Object target,
+            @NotNull Object src,
+            @NotNull FieldFilter ff,
+            @NotNull FieldProcessor fp) throws IllegalArgumentException, IllegalAccessException {
 
+        if (isNull(currentTargetClass) || isNull(ff) || isNull(fp)) {
+            throw new IllegalArgumentException(
+                    "Hierarchy current target class or source FieldFilter and FieldProcessor can't null");
+        }
         // Skip the current level copy.
-        if (isNull(src) || isNull(dest)) {
+        if (isNull(src) || isNull(target)) {
             return;
         }
 
         // Recursive traversal matching and processing
         Class<?> sourceClass = src.getClass();
-        for (Field tf : hierarchyDestClass.getDeclaredFields()) {
+        for (Field tf : currentTargetClass.getDeclaredFields()) {
             // Must be filtered over.
             // [BUGFIX]: for example when recursively getting
             // java.nio.charset.Charset, there will be an infinite loop stack
@@ -182,7 +194,7 @@ public abstract class BeanUtils2 {
             }
 
             makeAccessible(tf);
-            Object targetPropertyValue = tf.get(dest); // See:[MARK0]
+            Object targetPropertyValue = tf.get(target); // See:[MARK0]
             Object sourcePropertyValue = null;
             Field sf = findField(sourceClass, tf.getName());
             if (nonNull(sf)) {
@@ -190,25 +202,20 @@ public abstract class BeanUtils2 {
                 sourcePropertyValue = sf.get(src);
             }
 
-            // Base or general collection type?
-            if (isSimpleType(tf.getType()) || isSimpleCollectionType(tf.getType())) {
+            // Base type or collection type or enum?
+            if (isSimpleType(tf.getType()) || isSimpleCollectionType(tf.getType()) || tf.getType().isEnum()) {
                 // [MARK2] Filter matching property
-                if (nonNull(fp) && ff.matches(tf) && nonNull(sourcePropertyValue)) {
-                    fp.doProcess(dest, tf, sf, sourcePropertyValue);
+                if (nonNull(fp) && ff.matches(tf)) {
+                    fp.doProcess(target, tf, sf, sourcePropertyValue);
                 }
             } else {
                 doDeepCopyFields(tf.getType(), targetPropertyValue, sourcePropertyValue, ff, fp);
             }
         }
-
     }
 
     /**
      * Enhanced callback interface invoked on each field in the hierarchy.
-     * 
-     * @author Wangl.sir <983708408@qq.com>
-     * @version v1.0 2019年5月11日
-     * @since
      */
     public static interface FieldProcessor {
 
@@ -223,7 +230,7 @@ public abstract class BeanUtils2 {
          * @throws IllegalAccessException
          * @throws IllegalArgumentException
          */
-        void doProcess(Object target, Field tf, Field sf, Object sourcePropertyValue)
+        void doProcess(@NotNull Object target, @NotNull Field tf, @NotNull Field sf, @Nullable Object sourcePropertyValue)
                 throws IllegalArgumentException, IllegalAccessException;
     }
 

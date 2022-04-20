@@ -15,13 +15,6 @@
  */
 package com.wl4g.infra.core.utils.bean;
 
-import org.springframework.cglib.beans.BeanCopier;
-import org.springframework.cglib.core.Converter;
-import org.springframework.objenesis.Objenesis;
-import org.springframework.objenesis.ObjenesisStd;
-
-import com.wl4g.infra.common.bean.BeanUtils2;
-
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -32,6 +25,13 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.validation.constraints.NotNull;
+
+import org.springframework.cglib.beans.BeanCopier;
+import org.springframework.cglib.core.Converter;
+import org.springframework.objenesis.Objenesis;
+import org.springframework.objenesis.ObjenesisStd;
+
 /**
  * {@link BeanCopierUtils}
  * 
@@ -40,17 +40,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @see
  */
 public abstract class BeanCopierUtils {
-
-    public static <O> O deepCopyWithDefault(O targetConfig, O defaultConfig)
-            throws IllegalArgumentException, IllegalAccessException {
-        // clone copy to target.
-        O orignalTarget = clone(targetConfig);
-        // copy default override to target.
-        BeanUtils2.deepCopyFieldState(targetConfig, defaultConfig);
-        // copy target override to target clone.
-        BeanUtils2.deepCopyFieldState(targetConfig, orignalTarget);
-        return targetConfig;
-    }
 
     /***
      * Copy bean object the properties of new objects. Note: only when there is
@@ -63,7 +52,7 @@ public abstract class BeanCopierUtils {
      * @return return target dst object.
      */
     @SuppressWarnings("unchecked")
-    public static <O> O clone(O src) {
+    public static @NotNull <O> O clone(@NotNull O src) {
         notNull(src, "Mapper bean source object is required");
         checkSupport(src, null);
         try {
@@ -86,7 +75,7 @@ public abstract class BeanCopierUtils {
      * @param <T>
      * @return return target dst object.
      */
-    public static <O, T> T mapper(O src, T dst) {
+    public static @NotNull <O, T> T mapper(@NotNull O src, @NotNull T dst) {
         return mapper(src, dst, null);
     }
 
@@ -104,7 +93,7 @@ public abstract class BeanCopierUtils {
      * @param <T>
      * @return return target dst object.
      */
-    public static <O, T> T mapper(O src, T dst, Converter converter) {
+    public static @NotNull <O, T> T mapper(@NotNull O src, @NotNull T dst, @NotNull Converter converter) {
         return doBeanMapper(src, dst, converter);
     }
 
@@ -116,7 +105,7 @@ public abstract class BeanCopierUtils {
      * @param converter
      * @return
      */
-    private static <O, T> T doBeanMapper(O src, T dst, Converter converter) {
+    private static @NotNull <O, T> T doBeanMapper(@NotNull O src, @NotNull T dst, @NotNull Converter converter) {
         notNull(src, "Mapper bean source object is required");
         notNull(dst, "Mapper bean target object is required");
         checkSupport(src, dst);
