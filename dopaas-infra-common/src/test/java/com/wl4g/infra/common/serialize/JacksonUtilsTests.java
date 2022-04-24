@@ -30,7 +30,23 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.core.type.TypeReference;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
+
 public class JacksonUtilsTests {
+
+    //
+    // ----- General parse. -----
+    //
 
     @Test
     public void testDirectParseArray() {
@@ -41,112 +57,139 @@ public class JacksonUtilsTests {
         System.out.println(parsed2);
     }
 
+    @Getter
+    @Setter
+    @ToString
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class TestUserBean {
+        private long id;
+        private String name;
+        private Map<String, String> attributes = new HashMap<>();
+    }
+
+    @Getter
+    @Setter
+    @ToString
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class TestBarBean {
+        private String barName;
+    }
+
     @Test
     public void testDeepClone() {
-        TestBar bar = new TestBar("myBar");
-        TestBean1 bean1 = new TestBean1(1313466574534868992L, "jack", singletonMap("foo", toJSONString(bar)));
+        TestBarBean bar = new TestBarBean("myBar");
+        TestUserBean bean1 = new TestUserBean(1313466574534868992L, "jack", singletonMap("foo", toJSONString(bar)));
 
         String json = toJSONString(bean1);
         out.println("Serialization...");
         out.println(json);
 
         out.println("Deserialization...");
-        out.println(parseJSON(json, TestBean1.class));
+        out.println(parseJSON(json, TestUserBean.class));
 
         out.println("deepClone0...");
         out.println(deepClone(new ArrayList<>()));
 
         out.println("deepClone1...");
-        List<TestBar> list1 = new ArrayList<>();
-        list1.add(new TestBar("myBar00"));
+        List<TestBarBean> list1 = new ArrayList<>();
+        list1.add(new TestBarBean("myBar00"));
         out.println(deepClone(list1));
 
         out.println("deepClone2...");
-        Map<String, TestBar> map = new HashMap<>();
-        map.put("bar1", new TestBar("myBar11"));
+        Map<String, TestBarBean> map = new HashMap<>();
+        map.put("bar1", new TestBarBean("myBar11"));
         out.println(deepClone(map));
 
         out.println("deepClone3...");
-        Map<String, List<Map<String, TestBar>>> map2 = new HashMap<>();
-        Map<String, TestBar> map21 = new HashMap<>();
-        map21.put("bar21", new TestBar("myBar211"));
-        List<Map<String, TestBar>> list2 = new ArrayList<>();
+        Map<String, List<Map<String, TestBarBean>>> map2 = new HashMap<>();
+        Map<String, TestBarBean> map21 = new HashMap<>();
+        map21.put("bar21", new TestBarBean("myBar211"));
+        List<Map<String, TestBarBean>> list2 = new ArrayList<>();
         list2.add(map21);
         map2.put("bar2", list2);
         out.println(deepClone(map2));
     }
 
-    public static class TestBean1 {
+    //
+    // ----- Sub type parse. -----
+    //
 
-        private long id;
-
-        private String name;
-
-        private Map<String, String> attributes = new HashMap<>();
-
-        public TestBean1() {
-            super();
-        }
-
-        public TestBean1(long id, String name, Map<String, String> attributes) {
-            super();
-            this.id = id;
-            this.name = name;
-            this.attributes = attributes;
-        }
-
-        public long getId() {
-            return id;
-        }
-
-        public void setId(long id) {
-            this.id = id;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public Map<String, String> getAttributes() {
-            return attributes;
-        }
-
-        public void setAttributes(Map<String, String> attributes) {
-            this.attributes = attributes;
-        }
-
-        @Override
-        public String toString() {
-            return "TestBean1 [id=" + id + ", name=" + name + ", attributes=" + attributes + "]";
-        }
-
+    @Test
+    public void testPolymorphicMappingToJson() {
+        List<TestVehicle> vehicles = new ArrayList<>();
+        vehicles.add(TestCar.builder().model("X1").power("petroleum").build());
+        vehicles.add(TestCar.builder().model("X2").power("electric").build());
+        vehicles.add(TestBicycle.builder().model("X101").color("red").build());
+        out.println(toJSONString(vehicles));
     }
 
-    public static class TestBar {
+    @Test
+    public void testParseFromPolymorphicMappingObjectJson() {
+        String json1 = "{\"@type\":\"car\",\"model\":\"X1\",\"power\":\"petroleum\"}";
+        TestVehicle vehicle1 = parseJSON(json1, TestVehicle.class);
+        out.println("object: " + vehicle1);
+        out.println("class: " + vehicle1.getClass());
 
-        private String barName;
+        out.println("-----------------");
 
-        public TestBar() {
-            super();
-        }
+        String json2 = "{\"@type\":\"bicycle\",\"model\":\"X101\",\"color\":\"red\"}";
+        TestVehicle vehicle2 = parseJSON(json2, TestVehicle.class);
+        out.println("object: " + vehicle2);
+        out.println("class: " + vehicle2.getClass());
+    }
 
-        public TestBar(String barName) {
-            super();
-            this.barName = barName;
-        }
+    @Test
+    public void testParseFromPolymorphicMappingArrayJson() {
+        String arrJson = "[{\"@type\":\"car\",\"model\":\"X1\",\"power\":\"petroleum\"},{\"@type\":\"bicycle\",\"model\":\"X101\",\"color\":\"red\"}]";
+        List<TestVehicle> vehicles = parseJSON(arrJson, new TypeReference<List<TestVehicle>>() {
+        });
+        out.println("array vehicle: " + vehicles);
+        out.println("class: " + vehicles.toString());
+    }
 
-        public String getBarName() {
-            return barName;
-        }
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
+    @JsonSubTypes({ @Type(value = TestCar.class, name = "car"), @Type(value = TestBicycle.class, name = "bicycle"), })
+    @Getter
+    @Setter
+    @SuperBuilder
+    @ToString
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class TestVehicle {
+        private String model;
+        private String type;
+    }
 
-        public void setBarName(String barName) {
-            this.barName = barName;
-        }
+    @Getter
+    @Setter
+    @SuperBuilder
+    @ToString
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class TestCar extends TestVehicle {
+        private String power;
+    }
 
+    @Getter
+    @Setter
+    @SuperBuilder
+    @ToString
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class TestBicycle extends TestVehicle {
+        private String color;
+    }
+
+    @Getter
+    @Setter
+    @SuperBuilder
+    @ToString
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class TestWrapper {
+        private List<TestVehicle> vehicles;
     }
 
 }
