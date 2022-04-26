@@ -119,9 +119,9 @@ public class JacksonUtilsTests {
     @Test
     public void testPolymorphicMappingToJson() {
         List<TestVehicle> vehicles = new ArrayList<>();
-        vehicles.add(TestCar.builder().model("X1").power("petroleum").build());
-        vehicles.add(TestCar.builder().model("X2").power("electric").build());
-        vehicles.add(TestBicycle.builder().model("X101").color("red").build());
+        vehicles.add(TestCar.builder().type("T1").model("X1").power("petroleum").build());
+        vehicles.add(TestCar.builder().type("T1").model("X2").power("electric").build());
+        vehicles.add(TestBicycle.builder().type("T2").model("X101").color("red").build());
         out.println(toJSONString(vehicles));
     }
 
