@@ -46,9 +46,23 @@ public class BinderTests {
         properties.put("myuser.age", 18);
         properties.put("myuser.accounts[0]", "admin");
         properties.put("myuser.attributes['isAdmin']", "true");
-        properties.put("myuser.extra", "abcd");
+        properties.put("myuser.extra", "abcd"); // for test redundant fields
         Binder binder = new Binder(new MapConfigurationPropertySource(properties));
         BindResult<MyUser> result = binder.bind("myuser", MyUser.class);
+        System.out.println(result.get());
+    }
+
+    @Test
+    public void testBinderBindToBeanWithEmptyPrefix() {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("firstName", "T");
+        properties.put("lastName", "Tom");
+        properties.put("age", 18);
+        properties.put("accounts[0]", "admin");
+        properties.put("attributes['isAdmin']", "true");
+        properties.put("extra", "abcd"); // for test redundant fields
+        Binder binder = new Binder(new MapConfigurationPropertySource(properties));
+        BindResult<MyUser> result = binder.bind("", MyUser.class);
         System.out.println(result.get());
     }
 
