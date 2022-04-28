@@ -23,6 +23,7 @@ import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -43,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
@@ -74,23 +76,41 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SpelRequestMatcher {
 
-    private @Nullable final List<MatchHttpRequestRule> ruleDefinitions;
     private @NotBlank final SpelExpressions spel = SpelExpressions.create();
+    private @Nullable final List<MatchHttpRequestRule> ruleDefinitions;
+    private @Nullable final Map<String, Supplier<Predicate<String>>> extraPredicateVariableSuppliers;
 
     public SpelRequestMatcher(List<MatchHttpRequestRule> ruleDefinitions) {
+        this(ruleDefinitions, null);
+    }
+
+    public SpelRequestMatcher(List<MatchHttpRequestRule> ruleDefinitions,
+            Map<String, Supplier<Predicate<String>>> extraPredicateVariableSuppliers) {
         this.ruleDefinitions = isEmpty(ruleDefinitions) ? emptyList() : ruleDefinitions;
         this.ruleDefinitions.forEach(rule -> rule.validate()); // Validation
+        this.extraPredicateVariableSuppliers = isEmpty(extraPredicateVariableSuppliers) ? emptyMap()
+                : extraPredicateVariableSuppliers;
     }
 
     public List<MatchHttpRequestRule> find(@NotNull RequestExtractor extractor, @NotBlank String expression) {
         notNullOf(extractor, "extractor");
         hasTextOf(expression, "expression");
 
-        // Make model.
+        // Add '$' prefix to build-in rules variables.
         Map<String, Object> model = safeList(ruleDefinitions).stream().collect(toMap(r -> "$".concat(r.getName()), r -> r));
+
+        // Add '$' prefix to build-in request variables.
         model.put("$".concat(SPEL_KEYWORDS_REQUEST), extractor);
 
-        // find resolve.
+        // Add '$' prefix to build-in extension predicate variables supplier.
+        extraPredicateVariableSuppliers.forEach((varName, supplier) -> {
+            if (nonNull(model.putIfAbsent("$".concat(varName), supplier))) {
+                throw new IllegalArgumentException(
+                        format("Already exists for add built-in supplier variable name '%s'.", varName));
+            }
+        });
+
+        // do request matching.
         List<MatchHttpRequestRule> result = ruleDefinitions.stream().filter(e -> {
             model.put("$".concat(SPEL_KEYWORDS_RULE), e);
             return spel.resolve(expression, model);
@@ -103,10 +123,18 @@ public class SpelRequestMatcher {
         notNullOf(extractor, "extractor");
         hasTextOf(expression, "expression");
 
-        // Add '$' prefix to all key.
+        // Add '$' prefix to build-in request and rules variables.
         Map<String, Object> model = ruleDefinitions.stream().collect(toMap(r -> "$".concat(r.getName()), r -> r));
         model.put("$".concat(SPEL_KEYWORDS_REQUEST), extractor);
         model.put("$".concat(SPEL_KEYWORDS_RULES), ruleDefinitions.stream().collect(toMap(r -> r.getName(), r -> r)));
+
+        // Add '$' prefix to build-in extension predicate variables supplier.
+        extraPredicateVariableSuppliers.forEach((varName, supplier) -> {
+            if (nonNull(model.putIfAbsent("$".concat(varName), supplier))) {
+                throw new IllegalArgumentException(
+                        format("Already exists for add built-in supplier variable name '%s'.", varName));
+            }
+        });
 
         try {
             return spel.resolve(expression, model);

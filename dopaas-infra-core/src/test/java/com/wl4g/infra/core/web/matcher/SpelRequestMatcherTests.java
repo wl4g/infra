@@ -15,13 +15,18 @@
  */
 package com.wl4g.infra.core.web.matcher;
 
+import static java.util.Collections.singletonMap;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
+import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
 import com.wl4g.infra.core.web.matcher.SpelRequestMatcher.MatchHttpRequestRule;
 import com.wl4g.infra.core.web.matcher.SpelRequestMatcher.MatchProperty;
@@ -294,6 +299,64 @@ public class SpelRequestMatcherTests {
         // directly.
         String expression = "#{$rule.test($request)}";
         SpelRequestMatcher matcher = new SpelRequestMatcher(ruleDefinitions);
+
+        List<MatchHttpRequestRule> result = matcher.find(mockRequest, expression);
+        System.out.println(result);
+
+        assert !isEmpty(result);
+    }
+
+    @Test
+    public void testAddOtherExtraVarsSuccessFindRequestMatches() {
+        RequestExtractor mockRequest = new RequestExtractor() {
+            @Override
+            public String getHost() {
+                return "portal.example.com";
+            }
+
+            @Override
+            public String getHeaderValue(String name) {
+                if (StringUtils.equals(name, "X-User-Label")) {
+                    return "Beta";
+                }
+                return null;
+            }
+
+            @Override
+            public String getQueryValue(String name) {
+                if (StringUtils.equals(name, "version")) {
+                    return "v2";
+                }
+                return null;
+            }
+        };
+
+        List<MatchHttpRequestRule> ruleDefinitions = Lists.newArrayList();
+        // [Note]: Define a name that conforms to the java method naming
+        // specification, which can be used directly in SPEL expressions,
+        // otherwise only the method obtained in definitions can be used, for
+        // example: definitions.get('my-rule')
+        ruleDefinitions.add(MatchHttpRequestRule.builder()
+                .name("userLabelBasedCanaryRule")
+                .host("portal.example.com")
+                .header(new MatchProperty(MatchSymbol.EQ, "X-User-Label", "Beta"))
+                .build());
+
+        ruleDefinitions.add(MatchHttpRequestRule.builder()
+                .name("query-version-based-canary-rule")
+                .host("portal.example.com")
+                .query(new MatchProperty(MatchSymbol.EQ, "version", "v2"))
+                .build());
+
+        // [Note]: Names that meet the java method naming convention can be used
+        // directly.
+        String expression = "#{$rule.or($routeId.get()).test($request)}";
+
+        // Add extra build-in predicates.
+        Map<String, Supplier<Predicate<String>>> extraPredicateVariableSuppliers = singletonMap("routeId",
+                () -> Predicates.equalTo("example-service-route"));
+
+        SpelRequestMatcher matcher = new SpelRequestMatcher(ruleDefinitions, extraPredicateVariableSuppliers);
 
         List<MatchHttpRequestRule> result = matcher.find(mockRequest, expression);
         System.out.println(result);
