@@ -44,6 +44,7 @@ public class BinderTests {
         properties.put("myuser.firstName", "T");
         properties.put("myuser.lastName", "Tom");
         properties.put("myuser.age", 18);
+        properties.put("type", "user");
         properties.put("myuser.accounts[0]", "admin");
         properties.put("myuser.attributes['isAdmin']", "true");
         properties.put("myuser.extra", "abcd"); // for test redundant fields
@@ -58,6 +59,7 @@ public class BinderTests {
         properties.put("firstName", "T");
         properties.put("lastName", "Tom");
         properties.put("age", 18);
+        properties.put("type", "user");
         properties.put("accounts[0]", "admin");
         properties.put("attributes['isAdmin']", "true");
         properties.put("extra", "abcd"); // for test redundant fields
@@ -72,6 +74,7 @@ public class BinderTests {
         properties.put("firstName", "T");
         properties.put("lastName", "Tom");
         properties.put("age", 18);
+        properties.put("type", "user");
         properties.put("accounts", "['admin','admin1']");
         properties.put("attributes['isAdmin']", "true");
         properties.put("extra", "abcd"); // for test redundant fields
@@ -86,9 +89,14 @@ public class BinderTests {
     public static class MyUser {
         private String firstName = "M";
         private String lastName = "Mary";
+        private MyUserType type = MyUserType.User;
         private int age = 17;
         private List<String> accounts = new ArrayList<>();
         private Map<String, Boolean> attributes = new HashMap<>();
+    }
+
+    public static enum MyUserType {
+        Admin, User
     }
 
 }
