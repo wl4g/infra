@@ -78,21 +78,66 @@ public class SpelRequestMatcher {
 
     private @NotBlank final SpelExpressions spel = SpelExpressions.create();
     private @Nullable final List<MatchHttpRequestRule> ruleDefinitions;
-    private @Nullable final Map<String, Supplier<Predicate<String>>> extraPredicateVariableSuppliers;
+    private @Nullable final Map<String, Supplier<Predicate<String>>> defaultExtraPredicateVariableSuppliers;
 
+    /**
+     * @param ruleDefinitions
+     *            The rule set definition to match.
+     */
     public SpelRequestMatcher(List<MatchHttpRequestRule> ruleDefinitions) {
         this(ruleDefinitions, null);
     }
 
+    /**
+     * @param ruleDefinitions
+     *            The rule set definition to match.
+     * @param defaultExtraPredicateVariableSuppliers
+     *            The defaults extended predicate provider list. as such:
+     *            support getting data in request.getAttributes in SPEL
+     *            expressions.
+     */
     public SpelRequestMatcher(List<MatchHttpRequestRule> ruleDefinitions,
-            Map<String, Supplier<Predicate<String>>> extraPredicateVariableSuppliers) {
+            Map<String, Supplier<Predicate<String>>> defaultExtraPredicateVariableSuppliers) {
         this.ruleDefinitions = isEmpty(ruleDefinitions) ? emptyList() : ruleDefinitions;
         this.ruleDefinitions.forEach(rule -> rule.validate()); // Validation
-        this.extraPredicateVariableSuppliers = isEmpty(extraPredicateVariableSuppliers) ? emptyMap()
-                : extraPredicateVariableSuppliers;
+        this.defaultExtraPredicateVariableSuppliers = isEmpty(defaultExtraPredicateVariableSuppliers) ? emptyMap()
+                : defaultExtraPredicateVariableSuppliers;
     }
 
+    /**
+     * Finds a collection of all rule names that match the expectations of a
+     * SPEL expression based on request information.
+     * 
+     * @param extractor
+     *            Wrapper for extracting request parameters
+     * @param expression
+     *            SPEL expression used to match the request
+     * @return Returns true if the request satisfies the matching SPEL
+     *         expression, otherwise returns false.
+     */
     public List<MatchHttpRequestRule> find(@NotNull RequestExtractor extractor, @NotBlank String expression) {
+        return find(extractor, expression, null);
+    }
+
+    /**
+     * Finds a collection of all rule names that match the expectations of a
+     * SPEL expression based on request information.
+     * 
+     * @param extractor
+     *            Wrapper for extracting request parameters
+     * @param expression
+     *            SPEL expression used to match the request
+     * @param tmpExtraPredicateVariableSuppliers
+     *            The temporary extended predicate provider list. as such:
+     *            support getting data in request.getAttributes in SPEL
+     *            expressions.
+     * @return Returns true if the request satisfies the matching SPEL
+     *         expression, otherwise returns false.
+     */
+    public List<MatchHttpRequestRule> find(
+            @NotNull RequestExtractor extractor,
+            @NotBlank String expression,
+            @Nullable Map<String, Supplier<Predicate<String>>> tmpExtraPredicateVariableSuppliers) {
         notNullOf(extractor, "extractor");
         hasTextOf(expression, "expression");
 
@@ -102,13 +147,25 @@ public class SpelRequestMatcher {
         // Add '$' prefix to build-in request variables.
         model.put("$".concat(SPEL_KEYWORDS_REQUEST), extractor);
 
-        // Add '$' prefix to build-in extension predicate variables supplier.
-        extraPredicateVariableSuppliers.forEach((varName, supplier) -> {
+        // Add '$' prefix to default build-in extension predicate variables
+        // supplier.
+        defaultExtraPredicateVariableSuppliers.forEach((varName, supplier) -> {
             if (nonNull(model.putIfAbsent("$".concat(varName), supplier))) {
                 throw new IllegalArgumentException(
                         format("Already exists for add built-in supplier variable name '%s'.", varName));
             }
         });
+
+        // Add '$' prefix to temporary build-in extension predicate variables
+        // supplier.
+        if (nonNull(tmpExtraPredicateVariableSuppliers)) {
+            tmpExtraPredicateVariableSuppliers.forEach((varName, supplier) -> {
+                if (nonNull(model.putIfAbsent("$".concat(varName), supplier))) {
+                    throw new IllegalArgumentException(
+                            format("Already exists for add temporary built-in supplier variable name '%s'.", varName));
+                }
+            });
+        }
 
         // do request matching.
         List<MatchHttpRequestRule> result = ruleDefinitions.stream().filter(e -> {
@@ -119,7 +176,41 @@ public class SpelRequestMatcher {
         return unmodifiableList(result);
     }
 
+    /**
+     * The whether the match according to the request information satisfies the
+     * SPEL expression.
+     * 
+     * @param extractor
+     *            Wrapper for extracting request parameters
+     * @param expression
+     *            SPEL expression used to match the request
+     * @return Returns true if the request satisfies the matching SPEL
+     *         expression, otherwise returns false.
+     * @return
+     */
     public boolean matches(@NotNull RequestExtractor extractor, @NotBlank String expression) {
+        return matches(extractor, expression, null);
+    }
+
+    /**
+     * The whether the match according to the request information satisfies the
+     * SPEL expression.
+     * 
+     * @param extractor
+     *            Wrapper for extracting request parameters
+     * @param expression
+     *            SPEL expression used to match the request
+     * @param tmpExtraPredicateVariableSuppliers
+     *            The temporary extended predicate provider list. as such:
+     *            support getting data in request.getAttributes in SPEL
+     *            expressions.
+     * @return Returns true if the request satisfies the matching SPEL
+     *         expression, otherwise returns false.
+     */
+    public boolean matches(
+            @NotNull RequestExtractor extractor,
+            @NotBlank String expression,
+            @Nullable Map<String, Supplier<Predicate<String>>> tmpExtraPredicateVariableSuppliers) {
         notNullOf(extractor, "extractor");
         hasTextOf(expression, "expression");
 
@@ -128,13 +219,25 @@ public class SpelRequestMatcher {
         model.put("$".concat(SPEL_KEYWORDS_REQUEST), extractor);
         model.put("$".concat(SPEL_KEYWORDS_RULES), ruleDefinitions.stream().collect(toMap(r -> r.getName(), r -> r)));
 
-        // Add '$' prefix to build-in extension predicate variables supplier.
-        extraPredicateVariableSuppliers.forEach((varName, supplier) -> {
+        // Add '$' prefix to default build-in extension predicate variables
+        // supplier.
+        defaultExtraPredicateVariableSuppliers.forEach((varName, supplier) -> {
             if (nonNull(model.putIfAbsent("$".concat(varName), supplier))) {
                 throw new IllegalArgumentException(
                         format("Already exists for add built-in supplier variable name '%s'.", varName));
             }
         });
+
+        // Add '$' prefix to temporary build-in extension predicate variables
+        // supplier.
+        if (nonNull(tmpExtraPredicateVariableSuppliers)) {
+            tmpExtraPredicateVariableSuppliers.forEach((varName, supplier) -> {
+                if (nonNull(model.putIfAbsent("$".concat(varName), supplier))) {
+                    throw new IllegalArgumentException(
+                            format("Already exists for add temporary built-in supplier variable name '%s'.", varName));
+                }
+            });
+        }
 
         try {
             return spel.resolve(expression, model);
