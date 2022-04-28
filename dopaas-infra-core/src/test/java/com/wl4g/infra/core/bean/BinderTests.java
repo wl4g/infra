@@ -66,6 +66,20 @@ public class BinderTests {
         System.out.println(result.get());
     }
 
+    @Test
+    public void testBinderBindMultiValuesToBeanWithEmptyPrefix() {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("firstName", "T");
+        properties.put("lastName", "Tom");
+        properties.put("age", 18);
+        properties.put("accounts", "['admin','admin1']");
+        properties.put("attributes['isAdmin']", "true");
+        properties.put("extra", "abcd"); // for test redundant fields
+        Binder binder = new Binder(new MapConfigurationPropertySource(properties));
+        BindResult<MyUser> result = binder.bind("", MyUser.class);
+        System.out.println(result.get());
+    }
+
     @Getter
     @Setter
     @ToString
