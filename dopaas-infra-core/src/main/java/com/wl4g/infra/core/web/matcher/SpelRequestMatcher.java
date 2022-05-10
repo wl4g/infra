@@ -78,9 +78,11 @@ public class SpelRequestMatcher {
 
     private @NotBlank final SpelExpressions spel = SpelExpressions.create();
     private @Nullable final List<MatchHttpRequestRule> ruleDefinitions;
-    private @Nullable final Map<String, Supplier<Predicate<String>>> defaultExtraPredicateVariableSuppliers;
+    private @Nullable final Map<String, Supplier<Predicate<String>>> defaultExtraPredicateSupplierVariables;
 
     /**
+     * Construction {@link SpelRequestMatcher}
+     * 
      * @param ruleDefinitions
      *            The rule set definition to match.
      */
@@ -89,19 +91,21 @@ public class SpelRequestMatcher {
     }
 
     /**
+     * Construction {@link SpelRequestMatcher}
+     * 
      * @param ruleDefinitions
      *            The rule set definition to match.
-     * @param defaultExtraPredicateVariableSuppliers
+     * @param defaultExtraPredicateSupplierVariables
      *            The defaults extended predicate provider list. as such:
      *            support getting data in request.getAttributes in SPEL
      *            expressions.
      */
     public SpelRequestMatcher(List<MatchHttpRequestRule> ruleDefinitions,
-            Map<String, Supplier<Predicate<String>>> defaultExtraPredicateVariableSuppliers) {
+            Map<String, Supplier<Predicate<String>>> defaultExtraPredicateSupplierVariables) {
         this.ruleDefinitions = isEmpty(ruleDefinitions) ? emptyList() : ruleDefinitions;
         this.ruleDefinitions.forEach(rule -> rule.validate()); // Validation
-        this.defaultExtraPredicateVariableSuppliers = isEmpty(defaultExtraPredicateVariableSuppliers) ? emptyMap()
-                : defaultExtraPredicateVariableSuppliers;
+        this.defaultExtraPredicateSupplierVariables = isEmpty(defaultExtraPredicateSupplierVariables) ? emptyMap()
+                : defaultExtraPredicateSupplierVariables;
     }
 
     /**
@@ -127,7 +131,7 @@ public class SpelRequestMatcher {
      *            Wrapper for extracting request parameters
      * @param expression
      *            SPEL expression used to match the request
-     * @param tmpExtraPredicateVariableSuppliers
+     * @param extraPredicateSupplierVariables
      *            The temporary extended predicate provider list. as such:
      *            support getting data in request.getAttributes in SPEL
      *            expressions.
@@ -137,7 +141,7 @@ public class SpelRequestMatcher {
     public List<MatchHttpRequestRule> find(
             @NotNull RequestExtractor extractor,
             @NotBlank String expression,
-            @Nullable Map<String, Supplier<Predicate<String>>> tmpExtraPredicateVariableSuppliers) {
+            @Nullable Map<String, Supplier<Predicate<String>>> extraPredicateSupplierVariables) {
         notNullOf(extractor, "extractor");
         hasTextOf(expression, "expression");
 
@@ -149,7 +153,7 @@ public class SpelRequestMatcher {
 
         // Add '$' prefix to default build-in extension predicate variables
         // supplier.
-        defaultExtraPredicateVariableSuppliers.forEach((varName, supplier) -> {
+        defaultExtraPredicateSupplierVariables.forEach((varName, supplier) -> {
             if (nonNull(model.putIfAbsent("$".concat(varName), supplier))) {
                 throw new IllegalArgumentException(
                         format("Already exists for add built-in supplier variable name '%s'.", varName));
@@ -158,8 +162,8 @@ public class SpelRequestMatcher {
 
         // Add '$' prefix to temporary build-in extension predicate variables
         // supplier.
-        if (nonNull(tmpExtraPredicateVariableSuppliers)) {
-            tmpExtraPredicateVariableSuppliers.forEach((varName, supplier) -> {
+        if (nonNull(extraPredicateSupplierVariables)) {
+            extraPredicateSupplierVariables.forEach((varName, supplier) -> {
                 if (nonNull(model.putIfAbsent("$".concat(varName), supplier))) {
                     throw new IllegalArgumentException(
                             format("Already exists for add temporary built-in supplier variable name '%s'.", varName));
@@ -200,7 +204,7 @@ public class SpelRequestMatcher {
      *            Wrapper for extracting request parameters
      * @param expression
      *            SPEL expression used to match the request
-     * @param tmpExtraPredicateVariableSuppliers
+     * @param extraPredicateSupplierVariables
      *            The temporary extended predicate provider list. as such:
      *            support getting data in request.getAttributes in SPEL
      *            expressions.
@@ -210,7 +214,7 @@ public class SpelRequestMatcher {
     public boolean matches(
             @NotNull RequestExtractor extractor,
             @NotBlank String expression,
-            @Nullable Map<String, Supplier<Predicate<String>>> tmpExtraPredicateVariableSuppliers) {
+            @Nullable Map<String, Supplier<Predicate<String>>> extraPredicateSupplierVariables) {
         notNullOf(extractor, "extractor");
         hasTextOf(expression, "expression");
 
@@ -221,7 +225,7 @@ public class SpelRequestMatcher {
 
         // Add '$' prefix to default build-in extension predicate variables
         // supplier.
-        defaultExtraPredicateVariableSuppliers.forEach((varName, supplier) -> {
+        defaultExtraPredicateSupplierVariables.forEach((varName, supplier) -> {
             if (nonNull(model.putIfAbsent("$".concat(varName), supplier))) {
                 throw new IllegalArgumentException(
                         format("Already exists for add built-in supplier variable name '%s'.", varName));
@@ -230,11 +234,11 @@ public class SpelRequestMatcher {
 
         // Add '$' prefix to temporary build-in extension predicate variables
         // supplier.
-        if (nonNull(tmpExtraPredicateVariableSuppliers)) {
-            tmpExtraPredicateVariableSuppliers.forEach((varName, supplier) -> {
+        if (nonNull(extraPredicateSupplierVariables)) {
+            extraPredicateSupplierVariables.forEach((varName, supplier) -> {
                 if (nonNull(model.putIfAbsent("$".concat(varName), supplier))) {
                     throw new IllegalArgumentException(
-                            format("Already exists for add temporary built-in supplier variable name '%s'.", varName));
+                            format("The already exists for add temporary built-in supplier variable name '%s'.", varName));
                 }
             });
         }
