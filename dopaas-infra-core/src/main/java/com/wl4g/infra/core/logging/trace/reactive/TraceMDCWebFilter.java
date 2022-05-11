@@ -42,7 +42,7 @@ public class TraceMDCWebFilter extends AbstractTraceMDCSupport implements WebFil
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         try {
-            doFilterMDC(new ReactiveRequestExtractor(exchange.getRequest()));
+            bindToMDC(new ReactiveRequestExtractor(exchange.getRequest()));
             return chain.filter(exchange);
         } finally {
             MDC.clear(); // must

@@ -78,7 +78,7 @@ public class TraceMDCServletFilter extends AbstractTraceMDCSupport implements Fi
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
         try {
-            doFilterMDC(new ServletRequsetExtractor((HttpServletRequest) request));
+            bindToMDC(new ServletRequsetExtractor((HttpServletRequest) request));
             chain.doFilter(request, response);
         } finally {
             MDC.clear(); // must

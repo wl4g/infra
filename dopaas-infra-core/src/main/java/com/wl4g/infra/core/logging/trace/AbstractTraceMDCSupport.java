@@ -110,10 +110,10 @@ public abstract class AbstractTraceMDCSupport {
         this.environment = notNullOf(environment, "environment");
     }
 
-    protected void doFilterMDC(WebRequestExtractor extractor) {
+    protected void bindToMDC(WebRequestExtractor extractor) {
         try {
             reloadIfNecessary();
-            bindToMDC(extractor);
+            doBind(extractor);
         } catch (Exception e) {
             log.error(format("Could't set logging MDC. uri: %s", extractor.getRequestURI()), e);
         }
@@ -124,7 +124,7 @@ public abstract class AbstractTraceMDCSupport {
      * 
      * @param extractor
      */
-    protected void bindToMDC(WebRequestExtractor extractor) {
+    protected void doBind(WebRequestExtractor extractor) {
         // Sets trace core fields to MDC
         MDC.put(KEY_TIMESTAMP, valueOf(currentTimeMillis()));
         MDC.put(KEY_URI, extractor.getRequestURI().getPath());
