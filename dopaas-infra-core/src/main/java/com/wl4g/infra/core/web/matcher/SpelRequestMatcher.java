@@ -54,6 +54,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.expression.EvaluationException;
 import org.springframework.util.AntPathMatcher;
 
+import com.wl4g.infra.common.web.WebUtils.WebRequestExtractor;
 import com.wl4g.infra.core.utils.expression.SpelExpressions;
 
 import lombok.AccessLevel;
@@ -119,7 +120,7 @@ public class SpelRequestMatcher {
      * @return Returns true if the request satisfies the matching SPEL
      *         expression, otherwise returns false.
      */
-    public List<MatchHttpRequestRule> find(@NotNull RequestExtractor extractor, @NotBlank String expression) {
+    public List<MatchHttpRequestRule> find(@NotNull WebRequestExtractor extractor, @NotBlank String expression) {
         return find(extractor, expression, null);
     }
 
@@ -139,7 +140,7 @@ public class SpelRequestMatcher {
      *         expression, otherwise returns false.
      */
     public List<MatchHttpRequestRule> find(
-            @NotNull RequestExtractor extractor,
+            @NotNull WebRequestExtractor extractor,
             @NotBlank String expression,
             @Nullable Map<String, Supplier<Predicate<String>>> extraPredicateSupplierVariables) {
         notNullOf(extractor, "extractor");
@@ -192,7 +193,7 @@ public class SpelRequestMatcher {
      *         expression, otherwise returns false.
      * @return
      */
-    public boolean matches(@NotNull RequestExtractor extractor, @NotBlank String expression) {
+    public boolean matches(@NotNull WebRequestExtractor extractor, @NotBlank String expression) {
         return matches(extractor, expression, null);
     }
 
@@ -212,7 +213,7 @@ public class SpelRequestMatcher {
      *         expression, otherwise returns false.
      */
     public boolean matches(
-            @NotNull RequestExtractor extractor,
+            @NotNull WebRequestExtractor extractor,
             @NotBlank String expression,
             @Nullable Map<String, Supplier<Predicate<String>>> extraPredicateSupplierVariables) {
         notNullOf(extractor, "extractor");
@@ -252,41 +253,6 @@ public class SpelRequestMatcher {
         }
     }
 
-    public static interface RequestExtractor {
-
-        default String getMethod() {
-            return null;
-        }
-
-        default String getScheme() {
-            return null;
-        }
-
-        default String getHost() {
-            return null;
-        }
-
-        default Integer getPort() {
-            return null;
-        }
-
-        default String getPath() {
-            return null;
-        }
-
-        default String getHeaderValue(String name) {
-            return null;
-        }
-
-        default String getCookieValue(String name) {
-            return null;
-        }
-
-        default String getQueryValue(String name) {
-            return null;
-        }
-    }
-
     /**
      * @see {@link org.springframework.web.reactive.function.server.RequestPredicates}
      */
@@ -296,7 +262,7 @@ public class SpelRequestMatcher {
     @ToString
     @SuperBuilder
     @AllArgsConstructor
-    public static class MatchHttpRequestRule implements Predicate<RequestExtractor> {
+    public static class MatchHttpRequestRule implements Predicate<WebRequestExtractor> {
 
         /**
          * The name of the matching rule (required).
@@ -375,11 +341,11 @@ public class SpelRequestMatcher {
         }
 
         @Override
-        public boolean test(RequestExtractor extractor) {
+        public boolean test(WebRequestExtractor extractor) {
             return doMatchRequest(extractor);
         }
 
-        private boolean doMatchRequest(@NotNull RequestExtractor extractor) {
+        private boolean doMatchRequest(@NotNull WebRequestExtractor extractor) {
             notNullOf(extractor, "extractor");
 
             // Match HTTP method

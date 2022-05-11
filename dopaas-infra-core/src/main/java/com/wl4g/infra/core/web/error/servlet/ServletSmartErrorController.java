@@ -18,7 +18,7 @@ package com.wl4g.infra.core.web.error.servlet;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static com.wl4g.infra.common.web.WebUtils2.isStacktraceRequest;
-import static com.wl4g.infra.core.constant.CoreInfraConstants.TRACE_REQUEST_ID_HEADER_NAME;
+import static com.wl4g.infra.core.constant.CoreInfraConstants.TRACE_REQUEST_ID_HEADER;
 import static com.wl4g.infra.core.web.error.handler.AbstractSmartErrorHandler.obtainErrorAttributeOptions;
 
 import java.util.Map;
@@ -99,16 +99,16 @@ public class ServletSmartErrorController extends AbstractErrorController {
         errorHandler.rendering(new WebRequestExtractor() {
             @Override
             public String getRequestId() {
-                return request.getHeader(TRACE_REQUEST_ID_HEADER_NAME);
+                return request.getHeader(TRACE_REQUEST_ID_HEADER);
             }
 
             @Override
-            public String getQueryParam(String name) {
+            public String getQueryValue(String name) {
                 return request.getParameter(name);
             }
 
             @Override
-            public String getHeader(String name) {
+            public String getHeaderValue(String name) {
                 return request.getHeader(name);
             }
         }, model, th, new ErrorRender() {

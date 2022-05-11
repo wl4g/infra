@@ -23,7 +23,7 @@ import static com.wl4g.infra.common.reflect.ReflectionUtils2.findField;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.getField;
 import static com.wl4g.infra.common.runtime.JvmRuntimeTool.isJvmInDebugging;
 import static com.wl4g.infra.common.web.WebUtils.PARAM_STACKTRACE;
-import static com.wl4g.infra.core.constant.CoreInfraConstants.TRACE_REQUEST_ID_HEADER_NAME;
+import static com.wl4g.infra.core.constant.CoreInfraConstants.TRACE_REQUEST_ID_HEADER;
 import static com.wl4g.infra.core.web.error.handler.AbstractSmartErrorHandler.obtainErrorAttributeOptions;
 import static java.util.Locale.US;
 import static java.util.Objects.nonNull;
@@ -119,25 +119,25 @@ public class ReactiveSmartErrorController extends AbstractErrorWebExceptionHandl
             public String getRequestId() {
                 if (request instanceof org.springframework.http.server.ServerHttpRequest) {
                     return ((org.springframework.http.server.ServerHttpRequest) (request)).getHeaders()
-                            .getFirst(TRACE_REQUEST_ID_HEADER_NAME);
+                            .getFirst(TRACE_REQUEST_ID_HEADER);
                 } else if (request instanceof org.springframework.http.server.reactive.ServerHttpRequest) {
                     return ((org.springframework.http.server.reactive.ServerHttpRequest) (request)).getHeaders()
-                            .getFirst(TRACE_REQUEST_ID_HEADER_NAME);
+                            .getFirst(TRACE_REQUEST_ID_HEADER);
                 } else if (request instanceof org.springframework.web.reactive.function.server.ServerRequest) {
                     org.springframework.web.reactive.function.server.ServerRequest.Headers headers = getField(
                             REACTIVE_SERVER_REQUEST_HEADER_FIELD, request, true);
-                    return headers.firstHeader(TRACE_REQUEST_ID_HEADER_NAME);
+                    return headers.firstHeader(TRACE_REQUEST_ID_HEADER);
                 }
                 return null;
             }
 
             @Override
-            public String getQueryParam(String name) {
+            public String getQueryValue(String name) {
                 return request.queryParam(name).orElse(null);
             }
 
             @Override
-            public String getHeader(String name) {
+            public String getHeaderValue(String name) {
                 return request.headers().asHttpHeaders().getFirst(name);
             }
         }, model, getError(request), errorRender);

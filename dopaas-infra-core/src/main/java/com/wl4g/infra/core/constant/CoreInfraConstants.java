@@ -54,8 +54,9 @@ public abstract class CoreInfraConstants extends BaseConstants {
 
     public static final String CONF_PREFIX_INFRA_CORE_WEB_EMBED_WEBAPP = CONF_PREFIX_INFRA_CORE + ".web.embedded-webapps";
 
-    // Trace(Request) ID
-
-    public static final String TRACE_REQUEST_ID_HEADER_NAME = "X-Request-Id";
+    // TraceId AS RequestId.
+    public static final String TRACE_REQUEST_ID_HEADER = "X-Request-Id";
+    // SpanId AS RequestSeq.
+    public static final String TRACE_REQUEST_SEQ_HEADER = "X-Request-Seq";
 
 }

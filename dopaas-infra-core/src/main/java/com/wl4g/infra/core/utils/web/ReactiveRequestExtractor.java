@@ -13,16 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.core.web.matcher;
+package com.wl4g.infra.core.utils.web;
 
 import static java.util.Objects.nonNull;
 import static org.springframework.util.CollectionUtils.isEmpty;
+
+import java.util.Collection;
 
 import org.springframework.http.HttpCookie;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.util.MultiValueMap;
 
-import com.wl4g.infra.core.web.matcher.SpelRequestMatcher.RequestExtractor;
+import com.wl4g.infra.common.web.WebUtils.WebRequestExtractor;
 
 import lombok.AllArgsConstructor;
 
@@ -34,7 +36,7 @@ import lombok.AllArgsConstructor;
  * @since v3.0.0
  */
 @AllArgsConstructor
-public class ReactiveRequestExtractor implements RequestExtractor {
+public class ReactiveRequestExtractor implements WebRequestExtractor {
 
     private final ServerHttpRequest request;
 
@@ -64,8 +66,28 @@ public class ReactiveRequestExtractor implements RequestExtractor {
     }
 
     @Override
+    public Collection<String> getQueryNames() {
+        return request.getQueryParams().keySet();
+    }
+
+    @Override
+    public String getQueryValue(String name) {
+        return request.getQueryParams().getFirst(name);
+    }
+
+    @Override
+    public Collection<String> getHeaderNames() {
+        return request.getHeaders().keySet();
+    }
+
+    @Override
     public String getHeaderValue(String name) {
         return request.getHeaders().getFirst(name);
+    }
+
+    @Override
+    public Collection<String> getCookieNames() {
+        return request.getCookies().keySet();
     }
 
     @Override
@@ -78,11 +100,6 @@ public class ReactiveRequestExtractor implements RequestExtractor {
             }
         }
         return null;
-    }
-
-    @Override
-    public String getQueryValue(String name) {
-        return request.getQueryParams().getFirst(name);
     }
 
 }

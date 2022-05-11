@@ -24,7 +24,7 @@ import static com.wl4g.infra.common.lang.StringUtils2.startsWithIgnoreCase;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static com.wl4g.infra.common.web.WebUtils2.ResponseType.isRespJSON;
 import static com.wl4g.infra.common.web.rest.RespBase.RetCode.newCode;
-import static com.wl4g.infra.core.constant.CoreInfraConstants.TRACE_REQUEST_ID_HEADER_NAME;
+import static com.wl4g.infra.core.constant.CoreInfraConstants.TRACE_REQUEST_ID_HEADER;
 import static java.util.Collections.emptyMap;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -145,7 +145,7 @@ public abstract class AbstractSmartErrorHandler implements InitializingBean {
             int status = getStatus(model, th);
             String errmsg = getRootCause(model, th);
             String requestId = extractor.getRequestId();
-            model.put(TRACE_REQUEST_ID_HEADER_NAME, requestId);
+            model.put(TRACE_REQUEST_ID_HEADER, requestId);
 
             // When the client is not a browser or the exception rendering
             // configuration is empty, the JSON message is returned by default.

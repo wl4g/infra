@@ -13,12 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.core.web.matcher;
+package com.wl4g.infra.core.utils.web;
+
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToList;
+import static java.util.stream.Collectors.toList;
+
+import java.util.Collection;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.collections.EnumerationUtils;
+
 import com.wl4g.infra.common.web.CookieUtils;
-import com.wl4g.infra.core.web.matcher.SpelRequestMatcher.RequestExtractor;
+import com.wl4g.infra.common.web.WebUtils.WebRequestExtractor;
 
 import lombok.AllArgsConstructor;
 
@@ -30,7 +37,7 @@ import lombok.AllArgsConstructor;
  * @since v3.0.0
  */
 @AllArgsConstructor
-public class ServletRequsetExtractor implements RequestExtractor {
+public class ServletRequsetExtractor implements WebRequestExtractor {
 
     private final HttpServletRequest request;
 
@@ -60,18 +67,34 @@ public class ServletRequsetExtractor implements RequestExtractor {
     }
 
     @Override
-    public String getHeaderValue(String name) {
-        return request.getHeader(name);
-    }
-
-    @Override
-    public String getCookieValue(String name) {
-        return CookieUtils.getCookie(request, name);
+    public Collection<String> getQueryNames() {
+        return request.getParameterMap().keySet();
     }
 
     @Override
     public String getQueryValue(String name) {
         return request.getParameter(name);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Collection<String> getHeaderNames() {
+        return EnumerationUtils.toList(request.getHeaderNames());
+    }
+
+    @Override
+    public String getHeaderValue(String name) {
+        return request.getHeader(name);
+    }
+
+    @Override
+    public Collection<String> getCookieNames() {
+        return safeArrayToList(request.getCookies()).stream().map(c -> c.getName()).collect(toList());
+    }
+
+    @Override
+    public String getCookieValue(String name) {
+        return CookieUtils.getCookie(request, name);
     }
 
 }

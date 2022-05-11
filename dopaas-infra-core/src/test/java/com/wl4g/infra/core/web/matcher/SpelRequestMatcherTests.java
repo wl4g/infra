@@ -28,10 +28,10 @@ import org.junit.Test;
 
 import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
+import com.wl4g.infra.common.web.WebUtils.WebRequestExtractor;
 import com.wl4g.infra.core.web.matcher.SpelRequestMatcher.MatchHttpRequestRule;
 import com.wl4g.infra.core.web.matcher.SpelRequestMatcher.MatchProperty;
 import com.wl4g.infra.core.web.matcher.SpelRequestMatcher.MatchSymbol;
-import com.wl4g.infra.core.web.matcher.SpelRequestMatcher.RequestExtractor;
 
 /**
  * {@link SpelRequestMatcherTests}
@@ -76,7 +76,7 @@ public class SpelRequestMatcherTests {
 
     @Test
     public void testSuccessAndRequestMatches() {
-        RequestExtractor mockRequest = new RequestExtractor() {
+        WebRequestExtractor mockRequest = new WebRequestExtractor() {
             @Override
             public String getHost() {
                 return "portal.example.com";
@@ -129,7 +129,7 @@ public class SpelRequestMatcherTests {
 
     @Test
     public void testSuccessComplexRequestMatches() {
-        RequestExtractor mockRequest = new RequestExtractor() {
+        WebRequestExtractor mockRequest = new WebRequestExtractor() {
             @Override
             public String getMethod() {
                 return "POST";
@@ -192,7 +192,7 @@ public class SpelRequestMatcherTests {
 
     @Test
     public void testFailComplexRequestMatches() {
-        RequestExtractor mockRequest = new RequestExtractor() {
+        WebRequestExtractor mockRequest = new WebRequestExtractor() {
             @Override
             public String getMethod() {
                 return "POST";
@@ -255,7 +255,7 @@ public class SpelRequestMatcherTests {
 
     @Test
     public void testSuccessFindRequestMatches() {
-        RequestExtractor mockRequest = new RequestExtractor() {
+        WebRequestExtractor mockRequest = new WebRequestExtractor() {
             @Override
             public String getHost() {
                 return "portal.example.com";
@@ -308,7 +308,7 @@ public class SpelRequestMatcherTests {
 
     @Test
     public void testAddOtherExtraVarsSuccessFindRequestMatches() {
-        RequestExtractor mockRequest = new RequestExtractor() {
+        WebRequestExtractor mockRequest = new WebRequestExtractor() {
             @Override
             public String getHost() {
                 return "portal.example.com";
