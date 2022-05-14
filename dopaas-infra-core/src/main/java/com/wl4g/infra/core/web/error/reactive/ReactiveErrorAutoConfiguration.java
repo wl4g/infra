@@ -17,21 +17,20 @@ package com.wl4g.infra.core.web.error.reactive;
 
 import static com.wl4g.infra.core.constant.CoreInfraConstants.CONF_PREFIX_INFRA_CORE_WEB_GLOBAL_ERROR;
 import static java.util.stream.Collectors.toList;
-
-import java.net.URI;
-import java.util.Map;
-
 import static org.springframework.http.HttpStatus.TEMPORARY_REDIRECT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.TEXT_HTML;
 import static org.springframework.web.reactive.function.BodyInserters.fromValue;
+
+import java.net.URI;
+import java.util.Map;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
-import org.springframework.boot.autoconfigure.web.ResourceProperties;
+import org.springframework.boot.autoconfigure.web.WebProperties.Resources;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
@@ -87,15 +86,15 @@ public class ReactiveErrorAutoConfiguration extends AbstractErrorAutoConfigurati
     @Order(-2) // Takes precedence over the default handler
     public ReactiveSmartErrorController reactiveSmartErrorController(
             org.springframework.boot.web.reactive.error.ErrorAttributes errorAttributes,
-            ResourceProperties resourceProperties,
+            Resources resources,
             ObjectProvider<ViewResolver> viewResolvers,
             ServerCodecConfigurer codecConfigurer,
             ApplicationContext actx,
             ErrorHandlerProperties config,
             CompositeSmartErrorHandler errorHandler,
             AbstractSmartErrorHandler.ErrorRender errorRender) {
-        ReactiveSmartErrorController errorController = new ReactiveSmartErrorController(errorAttributes, resourceProperties, actx,
-                config, errorHandler, errorRender);
+        ReactiveSmartErrorController errorController = new ReactiveSmartErrorController(errorAttributes, resources, actx, config,
+                errorHandler, errorRender);
         errorController.setViewResolvers(viewResolvers.orderedStream().collect(toList()));
         errorController.setMessageWriters(codecConfigurer.getWriters());
         errorController.setMessageReaders(codecConfigurer.getReaders());

@@ -33,7 +33,6 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.wl4g.infra.common.log.SmartLogger;
 import com.wl4g.infra.common.web.WebUtils.RequestExtractor;
@@ -71,16 +70,6 @@ public class ServletSmartErrorController extends AbstractErrorController {
     }
 
     /**
-     * Returns the path of the error page.
-     *
-     * @return the error path
-     */
-    @Override
-    public String getErrorPath() {
-        return DEFAULT_ERROR_PATH;
-    }
-
-    /**
      * DO any servlet request handler errors.
      * 
      * @param request
@@ -88,7 +77,6 @@ public class ServletSmartErrorController extends AbstractErrorController {
      * @param th
      * @return
      */
-    @RequestMapping(DEFAULT_ERROR_PATH)
     @ExceptionHandler({ Throwable.class })
     public void doAnyHandleError(final HttpServletRequest request, final HttpServletResponse response, final Throwable th) {
         // Obtain errors attributes.
@@ -126,7 +114,6 @@ public class ServletSmartErrorController extends AbstractErrorController {
                 return response;
             }
         });
-
     }
 
     /**
@@ -162,7 +149,5 @@ public class ServletSmartErrorController extends AbstractErrorController {
         }
         return isStacktraceRequest(request);
     }
-
-    private static final String DEFAULT_ERROR_PATH = "/error";
 
 }

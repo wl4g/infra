@@ -53,13 +53,14 @@ public class WebClientAutoConfiguration {
 
     @Bean
     @ConfigurationProperties(prefix = CoreInfraConstants.CONF_PREFIX_INFRA_CORE_HTTP_REMOTE)
-    public ClientHttpProperties remoteProperties() {
+    public ClientHttpProperties defaultRemoteProperties() {
         return new ClientHttpProperties();
     }
 
+    @SuppressWarnings("deprecation")
     @Bean
     @ConditionalOnMissingBean
-    public ClientHttpConnector clientHttpConnector(ClientHttpProperties config, ReactorResourceFactory reactorFactory) {
+    public ClientHttpConnector defaultClientHttpConnector(ClientHttpProperties config, ReactorResourceFactory reactorFactory) {
         TcpClient client = TcpClient.create(reactorFactory.getConnectionProvider())
                 .runOn(reactorFactory.getLoopResources())
                 .option(CONNECT_TIMEOUT_MILLIS, safeLongToInt(SECONDS.toMillis(config.getConnectTimeout())))

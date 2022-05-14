@@ -19,7 +19,7 @@ import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.lang.StringUtils2.isTrue;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static com.wl4g.infra.common.runtime.JvmRuntimeTool.isJvmInDebugging;
-import static com.wl4g.infra.common.web.WebUtils2.PARAM_STACKTRACE;
+import static com.wl4g.infra.common.web.WebUtils.PARAM_STACKTRACE;
 import static com.wl4g.infra.core.web.error.handler.AbstractSmartErrorHandler.obtainErrorAttributeOptions;
 import static java.util.Locale.US;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -28,7 +28,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.web.ResourceProperties;
+import org.springframework.boot.autoconfigure.web.WebProperties.Resources;
 import org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler;
 import org.springframework.boot.web.reactive.error.ErrorAttributes;
 import org.springframework.context.ApplicationContext;
@@ -66,10 +66,10 @@ public class ReactiveSmartErrorController extends AbstractErrorWebExceptionHandl
     protected final CompositeSmartErrorHandler errorHandler;
     protected final AbstractSmartErrorHandler.ErrorRender errorRender;
 
-    public ReactiveSmartErrorController(ErrorAttributes errorAttributes, ResourceProperties resourceProperties,
-            ApplicationContext actx, ErrorHandlerProperties config, CompositeSmartErrorHandler errorHandler,
+    public ReactiveSmartErrorController(ErrorAttributes errorAttributes, Resources resources, ApplicationContext actx,
+            ErrorHandlerProperties config, CompositeSmartErrorHandler errorHandler,
             AbstractSmartErrorHandler.ErrorRender errorRender) {
-        super(errorAttributes, resourceProperties, actx);
+        super(errorAttributes, resources, actx);
         this.config = notNullOf(config, "config");
         this.errorHandler = notNullOf(errorHandler, "errorHandler");
         this.errorRender = notNullOf(errorRender, "errorRender");
