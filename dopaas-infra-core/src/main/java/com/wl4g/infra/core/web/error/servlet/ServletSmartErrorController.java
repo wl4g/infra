@@ -18,6 +18,7 @@ package com.wl4g.infra.core.web.error.servlet;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static com.wl4g.infra.common.web.WebUtils2.isStacktraceRequest;
+import static com.wl4g.infra.core.constant.CoreInfraConstants.TRACE_REQUEST_ID_HEADER;
 import static com.wl4g.infra.core.web.error.handler.AbstractSmartErrorHandler.obtainErrorAttributeOptions;
 
 import java.util.Map;
@@ -35,7 +36,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.wl4g.infra.common.log.SmartLogger;
-import com.wl4g.infra.common.web.WebUtils.RequestExtractor;
+import com.wl4g.infra.common.web.WebUtils.WebRequestExtractor;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration.ErrorController;
 import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration.ErrorHandlerProperties;
@@ -83,30 +84,35 @@ public class ServletSmartErrorController extends AbstractErrorController {
         Map<String, Object> model = getErrorAttributes(request, th);
 
         // handle errors
-        errorHandler.rendering(new RequestExtractor() {
+        errorHandler.rendering(new WebRequestExtractor() {
             @Override
-            public String getQueryParam(String name) {
+            public String getRequestId() {
+                return request.getHeader(TRACE_REQUEST_ID_HEADER);
+            }
+
+            @Override
+            public String getQueryValue(String name) {
                 return request.getParameter(name);
             }
 
             @Override
-            public String getHeader(String name) {
+            public String getHeaderValue(String name) {
                 return request.getHeader(name);
             }
         }, model, th, new ErrorRender() {
             @Override
-            public void renderingJson(Map<String, Object> model, RespBase<Object> resp) throws Exception {
-                errorRender.renderingJson(model, resp);
+            public Object renderingJson(Map<String, Object> model, RespBase<Object> resp) throws Exception {
+                return errorRender.renderingJson(model, resp);
             }
 
             @Override
-            public void renderingTemplate(Map<String, Object> model, int status, String templateString) throws Exception {
-                errorRender.renderingTemplate(model, status, templateString);
+            public Object renderingTemplate(Map<String, Object> model, int status, String templateString) throws Exception {
+                return errorRender.renderingTemplate(model, status, templateString);
             }
 
             @Override
-            public void redirectLocation(Map<String, Object> model, String errorRedirectUri) throws Exception {
-                errorRender.redirectLocation(model, errorRedirectUri);
+            public Object redirectLocation(Map<String, Object> model, String errorRedirectUri) throws Exception {
+                return errorRender.redirectLocation(model, errorRedirectUri);
             }
 
             @Override

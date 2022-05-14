@@ -13,51 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.core.logging.servlet;
+package com.wl4g.infra.core.logging.trace.reactive;
 
 import static com.wl4g.infra.core.constant.CoreInfraConstants.CONF_PREFIX_INFRA_CORE_MDC_LOGGING;
 
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
 
 /**
- * MDC logging filter auto configuration.
+ * {@link ReactiveMDCAutoConfiguration}
  * 
- * @author Wangl.sir <wanglsir@gmail.com, 983708408@qq.com>
- * @version v1.0 2022-03-20
- * @since
+ * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @version 2022-05-11 v3.0.0
+ * @since v3.0.0
  */
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE + 10)
 @ConditionalOnProperty(name = CONF_PREFIX_INFRA_CORE_MDC_LOGGING + ".enabled", matchIfMissing = true)
-@ConditionalOnWebApplication(type = Type.SERVLET)
-public class MDCLoggingAutoConfiguration {
+@ConditionalOnWebApplication(type = Type.REACTIVE)
+public class ReactiveMDCAutoConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean(TraceLoggingMDCFilter.class)
-    public TraceLoggingMDCFilter defaultTraceLoggingMDCFilter(ApplicationContext context) {
-        return new TraceLoggingMDCFilter(context) {
-        };
-    }
-
-    @Bean
-    @ConditionalOnBean(TraceLoggingMDCFilter.class)
-    public FilterRegistrationBean<TraceLoggingMDCFilter> defaultTraceLoggingMDCFilterBean(TraceLoggingMDCFilter filter) {
-        FilterRegistrationBean<TraceLoggingMDCFilter> filterBean = new FilterRegistrationBean<>(filter);
-        filterBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
-        // Cannot use '/*' or it will not be added to the container chain (only
-        // '/**')
-        filterBean.addUrlPatterns("/*");
-        return filterBean;
+    public TraceMDCWebFilter traceMDCWebFilter(Environment environment) {
+        return new TraceMDCWebFilter(environment);
     }
 
 }

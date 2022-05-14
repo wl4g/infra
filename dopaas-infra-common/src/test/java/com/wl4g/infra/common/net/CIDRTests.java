@@ -13,4 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.core.logging.reactive;
+package com.wl4g.infra.common.net;
+
+import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+
+/**
+ * {@link CIDRTests}
+ * 
+ * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @version 2022-05-05 v3.0.0
+ * @since v3.0.0
+ */
+public class CIDRTests {
+
+    @Test
+    public void testIpv4Parse() throws Exception {
+        Assertions.assertTrue(CIDR.newCIDR("192.168.3.0/24").getMask() == 24);
+    }
+
+}

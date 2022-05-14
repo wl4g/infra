@@ -377,9 +377,9 @@ public abstract class WebUtils2 extends WebUtils {
      */
     public static boolean isXHRRequest(@NotNull HttpServletRequest request) {
         notNullOf(request, "request");
-        return isXHRRequest(new RequestExtractor() {
+        return isXHRRequest(new WebRequestExtractor() {
             @Override
-            public String getHeader(String name) {
+            public String getHeaderValue(String name) {
                 return request.getHeader("X-Requested-With");
             }
         });
@@ -559,14 +559,14 @@ public abstract class WebUtils2 extends WebUtils {
          * @return
          */
         public static boolean isRespJSON(@NotBlank final String respTypeValue, @NotNull final HttpServletRequest request) {
-            return determineResponseWithJson(safeOf(respTypeValue), new RequestExtractor() {
+            return determineResponseWithJson(safeOf(respTypeValue), new WebRequestExtractor() {
                 @Override
-                public String getQueryParam(String name) {
+                public String getQueryValue(String name) {
                     return request.getParameter(name);
                 }
 
                 @Override
-                public String getHeader(String name) {
+                public String getHeaderValue(String name) {
                     return request.getHeader(name);
                 }
             });
@@ -579,14 +579,14 @@ public abstract class WebUtils2 extends WebUtils {
          * @return
          */
         public static boolean isRespJSON(@NotNull final HttpServletRequest request) {
-            return isRespJSON(new RequestExtractor() {
+            return isRespJSON(new WebRequestExtractor() {
                 @Override
-                public String getQueryParam(String name) {
+                public String getQueryValue(String name) {
                     return request.getParameter(name);
                 }
 
                 @Override
-                public String getHeader(String name) {
+                public String getHeaderValue(String name) {
                     return request.getHeader(name);
                 }
             }, null);
@@ -601,7 +601,7 @@ public abstract class WebUtils2 extends WebUtils {
          *            response type paremter name.
          * @return
          */
-        public static boolean isRespJSON(@NotNull RequestExtractor extractor, @Nullable String respTypeName) {
+        public static boolean isRespJSON(@NotNull WebRequestExtractor extractor, @Nullable String respTypeName) {
             notNullOf(extractor, "request");
 
             List<String> respTypeNames = asList(RESPTYPE_NAMES);
@@ -610,8 +610,8 @@ public abstract class WebUtils2 extends WebUtils {
             }
 
             for (String name : respTypeNames) {
-                String respTypeValue = extractor.getQueryParam(name);
-                respTypeValue = isBlank(respTypeValue) ? extractor.getHeader(name) : respTypeValue;
+                String respTypeValue = extractor.getQueryValue(name);
+                respTypeValue = isBlank(respTypeValue) ? extractor.getHeaderValue(name) : respTypeValue;
                 if (!isBlank(respTypeValue)) {
                     return determineResponseWithJson(safeOf(respTypeValue), extractor);
                 }
@@ -628,7 +628,7 @@ public abstract class WebUtils2 extends WebUtils {
          * @param extractor
          * @return
          */
-        private static boolean determineResponseWithJson(ResponseType respType, @NotNull RequestExtractor extractor) {
+        private static boolean determineResponseWithJson(ResponseType respType, @NotNull WebRequestExtractor extractor) {
             notNullOf(extractor, "request");
 
             // Using default strategy
@@ -638,7 +638,7 @@ public abstract class WebUtils2 extends WebUtils {
 
             // Has header(accept:application/json)
             boolean hasAccpetJson = false;
-            for (String typePart : String.valueOf(extractor.getHeader("Accept")).split(",")) {
+            for (String typePart : String.valueOf(extractor.getHeaderValue("Accept")).split(",")) {
                 if (startsWithIgnoreCase(typePart, "application/json")) {
                     hasAccpetJson = true;
                     break;
@@ -646,7 +646,7 @@ public abstract class WebUtils2 extends WebUtils {
             }
 
             // Has header(origin:xx.domain.com)
-            boolean hasOrigin = !isBlank(extractor.getHeader("Origin"));
+            boolean hasOrigin = !isBlank(extractor.getHeaderValue("Origin"));
 
             // Is header[XHR] ?
             boolean isXhr = isXHRRequest(extractor);
@@ -663,7 +663,7 @@ public abstract class WebUtils2 extends WebUtils {
                  * the line), it responds to the rendering page, otherwise it
                  * responds to JSON.
                  */
-                return isBrowser(extractor.getHeader("User-Agent")) ? (isXhr || hasAccpetJson || hasOrigin) : true;
+                return isBrowser(extractor.getHeaderValue("User-Agent")) ? (isXhr || hasAccpetJson || hasOrigin) : true;
             default:
                 throw new IllegalStateException(format("Illegal response type %s", respType));
             }

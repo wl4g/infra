@@ -29,18 +29,19 @@ import com.wl4g.infra.core.kit.access.IPAccessControl.IPAccessProperties;
  * @sine v1.0
  * @see
  */
+@SuppressWarnings("deprecation")
 public class IPAccessControlTests {
 
-	public static void main(String[] args) throws Exception {
-		IPAccessProperties config = new IPAccessProperties();
-		// config.getAllowIp().add("10.0.0.160");
-		config.getAllowIpRange().add("0.0.0.0/0");
-		config.afterPropertiesSet();
-		IPAccessControl ctl = new IPAccessControl(config);
-		System.out.println(ctl.isIPRangePermitted("10.0.0.160"));
-		System.out.println(ctl.isIPRangePermitted("10.0.0.161"));
-		System.out.println(ctl.isAnyNetIPOwnPermitted("10.0.0.161"));
-		System.out.println(ctl.isAnyNetIPOwnPermitted("121.47.108.77"));
-	}
+    public static void main(String[] args) throws Exception {
+        IPAccessProperties config = new IPAccessProperties();
+        // config.getAllowIp().add("10.0.0.160");
+        config.getAllowIpRange().add("0.0.0.0/0");
+        config.afterPropertiesSet();
+        IPAccessControl ctl = new IPAccessControl(config);
+        System.out.println(ctl.isIPRangePermitted("10.0.0.160"));
+        System.out.println(ctl.isIPRangePermitted("10.0.0.161"));
+        System.out.println(ctl.isAnyNetIPOwnPermitted("10.0.0.161"));
+        System.out.println(ctl.isAnyNetIPOwnPermitted("121.47.108.77"));
+    }
 
 }

@@ -52,18 +52,21 @@ public class ServletErrorAutoConfiguration extends AbstractErrorAutoConfiguratio
     public AbstractSmartErrorHandler.ErrorRender defaultServletSmartErrorRender(ErrorHandlerProperties config) {
         return new AbstractSmartErrorHandler.ErrorRender() {
             @Override
-            public void renderingJson(Map<String, Object> model, RespBase<Object> resp) throws Exception {
+            public Object renderingJson(Map<String, Object> model, RespBase<Object> resp) throws Exception {
                 writeJson((HttpServletResponse) getHttpResponse(), resp.asJson());
+                return null;
             }
 
             @Override
-            public void renderingTemplate(Map<String, Object> model, int status, String templateString) throws Exception {
+            public Object renderingTemplate(Map<String, Object> model, int status, String templateString) throws Exception {
                 write((HttpServletResponse) getHttpResponse(), status, TEXT_HTML_VALUE, templateString.getBytes(UTF_8));
+                return null;
             }
 
             @Override
-            public void redirectLocation(Map<String, Object> model, String errorRedirectUri) throws Exception {
+            public Object redirectLocation(Map<String, Object> model, String errorRedirectUri) throws Exception {
                 ((HttpServletResponse) getHttpResponse()).sendRedirect(errorRedirectUri);
+                return null;
             }
         };
     }

@@ -39,6 +39,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -606,13 +607,13 @@ public abstract class WebUtils {
      * @param extractor
      * @return
      */
-    public static boolean isXHRRequest(@NotNull RequestExtractor extractor) {
+    public static boolean isXHRRequest(@NotNull WebRequestExtractor extractor) {
         notNullOf(extractor, "extractor");
-        return equalsIgnoreCase(extractor.getHeader("X-Requested-With"), "XMLHttpRequest");
+        return equalsIgnoreCase(extractor.getHeaderValue("X-Requested-With"), "XMLHttpRequest");
     }
 
     /**
-     * Request extractor wrapper, It is mainly to solve the request types of
+     * Web Request extractor wrapper, It is mainly to solve the request types of
      * different models or protocols, such as:
      * Xxx{@link javax.servlet.ServletRequest} or {@link HttpServletRequest} or
      * {@link org.springframework.web.servlet.function.ServerRequest}(reactive)
@@ -622,15 +623,93 @@ public abstract class WebUtils {
      * @version v1.0 2020-09-15
      * @since
      */
-    public static interface RequestExtractor {
+    public static interface WebRequestExtractor {
+
+        /**
+         * Gets request Id. </br>
+         * 
+         * Spring reactor HTTP request refer to:
+         * {@link org.springframework.web.server.ServerWebExchange.LOG_ID}
+         * 
+         * @return
+         */
+        default @Nullable String getRequestId() {
+            return null;
+        }
+
+        /**
+         * Gets web request URI.
+         * 
+         * @return
+         */
+        default @Nullable URI getRequestURI() {
+            return null;
+        }
+
+        /**
+         * Gets web request method.
+         * 
+         * @return
+         */
+        default String getMethod() {
+            return null;
+        }
+
+        /**
+         * Gets web request scheme.
+         * 
+         * @return
+         */
+        default String getScheme() {
+            return null;
+        }
+
+        /**
+         * Gets web request remote host.
+         * 
+         * @return
+         */
+        default String getHost() {
+            return null;
+        }
+
+        /**
+         * Gets web request port.
+         * 
+         * @return
+         */
+        default Integer getPort() {
+            return null;
+        }
+
+        /**
+         * Gets web request path.
+         * 
+         * @return
+         */
+        default String getPath() {
+            return null;
+        }
+
+        /**
+         * Gets request an collection of all the query parameter names this
+         * request contains. If the request has no query parameter, this method
+         * returns an null collection.
+         * 
+         * @return
+         */
+        default Collection<String> getQueryNames() {
+            return null;
+        }
+
         /**
          * Gets query parameter by name.
          * 
          * @param name
          * @return
          */
-        default String getQueryParam(String name) {
-            throw new UnsupportedOperationException();
+        default @Nullable String getQueryValue(String name) {
+            return null;
         }
 
         /**
@@ -639,9 +718,40 @@ public abstract class WebUtils {
          * @param name
          * @return
          */
-        default String getHeader(String name) {
-            throw new UnsupportedOperationException();
+        default @Nullable String getHeaderValue(String name) {
+            return null;
         }
+
+        /**
+         * Returns an collection of all the header names this request contains.
+         * If the request has no headers, this method returns an null
+         * collection.
+         * 
+         * @return
+         */
+        default Collection<String> getHeaderNames() {
+            return null;
+        }
+
+        /**
+         * Gets cookie value by name.
+         * 
+         * @param name
+         * @return
+         */
+        default @Nullable String getCookieValue(String name) {
+            return null;
+        }
+
+        /**
+         * Gets cookie names.
+         * 
+         * @return
+         */
+        default @Nullable Collection<String> getCookieNames() {
+            return null;
+        }
+
     }
 
     /**
@@ -740,7 +850,7 @@ public abstract class WebUtils {
     /**
      * Unified exception handling stack trace parameter name.
      */
-    public static final String PARAM_STACKTRACE = getenv().getOrDefault("DOPAAS_INFRA_REQUEST_STACKTRACE_PARAM", "x-stacktrace");
+    public static final String PARAM_STACKTRACE = getenv().getOrDefault("INFRA_REQUEST_STACKTRACE_PARAM", "x-stacktrace");
 
     public static final Predicate<String> defaultStringAnyFilter = name -> true;
 

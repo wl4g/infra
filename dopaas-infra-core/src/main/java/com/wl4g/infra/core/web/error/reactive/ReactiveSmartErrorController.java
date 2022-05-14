@@ -16,14 +16,19 @@
 package com.wl4g.infra.core.web.error.reactive;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.infra.common.lang.ClassUtils2.resolveClassName;
 import static com.wl4g.infra.common.lang.StringUtils2.isTrue;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
+import static com.wl4g.infra.common.reflect.ReflectionUtils2.findField;
+import static com.wl4g.infra.common.reflect.ReflectionUtils2.getField;
 import static com.wl4g.infra.common.runtime.JvmRuntimeTool.isJvmInDebugging;
 import static com.wl4g.infra.common.web.WebUtils.PARAM_STACKTRACE;
+import static com.wl4g.infra.core.constant.CoreInfraConstants.TRACE_REQUEST_ID_HEADER;
 import static com.wl4g.infra.core.web.error.handler.AbstractSmartErrorHandler.obtainErrorAttributeOptions;
 import static java.util.Locale.US;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
+import java.lang.reflect.Field;
 import java.util.Map;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -40,7 +45,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
 import com.wl4g.infra.common.log.SmartLogger;
-import com.wl4g.infra.common.web.WebUtils.RequestExtractor;
+import com.wl4g.infra.common.web.WebUtils.WebRequestExtractor;
 import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration.ErrorController;
 import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration.ErrorHandlerProperties;
 import com.wl4g.infra.core.web.error.handler.AbstractSmartErrorHandler;
@@ -105,14 +110,30 @@ public class ReactiveSmartErrorController extends AbstractErrorWebExceptionHandl
     private Mono<ServerResponse> handleRendering(final ServerRequest request) {
         Map<String, Object> model = getErrorAttributes(request, false);
 
-        return (Mono<ServerResponse>) errorHandler.rendering(new RequestExtractor() {
+        return (Mono<ServerResponse>) errorHandler.rendering(new WebRequestExtractor() {
             @Override
-            public String getQueryParam(String name) {
+            public String getRequestId() {
+                if (request instanceof org.springframework.http.server.ServerHttpRequest) {
+                    return ((org.springframework.http.server.ServerHttpRequest) (request)).getHeaders()
+                            .getFirst(TRACE_REQUEST_ID_HEADER);
+                } else if (request instanceof org.springframework.http.server.reactive.ServerHttpRequest) {
+                    return ((org.springframework.http.server.reactive.ServerHttpRequest) (request)).getHeaders()
+                            .getFirst(TRACE_REQUEST_ID_HEADER);
+                } else if (request instanceof org.springframework.web.reactive.function.server.ServerRequest) {
+                    org.springframework.web.reactive.function.server.ServerRequest.Headers headers = getField(
+                            REACTIVE_SERVER_REQUEST_HEADER_FIELD, request, true);
+                    return headers.firstHeader(TRACE_REQUEST_ID_HEADER);
+                }
+                return null;
+            }
+
+            @Override
+            public String getQueryValue(String name) {
                 return request.queryParam(name).orElse(null);
             }
 
             @Override
-            public String getHeader(String name) {
+            public String getHeaderValue(String name) {
                 return request.headers().asHttpHeaders().getFirst(name);
             }
         }, model, getError(request), errorRender);
@@ -141,4 +162,8 @@ public class ReactiveSmartErrorController extends AbstractErrorWebExceptionHandl
         return isTrue(stacktrace.toLowerCase(US), false);
     }
 
+    public static final Class<?> REACTIVE_DEFAULT_SERVER_REQUEST_CLASS = resolveClassName(
+            "org.springframework.web.reactive.function.server.DefaultServerRequest", null);
+    public static final Field REACTIVE_SERVER_REQUEST_HEADER_FIELD = findField(REACTIVE_DEFAULT_SERVER_REQUEST_CLASS, "headers",
+            org.springframework.web.reactive.function.server.ServerRequest.Headers.class);
 }

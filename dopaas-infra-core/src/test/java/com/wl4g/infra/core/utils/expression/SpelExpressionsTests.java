@@ -19,6 +19,7 @@ import static java.lang.String.format;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.junit.Test;
 
@@ -34,106 +35,124 @@ import com.wl4g.infra.core.utils.expression.SpelExpressions;
  */
 public class SpelExpressionsTests {
 
-	@Test
-	public void mapSpelCase() {
-		Map<String, Object> model = new HashMap<>();
-		model.put("name", "Mia");
-		model.put("age", 25);
-		model.put("isAmerican", true);
-		Map<String, Object> attributes = new HashMap<>();
-		attributes.put("workyear", 1);
-		attributes.put("income", 20000);
-		model.put("attributes", attributes);
+    @Test
+    public void mapSpelCase() {
+        Map<String, Object> model = new HashMap<>();
+        model.put("name", "Mia");
+        model.put("age", 25);
+        model.put("isAmerican", true);
+        model.put("my_function1", new Function<String, String>() {
+            @Override
+            public String apply(String t) {
+                return "echo1 :: " + t;
+            }
+        });
+        Map<String, Object> attributes = new HashMap<>();
+        attributes.put("workyear", 1);
+        attributes.put("income", 20000);
+        attributes.put("my_function2", new Function<String, String>() {
+            @Override
+            public String apply(String t) {
+                return "echo2 :: " + t;
+            }
+        });
+        model.put("attributes", attributes);
 
-		String result1 = SpelExpressions.create().resolve("#{name}", model);
-		System.out.println(result1);
+        String result1 = SpelExpressions.create().resolve("#{name}", model);
+        System.out.println(result1);
 
-		Object result2 = SpelExpressions.create().resolve("#{isAmerican}", model);
-		System.out.println(result2);
-	}
+        Object result2 = SpelExpressions.create().resolve("#{attributes.income}", model);
+        System.out.println(result2);
 
-	@Test
-	public void stringMethodSpelCase() {
-		String expression = "#{'Hi, everybody'.contains('Hi')}";
-		System.out.println("contains: " + SpelExpressions.create().resolve(expression, null));
-	}
+        Object result3 = SpelExpressions.create().resolve("#{my_function1.apply('tom')}", model);
+        System.out.println(result3);
 
-	@Test
-	public void directCallMethodSpelCase() {
-		String expression = "#{T(com.wl4g.infra.core.utils.expression.SpelExpressionsTests.JoinUtil).join(name)}";
-		Map<String, Object> model = new HashMap<>();
-		model.put("name", "Mia");
-		System.out.println("result: " + SpelExpressions.create().resolve(expression, model));
-	}
+        Object result4 = SpelExpressions.create().resolve("#{attributes.my_function2.apply('tom')}", model);
+        System.out.println(result4);
+    }
 
-	@Test
-	public void aliasCallMethodSpelCase() {
-		String expression = "#{T(SpelExpressionsTests$JoinUtil).join(name)}";
-		Map<String, Object> model = new HashMap<>();
-		model.put("name", "Mia");
-		System.out.println("result: " + SpelExpressions.create(JoinUtil.class).resolve(expression, model));
-	}
+    @Test
+    public void stringMethodSpelCase() {
+        String expression = "#{'Hi, everybody'.contains('Hi')}";
+        System.out.println("contains: " + SpelExpressions.create().resolve(expression, null));
+    }
 
-	@Test
-	public void modelCallMethodSpelCase() {
-		String expression = "#{JoinUtil.join(name)}";
-		Map<String, Object> model = new HashMap<>();
-		model.put("name", "Mia");
-		model.put("JoinUtil", JoinUtil.class);
-		System.out.println("result: " + SpelExpressions.create().resolve(expression, model));
-	}
+    @Test
+    public void directCallMethodSpelCase() {
+        String expression = "#{T(com.wl4g.infra.core.utils.expression.SpelExpressionsTests.JoinUtil).join(name)}";
+        Map<String, Object> model = new HashMap<>();
+        model.put("name", "Mia");
+        System.out.println("result: " + SpelExpressions.create().resolve(expression, model));
+    }
 
-	@Test
-	public void nonStringArgCallMethodSpelCase() {
-		String expression = "#{T(com.wl4g.infra.core.utils.expression.SpelExpressionsTests.JoinUtil).show(T(String).class)}";
-		System.out.println("result: " + SpelExpressions.create().resolve(expression, null));
-	}
+    @Test
+    public void aliasCallMethodSpelCase() {
+        String expression = "#{T(SpelExpressionsTests$JoinUtil).join(name)}";
+        Map<String, Object> model = new HashMap<>();
+        model.put("name", "Mia");
+        System.out.println("result: " + SpelExpressions.create(JoinUtil.class).resolve(expression, model));
+    }
 
-	@Test
-	public void modelCallObjectMethodSpelCase() {
-		String expression = "#{joinUtil.join(name)}";
-		Map<String, Object> model = new HashMap<>();
-		model.put("joinUtil", new JoinUtil());
-		model.put("name", "Mia");
-		System.out.println("result: " + SpelExpressions.create().resolve(expression, model));
-	}
+    @Test
+    public void modelCallMethodSpelCase() {
+        String expression = "#{JoinUtil.join(name)}";
+        Map<String, Object> model = new HashMap<>();
+        model.put("name", "Mia");
+        model.put("JoinUtil", JoinUtil.class);
+        System.out.println("result: " + SpelExpressions.create().resolve(expression, model));
+    }
 
-	/**
-	 * <b style='color:red'>[Warning]</b> this is a reflection of remote command
-	 * execution attack test, please call the external program must pay
-	 * attention to, such as setting white list filtering.</br>
-	 * </br>
-	 * 
-	 * for example1:
-	 * 
-	 * <pre>
-	 * String expression = "#{T(com.wl4g.infra.common.reflect.ReflectionUtils2).invokeMethod(T(com.wl4g.infra.common.reflect.ReflectionUtils2).findMethod(T(java.lang.Class).forName(\"com.wl4g.infra.common.cli.ProcessUtils\"),\"execSingle\"),null,\"rm -rf /tmp/test1\")}";
-	 * System.out.println("result: " + SpelExpressions.create().resolve(expression, null));
-	 * </pre>
-	 * 
-	 * for example2:
-	 * 
-	 * <pre>
-	 * String expression = "#{T(com.wl4g.infra.common.cli.ProcessUtils).execSingle(\"rm -rf /tmp/test1\")}";
-	 * System.out.println("result: " + SpelExpressions.create().resolve(expression, null));
-	 * </pre>
-	 * 
-	 * @throws ClassNotFoundException
-	 */
-	@Test
-	public void invokeAttackSpelCase() throws ClassNotFoundException {
-		String expression = "#{T(com.wl4g.infra.common.cli.ProcessUtils).execSingle(\"rm -rf /tmp/test1\")}";
-		System.out.println("result: " + SpelExpressions.create().resolve(expression, null));
-	}
+    @Test
+    public void nonStringArgCallMethodSpelCase() {
+        String expression = "#{T(com.wl4g.infra.core.utils.expression.SpelExpressionsTests.JoinUtil).show(T(String).class)}";
+        System.out.println("result: " + SpelExpressions.create().resolve(expression, null));
+    }
 
-	public static class JoinUtil {
-		public static String join(String str) {
-			return format("%s nationality is America", str);
-		}
+    @Test
+    public void modelCallObjectMethodSpelCase() {
+        String expression = "#{joinUtil.join(name)}";
+        Map<String, Object> model = new HashMap<>();
+        model.put("joinUtil", new JoinUtil());
+        model.put("name", "Mia");
+        System.out.println("result: " + SpelExpressions.create().resolve(expression, model));
+    }
 
-		public static String show(Class<?> clazz) {
-			return format("Show input parameters: %s", clazz);
-		}
-	}
+    /**
+     * <b style='color:red'>[Warning]</b> this is a reflection of remote command
+     * execution attack test, please call the external program must pay
+     * attention to, such as setting white list filtering.</br>
+     * </br>
+     * 
+     * for example1:
+     * 
+     * <pre>
+     * String expression = "#{T(com.wl4g.infra.common.reflect.ReflectionUtils2).invokeMethod(T(com.wl4g.infra.common.reflect.ReflectionUtils2).findMethod(T(java.lang.Class).forName(\"com.wl4g.infra.common.cli.ProcessUtils\"),\"execSingle\"),null,\"rm -rf /tmp/test1\")}";
+     * System.out.println("result: " + SpelExpressions.create().resolve(expression, null));
+     * </pre>
+     * 
+     * for example2:
+     * 
+     * <pre>
+     * String expression = "#{T(com.wl4g.infra.common.cli.ProcessUtils).execSingle(\"rm -rf /tmp/test1\")}";
+     * System.out.println("result: " + SpelExpressions.create().resolve(expression, null));
+     * </pre>
+     * 
+     * @throws ClassNotFoundException
+     */
+    @Test
+    public void invokeAttackSpelCase() throws ClassNotFoundException {
+        String expression = "#{T(com.wl4g.infra.common.cli.ProcessUtils).execSingle(\"rm -rf /tmp/test1\")}";
+        System.out.println("result: " + SpelExpressions.create().resolve(expression, null));
+    }
+
+    public static class JoinUtil {
+        public static String join(String str) {
+            return format("%s nationality is America", str);
+        }
+
+        public static String show(Class<?> clazz) {
+            return format("Show input parameters: %s", clazz);
+        }
+    }
 
 }

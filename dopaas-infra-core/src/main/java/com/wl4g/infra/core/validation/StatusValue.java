@@ -24,16 +24,38 @@ import java.lang.annotation.Target;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 
-@Documented
-@Constraint(validatedBy = PhoneValidationValidator.class)
-@Target({ ElementType.METHOD, ElementType.FIELD })
+/**
+ * {@link StatusValue}
+ * 
+ * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @version 2022-04-03 v3.0.0
+ * @since v3.0.0
+ */
+@Constraint(validatedBy = StatusValidator.class)
+@Target({ ElementType.FIELD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface PhoneValidation {
+@Documented
+public @interface StatusValue {
 
-    String message() default "Illegal mobile phone number format";
+    String message() default "Incorrect status identification";
 
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
 
+    boolean required() default true;
+
+    boolean caseSensitive() default false;
+
+    String[] options() default { ENABLED, DISABLED };
+
+    @Target({ ElementType.FIELD, ElementType.PARAMETER })
+    @Retention(RetentionPolicy.RUNTIME)
+    @Documented
+    @interface List {
+        StatusValue[] value();
+    }
+
+    public static final String ENABLED = "enabled";
+    public static final String DISABLED = "disabled";
 }

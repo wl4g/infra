@@ -20,13 +20,15 @@ import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.lang.Exceptions.getStackTraceAsString;
+import static com.wl4g.infra.common.lang.StringUtils2.startsWithIgnoreCase;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static com.wl4g.infra.common.web.WebUtils2.ResponseType.isRespJSON;
+import static com.wl4g.infra.common.web.rest.RespBase.RetCode.newCode;
+import static com.wl4g.infra.core.constant.CoreInfraConstants.TRACE_REQUEST_ID_HEADER;
 import static java.util.Collections.emptyMap;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.startsWithIgnoreCase;
 import static org.springframework.boot.web.error.ErrorAttributeOptions.of;
 import static org.springframework.boot.web.error.ErrorAttributeOptions.Include.BINDING_ERRORS;
 import static org.springframework.boot.web.error.ErrorAttributeOptions.Include.EXCEPTION;
@@ -35,10 +37,6 @@ import static org.springframework.boot.web.error.ErrorAttributeOptions.Include.S
 import static org.springframework.ui.freemarker.FreeMarkerTemplateUtils.processTemplateIntoString;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -47,11 +45,10 @@ import javax.validation.constraints.NotNull;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.FieldError;
 
 import com.wl4g.infra.common.log.SmartLogger;
 import com.wl4g.infra.common.view.Freemarkers;
-import com.wl4g.infra.common.web.WebUtils.RequestExtractor;
+import com.wl4g.infra.common.web.WebUtils.WebRequestExtractor;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration.ErrorHandlerProperties;
 
@@ -76,11 +73,11 @@ public abstract class AbstractSmartErrorHandler implements InitializingBean {
     protected final ErrorHandlerProperties config;
 
     /** Errors {@link Template} cache. */
-    protected final Map<Integer, Template> errorTplMappingCache;
+    protected final Map<Integer, Template> errorTemplateCache;
 
     public AbstractSmartErrorHandler(ErrorHandlerProperties config) {
         this.config = notNullOf(config, "config");
-        this.errorTplMappingCache = new ConcurrentHashMap<>(4);
+        this.errorTemplateCache = new ConcurrentHashMap<>(4);
     }
 
     @Override
@@ -90,10 +87,10 @@ public abstract class AbstractSmartErrorHandler implements InitializingBean {
         Configuration fmc = Freemarkers.create(config.getBasePath()).build();
         safeMap(config.getRenderingMapping()).entrySet().stream().forEach(p -> {
             try {
-                if (!isErrorRedirectURI(p.getValue())) { // e.g 404.tpl.html
+                if (!isRedirectUri(p.getValue())) { // E.g: 404.tpl.html
                     Template tpl = fmc.getTemplate(p.getValue(), UTF_8.name());
                     notNull(tpl, "Default (%s) error template must not be null", p.getKey());
-                    errorTplMappingCache.put(p.getKey(), tpl);
+                    errorTemplateCache.put(p.getKey(), tpl);
                 }
             } catch (Exception e) {
                 throw new IllegalStateException(e);
@@ -139,7 +136,7 @@ public abstract class AbstractSmartErrorHandler implements InitializingBean {
      * @return handle errors result(if necessary). for example: {@link Mono}
      */
     public Object rendering(
-            @NotNull RequestExtractor extractor,
+            @NotNull WebRequestExtractor extractor,
             @NotNull Map<String, Object> model,
             @NotNull Throwable th,
             @NotNull ErrorRender errorRender) {
@@ -147,29 +144,37 @@ public abstract class AbstractSmartErrorHandler implements InitializingBean {
             // Obtain custom extension response status.
             int status = getStatus(model, th);
             String errmsg = getRootCause(model, th);
-            Object uriOrTpl = loadRedirectUriOrRenderView(status);
+            String requestId = extractor.getRequestId();
+            model.put(TRACE_REQUEST_ID_HEADER, requestId);
 
             // When the client is not a browser or the exception rendering
             // configuration is empty, the JSON message is returned by default.
-            if (isNull(uriOrTpl) || isRespJSON(extractor, null)) {
-                RespBase<Object> resp = new RespBase<>(RespBase.RetCode.newCode(status, errmsg));
-                if (!(uriOrTpl instanceof Template)) {
-                    resp.forMap().put(DEFAULT_REDIRECT_KEY, uriOrTpl);
+            if (isRespJSON(extractor, null)) {
+                RespBase<Object> resp = new RespBase<>(newCode(status, errmsg)).withRequestId(requestId);
+                Object redirectUri = loadRedirectUri(status);
+                if (nonNull(redirectUri)) {
+                    resp.forMap().put(DEFAULT_REDIRECT_KEY, redirectUri);
                 }
                 log.error("resp:error - {}", resp.asJson());
-                errorRender.renderingJson(model, resp);
+                return errorRender.renderingJson(model, resp);
             }
-            // Rendering error to HTML/Location
+            // Rendering to error HTML.
             else {
-                if (uriOrTpl instanceof Template) {
-                    log.error("redirect:error - {}", status);
+                Object tpl = loadRenderTemplate(status);
+                if (nonNull(tpl)) {
+                    log.error("rendering:error - {}", status);
                     // Merge configuration.
                     model.putAll(config.asMap());
-                    String renderString = processTemplateIntoString((Template) uriOrTpl, model);
-                    errorRender.renderingTemplate(model, status, renderString);
-                } else {
-                    log.error("redirect:error - {}", uriOrTpl);
-                    errorRender.redirectLocation(model, (String) uriOrTpl);
+                    String renderString = processTemplateIntoString((Template) tpl, model);
+                    return errorRender.renderingTemplate(model, status, renderString);
+                }
+                // Rendering to error location.
+                else {
+                    Object redirectUri = loadRedirectUri(status);
+                    if (nonNull(redirectUri)) {
+                        log.error("redirect:error - {}", redirectUri);
+                        return errorRender.redirectLocation(model, (String) redirectUri);
+                    }
                 }
             }
         } catch (Throwable th0) {
@@ -180,26 +185,43 @@ public abstract class AbstractSmartErrorHandler implements InitializingBean {
     }
 
     /**
-     * Load redirect URI rendering errors page view.
+     * Load rendering errors page template.
      * 
      * @param status
      * @return
      * @throws TemplateException
      * @throws IOException
      */
-    private Object loadRedirectUriOrRenderView(int status) throws IOException, TemplateException {
-        Template tpl = errorTplMappingCache.get(status);
-        if (nonNull(tpl)) { // error template?
-            return tpl;
-        }
-
-        // error redirect URI
-        String errorRedirectUri = config.getRenderingMapping().get(status);
-        if (isBlank(errorRedirectUri)) {
-            log.debug("No found render template or redirection uri for error status: %s", status);
+    private Object loadRenderTemplate(int status) throws IOException, TemplateException {
+        Template tpl = errorTemplateCache.get(status);
+        if (isNull(tpl)) { // error template?
+            log.warn("No found render template for error status: {}", status);
             return null;
         }
-        return errorRedirectUri.substring(DEFAULT_REDIRECT_PREFIX.length());
+        return tpl;
+    }
+
+    /**
+     * Load error redirect URI.
+     * 
+     * @param status
+     * @return
+     * @throws TemplateException
+     * @throws IOException
+     */
+    private Object loadRedirectUri(int status) throws IOException, TemplateException {
+        String errorRedirectUri = config.getRenderingMapping().get(status);
+        if (isBlank(errorRedirectUri)) {
+            log.warn("No found render redirect uri for error status: {}", status);
+            return null;
+        }
+        // Only the 'redirect:' prefix indicates the redirect URI, otherwise it
+        // is the HTML rendering template.
+        if (startsWithIgnoreCase(errorRedirectUri, DEFAULT_REDIRECT_PREFIX)) {
+            return errorRedirectUri.substring(DEFAULT_REDIRECT_PREFIX.length());
+        }
+        // If it is a rendering template, no need to use.
+        return null;
     }
 
     /**
@@ -208,63 +230,8 @@ public abstract class AbstractSmartErrorHandler implements InitializingBean {
      * @param uriOrTpl
      * @return
      */
-    private boolean isErrorRedirectURI(String uriOrTpl) {
+    private boolean isRedirectUri(String uriOrTpl) {
         return startsWithIgnoreCase(uriOrTpl, DEFAULT_REDIRECT_PREFIX);
-    }
-
-    /**
-     * Extract meaningful valid errors messages.
-     * 
-     * @param model
-     * @return
-     */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public static String extractValidErrorsMessage(@NotNull Map<String, Object> model) {
-        notNull(model, "Shouldn't be here");
-
-        StringBuffer errmsg = new StringBuffer();
-        Object message = model.get("message");
-        if (message != null) {
-            errmsg.append(message);
-        }
-
-        Object errors = model.get("errors"); // @NotNull?
-        if (errors != null) {
-            errmsg.setLength(0); // Print only errors information
-            if (errors instanceof Collection) {
-                // Used to remove duplication
-                List<String> fieldErrs = new ArrayList<>(8);
-
-                Collection<Object> _errors = (Collection) errors;
-                Iterator<Object> it = _errors.iterator();
-                while (it.hasNext()) {
-                    Object err = it.next();
-                    if (err instanceof FieldError) {
-                        FieldError ferr = (FieldError) err;
-                        /*
-                         * Remove duplicate field validation errors,
-                         * e.g. @NotNull and @NotEmpty
-                         */
-                        String fieldErr = ferr.getField();
-                        if (!fieldErrs.contains(fieldErr)) {
-                            errmsg.append("'");
-                            errmsg.append(fieldErr);
-                            errmsg.append("' ");
-                            errmsg.append(ferr.getDefaultMessage());
-                            errmsg.append(", ");
-                        }
-                        fieldErrs.add(fieldErr);
-                    } else {
-                        errmsg.append(err.toString());
-                        errmsg.append(", ");
-                    }
-                }
-            } else {
-                errmsg.append(errors.toString());
-            }
-        }
-
-        return errmsg.toString();
     }
 
     /**
@@ -278,15 +245,15 @@ public abstract class AbstractSmartErrorHandler implements InitializingBean {
     }
 
     public static interface ErrorRender {
-        default void renderingJson(Map<String, Object> model, RespBase<Object> resp) throws Exception {
+        default Object renderingJson(Map<String, Object> model, RespBase<Object> resp) throws Exception {
             throw new UnsupportedOperationException();
         }
 
-        default void renderingTemplate(Map<String, Object> model, int status, String templateString) throws Exception {
+        default Object renderingTemplate(Map<String, Object> model, int status, String templateString) throws Exception {
             throw new UnsupportedOperationException();
         }
 
-        default void redirectLocation(Map<String, Object> model, String errorRedirectUri) throws Exception {
+        default Object redirectLocation(Map<String, Object> model, String errorRedirectUri) throws Exception {
             throw new UnsupportedOperationException();
         }
 

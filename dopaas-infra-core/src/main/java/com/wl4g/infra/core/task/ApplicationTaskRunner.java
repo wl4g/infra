@@ -15,15 +15,12 @@
  */
 package com.wl4g.infra.core.task;
 
-import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
-
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 
-import com.wl4g.infra.common.log.SmartLogger;
 import com.wl4g.infra.common.task.GenericTaskRunner;
 import com.wl4g.infra.common.task.RunnerProperties;
 import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor;
@@ -42,8 +39,7 @@ import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor;
 public abstract class ApplicationTaskRunner<C extends RunnerProperties> extends GenericTaskRunner<C>
         implements ApplicationRunner, DisposableBean {
 
-    protected final SmartLogger log = getLogger(getClass());
-    private final AtomicBoolean running = new AtomicBoolean(false);
+    private final AtomicBoolean started = new AtomicBoolean(false);
 
     public ApplicationTaskRunner() {
         super();
@@ -60,7 +56,7 @@ public abstract class ApplicationTaskRunner<C extends RunnerProperties> extends 
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        if (running.compareAndSet(false, true)) {
+        if (started.compareAndSet(false, true)) {
             super.start();
             onApplicationStarted(args, getWorker());
         }
