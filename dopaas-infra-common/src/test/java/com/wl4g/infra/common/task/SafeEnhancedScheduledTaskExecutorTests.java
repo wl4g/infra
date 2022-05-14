@@ -17,23 +17,22 @@ package com.wl4g.infra.common.task;
 
 import static java.lang.System.currentTimeMillis;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Test;
+
 import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor;
 
 public class SafeEnhancedScheduledTaskExecutorTests {
 
-    public static void main(String[] args) throws Exception {
-        scheduleQueueRejectedTest1();
-        // scheduleWithFixedErrorInterruptedTest2();
-        // scheduleWithRandomErrorInterruptedTest3();
-    }
+    @Test
+    public void testScheduleQueueRejected() throws Exception {
+        CountDownLatch latch = new CountDownLatch(20);
 
-    public static void scheduleQueueRejectedTest1() throws Exception {
-        // Create ScheduledTaskExecutor.
         SafeScheduledTaskPoolExecutor executor = createSafeEnhancedScheduledExecutor(2);
 
         for (int i = 0; i < 20; i++) {
@@ -50,56 +49,71 @@ public class SafeEnhancedScheduledTaskExecutorTests {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                    latch.countDown();
                 }
             });
         }
 
-        // executor.shutdown();
+        latch.await();
+        executor.shutdown();
     }
 
-    public static void scheduleWithFixedErrorInterruptedTest2() throws Exception {
-        // Create ScheduledTaskExecutor.
+    @Test
+    public void testScheduleWithFixedErrorInterrupted() throws Exception {
+        CountDownLatch latch = new CountDownLatch(3);
+
         SafeScheduledTaskPoolExecutor executor = createSafeEnhancedScheduledExecutor(2);
 
         // Task1(Error):
         executor.scheduleAtFixedRate(() -> {
             System.out.println(currentTimeMillis() + " - Error of task1..." + executor);
+            latch.countDown();
             throw new RuntimeException(currentTimeMillis() + " - Error of task1...");
         }, 1, 2, TimeUnit.SECONDS);
 
         // Task2(Normal):
         executor.scheduleAtFixedRate(() -> {
             System.out.println(currentTimeMillis() + " - Normal of task2..." + executor);
+            latch.countDown();
         }, 1, 2, TimeUnit.SECONDS);
 
         // Task3(Normal):
         executor.scheduleAtFixedRate(() -> {
             System.out.println(currentTimeMillis() + " - Normal of task3..." + executor);
+            latch.countDown();
         }, 1, 2, TimeUnit.SECONDS);
 
-        // executor.shutdown();
+        latch.await();
+        executor.shutdown();
     }
 
-    public static void scheduleWithRandomErrorInterruptedTest3() throws Exception {
-        // Create ScheduledTaskExecutor.
+    @Test
+    public void testScheduleWithRandomErrorInterrupted() throws Exception {
+        CountDownLatch latch = new CountDownLatch(3);
+
         SafeScheduledTaskPoolExecutor executor = createSafeEnhancedScheduledExecutor(2);
 
         // Task1(Error):
         executor.scheduleAtRandomRate(() -> {
             System.out.println(currentTimeMillis() + " - Error of task1..." + executor);
+            latch.countDown();
             throw new RuntimeException(currentTimeMillis() + " - Error of task1...");
         }, 1, 1, 2, TimeUnit.SECONDS);
 
         // Task2(Normal):
         executor.scheduleAtRandomRate(() -> {
             System.out.println(currentTimeMillis() + " - Normal of task2..." + executor);
+            latch.countDown();
         }, 1, 1, 6, TimeUnit.SECONDS);
 
         // Task3(Normal):
         executor.scheduleAtRandomRate(() -> {
             System.out.println(currentTimeMillis() + " - Normal of task3..." + executor);
+            latch.countDown();
         }, 1, 1, 6, TimeUnit.SECONDS);
 
+        latch.await();
+        executor.shutdown();
     }
 
     private static SafeScheduledTaskPoolExecutor createSafeEnhancedScheduledExecutor(int concurrencyPoolSize) throws Exception {

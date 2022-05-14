@@ -41,6 +41,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Delayed;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.RejectedExecutionHandler;
@@ -60,32 +61,32 @@ import com.wl4g.infra.common.collection.CollectionUtils2;
  * An enhanced security and flexible scheduling executor.</br>
  * As the default {@link java.util.concurrent.ScheduledThreadPoolExecutor} and
  * {@link org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler} of
- * JDK do not limit the maximum task waiting queue, the problem of oom may
- * occur, which is designed to solve this problem.
+ * JDK do not limit the maximum task waiting queue, the problem of OOM may
+ * occur, which is designed to use a bounded queue to solve this problem.
  * 
  * @author Wangl.sir <wanglsir@gmail.com, 983708408@qq.com>
  * @version v1.0 2020年1月18日
  * @since
  * @see {@link org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler}
- * @see <a href= "http://www.doc88.com/p-3922316178617.html"> Resolution
- *      ScheduledThreadPoolExecutor for retry task OOM</a>
+ * @see https://stackoverflow.com/questions/55429073/why-does-not-scheduledthreadpoolexecutor-provide-finite-queue
  */
 public class SafeScheduledTaskPoolExecutor extends ScheduledThreadPoolExecutor {
-    final protected Logger log = getLogger(getClass());
+    protected final Logger log = getLogger(getClass());
 
     /**
      * Maximum allowed waiting execution queue size.
      */
-    final private int acceptQueue;
+    private final int acceptQueue;
 
     /**
      * {@link RejectedExecutionHandler}
      */
-    final private RejectedExecutionHandler rejectHandler;
+    private final RejectedExecutionHandler rejectHandler;
 
     public SafeScheduledTaskPoolExecutor(int coreMaximumPoolSize, long keepAliveTimeMs, ThreadFactory threadFactory,
             int acceptQueue, RejectedExecutionHandler rejectHandler) {
         super(coreMaximumPoolSize, threadFactory, rejectHandler);
+        setRemoveOnCancelPolicy(true);
         isTrue(acceptQueue > 0, "acceptQueue must be greater than 0");
         notNullOf(rejectHandler, "rejectHandler");
         setMaximumPoolSize(coreMaximumPoolSize); // corePoolSize==maximumPoolSize
@@ -104,22 +105,26 @@ public class SafeScheduledTaskPoolExecutor extends ScheduledThreadPoolExecutor {
      */
     @Override
     public void execute(Runnable command) {
-        if (checkRejectedQueueLimit(command))
+        if (checkRunableLimit(command)) {
             return;
+        }
         super.execute(command);
     }
 
     @Override
     public Future<?> submit(Runnable task) {
-        if (checkRejectedQueueLimit(task))
-            return null;
+        if (checkRunableLimit(task)) {
+            return EMPTY_FUTURE;
+        }
         return super.submit(task);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> Future<T> submit(Runnable task, T result) {
-        if (checkRejectedQueueLimit(task))
-            return null;
+        if (checkRunableLimit(task)) {
+            return (Future<T>) EMPTY_FUTURE;
+        }
         return super.submit(task, result);
     }
 
@@ -183,15 +188,19 @@ public class SafeScheduledTaskPoolExecutor extends ScheduledThreadPoolExecutor {
 
     @Override
     public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit) {
-        if (checkRejectedQueueLimit(command))
-            return null;
+        if (checkRunableLimit(command)) {
+            return (ScheduledFuture<?>) EMPTY_FUTURE;
+        }
         return super.schedule(command, delay, unit);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit) {
-        if (checkRejectedQueueLimit(callable))
-            return null;
+        // TODO return callable original value.
+        if (checkCallableLimit(callable)) {
+            return (ScheduledFuture<V>) EMPTY_FUTURE;
+        }
         return super.schedule(callable, delay, unit);
     }
 
@@ -207,7 +216,11 @@ public class SafeScheduledTaskPoolExecutor extends ScheduledThreadPoolExecutor {
      * @param unit
      * @return
      */
-    public ScheduledFuture<?> scheduleAtRandomRate(Runnable runnable, long initialDelay, long minDelay, long maxDelay,
+    public ScheduledFuture<?> scheduleAtRandomRate(
+            Runnable runnable,
+            long initialDelay,
+            long minDelay,
+            long maxDelay,
             TimeUnit unit) {
         return scheduleAtFixedRate(new RandomScheduleRunnable(unit.toMillis(minDelay), unit.toMillis(maxDelay), runnable),
                 unit.toMillis(initialDelay), MAX_VALUE, MILLISECONDS);
@@ -225,7 +238,11 @@ public class SafeScheduledTaskPoolExecutor extends ScheduledThreadPoolExecutor {
      * @param unit
      * @return
      */
-    public ScheduledFuture<?> scheduleWithRandomDelay(Runnable runnable, long initialDelay, long minDelay, long maxDelay,
+    public ScheduledFuture<?> scheduleWithRandomDelay(
+            Runnable runnable,
+            long initialDelay,
+            long minDelay,
+            long maxDelay,
             TimeUnit unit) {
         return scheduleWithFixedDelay(new RandomScheduleRunnable(unit.toMillis(minDelay), unit.toMillis(maxDelay), runnable),
                 unit.toMillis(initialDelay), MAX_VALUE, MILLISECONDS);
@@ -233,14 +250,14 @@ public class SafeScheduledTaskPoolExecutor extends ScheduledThreadPoolExecutor {
 
     @Override
     public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit) {
-        if (checkRejectedQueueLimit(command))
+        if (checkRunableLimit(command))
             return null;
         return super.scheduleAtFixedRate(command, initialDelay, period, unit);
     }
 
     @Override
     public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
-        if (checkRejectedQueueLimit(command))
+        if (checkRunableLimit(command))
             return null;
         return super.scheduleWithFixedDelay(command, initialDelay, delay, unit);
     }
@@ -280,7 +297,7 @@ public class SafeScheduledTaskPoolExecutor extends ScheduledThreadPoolExecutor {
      * @param command
      * @return
      */
-    private boolean checkRejectedQueueLimit(Callable<?> command) {
+    private boolean checkCallableLimit(Callable<?> command) {
         if (getQueue().size() > acceptQueue) {
             rejectHandler.rejectedExecution(() -> {
                 try {
@@ -300,7 +317,7 @@ public class SafeScheduledTaskPoolExecutor extends ScheduledThreadPoolExecutor {
      * @param command
      * @return
      */
-    private boolean checkRejectedQueueLimit(Runnable command) {
+    private boolean checkRunableLimit(Runnable command) {
         if (getQueue().size() > acceptQueue) {
             rejectHandler.rejectedExecution(command, this);
             // throw new RejectedExecutionException("Rejected execution of " + r
@@ -552,34 +569,72 @@ public class SafeScheduledTaskPoolExecutor extends ScheduledThreadPoolExecutor {
     /**
      * Empty runnable.
      */
-    final private static Runnable EMPTY_RUNNABLE = () -> {
+    private static final Runnable EMPTY_RUNNABLE = () -> {
+    };
+
+    private static final ScheduledFuture<Object> EMPTY_FUTURE = new ScheduledFuture<Object>() {
+
+        @Override
+        public boolean cancel(boolean mayInterruptIfRunning) {
+            return false;
+        }
+
+        @Override
+        public boolean isCancelled() {
+            return false;
+        }
+
+        @Override
+        public boolean isDone() {
+            return false;
+        }
+
+        @Override
+        public Object get() throws InterruptedException, ExecutionException {
+            return null;
+        }
+
+        @Override
+        public Object get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+            return null;
+        }
+
+        @Override
+        public long getDelay(TimeUnit unit) {
+            return 0;
+        }
+
+        @Override
+        public int compareTo(Delayed o) {
+            return 0;
+        }
     };
 
     /**
      * Sequence number to break scheduling ties, and in turn to guarantee FIFO
      * order among tied entries.
      */
-    final private static AtomicLong sequencer = new AtomicLong();
+    private static final AtomicLong sequencer = new AtomicLong();
 
     /**
      * {@link java.util.concurrent.ScheduledThreadPoolExecutor#reExecutePeriodic(RunnableScheduledFuture)}
      */
-    final private static Method reExecutePeriodicMethod;
+    private static final Method reExecutePeriodicMethod;
 
     /**
      * {@link java.util.concurrent.ScheduledThreadPoolExecutor#canRunInCurrentRunState(boolean)}
      */
-    final private static Method canRunInCurrentRunStateMethod;
+    private static final Method canRunInCurrentRunStateMethod;
 
     /**
      * {@link java.util.concurrent.ScheduledThreadPoolExecutor.ScheduledFutureTask#callable}
      */
-    final private static Field callableField;
+    private static final Field callableField;
 
     /**
      * {@link java.util.concurrent.ScheduledThreadPoolExecutor.ScheduledFutureTask#time}
      */
-    final private static Field timeField;
+    private static final Field timeField;
 
     static {
         try {
@@ -595,8 +650,19 @@ public class SafeScheduledTaskPoolExecutor extends ScheduledThreadPoolExecutor {
                     RunnableScheduledFuture.class);
             makeAccessible(reExecutePeriodicMethod);
 
-            canRunInCurrentRunStateMethod = ScheduledThreadPoolExecutor.class.getDeclaredMethod("canRunInCurrentRunState",
-                    boolean.class);
+            Method _canRunInCurrentRunStateMethod = null;
+            try {
+                // JDK8
+                _canRunInCurrentRunStateMethod = ScheduledThreadPoolExecutor.class.getDeclaredMethod("canRunInCurrentRunState",
+                        boolean.class);
+            } catch (NoSuchMethodException e) {
+                // JDK10.17+
+                // see:https://github.com/openjdk/jdk/blob/jdk-10+17/jdk/src/java.base/share/classes/java/util/concurrent/ScheduledThreadPoolExecutor.java#L316
+                // see:https://github.com/openjdk/jdk/blob/jdk-10+24/src/java.base/share/classes/java/util/concurrent/ScheduledThreadPoolExecutor.java#L316
+                _canRunInCurrentRunStateMethod = ScheduledThreadPoolExecutor.class.getDeclaredMethod("canRunInCurrentRunState",
+                        RunnableScheduledFuture.class);
+            }
+            canRunInCurrentRunStateMethod = _canRunInCurrentRunStateMethod;
             makeAccessible(canRunInCurrentRunStateMethod);
         } catch (Exception e) {
             throw new IllegalStateException(e);
