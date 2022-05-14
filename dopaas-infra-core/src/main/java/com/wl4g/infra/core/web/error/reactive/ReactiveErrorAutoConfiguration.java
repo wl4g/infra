@@ -30,7 +30,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
-import org.springframework.boot.autoconfigure.web.WebProperties.Resources;
+import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
@@ -86,15 +86,15 @@ public class ReactiveErrorAutoConfiguration extends AbstractErrorAutoConfigurati
     @Order(-2) // Takes precedence over the default handler
     public ReactiveSmartErrorController reactiveSmartErrorController(
             org.springframework.boot.web.reactive.error.ErrorAttributes errorAttributes,
-            Resources resources,
+            WebProperties webProperties,
             ObjectProvider<ViewResolver> viewResolvers,
             ServerCodecConfigurer codecConfigurer,
             ApplicationContext actx,
             ErrorHandlerProperties config,
             CompositeSmartErrorHandler errorHandler,
             AbstractSmartErrorHandler.ErrorRender errorRender) {
-        ReactiveSmartErrorController errorController = new ReactiveSmartErrorController(errorAttributes, resources, actx, config,
-                errorHandler, errorRender);
+        ReactiveSmartErrorController errorController = new ReactiveSmartErrorController(errorAttributes,
+                webProperties.getResources(), actx, config, errorHandler, errorRender);
         errorController.setViewResolvers(viewResolvers.orderedStream().collect(toList()));
         errorController.setMessageWriters(codecConfigurer.getWriters());
         errorController.setMessageReaders(codecConfigurer.getReaders());
