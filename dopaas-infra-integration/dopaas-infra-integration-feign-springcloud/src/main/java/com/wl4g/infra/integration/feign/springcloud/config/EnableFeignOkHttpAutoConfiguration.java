@@ -29,6 +29,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.client.loadbalancer.LoadBalancedRetryFactory;
+import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.cloud.commons.httpclient.OkHttpClientConnectionPoolFactory;
 import org.springframework.cloud.commons.httpclient.OkHttpClientFactory;
 import org.springframework.cloud.loadbalancer.blocking.client.BlockingLoadBalancerClient;
@@ -101,7 +102,8 @@ public class EnableFeignOkHttpAutoConfiguration {
     @Conditional(OnRetryNotEnabledCondition.class)
     public Client feignLoadBalancerClient(
             @Qualifier(BEAN_FEIGN_OKHTTP3_CLIENT) feign.Client feignClient,
-            BlockingLoadBalancerClient loadBalancerClient,
+            // BlockingLoadBalancerClient loadBalancerClient,
+            LoadBalancerClient loadBalancerClient,
             LoadBalancerClientFactory loadBalancerClientFactory) {
         return new FeignBlockingLoadBalancerClient(feignClient, loadBalancerClient, loadBalancerClientFactory);
     }

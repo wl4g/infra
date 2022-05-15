@@ -32,7 +32,6 @@ import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.cloud.openfeign.AnnotatedParameterProcessor;
@@ -50,7 +49,6 @@ import org.springframework.cloud.openfeign.support.SpringDecoder;
 import org.springframework.cloud.openfeign.support.SpringEncoder;
 import org.springframework.cloud.openfeign.support.SpringMvcContract;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.Ordered;
@@ -60,7 +58,6 @@ import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.format.support.FormattingConversionService;
 
 import com.fasterxml.jackson.databind.Module;
-import com.netflix.hystrix.HystrixCommand;
 import com.wl4g.infra.integration.feign.core.context.internal.ConsumerFeignContextFilter.FeignContextDecoder;
 import com.wl4g.infra.integration.feign.core.context.internal.FeignContextBuilder;
 import com.wl4g.infra.integration.feign.springcloud.config.EnhanceSpringCloudFeignAutoConfiguration;
@@ -73,7 +70,6 @@ import feign.codec.Decoder;
 import feign.codec.Encoder;
 import feign.form.MultipartFormContentProcessor;
 import feign.form.spring.SpringFormEncoder;
-import feign.hystrix.HystrixFeign;
 import feign.optionals.OptionalDecoder;
 
 /**
@@ -217,19 +213,22 @@ public class FeignContextClientsAutoConfiguration {
         }
     }
 
-    @Configuration(proxyBeanMethods = false)
-    @ConditionalOnClass({ HystrixCommand.class, HystrixFeign.class })
-    protected static class HystrixFeignConfiguration {
-
-        @Bean
-        @Scope("prototype")
-        @ConditionalOnMissingBean
-        @ConditionalOnProperty(name = "feign.hystrix.enabled")
-        public Feign.Builder feignHystrixBuilder() {
-            return HystrixFeign.builder();
-        }
-
-    }
+    //
+    // TODO remove
+    //
+    // @Configuration(proxyBeanMethods = false)
+    // @ConditionalOnClass({ com.netflix.hystrix.HystrixCommand.class,
+    // feign.hystrix.HystrixFeign.class })
+    // protected static class HystrixFeignConfiguration {
+    //
+    // @Bean
+    // @Scope("prototype")
+    // @ConditionalOnMissingBean
+    // @ConditionalOnProperty(name = "feign.hystrix.enabled")
+    // public Feign.Builder feignHystrixBuilder() {
+    // return HystrixFeign.builder();
+    // }
+    // }
 
     private class SpringPojoFormEncoder extends SpringFormEncoder {
 

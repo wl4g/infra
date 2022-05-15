@@ -72,10 +72,10 @@ public interface OrderService {
 
     // Notes: Cannot be used @GetMapping, because feign convention does not
     // allow it.
-    @RequestMapping(value = "/order_list", method = POST)
+    @RequestMapping(value = "/list", method = POST)
     List<OrderInfo> list(@RequestBody PageHolder<OrderInfo> page, @RequestParam("orderName") String orderName);
 
-    @RequestMapping(value = "/order_create", method = POST)
+    @RequestMapping(value = "/create", method = POST)
     int create(@RequestBody OrderInfo order, @RequestParam("goodsId") Long goodsId);
 
 }

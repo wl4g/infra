@@ -1,13 +1,14 @@
 # Application Auto Configuration.
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.wl4g.infra.integration.feign.springcloud.context.SpringCloudHystrixFeignContextAutoConfiguration,\
+com.wl4g.infra.integration.feign.springcloud.context.SpringCloudSentinelFeignContextAutoConfiguration,\
+com.wl4g.infra.integration.feign.springcloud.context.FeignContextClientsAutoConfiguration,\
+com.wl4g.infra.integration.feign.springcloud.config.EnhanceSpringCloudFeignAutoConfiguration,\
 com.wl4g.infra.integration.feign.springcloud.config.EnableCircuitBreakerAutoConfiguration,\
 com.wl4g.infra.integration.feign.springcloud.config.EnableEurekaClientAutoConfiguration,\
 com.wl4g.infra.integration.feign.springcloud.config.EnableHystrixStreamAutoConfiguration,\
-com.wl4g.infra.integration.feign.springcloud.config.EnhanceSpringCloudLoadbalancerAutoConfiguration,\
-com.wl4g.infra.integration.feign.springcloud.config.EnhanceSpringCloudLoadbalancerAutoConfiguration.ReactiveSupportConfiguration,\
-com.wl4g.infra.integration.feign.springcloud.config.EnhanceSpringCloudLoadbalancerAutoConfiguration.BlockingSupportConfiguration,\
-com.wl4g.infra.integration.feign.springcloud.config.EnableFeignOkHttpAutoConfiguration,\
-com.wl4g.infra.integration.feign.springcloud.context.SpringCloudHystrixFeignContextAutoConfiguration,\
-com.wl4g.infra.integration.feign.springcloud.context.SpringCloudSentinelFeignContextAutoConfiguration,\
-com.wl4g.infra.integration.feign.springcloud.config.EnhanceSpringCloudFeignAutoConfiguration,\
-com.wl4g.infra.integration.feign.springcloud.context.FeignContextClientsAutoConfiguration
+com.wl4g.infra.integration.feign.springcloud.config.EnableFeignOkHttpAutoConfiguration
+
+#com.wl4g.infra.integration.feign.springcloud.config.EnhanceSpringCloudLoadbalancerAutoConfiguration,\
+#com.wl4g.infra.integration.feign.springcloud.config.EnhanceSpringCloudLoadbalancerAutoConfiguration.ReactiveSupportConfiguration,\
+#com.wl4g.infra.integration.feign.springcloud.config.EnhanceSpringCloudLoadbalancerAutoConfiguration.BlockingSupportConfiguration,\
