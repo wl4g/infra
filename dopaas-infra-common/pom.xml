@@ -160,6 +160,17 @@
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 		</dependency>
+		<!-- see:https://stackoverflow.com/questions/62170698/jaxb-and-java-11-module-info-java -->
+		<dependency>
+			<groupId>jakarta.xml.bind</groupId>
+			<artifactId>jakarta.xml.bind-api</artifactId>
+			<!-- <version>2.3.3</version> -->
+		</dependency>
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-impl</artifactId>
+			<scope>runtime</scope>
+		</dependency>
 		<!-- Compression's -->
 		<dependency>
 			<groupId>org.xerial.snappy</groupId>

@@ -32,6 +32,7 @@ import org.springframework.cloud.client.loadbalancer.LoadBalancedRetryFactory;
 import org.springframework.cloud.commons.httpclient.OkHttpClientConnectionPoolFactory;
 import org.springframework.cloud.commons.httpclient.OkHttpClientFactory;
 import org.springframework.cloud.loadbalancer.blocking.client.BlockingLoadBalancerClient;
+import org.springframework.cloud.loadbalancer.support.LoadBalancerClientFactory;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.loadbalancer.FeignBlockingLoadBalancerClient;
 import org.springframework.cloud.openfeign.loadbalancer.OnRetryNotEnabledCondition;
@@ -100,8 +101,9 @@ public class EnableFeignOkHttpAutoConfiguration {
     @Conditional(OnRetryNotEnabledCondition.class)
     public Client feignLoadBalancerClient(
             @Qualifier(BEAN_FEIGN_OKHTTP3_CLIENT) feign.Client feignClient,
-            BlockingLoadBalancerClient loadBalancerClient) {
-        return new FeignBlockingLoadBalancerClient(feignClient, loadBalancerClient);
+            BlockingLoadBalancerClient loadBalancerClient,
+            LoadBalancerClientFactory loadBalancerClientFactory) {
+        return new FeignBlockingLoadBalancerClient(feignClient, loadBalancerClient, loadBalancerClientFactory);
     }
 
     // Notes: spring-cloud-loadbalancer-2.2.6.RELEASE.jar Retrying is not
@@ -116,9 +118,11 @@ public class EnableFeignOkHttpAutoConfiguration {
     public Client feignRetryClient(
             BlockingLoadBalancerClient loadBalancerClient,
             feign.okhttp.OkHttpClient feignOkHttpClient,
-            List<LoadBalancedRetryFactory> lbRetryFactories) {
+            List<LoadBalancedRetryFactory> lbRetryFactories,
+            LoadBalancerClientFactory loadBalancerClientFactory) {
         AnnotationAwareOrderComparator.sort(lbRetryFactories);
-        return new RetryableFeignBlockingLoadBalancerClient(feignOkHttpClient, loadBalancerClient, lbRetryFactories.get(0));
+        return new RetryableFeignBlockingLoadBalancerClient(feignOkHttpClient, loadBalancerClient, lbRetryFactories.get(0),
+                loadBalancerClientFactory);
     }
 
     private static final String BEAN_OKHTTP3_POOL = "infraFeignSpringCloud.okhttp3Pool";

@@ -103,7 +103,7 @@
 		<typesafe-config.version>1.4.0</typesafe-config.version>
 		<!-- ssh/git -->
 		<ganymed-ssh2.version>262</ganymed-ssh2.version>
-		<sshd.version>2.4.0</sshd.version>
+		<sshd.version>2.8.0</sshd.version>
 		<sshj.version>0.27.0</sshj.version>
 		<!-- web compontens -->
 		<user-agent.version>1.2.4</user-agent.version>
@@ -120,6 +120,7 @@
 		<!-- Note: Must be consistent with springboot -->
 		<!-- <jackson.version>2.10.2</jackson.version> -->
 		<jackson.version>2.13.1</jackson.version>
+		<jaxb-xml.version>2.3.3</jaxb-xml.version>
 		<!-- <fastjson.version>1.2.56</fastjson.version> -->
 		<protobuf.version>3.8.0</protobuf.version>
 		<!-- <protobuf.version>2.5.0</protobuf.version> hbase-1.2.5 dependency -->
@@ -532,6 +533,18 @@
 				<groupId>com.fasterxml.jackson.module</groupId>
 				<artifactId>jackson-module-parameter-names</artifactId>
 				<version>${jackson.version}</version>
+			</dependency>
+			<!-- see:https://stackoverflow.com/questions/62170698/jaxb-and-java-11-module-info-java -->
+			<dependency>
+				<groupId>jakarta.xml.bind</groupId>
+				<artifactId>jakarta.xml.bind-api</artifactId>
+				<version>${jaxb-xml.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.sun.xml.bind</groupId>
+				<artifactId>jaxb-impl</artifactId>
+				<version>${jaxb-xml.version}</version>
+				<scope>runtime</scope>
 			</dependency>
 			<dependency>
 				<groupId>com.google.protobuf</groupId>

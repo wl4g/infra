@@ -15,32 +15,36 @@
  */
 package com.wl4g.infra.common.cli.ssh2;
 
-import com.google.common.annotations.Beta;
-import com.wl4g.infra.common.function.CallbackFunction;
-import com.wl4g.infra.common.function.ProcessFunction;
-import com.wl4g.infra.common.log.SmartLogger;
+import static com.wl4g.infra.common.lang.Assert2.hasText;
+import static com.wl4g.infra.common.lang.Assert2.notNull;
+import static java.util.Collections.singleton;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
-import org.apache.sshd.client.SshClient;
-import org.apache.sshd.client.channel.ChannelExec;
-import org.apache.sshd.client.channel.ClientChannelEvent;
-import org.apache.sshd.client.future.AuthFuture;
-import org.apache.sshd.client.scp.DefaultScpClientCreator;
-import org.apache.sshd.client.scp.ScpClient;
-import org.apache.sshd.client.session.ClientSession;
-import org.apache.sshd.common.util.security.SecurityUtils;
-
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.util.Iterator;
 import java.util.Objects;
 
-import static com.wl4g.infra.common.lang.Assert2.hasText;
-import static com.wl4g.infra.common.lang.Assert2.notNull;
-import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
-import static java.util.Collections.singleton;
-import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
+import org.apache.sshd.client.SshClient;
+import org.apache.sshd.client.channel.ChannelExec;
+import org.apache.sshd.client.channel.ClientChannelEvent;
+import org.apache.sshd.client.future.AuthFuture;
+import org.apache.sshd.client.session.ClientSession;
+import org.apache.sshd.common.util.security.SecurityUtils;
+import org.apache.sshd.scp.client.DefaultScpClientCreator;
+import org.apache.sshd.scp.client.ScpClient;
+
+import com.google.common.annotations.Beta;
+import com.wl4g.infra.common.function.CallbackFunction;
+import com.wl4g.infra.common.function.ProcessFunction;
+
+import lombok.CustomLog;
 
 /**
  * Sshd based SSH2 tools.
@@ -50,9 +54,8 @@ import static java.util.Objects.nonNull;
  * @since
  */
 @Beta
+@CustomLog
 public class SshdHolder extends SSH2Holders<ChannelExec, ScpClient> {
-
-    private static final SmartLogger log = getLogger(SshdHolder.class);
 
     // --- Transfer files. ---
 
@@ -127,7 +130,11 @@ public class SshdHolder extends SSH2Holders<ChannelExec, ScpClient> {
      * @throws IOException
      */
     @Override
-    protected void doScpTransfer(String host, String user, char[] pemPrivateKey, String password,
+    protected void doScpTransfer(
+            String host,
+            String user,
+            char[] pemPrivateKey,
+            String password,
             CallbackFunction<ScpClient> processor) throws Exception {
         hasText(host, "Transfer host can't empty.");
         hasText(user, "Transfer user can't empty.");
@@ -171,7 +178,12 @@ public class SshdHolder extends SSH2Holders<ChannelExec, ScpClient> {
 
     // --- Execution commands. ---
 
-    public Ssh2ExecResult execWaitForResponse(String host, String user, char[] pemPrivateKey, String password, String command,
+    public Ssh2ExecResult execWaitForResponse(
+            String host,
+            String user,
+            char[] pemPrivateKey,
+            String password,
+            String command,
             long timeoutMs) throws Exception {
         return execWaitForComplete(host, user, pemPrivateKey, password, command, session -> {
             String msg = null, errmsg = null;
@@ -187,8 +199,14 @@ public class SshdHolder extends SSH2Holders<ChannelExec, ScpClient> {
     }
 
     @Override
-    public <T> T execWaitForComplete(String host, String user, char[] pemPrivateKey, String password, String command,
-            ProcessFunction<ChannelExec, T> processor, long timeoutMs) throws Exception {
+    public <T> T execWaitForComplete(
+            String host,
+            String user,
+            char[] pemPrivateKey,
+            String password,
+            String command,
+            ProcessFunction<ChannelExec, T> processor,
+            long timeoutMs) throws Exception {
         return doExecCommand(host, user, pemPrivateKey, password, command, channelExec -> {
             // Wait for completed by condition.
             channelExec.waitFor(singleton(ClientChannelEvent.CLOSED), timeoutMs);
@@ -197,7 +215,12 @@ public class SshdHolder extends SSH2Holders<ChannelExec, ScpClient> {
     }
 
     @Override
-    public <T> T doExecCommand(String host, String user, char[] pemPrivateKey, String password, String command,
+    public <T> T doExecCommand(
+            String host,
+            String user,
+            char[] pemPrivateKey,
+            String password,
+            String command,
             ProcessFunction<ChannelExec, T> processor) throws Exception {
         hasText(host, "SSH2 command host can't empty.");
         hasText(user, "SSH2 command user can't empty.");
@@ -267,7 +290,12 @@ public class SshdHolder extends SSH2Holders<ChannelExec, ScpClient> {
         return null;
     }
 
-    private ClientSession authWithPrivateKey(SshClient client, String host, Integer port, String user, char[] pemPrivateKey,
+    private ClientSession authWithPrivateKey(
+            SshClient client,
+            String host,
+            Integer port,
+            String user,
+            char[] pemPrivateKey,
             String password) throws IOException, GeneralSecurityException {
         ClientSession session = client.connect(user, host, Objects.isNull(port) ? 22 : port).verify(10000).getSession();
         if (nonNull(pemPrivateKey)) {

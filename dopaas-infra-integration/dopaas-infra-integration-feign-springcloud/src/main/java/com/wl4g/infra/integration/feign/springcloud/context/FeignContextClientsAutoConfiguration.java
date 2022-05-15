@@ -114,6 +114,7 @@ public class FeignContextClientsAutoConfiguration {
     // SpringDecoder(this.messageConverters)));
     // }
 
+    @SuppressWarnings("deprecation")
     @Bean
     @Primary
     @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -206,6 +207,7 @@ public class FeignContextClientsAutoConfiguration {
         };
     }
 
+    @SuppressWarnings("deprecation")
     private Encoder springEncoder(ObjectProvider<AbstractFormWriter> formWriterProvider) {
         AbstractFormWriter formWriter = formWriterProvider.getIfAvailable();
         if (formWriter != null) {

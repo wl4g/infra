@@ -30,6 +30,7 @@ import org.springframework.cloud.netflix.hystrix.EnableHystrix;
  * @sine v1.0
  * @see
  */
+@SuppressWarnings("deprecation")
 @EnableCircuitBreaker
 @EnableHystrix
 public class EnableCircuitBreakerAutoConfiguration {
