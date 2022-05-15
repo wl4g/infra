@@ -21,6 +21,7 @@ import static com.wl4g.infra.support.constant.SupportInfraConstant.CONF_PREFIX_I
 import static redis.clients.jedis.HostAndPort.parseString;
 
 import java.io.Serializable;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -66,8 +67,10 @@ public class JedisClientAutoConfiguration {
 
     // Requires
     @Bean
-    public JedisClientFactoryBean jedisClientFactoryBean(@Autowired(required = false) JedisProperties config,
-            @Autowired(required = false) JedisCluster jedisCluster, @Autowired(required = false) JedisPool jedisPool) {
+    public JedisClientFactoryBean jedisClientFactoryBean(
+            @Autowired(required = false) JedisProperties config,
+            @Autowired(required = false) JedisCluster jedisCluster,
+            @Autowired(required = false) JedisPool jedisPool) {
         return new JedisClientFactoryBean(config, jedisCluster, jedisPool);
     }
 
@@ -106,7 +109,7 @@ public class JedisClientAutoConfiguration {
              * [Note:] importants, The default value is - 1, that is, there is
              * no time-out for acquiring resources, which will lead to deadlock.
              */
-            this.poolConfig.setMaxWaitMillis(10000);
+            this.poolConfig.setMaxWait(Duration.ofMillis(10000));
             this.poolConfig.setMinIdle(10);
             this.poolConfig.setMaxIdle(100);
             this.poolConfig.setMaxTotal(60000);
