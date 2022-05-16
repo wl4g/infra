@@ -20,6 +20,7 @@ import static java.lang.String.valueOf;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -46,8 +47,12 @@ public class EventBusSupport implements Closeable {
     protected ThreadPoolExecutor executor;
 
     public EventBusSupport(int eventThreads) {
+        this(null, eventThreads);
+    }
+
+    public EventBusSupport(String prefix, int eventThreads) {
         isTrueOf(eventThreads > 0, "eventThreads >0");
-        this.bus = initEventBus(eventThreads);
+        this.bus = initEventBus(prefix, eventThreads);
     }
 
     /**
@@ -139,13 +144,15 @@ public class EventBusSupport implements Closeable {
     /**
      * Init create {@link EventBus}
      * 
+     * @param prefix
      * @param eventThreads
      * @return
      */
-    private final EventBus initEventBus(int eventThreads) {
+    private final EventBus initEventBus(String prefix, int eventThreads) {
+        String _prefix = isBlank(prefix) ? "eventbus" : prefix;
         final AtomicInteger incr = new AtomicInteger(0);
         this.executor = new ThreadPoolExecutor(eventThreads, eventThreads, 0, MILLISECONDS, new LinkedBlockingQueue<>(), r -> {
-            Thread t = new Thread(r, "scm-event-".concat(valueOf(incr.getAndIncrement())));
+            Thread t = new Thread(r, _prefix.concat("-").concat(valueOf(incr.getAndIncrement())));
             if (t.isDaemon())
                 t.setDaemon(false);
             if (t.getPriority() != Thread.NORM_PRIORITY)
