@@ -534,7 +534,8 @@ public abstract class WebUtils2 extends WebUtils {
          * }
          * </pre>
          */
-        public static final String[] RESPTYPE_NAMES = { DEFAULT_RESPTYPE_NAME, "responsetype", "Response-Type" };
+        public static final String[] RESPTYPE_NAMES = { DEFAULT_RESPTYPE_NAME, "responsetype", "Response-Type",
+                "X-Response-Type" };
 
         /**
          * Safe converter string to {@link ResponseType}
