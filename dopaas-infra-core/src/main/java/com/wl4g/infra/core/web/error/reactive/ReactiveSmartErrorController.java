@@ -163,7 +163,10 @@ public class ReactiveSmartErrorController extends AbstractErrorWebExceptionHandl
         if (isBlank(stacktrace)) {
             MultiValueMap<String, HttpCookie> cookies = request.cookies();
             if (nonNull(cookies)) {
-                stacktrace = cookies.getFirst(PARAM_STACKTRACE).getValue();
+                HttpCookie c = cookies.getFirst(PARAM_STACKTRACE);
+                if (nonNull(c)) {
+                    stacktrace = c.getValue();
+                }
             }
         }
         if (isBlank(stacktrace)) {
