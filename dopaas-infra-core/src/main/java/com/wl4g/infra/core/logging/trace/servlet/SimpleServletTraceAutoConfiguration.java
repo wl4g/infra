@@ -35,8 +35,9 @@ import org.springframework.core.env.Environment;
  * @author Wangl.sir <wanglsir@gmail.com, 983708408@qq.com>
  * @version v1.0 2022-03-20
  * @since
+ * @see https://github.com/spring-projects-experimental/spring-cloud-sleuth-otel
  */
-@Deprecated // use:https://github.com/spring-projects-experimental/spring-cloud-sleuth-otel
+@Deprecated
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE + 10)
 @ConditionalOnProperty(name = CONF_PREFIX_INFRA_CORE_LOGGING_TRACE + ".enabled", matchIfMissing = false)

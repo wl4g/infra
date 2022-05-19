@@ -15,6 +15,9 @@
  */
 package com.wl4g.infra.core.logging.trace.reactive;
 
+import java.util.Optional;
+import java.util.function.Consumer;
+
 import org.slf4j.MDC;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.Environment;
@@ -27,6 +30,7 @@ import com.wl4g.infra.core.logging.trace.AbstractTraceMDCSupport;
 import com.wl4g.infra.core.utils.web.ReactiveRequestExtractor;
 
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Signal;
 
 /**
  * {@link SimpleTraceMDCWebFilter}
@@ -49,27 +53,25 @@ public class SimpleTraceMDCWebFilter extends AbstractTraceMDCSupport implements 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         bindToMDC(new ReactiveRequestExtractor(exchange.getRequest()));
-        // see:https://stackoverflow.com/questions/61409047/how-does-spring-cloud-sleuth-propagate-the-mdc-context-in-webflux-ouf-of-the-box
-
-        // return chain.filter(exchange).doOnEach(logOnNext(r ->
-        // log.debug("found restaurant {} for ${}"))).doOnTerminate(()
-        // -> MDC.clear());
-        return chain.filter(exchange).doOnTerminate(() -> MDC.clear());
+        // see:https://stackoverflow.com/questions/61409047/how-does-spring-cloud-sleuth-propagate-the-mdc-context-in-webflux-ouf-of-the-box\
+        // see:https://simonbasle.github.io/2018/02/contextual-logging-with-reactor-context-and-mdc/
+        return chain.filter(exchange).doOnEach(logOnNext(r -> {
+            log.debug("found restaurant {} for ${}");
+        })).doOnTerminate(() -> System.out.println()/* MDC.clear() */);
     }
 
-    // private static <T> Consumer<Signal<T>> logOnNext(Consumer<T>
-    // logStatement) {
-    // return signal -> {
-    // if (!signal.isOnNext())
-    // return;
-    // Optional<String> traceIdOp =
-    // signal.getContextView().getOrEmpty("traceId");
-    // traceIdOp.ifPresent(traceId -> {
-    // try (MDC.MDCCloseable closeable = MDC.putCloseable("traceId", traceId)) {
-    // logStatement.accept(signal.get());
-    // }
-    // });
-    // };
-    // }
+    private static <T> Consumer<Signal<T>> logOnNext(Consumer<T> logStatement) {
+        return signal -> {
+            // if (!signal.isOnNext()) {
+            // return;
+            // }
+            Optional<String> traceIdOp = signal.getContextView().getOrEmpty("requestId");
+            traceIdOp.ifPresent(requestId -> {
+                try (MDC.MDCCloseable closeable = MDC.putCloseable("requestId", requestId)) {
+                    logStatement.accept(signal.get());
+                }
+            });
+        };
+    }
 
 }

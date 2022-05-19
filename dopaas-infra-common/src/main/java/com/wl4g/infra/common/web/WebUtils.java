@@ -39,6 +39,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.security.Principal;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -643,6 +644,15 @@ public abstract class WebUtils {
          * @return
          */
         default @Nullable URI getRequestURI() {
+            return null;
+        }
+
+        /**
+         * Gets web request authenticated principal.
+         * 
+         * @return
+         */
+        default @Nullable Principal getPrincipal() {
             return null;
         }
 

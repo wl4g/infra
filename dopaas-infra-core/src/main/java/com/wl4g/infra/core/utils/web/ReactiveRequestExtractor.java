@@ -15,23 +15,30 @@
  */
 package com.wl4g.infra.core.utils.web;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToList;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.lang.ClassUtils2.resolveClassName;
+import static com.wl4g.infra.common.lang.StringUtils2.eqIgnCase;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.findField;
 import static com.wl4g.infra.core.constant.CoreInfraConstants.TRACE_REQUEST_ID_HEADER;
 import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.split;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 import java.lang.reflect.Field;
 import java.net.URI;
+import java.security.Principal;
 import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.springframework.http.HttpCookie;
-import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.HttpRequest;
 import org.springframework.util.MultiValueMap;
 
 import com.wl4g.infra.common.web.WebUtils.WebRequestExtractor;
-
-import lombok.AllArgsConstructor;
+import com.wl4g.infra.common.web.WebUtils2;
 
 /**
  * {@link ReactiveRequestExtractor}
@@ -40,10 +47,21 @@ import lombok.AllArgsConstructor;
  * @version 2022-04-07 v3.0.0
  * @since v3.0.0
  */
-@AllArgsConstructor
 public class ReactiveRequestExtractor implements WebRequestExtractor {
 
-    private final ServerHttpRequest request;
+    private final HttpRequest request;
+
+    public ReactiveRequestExtractor(org.springframework.http.server.ServerHttpRequest request) {
+        this.request = notNullOf(request, "request");
+    }
+
+    public ReactiveRequestExtractor(org.springframework.http.server.reactive.ServerHttpRequest request) {
+        this.request = notNullOf(request, "request");
+    }
+
+    public ReactiveRequestExtractor(org.springframework.web.reactive.function.server.ServerRequest request) {
+        this.request = notNullOf(request, "request");
+    }
 
     @Override
     public String getRequestId() {
@@ -53,6 +71,21 @@ public class ReactiveRequestExtractor implements WebRequestExtractor {
     @Override
     public URI getRequestURI() {
         return request.getURI();
+    }
+
+    @Override
+    public Principal getPrincipal() {
+        if (request instanceof org.springframework.http.server.ServerHttpRequest) {
+            return ((org.springframework.http.server.ServerHttpRequest) (request)).getPrincipal();
+        } else if (request instanceof org.springframework.http.server.reactive.ServerHttpRequest) {
+            return null; // not-get-principal
+        } else if (request instanceof org.springframework.web.reactive.function.server.ServerRequest) {
+            AtomicReference<Principal> principal = new AtomicReference<>(null);
+            ((org.springframework.web.reactive.function.server.ServerRequest) request).principal()
+                    .doOnSuccess(p -> principal.set(p));
+            return principal.get();
+        }
+        return null;
     }
 
     @Override
@@ -82,12 +115,28 @@ public class ReactiveRequestExtractor implements WebRequestExtractor {
 
     @Override
     public Collection<String> getQueryNames() {
-        return request.getQueryParams().keySet();
+        if (request instanceof org.springframework.http.server.ServerHttpRequest) {
+            String urlQuery = ((org.springframework.http.server.ServerHttpRequest) (request)).getURI().getQuery();
+            return WebUtils2.toQueryParams(urlQuery).keySet();
+        } else if (request instanceof org.springframework.http.server.reactive.ServerHttpRequest) {
+            return ((org.springframework.http.server.reactive.ServerHttpRequest) request).getQueryParams().keySet();
+        } else if (request instanceof org.springframework.web.reactive.function.server.ServerRequest) {
+            return ((org.springframework.web.reactive.function.server.ServerRequest) request).queryParams().keySet();
+        }
+        return null;
     }
 
     @Override
     public String getQueryValue(String name) {
-        return request.getQueryParams().getFirst(name);
+        if (request instanceof org.springframework.http.server.ServerHttpRequest) {
+            String urlQuery = ((org.springframework.http.server.ServerHttpRequest) (request)).getURI().getQuery();
+            return WebUtils2.toQueryParams(urlQuery).get(name);
+        } else if (request instanceof org.springframework.http.server.reactive.ServerHttpRequest) {
+            return ((org.springframework.http.server.reactive.ServerHttpRequest) request).getQueryParams().getFirst(name);
+        } else if (request instanceof org.springframework.web.reactive.function.server.ServerRequest) {
+            return ((org.springframework.web.reactive.function.server.ServerRequest) request).queryParams().getFirst(name);
+        }
+        return null;
     }
 
     @Override
@@ -102,16 +151,43 @@ public class ReactiveRequestExtractor implements WebRequestExtractor {
 
     @Override
     public Collection<String> getCookieNames() {
-        return request.getCookies().keySet();
+        if (request instanceof org.springframework.http.server.ServerHttpRequest) {
+            List<String> cookies = safeArrayToList(split(getHeaderValue("cookie"), ";"));
+            return cookies.stream().map(c -> split(c, "=")[0]).collect(toList());
+        } else if (request instanceof org.springframework.http.server.reactive.ServerHttpRequest) {
+            return ((org.springframework.http.server.reactive.ServerHttpRequest) request).getCookies().keySet();
+        } else if (request instanceof org.springframework.web.reactive.function.server.ServerRequest) {
+            return ((org.springframework.web.reactive.function.server.ServerRequest) request).cookies().keySet();
+        }
+        return null;
     }
 
     @Override
     public String getCookieValue(String name) {
-        MultiValueMap<String, HttpCookie> cookies = request.getCookies();
-        if (isEmpty(cookies)) {
-            HttpCookie cookie = cookies.getFirst(name);
-            if (nonNull(cookie)) {
-                return cookie.getValue();
+        if (request instanceof org.springframework.http.server.ServerHttpRequest) {
+            for (String cookieKeyValue : safeArrayToList(split(getHeaderValue("cookie"), ";"))) {
+                String[] parts = split(cookieKeyValue, "=");
+                if (nonNull(parts) && parts.length >= 2 && eqIgnCase(name, parts[0])) {
+                    return parts[1];
+                }
+            }
+        } else if (request instanceof org.springframework.http.server.reactive.ServerHttpRequest) {
+            MultiValueMap<String, HttpCookie> cookies = ((org.springframework.http.server.reactive.ServerHttpRequest) request)
+                    .getCookies();
+            if (isEmpty(cookies)) {
+                HttpCookie cookie = cookies.getFirst(name);
+                if (nonNull(cookie)) {
+                    return cookie.getValue();
+                }
+            }
+        } else if (request instanceof org.springframework.web.reactive.function.server.ServerRequest) {
+            MultiValueMap<String, HttpCookie> cookies = ((org.springframework.web.reactive.function.server.ServerRequest) request)
+                    .cookies();
+            if (isEmpty(cookies)) {
+                HttpCookie cookie = cookies.getFirst(name);
+                if (nonNull(cookie)) {
+                    return cookie.getValue();
+                }
             }
         }
         return null;

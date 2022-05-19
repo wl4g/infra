@@ -259,7 +259,6 @@ public class SpelRequestMatcher {
     @With
     @Getter
     @Setter
-    @ToString
     @SuperBuilder
     @AllArgsConstructor
     public static class MatchHttpRequestRule implements Predicate<WebRequestExtractor> {
@@ -412,6 +411,13 @@ public class SpelRequestMatcher {
                 getQuery().validate();
             }
             return this;
+        }
+
+        @Override
+        public String toString() {
+            return "MatchHttpRequestRule [name=" + name + ", method=" + method + ", scheme=" + scheme + ", host=" + host
+                    + ", port=" + port + ", path=" + path + ", header=" + header + ", cookie=" + cookie + ", query=" + query
+                    + ", pathMatcher=" + pathMatcher + "]";
         }
     }
 

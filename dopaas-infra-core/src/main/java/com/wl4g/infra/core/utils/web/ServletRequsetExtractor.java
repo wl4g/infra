@@ -20,6 +20,7 @@ import static com.wl4g.infra.core.constant.CoreInfraConstants.TRACE_REQUEST_ID_H
 import static java.util.stream.Collectors.toList;
 
 import java.net.URI;
+import java.security.Principal;
 import java.util.Collection;
 
 import javax.servlet.http.HttpServletRequest;
@@ -51,6 +52,11 @@ public class ServletRequsetExtractor implements WebRequestExtractor {
     @Override
     public URI getRequestURI() {
         return URI.create(request.getRequestURI());
+    }
+
+    @Override
+    public Principal getPrincipal() {
+        return request.getUserPrincipal();
     }
 
     @Override
