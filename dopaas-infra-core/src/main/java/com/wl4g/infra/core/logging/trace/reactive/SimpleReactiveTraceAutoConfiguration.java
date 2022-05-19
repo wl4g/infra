@@ -15,7 +15,7 @@
  */
 package com.wl4g.infra.core.logging.trace.reactive;
 
-import static com.wl4g.infra.core.constant.CoreInfraConstants.CONF_PREFIX_INFRA_CORE_MDC_LOGGING;
+import static com.wl4g.infra.core.constant.CoreInfraConstants.CONF_PREFIX_INFRA_CORE_LOGGING_TRACE;
 
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -27,21 +27,22 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 
 /**
- * {@link ReactiveMDCAutoConfiguration}
+ * Reactive logging MDC auto configuration.
  * 
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version 2022-05-11 v3.0.0
  * @since v3.0.0
  */
+@Deprecated // use:https://github.com/spring-projects-experimental/spring-cloud-sleuth-otel
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE + 10)
-@ConditionalOnProperty(name = CONF_PREFIX_INFRA_CORE_MDC_LOGGING + ".enabled", matchIfMissing = true)
+@ConditionalOnProperty(name = CONF_PREFIX_INFRA_CORE_LOGGING_TRACE + ".enabled", matchIfMissing = false)
 @ConditionalOnWebApplication(type = Type.REACTIVE)
-public class ReactiveMDCAutoConfiguration {
+public class SimpleReactiveTraceAutoConfiguration {
 
     @Bean
-    public TraceMDCWebFilter traceMDCWebFilter(Environment environment) {
-        return new TraceMDCWebFilter(environment);
+    public SimpleTraceMDCWebFilter simpleTraceMDCWebFilter(Environment environment) {
+        return new SimpleTraceMDCWebFilter(environment);
     }
 
 }

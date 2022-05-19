@@ -16,37 +16,60 @@
 package com.wl4g.infra.core.logging.trace.reactive;
 
 import org.slf4j.MDC;
+import org.springframework.core.Ordered;
 import org.springframework.core.env.Environment;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 
+import com.wl4g.infra.core.constant.CoreInfraConstants;
 import com.wl4g.infra.core.logging.trace.AbstractTraceMDCSupport;
 import com.wl4g.infra.core.utils.web.ReactiveRequestExtractor;
 
 import reactor.core.publisher.Mono;
 
 /**
- * {@link TraceMDCWebFilter}
+ * {@link SimpleTraceMDCWebFilter}
  * 
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version 2022-05-11 v3.0.0
  * @since v3.0.0
  */
-public class TraceMDCWebFilter extends AbstractTraceMDCSupport implements WebFilter {
+public class SimpleTraceMDCWebFilter extends AbstractTraceMDCSupport implements WebFilter, Ordered {
 
-    public TraceMDCWebFilter(Environment environment) {
+    public SimpleTraceMDCWebFilter(Environment environment) {
         super(environment);
     }
 
     @Override
-    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-        try {
-            bindToMDC(new ReactiveRequestExtractor(exchange.getRequest()));
-            return chain.filter(exchange);
-        } finally {
-            MDC.clear(); // must
-        }
+    public int getOrder() {
+        return CoreInfraConstants.TRACE_ORDER;
     }
+
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+        bindToMDC(new ReactiveRequestExtractor(exchange.getRequest()));
+        // see:https://stackoverflow.com/questions/61409047/how-does-spring-cloud-sleuth-propagate-the-mdc-context-in-webflux-ouf-of-the-box
+
+        // return chain.filter(exchange).doOnEach(logOnNext(r ->
+        // log.debug("found restaurant {} for ${}"))).doOnTerminate(()
+        // -> MDC.clear());
+        return chain.filter(exchange).doOnTerminate(() -> MDC.clear());
+    }
+
+    // private static <T> Consumer<Signal<T>> logOnNext(Consumer<T>
+    // logStatement) {
+    // return signal -> {
+    // if (!signal.isOnNext())
+    // return;
+    // Optional<String> traceIdOp =
+    // signal.getContextView().getOrEmpty("traceId");
+    // traceIdOp.ifPresent(traceId -> {
+    // try (MDC.MDCCloseable closeable = MDC.putCloseable("traceId", traceId)) {
+    // logStatement.accept(signal.get());
+    // }
+    // });
+    // };
+    // }
 
 }

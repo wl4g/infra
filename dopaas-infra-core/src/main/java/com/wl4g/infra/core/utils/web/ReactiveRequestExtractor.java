@@ -15,9 +15,14 @@
  */
 package com.wl4g.infra.core.utils.web;
 
+import static com.wl4g.infra.common.lang.ClassUtils2.resolveClassName;
+import static com.wl4g.infra.common.reflect.ReflectionUtils2.findField;
+import static com.wl4g.infra.core.constant.CoreInfraConstants.TRACE_REQUEST_ID_HEADER;
 import static java.util.Objects.nonNull;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
+import java.lang.reflect.Field;
+import java.net.URI;
 import java.util.Collection;
 
 import org.springframework.http.HttpCookie;
@@ -39,6 +44,16 @@ import lombok.AllArgsConstructor;
 public class ReactiveRequestExtractor implements WebRequestExtractor {
 
     private final ServerHttpRequest request;
+
+    @Override
+    public String getRequestId() {
+        return request.getHeaders().getFirst(TRACE_REQUEST_ID_HEADER);
+    }
+
+    @Override
+    public URI getRequestURI() {
+        return request.getURI();
+    }
 
     @Override
     public String getMethod() {
@@ -101,5 +116,10 @@ public class ReactiveRequestExtractor implements WebRequestExtractor {
         }
         return null;
     }
+
+    public static final Class<?> REACTIVE_DEFAULT_SERVER_REQUEST_CLASS = resolveClassName(
+            "org.springframework.web.reactive.function.server.DefaultServerRequest", null);
+    public static final Field REACTIVE_SERVER_REQUEST_HEADER_FIELD = findField(REACTIVE_DEFAULT_SERVER_REQUEST_CLASS, "headers",
+            org.springframework.web.reactive.function.server.ServerRequest.Headers.class);
 
 }

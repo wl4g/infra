@@ -18,16 +18,16 @@ package com.wl4g.infra.core.logging.trace;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.lang.FastTimeClock.currentTimeMillis;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
+import static com.wl4g.infra.core.constant.CoreInfraConstants.TRACE_REQUEST_ID_HEADER;
+import static com.wl4g.infra.core.constant.CoreInfraConstants.TRACE_REQUEST_SEQ_HEADER;
 import static com.wl4g.infra.core.logging.trace.AbstractTraceMDCSupport.MDCKey.KEY_NEXT_REQUEST_SEQ;
 import static com.wl4g.infra.core.logging.trace.AbstractTraceMDCSupport.MDCKey.KEY_PREFIX_COOKIE;
 import static com.wl4g.infra.core.logging.trace.AbstractTraceMDCSupport.MDCKey.KEY_PREFIX_HEADER;
 import static com.wl4g.infra.core.logging.trace.AbstractTraceMDCSupport.MDCKey.KEY_PREFIX_PARAMETER;
 import static com.wl4g.infra.core.logging.trace.AbstractTraceMDCSupport.MDCKey.KEY_REQUEST_ID;
 import static com.wl4g.infra.core.logging.trace.AbstractTraceMDCSupport.MDCKey.KEY_REQUEST_SEQ;
-import static com.wl4g.infra.core.logging.trace.AbstractTraceMDCSupport.MDCKey.KEY_TIMESTAMP;
 import static com.wl4g.infra.core.logging.trace.AbstractTraceMDCSupport.MDCKey.KEY_URI;
 import static java.lang.String.format;
-import static java.lang.String.valueOf;
 import static org.apache.commons.lang3.StringUtils.contains;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.startsWithIgnoreCase;
@@ -42,7 +42,7 @@ import org.springframework.core.env.Environment;
 
 import com.wl4g.infra.common.log.SmartLogger;
 import com.wl4g.infra.common.web.WebUtils.WebRequestExtractor;
-import com.wl4g.infra.core.constant.CoreInfraConstants;
+import com.wl4g.infra.core.constant.BaseConstants;
 
 /**
  * Abstract the MDC parameter option to the logback log output. Note that this
@@ -125,12 +125,10 @@ public abstract class AbstractTraceMDCSupport {
      * @param extractor
      */
     protected void doBind(WebRequestExtractor extractor) {
-        // Sets trace core fields to MDC
-        MDC.put(KEY_TIMESTAMP, valueOf(currentTimeMillis()));
+        // Bind trace required fields.
         MDC.put(KEY_URI, extractor.getRequestURI().getPath());
-        MDC.put(KEY_REQUEST_ID, extractor.getHeaderValue(CoreInfraConstants.TRACE_REQUEST_ID_HEADER));
-
-        String requestSeq = extractor.getHeaderValue(CoreInfraConstants.TRACE_REQUEST_SEQ_HEADER);
+        MDC.put(KEY_REQUEST_ID, extractor.getHeaderValue(TRACE_REQUEST_ID_HEADER));
+        String requestSeq = extractor.getHeaderValue(TRACE_REQUEST_SEQ_HEADER);
         MDC.put(KEY_REQUEST_SEQ, requestSeq);
         if (isBlank(requestSeq)) {
             MDC.put(KEY_NEXT_REQUEST_SEQ, "0");
@@ -140,7 +138,7 @@ public abstract class AbstractTraceMDCSupport {
             MDC.put(KEY_NEXT_REQUEST_SEQ, nextSeq);
         }
 
-        // Bind extra headers to MDC
+        // Bind extra headers,
         if (bindHeaders.get()) {
             Collection<String> headerNames = extractor.getHeaderNames();
             if (!isEmpty(headerNames)) {
@@ -152,17 +150,7 @@ public abstract class AbstractTraceMDCSupport {
             }
         }
 
-        // Bind extra cookies to MDC
-        if (bindCookies.get()) {
-            Collection<String> cookieNames = extractor.getCookieNames();
-            for (String name : cookieNames) {
-                if (isMDCField(name)) {
-                    MDC.put(KEY_PREFIX_COOKIE.concat(name), extractor.getCookieValue(name));
-                }
-            }
-        }
-
-        // Bind extra parameters to MDC
+        // Bind extra parameters.
         if (bindParameters.get()) {
             Collection<String> parameterNames = extractor.getQueryNames();
             if (!isEmpty(parameterNames)) {
@@ -170,6 +158,16 @@ public abstract class AbstractTraceMDCSupport {
                     if (isMDCField(name)) {
                         MDC.put(KEY_PREFIX_PARAMETER.concat(name), extractor.getQueryValue(name));
                     }
+                }
+            }
+        }
+
+        // Bind extra cookies.
+        if (bindCookies.get()) {
+            Collection<String> cookieNames = extractor.getCookieNames();
+            for (String name : cookieNames) {
+                if (isMDCField(name)) {
+                    MDC.put(KEY_PREFIX_COOKIE.concat(name), extractor.getCookieValue(name));
                 }
             }
         }
@@ -219,30 +217,25 @@ public abstract class AbstractTraceMDCSupport {
         return contains(consolePattern, key) || contains(filePattern, key);
     }
 
-    public static class MDCKey {
+    static class MDCKey extends BaseConstants {
 
-        public static final String KEY_REQUEST_ID = "requestId";
+        public static final String KEY_REQUEST_ID = getStringProperty("TRACE_MDC_REQUESTID", "requestId");
 
-        public static final String KEY_REQUEST_SEQ = "requestSeq";
+        public static final String KEY_REQUEST_SEQ = getStringProperty("TRACE_MDC_REQUESTSEQ", "requestSeq");
 
         /**
          * When the tracking chain is distributed, the used SEQ is generated by
          * filter, and usually the developer does not need to modify it.
          */
-        public static final String KEY_NEXT_REQUEST_SEQ = "nextRequestSeq";
+        public static final String KEY_NEXT_REQUEST_SEQ = getStringProperty("TRACE_MDC_NEXT_REQUESTSEQ", "nextRequestSeq");
 
-        public static final String KEY_URI = "_uri_";
+        public static final String KEY_URI = "URI";
 
-        /**
-         * Time-stamp when the request enters the filter.
-         */
-        public static final String KEY_TIMESTAMP = "_timestamp_";
+        public static final String KEY_PREFIX_HEADER = "H:";
 
-        public static final String KEY_PREFIX_COOKIE = "_C_:";
+        public static final String KEY_PREFIX_PARAMETER = "P:";
 
-        public static final String KEY_PREFIX_HEADER = "_H_:";
-
-        public static final String KEY_PREFIX_PARAMETER = "_P_:";
+        public static final String KEY_PREFIX_COOKIE = "C:";
 
     }
 

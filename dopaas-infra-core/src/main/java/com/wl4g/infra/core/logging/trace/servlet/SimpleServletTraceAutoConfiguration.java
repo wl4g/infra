@@ -15,7 +15,7 @@
  */
 package com.wl4g.infra.core.logging.trace.servlet;
 
-import static com.wl4g.infra.core.constant.CoreInfraConstants.CONF_PREFIX_INFRA_CORE_MDC_LOGGING;
+import static com.wl4g.infra.core.constant.CoreInfraConstants.CONF_PREFIX_INFRA_CORE_LOGGING_TRACE;
 
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -30,28 +30,30 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 
 /**
- * MDC logging filter auto configuration.
+ * Servlet logging trace MDC auto configuration.
  * 
  * @author Wangl.sir <wanglsir@gmail.com, 983708408@qq.com>
  * @version v1.0 2022-03-20
  * @since
  */
+@Deprecated // use:https://github.com/spring-projects-experimental/spring-cloud-sleuth-otel
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE + 10)
-@ConditionalOnProperty(name = CONF_PREFIX_INFRA_CORE_MDC_LOGGING + ".enabled", matchIfMissing = true)
+@ConditionalOnProperty(name = CONF_PREFIX_INFRA_CORE_LOGGING_TRACE + ".enabled", matchIfMissing = false)
 @ConditionalOnWebApplication(type = Type.SERVLET)
-public class ServletMDCAutoConfiguration {
+public class SimpleServletTraceAutoConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean(TraceMDCServletFilter.class)
-    public TraceMDCServletFilter traceMDCServletFilter(Environment environment) {
-        return new TraceMDCServletFilter(environment);
+    @ConditionalOnMissingBean(SimpleTraceMDCServletFilter.class)
+    public SimpleTraceMDCServletFilter simpleTraceMDCServletFilter(Environment environment) {
+        return new SimpleTraceMDCServletFilter(environment);
     }
 
     @Bean
-    @ConditionalOnBean(TraceMDCServletFilter.class)
-    public FilterRegistrationBean<TraceMDCServletFilter> defaultTraceLoggingMDCFilterBean(TraceMDCServletFilter filter) {
-        FilterRegistrationBean<TraceMDCServletFilter> filterBean = new FilterRegistrationBean<>(filter);
+    @ConditionalOnBean(SimpleTraceMDCServletFilter.class)
+    public FilterRegistrationBean<SimpleTraceMDCServletFilter> defaultTraceLoggingMDCFilterBean(
+            SimpleTraceMDCServletFilter filter) {
+        FilterRegistrationBean<SimpleTraceMDCServletFilter> filterBean = new FilterRegistrationBean<>(filter);
         filterBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
         // Cannot use '/*' or it will not be added to the container chain (only
         // '/**')

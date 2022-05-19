@@ -13,4 +13,6 @@ com.wl4g.infra.core.remoting.RestTemplateAutoConfiguration,\
 com.wl4g.infra.core.remoting.WebClientAutoConfiguration,\
 com.wl4g.infra.core.utils.context.SpringContextHolder,\
 com.wl4g.infra.core.web.error.servlet.ServletErrorAutoConfiguration,\
-com.wl4g.infra.core.web.error.reactive.ReactiveErrorAutoConfiguration
+com.wl4g.infra.core.web.error.reactive.ReactiveErrorAutoConfiguration,\
+com.wl4g.infra.core.logging.trace.reactive.SimpleReactiveTraceAutoConfiguration,\
+com.wl4g.infra.core.logging.trace.servlet.SimpleServletTraceAutoConfiguration

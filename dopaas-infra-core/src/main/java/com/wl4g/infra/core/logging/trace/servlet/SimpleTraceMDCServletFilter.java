@@ -64,9 +64,9 @@ red>[%X{_H_:X-Request-Id}] [%X{_H_:X-Request-Seq}] [%X{_C_:${spring.iam.client.c
  * @version v1.0 2020年2月26日
  * @since
  */
-public class TraceMDCServletFilter extends AbstractTraceMDCSupport implements Filter {
+public class SimpleTraceMDCServletFilter extends AbstractTraceMDCSupport implements Filter {
 
-    public TraceMDCServletFilter(Environment environment) {
+    public SimpleTraceMDCServletFilter(Environment environment) {
         super(environment);
     }
 

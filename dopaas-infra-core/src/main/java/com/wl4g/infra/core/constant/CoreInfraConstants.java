@@ -39,7 +39,7 @@ public abstract class CoreInfraConstants extends BaseConstants {
 
     public static final String CONF_PREFIX_INFRA_CORE_BOOTSTRAPPING = CONF_PREFIX_INFRA_CORE + ".bootstrapping";
 
-    public static final String CONF_PREFIX_INFRA_CORE_MDC_LOGGING = CONF_PREFIX_INFRA_CORE + ".mdc-logging";
+    public static final String CONF_PREFIX_INFRA_CORE_LOGGING_TRACE = CONF_PREFIX_INFRA_CORE + ".logging.trace";
 
     public static final String CONF_PREFIX_INFRA_CORE_NAMING_PROTOYPE = CONF_PREFIX_INFRA_CORE + ".naming-beanfactory";
 
@@ -54,9 +54,21 @@ public abstract class CoreInfraConstants extends BaseConstants {
 
     public static final String CONF_PREFIX_INFRA_CORE_WEB_EMBED_WEBAPP = CONF_PREFIX_INFRA_CORE + ".web.embedded-webapps";
 
-    // TraceId AS RequestId.
+    /**
+     * The alias for OpenTracing 'traceId'.
+     */
     public static final String TRACE_REQUEST_ID_HEADER = "X-Request-Id";
-    // SpanId AS RequestSeq.
+
+    /**
+     * The alias for OpenTracing 'spanId'.
+     */
     public static final String TRACE_REQUEST_SEQ_HEADER = "X-Request-Seq";
+
+    /**
+     * Reactive trace webFilter order. Note: If it is integrated in the
+     * Iam-Gateway project, you need to take care of him, hereby the default
+     * definition is: -50
+     */
+    public static final int TRACE_ORDER = getIntegerProperty("TRACE_ORDER", -50);
 
 }

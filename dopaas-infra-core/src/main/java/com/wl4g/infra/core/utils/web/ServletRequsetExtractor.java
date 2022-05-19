@@ -16,8 +16,10 @@
 package com.wl4g.infra.core.utils.web;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToList;
+import static com.wl4g.infra.core.constant.CoreInfraConstants.TRACE_REQUEST_ID_HEADER;
 import static java.util.stream.Collectors.toList;
 
+import java.net.URI;
 import java.util.Collection;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,6 +42,16 @@ import lombok.AllArgsConstructor;
 public class ServletRequsetExtractor implements WebRequestExtractor {
 
     private final HttpServletRequest request;
+
+    @Override
+    public String getRequestId() {
+        return request.getHeader(TRACE_REQUEST_ID_HEADER);
+    }
+
+    @Override
+    public URI getRequestURI() {
+        return URI.create(request.getRequestURI());
+    }
 
     @Override
     public String getMethod() {
