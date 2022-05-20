@@ -16,7 +16,12 @@ spring:
     type: com.zaxxer.hikari.HikariDataSource
     driverClassName: org.h2.Driver
     hikari:
-      jdbcUrl: 'jdbc:h2:/tmp/h2test;FORBID_CREATION=FALSE'
+      ## Note: Must contains the ':h2:mem:' character??
+      ## see:org.springframework.boot.jdbc.init.DataSourceScriptDatabaseInitializer#isEmbeddedDatabase()
+      ## see:org.springframework.boot.jdbc.EmbeddedDatabaseConnection.H2
+      ## see:https://github.com/spring-projects/spring-boot/blob/v2.6.7/spring-boot-project/spring-boot/src/test/java/org/springframework/boot/jdbc/EmbeddedDatabaseConnectionTests.java#L84
+      #jdbcUrl: 'jdbc:h2:/tmp/h2test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;FORBID_CREATION=FALSE'
+      jdbcUrl: 'jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;FORBID_CREATION=FALSE'
       username: sa
       password: 
       connectionTimeout: 30000

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.wl4g.infra.core.logging.logback;
+package com.wl4g.infra.core.logging.custom.logback;
 
 import java.net.URL;
 import java.security.CodeSource;
@@ -162,7 +162,7 @@ public class LogbackLoggingSystem extends Slf4JLoggingSystem {
         //
         // [Start] Custom enhanced logback configurer.
         //
-        new EnhancedLogbackConfigurer(logFile).apply(configurator);
+        new CustomLogbackConfigurer(logFile).apply(configurator);
         //
         // [End] Custom enhanced logback configurer.
         //

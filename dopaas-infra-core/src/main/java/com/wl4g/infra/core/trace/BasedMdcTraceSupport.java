@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.core.logging.trace;
+package com.wl4g.infra.core.trace;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.lang.FastTimeClock.currentTimeMillis;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static com.wl4g.infra.core.constant.CoreInfraConstants.TRACE_REQUEST_ID_HEADER;
 import static com.wl4g.infra.core.constant.CoreInfraConstants.TRACE_REQUEST_SEQ_HEADER;
-import static com.wl4g.infra.core.logging.trace.AbstractTraceMDCSupport.MDCKey.KEY_NEXT_REQUEST_SEQ;
-import static com.wl4g.infra.core.logging.trace.AbstractTraceMDCSupport.MDCKey.KEY_PREFIX_COOKIE;
-import static com.wl4g.infra.core.logging.trace.AbstractTraceMDCSupport.MDCKey.KEY_PREFIX_HEADER;
-import static com.wl4g.infra.core.logging.trace.AbstractTraceMDCSupport.MDCKey.KEY_PREFIX_PARAMETER;
-import static com.wl4g.infra.core.logging.trace.AbstractTraceMDCSupport.MDCKey.KEY_PRINCIPAL;
-import static com.wl4g.infra.core.logging.trace.AbstractTraceMDCSupport.MDCKey.KEY_REQUEST_ID;
-import static com.wl4g.infra.core.logging.trace.AbstractTraceMDCSupport.MDCKey.KEY_REQUEST_SEQ;
-import static com.wl4g.infra.core.logging.trace.AbstractTraceMDCSupport.MDCKey.KEY_URI;
+import static com.wl4g.infra.core.trace.BasedMdcTraceSupport.MDCKey.KEY_NEXT_REQUEST_SEQ;
+import static com.wl4g.infra.core.trace.BasedMdcTraceSupport.MDCKey.KEY_PREFIX_COOKIE;
+import static com.wl4g.infra.core.trace.BasedMdcTraceSupport.MDCKey.KEY_PREFIX_HEADER;
+import static com.wl4g.infra.core.trace.BasedMdcTraceSupport.MDCKey.KEY_PREFIX_PARAMETER;
+import static com.wl4g.infra.core.trace.BasedMdcTraceSupport.MDCKey.KEY_PRINCIPAL;
+import static com.wl4g.infra.core.trace.BasedMdcTraceSupport.MDCKey.KEY_REQUEST_ID;
+import static com.wl4g.infra.core.trace.BasedMdcTraceSupport.MDCKey.KEY_REQUEST_SEQ;
+import static com.wl4g.infra.core.trace.BasedMdcTraceSupport.MDCKey.KEY_URI;
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.contains;
@@ -75,7 +75,7 @@ red>[%-32.32X{H:X-Request-ID}] [%-16.16X{H:X-Request-Seq}]</font> - %-40.40logge
  * @version v1.0 2020-02-26
  * @since
  */
-public abstract class AbstractTraceMDCSupport {
+public abstract class BasedMdcTraceSupport {
 
     protected SmartLogger log = getLogger(getClass());
 
@@ -104,7 +104,7 @@ public abstract class AbstractTraceMDCSupport {
      */
     protected AtomicBoolean bindParameters = new AtomicBoolean(false);
 
-    public AbstractTraceMDCSupport(Environment environment) {
+    public BasedMdcTraceSupport(Environment environment) {
         this.environment = notNullOf(environment, "environment");
     }
 

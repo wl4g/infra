@@ -326,7 +326,7 @@ class FeignSpringBootConsumerFactoryBean<T> implements FactoryBean<T>, Applicati
             try {
                 // see:feign.jackson.JacksonDecoder#decode()
                 return decoder.decode(resp, type);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 String errmsg = format("Failed to decode feign RPC called. - ReturnType: %s\n--->>\n%s\n<<---\n%s", type,
                         printRequestAsString(response.request()), resp);
                 // High concurrency performance optimizing throw exception.

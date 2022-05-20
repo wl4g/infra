@@ -34,7 +34,7 @@ import com.wl4g.infra.integration.feign.core.annotation.EnableFeignConsumers;
  */
 // @EnableFeignClients("com.wl4g.infra.integration.feign.istio.example.service")
 @EnableFeignConsumers("com.wl4g.infra.integration.feign.istio.example.service")
-@SpringBootApplication(scanBasePackages = "com.wl4g.infra.integration")
+@SpringBootApplication /* (scanBasePackages = "com.wl4g.infra.integration") */
 public class FeginIstioExampleWeb {
 
     public static void main(String[] args) {

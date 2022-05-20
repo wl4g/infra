@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.core.logging.trace.reactive;
+package com.wl4g.infra.core.trace.reactive;
 
-import static com.wl4g.infra.core.constant.CoreInfraConstants.CONF_PREFIX_INFRA_CORE_LOGGING_TRACE;
+import static com.wl4g.infra.core.constant.CoreInfraConstants.CONF_PREFIX_INFRA_CORE_TRACE;
 
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -37,13 +37,13 @@ import org.springframework.core.env.Environment;
 @Deprecated
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE + 10)
-@ConditionalOnProperty(name = CONF_PREFIX_INFRA_CORE_LOGGING_TRACE + ".enabled", matchIfMissing = false)
+@ConditionalOnProperty(name = CONF_PREFIX_INFRA_CORE_TRACE + ".enabled", matchIfMissing = false)
 @ConditionalOnWebApplication(type = Type.REACTIVE)
 public class SimpleReactiveTraceAutoConfiguration {
 
     @Bean
-    public SimpleTraceMDCWebFilter simpleTraceMDCWebFilter(Environment environment) {
-        return new SimpleTraceMDCWebFilter(environment);
+    public SimpleTraceWebFilter simpleTraceWebFilter(Environment environment) {
+        return new SimpleTraceWebFilter(environment);
     }
 
 }

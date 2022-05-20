@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.core.logging.logback;
+package com.wl4g.infra.core.logging.custom.logback;
 
 import java.nio.charset.Charset;
 
@@ -45,7 +45,7 @@ import ch.qos.logback.core.util.OptionHelper;
  * <pre>
  * ## Logging configuration.
  * ## see:https://docs.spring.io/spring-boot/docs/2.6.7/reference/htmlsingle/#features.logging.custom-log-configuration
- * ## see:com.wl4g.infra.core.logging.logback.EnhancedLogbackConfigurer
+ * ## see:com.wl4g.infra.core.logging.custom.logback.CustomLogbackConfigurer
  * logging:
  *   register-shutdown-hook: false
  *   charset.file: UTF-8
@@ -92,11 +92,11 @@ import ch.qos.logback.core.util.OptionHelper;
  * @since 1.1.2
  * @see {@link org.springframework.boot.logging.logback.DefaultLogbackConfiguration.DefaultLogbackConfiguration}
  */
-class EnhancedLogbackConfigurer {
+class CustomLogbackConfigurer {
 
     private final LogFile logFile;
 
-    EnhancedLogbackConfigurer(LogFile logFile) {
+    CustomLogbackConfigurer(LogFile logFile) {
         this.logFile = logFile;
     }
 

@@ -48,3 +48,7 @@
 
 ![Login h2](shots/login_h2.png)
 ![Select table](shots/select_table.png)
+
+- 2. Where is default generated configuration path?
+
+`${HOME}/.h2.server.properties`

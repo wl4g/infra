@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.core.logging.trace.reactive;
+package com.wl4g.infra.core.trace.reactive;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -26,22 +26,22 @@ import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 
 import com.wl4g.infra.core.constant.CoreInfraConstants;
-import com.wl4g.infra.core.logging.trace.AbstractTraceMDCSupport;
+import com.wl4g.infra.core.trace.BasedMdcTraceSupport;
 import com.wl4g.infra.core.utils.web.ReactiveRequestExtractor;
 
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Signal;
 
 /**
- * {@link SimpleTraceMDCWebFilter}
+ * {@link SimpleTraceWebFilter}
  * 
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version 2022-05-11 v3.0.0
  * @since v3.0.0
  */
-public class SimpleTraceMDCWebFilter extends AbstractTraceMDCSupport implements WebFilter, Ordered {
+public class SimpleTraceWebFilter extends BasedMdcTraceSupport implements WebFilter, Ordered {
 
-    public SimpleTraceMDCWebFilter(Environment environment) {
+    public SimpleTraceWebFilter(Environment environment) {
         super(environment);
     }
 

@@ -13,52 +13,55 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.core.logging.trace.servlet;
+package com.wl4g.infra.core.logging.servlet;
 
-import static com.wl4g.infra.core.constant.CoreInfraConstants.CONF_PREFIX_INFRA_CORE_LOGGING_TRACE;
+import static com.wl4g.infra.core.constant.CoreInfraConstants.CONF_PREFIX_INFRA_CORE_LOGGING;
 
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 
+import com.wl4g.infra.core.logging.config.LoggingMessageProperties;
+
 /**
- * Servlet logging trace MDC auto configuration.
+ * {@link ServletLoggingAutoConfiguration}
  * 
- * @author Wangl.sir <wanglsir@gmail.com, 983708408@qq.com>
- * @version v1.0 2022-03-20
- * @since
- * @see https://github.com/spring-projects-experimental/spring-cloud-sleuth-otel
+ * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @version 2022-05-21 v3.0.0
+ * @since v3.0.0
  */
-@Deprecated
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE + 10)
-@ConditionalOnProperty(name = CONF_PREFIX_INFRA_CORE_LOGGING_TRACE + ".enabled", matchIfMissing = false)
+@ConditionalOnProperty(name = CONF_PREFIX_INFRA_CORE_LOGGING + ".enabled", matchIfMissing = true)
 @ConditionalOnWebApplication(type = Type.SERVLET)
-public class SimpleServletTraceAutoConfiguration {
+public class ServletLoggingAutoConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean(SimpleTraceMDCServletFilter.class)
-    public SimpleTraceMDCServletFilter simpleTraceMDCServletFilter(Environment environment) {
-        return new SimpleTraceMDCServletFilter(environment);
+    @ConfigurationProperties(prefix = CONF_PREFIX_INFRA_CORE_LOGGING)
+    public LoggingMessageProperties loggingMessageProperties() {
+        return new LoggingMessageProperties();
     }
 
     @Bean
-    @ConditionalOnBean(SimpleTraceMDCServletFilter.class)
-    public FilterRegistrationBean<SimpleTraceMDCServletFilter> defaultTraceLoggingMDCFilterBean(
-            SimpleTraceMDCServletFilter filter) {
-        FilterRegistrationBean<SimpleTraceMDCServletFilter> filterBean = new FilterRegistrationBean<>(filter);
-        filterBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
-        // Cannot use '/*' or it will not be added to the container chain (only
-        // '/**')
-        filterBean.addUrlPatterns("/*");
+    public LoggingMessageServletFilter loggingMessageServletFilter(
+            LoggingMessageProperties loggingConfig,
+            Environment environment) {
+        return new LoggingMessageServletFilter(loggingConfig, environment);
+    }
+
+    @Bean
+    public FilterRegistrationBean<LoggingMessageServletFilter> loggingMessageRegistrationBean(
+            LoggingMessageServletFilter filter) {
+        FilterRegistrationBean<LoggingMessageServletFilter> filterBean = new FilterRegistrationBean<>();
+        filterBean.setFilter(filter);
+        filterBean.setOrder(0); // TODO
         return filterBean;
     }
 

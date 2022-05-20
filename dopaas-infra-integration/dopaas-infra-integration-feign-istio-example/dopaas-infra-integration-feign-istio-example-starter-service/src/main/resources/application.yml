@@ -14,18 +14,39 @@
 # #### Spring boot configuration. ####
 #
 spring:
-  application.name: feign-example-service
+  application.name: istio-feign-example-service
   profiles:
     active: dev
-  h2.console.enabled: true
   infra:
     data:
       mybatis:
         configLocation: mybatis/mybatis-config.xml
         mapperLocations: classpath:mybatis/**/*Mapper.xml
         typeAliasesPackage: com.wl4g.infra.integration.feign.istio.bean.*
+  ## see:org.springframework.boot.autoconfigure.sql.init.SqlInitializationAutoConfiguration
+  ## see:org.springframework.boot.autoconfigure.sql.init.DataSourceInitializationConfiguration#dataSourceScriptDatabaseInitializer()
+  ## see:org.springframework.boot.sql.init.AbstractScriptDatabaseInitializer#initializeDatabase()
+  sql:
+    init:
+      enabled: true ## Default by true
+      platform: h2
+      ## see:org.springframework.boot.autoconfigure.jdbc.DataSourceProperties#isContinueOnError()
+      continue-on-error: false
+      separator: ';'
+      encoding: UTF-8
+  ## see:org.springframework.boot.autoconfigure.h2.H2ConsoleAutoConfiguration
+  h2:
+    console:
+      enabled: true ## Default by false
+      path: /h2-console ## Default by "/h2-console"
+      ## see:https://github.com/spring-projects/spring-boot/blob/v2.6.7/spring-boot-project/spring-boot-autoconfigure/src/test/java/org/springframework/boot/autoconfigure/h2/H2ConsoleAutoConfigurationTests.java#L106
+      settings:
+        web-allow-others: true
+        web-admin-password: admin
   datasource:
-    schema: classpath*:sql/example.sql
+    ## see:org.springframework.boot.autoconfigure.jdbc.DataSourceInitializationConfiguration.SharedCredentialsDataSourceInitializationConfiguration#scriptDataSourceInitializer()
+    schema: classpath:sql/init-schema.sql
+    data: classpath:sql/init-data.sql
 
 # Logging configuration.
 logging:

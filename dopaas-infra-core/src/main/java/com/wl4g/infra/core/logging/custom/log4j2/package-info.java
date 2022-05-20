@@ -13,4 +13,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.core.logging.log4j2;
+package com.wl4g.infra.core.logging.custom.log4j2;

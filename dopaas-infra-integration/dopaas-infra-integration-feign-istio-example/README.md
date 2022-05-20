@@ -3,13 +3,12 @@
 > This example demonstrates how to use `dopaas-infra-integration-feign-istio` to quickly integrate feign based distributed architecture based on external integration locally.
 
 ## Quick start
-- 1. [Start-up the Eureka service locally first](../dopaas-infra-integration-eureka/README.md)
 
-- 2. Start-up the [FeginIstioExampleService](dopaas-infra-integration-feign-istio-example-starter-service/src/main/java/com/wl4g/FeginIstioExampleService.java)
+- 1. Start-up the [FeginIstioExampleService](dopaas-infra-integration-feign-istio-example-starter-service/src/main/java/com/wl4g/FeginIstioExampleService.java)
 
-- 3. Start-up the [FeginIstioExampleWeb](dopaas-infra-integration-feign-istio-example-starter-web/src/main/java/com/wl4g/FeginIstioExampleWeb.java)
+- 2. Start-up the [FeginIstioExampleWeb](dopaas-infra-integration-feign-istio-example-starter-web/src/main/java/com/wl4g/FeginIstioExampleWeb.java)
 
-- 4. for testing
+- 3. for testing
 
   - Base URL.
   
@@ -20,7 +19,7 @@
   - Query order list.
 
   ```bash
-  curl "$BASE_WEB_URL/order/list?pageSize=2&pageNo=1"
+  curl -v "$BASE_WEB_URL/order/list?pageSize=2&pageNo=1"
   
   {"code":200,"status":"Normal","requestId":null,"message":"Ok","data":[{"orderNo":10001,"name":"Sniper rifle","deliveryAddress":"1458 Bee Street1","attributes":null},{"orderNo":10002,"name":"Over limit combat check","deliveryAddress":"95 Oxford Rd","attributes":null},{"orderNo":10003,"name":"fake vote","deliveryAddress":"394 Patterson Fork Road","attributes":null}]}
   ```
@@ -48,3 +47,7 @@
 
 ![Login h2](shots/login_h2.png)
 ![Select table](shots/select_table.png)
+
+- 2. Where is default generated configuration path?
+
+`${HOME}/.h2.server.properties`

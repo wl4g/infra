@@ -33,7 +33,7 @@ import com.wl4g.infra.data.annotation.EnableComponentDataConfiguration;
  * @see
  */
 @EnableComponentDataConfiguration("com.wl4g.infra.integration.feign.istio.example.dao")
-@SpringBootApplication(scanBasePackages = "com.wl4g.infra.integration")
+@SpringBootApplication /* (scanBasePackages = "com.wl4g.infra.integration") */
 public class FeginIstioExampleService {
 
     public static void main(String[] args) {

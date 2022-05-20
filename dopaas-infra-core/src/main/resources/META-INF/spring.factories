@@ -1,6 +1,6 @@
 # Application Listeners
 org.springframework.context.ApplicationListener=\
-com.wl4g.infra.core.logging.EnhancedLoggingApplicationListener,\
+com.wl4g.infra.core.logging.custom.CustomLoggingApplicationListener,\
 com.wl4g.infra.core.boot.listener.BootstrappingConfigApplicationListener
 
 # Application Auto Configuration.
@@ -14,5 +14,7 @@ com.wl4g.infra.core.remoting.WebClientAutoConfiguration,\
 com.wl4g.infra.core.utils.context.SpringContextHolder,\
 com.wl4g.infra.core.web.error.servlet.ServletErrorAutoConfiguration,\
 com.wl4g.infra.core.web.error.reactive.ReactiveErrorAutoConfiguration,\
-com.wl4g.infra.core.logging.trace.reactive.SimpleReactiveTraceAutoConfiguration,\
-com.wl4g.infra.core.logging.trace.servlet.SimpleServletTraceAutoConfiguration
+com.wl4g.infra.core.logging.reactive.ReactiveLoggingAutoConfiguration,\
+com.wl4g.infra.core.logging.servlet.ServletLoggingAutoConfiguration,\
+com.wl4g.infra.core.trace.reactive.SimpleReactiveTraceAutoConfiguration,\
+com.wl4g.infra.core.trace.servlet.SimpleServletTraceAutoConfiguration

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.core.logging.trace.servlet;
+package com.wl4g.infra.core.trace.servlet;
 
 import java.io.IOException;
 
@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.MDC;
 import org.springframework.core.env.Environment;
 
-import com.wl4g.infra.core.logging.trace.AbstractTraceMDCSupport;
+import com.wl4g.infra.core.trace.BasedMdcTraceSupport;
 import com.wl4g.infra.core.utils.web.ServletRequsetExtractor;
 
 /**
@@ -64,7 +64,7 @@ red>[%X{_H_:X-Request-Id}] [%X{_H_:X-Request-Seq}] [%X{_C_:${spring.iam.client.c
  * @version v1.0 2020年2月26日
  * @since
  */
-public class SimpleTraceMDCServletFilter extends AbstractTraceMDCSupport implements Filter {
+public class SimpleTraceMDCServletFilter extends BasedMdcTraceSupport implements Filter {
 
     public SimpleTraceMDCServletFilter(Environment environment) {
         super(environment);

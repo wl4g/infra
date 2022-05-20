@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.core.logging;
+package com.wl4g.infra.core.logging.custom;
 
 import static org.springframework.boot.logging.LoggingSystem.SYSTEM_PROPERTY;
 
@@ -23,7 +23,7 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
-import com.wl4g.infra.core.logging.logback.LogbackLoggingSystem;
+import com.wl4g.infra.core.logging.custom.logback.LogbackLoggingSystem;
 
 /**
  * Enhanced logging system application listener.
@@ -34,7 +34,7 @@ import com.wl4g.infra.core.logging.logback.LogbackLoggingSystem;
  */
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE)
-public class EnhancedLoggingApplicationListener extends LoggingApplicationListener {
+public class CustomLoggingApplicationListener extends LoggingApplicationListener {
 
     /**
      * Automatic setting uses the enhanced spring log system. Refer to the

@@ -30,8 +30,51 @@ spring:
   #      enabled: true ## Default by true
   #      base-packages: ## Default by '*'
   #    logging:
-  #      trace:
-  #        enabled: false ## Default by false
+  #      ## If this switch is enabled, then check whether the request header and parameters meet the current conditions for printing flight logs.
+  #      ## If so, print according to the predetermined level, otherwise do not print. If this switch is set to false, printing logs will be
+  #      ## permanently disabled (regardless of the request header). and whether the parameters meet the conditions).
+  #      enabled: false ## Default by false
+  #      ## The output default level of flight log printing, similar to kubectl design value range: 1-10, 1 is coarse-grained log, 10 is the most fine-grained log.
+  #      defaultVerboseLevel: 10 ## Default by 10
+  #      ## The request header name used to set the log output verbose level valid only for the current request, This value takes precedence over '#defaultVerboseLevel'
+  #      verboseLevelRequestHeader: X-Log-Level ## Default by 'X-Log-Level'
+  #      ## In order to prevent the request body data from being too large, only the
+  #      ## first small part of the body data is obtained.
+  #      maxPrintRequestBodyLength: 1024 ## Default by 1024
+  #      ## In order to prevent the response body data from being too large, only the
+  #      ## first small part of the body data is obtained.
+  #      maxPrintResponseBodyLength: 1024 ## Default by 1024
+  #      ## Prefer to enable print logs match SPEL match expression. Default by '#{true}', which means never match.
+  #      preferOpenMatchExpression: '#{$defaultLogHeader.or($defaultLogQuery).or($apiLogPath).test($request)}'
+  #      ## Prefer to enable print logs match rules definition.
+  #      preferMatchRuleDefinitions:
+  #        - name: defaultLogHeader
+  #          #method:
+  #          #schema:
+  #          #host:
+  #          #port:
+  #          #path: ## Ant path pattern.
+  #          header:
+  #            symbol: IGNORECASE_EQ ## Options(eq|prefix|suffix|include|ignorecase_eq|ignorecase_prefix|ignorecase_suffix|ignorecase_include)
+  #            key: X-${spring.application.name}-Log
+  #            value: y
+  #          #cookie:
+  #          #  symbol:
+  #          #  key:
+  #          #  value:
+  #          #query:
+  #          #  symbol:
+  #          #  key:
+  #          #  value:
+  #        - name: defaultLogQuery
+  #          query:
+  #            symbol: IGNORECASE_EQ
+  #            key: __${spring.application.name}_log
+  #            value: y
+  #        - name: apiLogPath
+  #          path: '/api/**'
+  #    trace:
+  #      enabled: false ## Default by false
   #    web:
   #      human-date-converter:
   #        enabled: true ## Default by true

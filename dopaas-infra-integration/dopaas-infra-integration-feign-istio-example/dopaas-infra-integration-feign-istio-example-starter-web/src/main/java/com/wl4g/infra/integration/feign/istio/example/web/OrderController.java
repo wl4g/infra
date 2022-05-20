@@ -49,22 +49,27 @@ public class OrderController extends BaseController {
     private @Autowired OrderService orderService;
 
     @RequestMapping(value = "/list", method = GET)
-    public RespBase<?> list(PageHolder<OrderInfo> page,
+    public RespBase<?> list(
+            PageHolder<OrderInfo> page,
             @RequestParam(name = "orderName", defaultValue = "", required = false) String orderName) {
         RespBase<Object> resp = RespBase.create();
 
         resp.setData(orderService.list(page, orderName));
+
         log.info("find orders resp: {}", resp);
         return resp;
     }
 
     @RequestMapping(value = "/create", method = POST)
-    public RespBase<?> createOrder(@RequestBody OrderInfo order,
+    public RespBase<?> createOrder(
+            @RequestBody OrderInfo order,
             @RequestParam(name = "goodsId", defaultValue = "20001", required = false) Long goodsId) {
         log.info("Saving order, orderId: {}", order.getId());
+
         RespBase<Object> resp = RespBase.create();
 
-        orderService.create(order, goodsId);
+        resp.setData(orderService.create(order, goodsId));
+
         log.info("Created orders resp: {}", resp);
         return resp;
     }
