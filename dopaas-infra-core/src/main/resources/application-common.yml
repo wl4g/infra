@@ -33,7 +33,7 @@ spring:
   #      ## If this switch is enabled, then check whether the request header and parameters meet the current conditions for printing flight logs.
   #      ## If so, print according to the predetermined level, otherwise do not print. If this switch is set to false, printing logs will be
   #      ## permanently disabled (regardless of the request header). and whether the parameters meet the conditions).
-  #      enabled: false ## Default by false
+  #      enabled: true ## Default by true
   #      ## It is used to set the execution order of the filter bean. Note: Setting this value to a small or large value will affect the behavior.
   #      ## For example, if it is set to Ordered.HIGHEST_PRECEDENCE (after the authentication filter), the principal can be printed to the log,
   #      ## otherwise it will not be available. principal value.

@@ -38,7 +38,7 @@ import com.wl4g.infra.core.logging.config.LoggingMessageProperties;
  */
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE + 10)
-@ConditionalOnProperty(name = CONF_PREFIX_INFRA_CORE_LOGGING + ".enabled", matchIfMissing = false)
+@ConditionalOnProperty(name = CONF_PREFIX_INFRA_CORE_LOGGING + ".enabled", matchIfMissing = true)
 @ConditionalOnWebApplication(type = Type.REACTIVE)
 public class ReactiveLoggingAutoConfiguration {
 
