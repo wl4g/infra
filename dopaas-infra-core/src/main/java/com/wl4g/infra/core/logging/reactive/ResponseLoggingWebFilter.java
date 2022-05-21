@@ -205,9 +205,11 @@ public class ResponseLoggingWebFilter extends BaseLoggingWebFilter {
                 // TODO to be tested get response content type
                 // String
                 // responseContentType=exchange.getAttribute(ServerWebExchangeUtils.ORIGINAL_RESPONSE_CONTENT_TYPE_ATTR);
-                String responseContentType = exchange.getResponse().getHeaders().getContentType().toString();
+                HttpHeaders originalHeaders = exchange.getResponse().getHeaders();
                 HttpHeaders newHeaders = new HttpHeaders();
-                newHeaders.add(HttpHeaders.CONTENT_TYPE, responseContentType);
+                if (nonNull(originalHeaders.getContentType())) {
+                    newHeaders.add(HttpHeaders.CONTENT_TYPE, originalHeaders.getContentType().toString());
+                }
 
                 ClientResponse clientResponse = ClientResponse.create(exchange.getResponse().getStatusCode())
                         .headers(headers -> headers.putAll(newHeaders))
@@ -223,7 +225,7 @@ public class ResponseLoggingWebFilter extends BaseLoggingWebFilter {
                 // ReadOnlyHttpHeaders, but it will be abnormal when other
                 // filters need to modify the header. Is this due to the order
                 // of the filters ???
-                HttpHeaders editableHeaders = new HttpHeaders(new LinkedMultiValueMap<>(exchange.getResponse().getHeaders()));
+                HttpHeaders editableHeaders = new HttpHeaders(new LinkedMultiValueMap<>(originalHeaders));
                 CachedBodyOutputMessage outputMessage = new CachedBodyOutputMessage(exchange, editableHeaders);
 
                 return bodyInserter.insert(outputMessage, new BodyInserterContext()).then(Mono.defer(() -> {
