@@ -202,7 +202,7 @@ public class ResponseLoggingWebFilter extends BaseLoggingWebFilter {
                 Class<byte[]> inClass = byte[].class;
                 Class<byte[]> outClass = byte[].class;
 
-                // TODO to be tested get response content type
+                // [Note]: Update from the gateway projects logging:
                 // String
                 // responseContentType=exchange.getAttribute(ServerWebExchangeUtils.ORIGINAL_RESPONSE_CONTENT_TYPE_ATTR);
                 HttpHeaders originalHeaders = exchange.getResponse().getHeaders();
