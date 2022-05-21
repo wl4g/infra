@@ -40,7 +40,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
 import com.google.common.io.ByteStreams;
@@ -76,15 +75,23 @@ public class LoggingMessageServletFilter extends BaseLoggingServletFilter {
         if (nonNull(request.getContentType()) && isUploadStreamMedia(parseMediaType(request.getContentType()))) {
             chain.doFilter(request, response);
         } else {
-            ContentCachingRequestWrapper requestWrapper = new ContentCachingRequestWrapper(request);
-            ContentCachingResponseWrapper responseWrapper = new ContentCachingResponseWrapper(response);
-            logRequest(requestWrapper, responseWrapper, traceId); // Logs-request.
-            chain.doFilter(requestWrapper, responseWrapper);
-            logResponse(requestWrapper, responseWrapper, traceId); // Logs-response.
+            CachedHttpServletRequestWrapper cacheRequestWrapper = new CachedHttpServletRequestWrapper(request);
+            ContentCachingResponseWrapper cacheResponseWrapper = new ContentCachingResponseWrapper(response);
+
+            logRequest(cacheRequestWrapper, cacheResponseWrapper, traceId); // Logs-request.
+            // Fix: Must be called, otherwise the next read from request will
+            // have no data.
+            // cacheRequestWrapper.copyBodyToCachedContent();
+
+            chain.doFilter(cacheRequestWrapper, cacheResponseWrapper);
+
+            logResponse(cacheRequestWrapper, cacheResponseWrapper, traceId); // Logs-response.
+            // Fix: Must be called, otherwise the response will have no data.
+            cacheResponseWrapper.copyBodyToResponse();
         }
     }
 
-    protected void logRequest(ContentCachingRequestWrapper request, ContentCachingResponseWrapper response, String traceId)
+    protected void logRequest(HttpServletRequest request, ContentCachingResponseWrapper response, String traceId)
             throws IOException {
         String requestMethod = request.getMethod();
         URI uri = URI.create(request.getRequestURI());
@@ -126,10 +133,10 @@ public class LoggingMessageServletFilter extends BaseLoggingServletFilter {
             });
         }
         // When the request has no body, print the end flag directly.
-        boolean processBodyIfNeed = LoggingMessageUtil.isCompatibleWithPlainBody(headers.getContentType());
+        boolean processBodyIfNeed = isCompatibleWithPlainBody(headers.getContentType());
         if (!processBodyIfNeed) {
             // If it is a file upload, direct printing does not display binary.
-            if (LoggingMessageUtil.isUploadStreamMedia(headers.getContentType())) {
+            if (isUploadStreamMedia(headers.getContentType())) {
                 processBodyIfNeed = false;
                 requestLog.append(LoggingMessageUtil.LOG_REQUEST_BODY);
                 requestLog.append(LoggingMessageUtil.LOG_REQUEST_END);
@@ -139,10 +146,8 @@ public class LoggingMessageServletFilter extends BaseLoggingServletFilter {
                 requestLog.append(LoggingMessageUtil.LOG_REQUEST_END);
                 log.info(requestLog.toString(), requestLogArgs.toArray());
             }
-        }
-
-        // Add request body.
-        if (processBodyIfNeed) {
+        } else {
+            // Add request body.
             if (log8_10) {
                 requestLog.append(LoggingMessageUtil.LOG_REQUEST_BODY);
                 requestLog.append(LoggingMessageUtil.LOG_REQUEST_END);
@@ -150,11 +155,10 @@ public class LoggingMessageServletFilter extends BaseLoggingServletFilter {
                 // the request body, which has prevented the amount of
                 // data from being too large.
                 ServletInputStream in = request.getInputStream();
-                int length = Math.min(in.available(), loggingConfig.getMaxPrintRequestBodyLength());
-                byte[] requestBodySegment = new byte[length];
-                ByteStreams.read(in, requestBodySegment, 0, length);
-                String requestBodySegmentString = new String(requestBodySegment, 0, length, UTF_8);
-                requestLogArgs.add(requestBodySegmentString);
+                int maxLen = loggingConfig.getMaxPrintRequestBodyLength();
+                byte[] requestBodySegment = new byte[maxLen];
+                ByteStreams.read(in, requestBodySegment, 0, maxLen);
+                requestLogArgs.add(new String(requestBodySegment, 0, maxLen, UTF_8));
                 log.info(requestLog.toString(), requestLogArgs.toArray());
             } else if (log3_10) {
                 requestLog.append(LoggingMessageUtil.LOG_REQUEST_END);
@@ -163,7 +167,7 @@ public class LoggingMessageServletFilter extends BaseLoggingServletFilter {
         }
     }
 
-    protected void logResponse(ContentCachingRequestWrapper request, ContentCachingResponseWrapper response, String traceId)
+    protected void logResponse(HttpServletRequest request, ContentCachingResponseWrapper response, String traceId)
             throws IOException {
         MediaType contentType = nonNull(response.getContentType()) ? parseMediaType(response.getContentType()) : null;
         String requestMethod = request.getMethod();
@@ -176,8 +180,6 @@ public class LoggingMessageServletFilter extends BaseLoggingServletFilter {
         boolean log8_10 = isLoglevelRange(request, 8, 10);
         boolean log9_10 = isLoglevelRange(request, 9, 10);
 
-        // MDC.put("type", "RESPONSE-BODY");
-        // log.info(String.format("[%s], %s",requestId,originalBody));
         Long startTime = (Long) request.getAttribute(LoggingMessageUtil.KEY_START_TIME);
         startTime = nonNull(startTime) ? startTime : 0;
         long costTime = nonNull(startTime) ? (FastTimeClock.currentTimeMillis() - startTime) : 0L;
@@ -220,10 +222,10 @@ public class LoggingMessageServletFilter extends BaseLoggingServletFilter {
                 // the response body, which has prevented the amount of
                 // data from being too large.
                 InputStream in = response.getContentInputStream();
-                int length = Math.min(in.available(), loggingConfig.getMaxPrintResponseBodyLength());
-                byte[] responseBodySegment = new byte[length];
-                ByteStreams.read(in, responseBodySegment, 0, length);
-                responseLogArgs.add(new String(responseBodySegment, 0, length, UTF_8));
+                int maxLen = loggingConfig.getMaxPrintResponseBodyLength();
+                byte[] responseBodySegment = new byte[maxLen];
+                ByteStreams.read(in, responseBodySegment, 0, maxLen);
+                responseLogArgs.add(new String(responseBodySegment, 0, maxLen, UTF_8));
             }
         }
 

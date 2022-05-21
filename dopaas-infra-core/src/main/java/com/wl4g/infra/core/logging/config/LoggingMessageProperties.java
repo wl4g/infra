@@ -47,6 +47,15 @@ public class LoggingMessageProperties {
     private boolean enabled = true;
 
     /**
+     * It is used to set the execution order of the filter bean. Note: Setting
+     * this value to a small or large value will affect the behavior. For
+     * example, if it is set to Ordered.HIGHEST_PRECEDENCE (after the
+     * authentication filter), the principal can be printed to the log,
+     * otherwise it will not be available. principal value. Default is 0
+     */
+    private int filterOrder = 0;
+
+    /**
      * The output default level of flight log printing, similar to
      * {@linkplain https://github.com/kubernetes/kubectl} design value range:
      * 1-10, 1 is coarse-grained log, 10 is the most fine-grained log.

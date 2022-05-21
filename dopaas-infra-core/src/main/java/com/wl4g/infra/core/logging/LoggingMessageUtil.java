@@ -159,10 +159,10 @@ public abstract class LoggingMessageUtil {
         }
     });
 
-    public static final String LOG_REQUEST_BEGIN = LINE_SEPARATOR + "--- <Iscg Request> -------" + LINE_SEPARATOR;
+    public static final String LOG_REQUEST_BEGIN = LINE_SEPARATOR + "--- <%s Request> -------" + LINE_SEPARATOR;
     public static final String LOG_REQUEST_BODY = LINE_SEPARATOR + "\\r\\n" + LINE_SEPARATOR + "{}";
     public static final String LOG_REQUEST_END = LINE_SEPARATOR + "EOF" + LINE_SEPARATOR;
-    public static final String LOG_RESPONSE_BEGIN = LINE_SEPARATOR + "--- <Iscg Response> ------" + LINE_SEPARATOR;
+    public static final String LOG_RESPONSE_BEGIN = LINE_SEPARATOR + "--- <%s Response> ------" + LINE_SEPARATOR;
     public static final String LOG_RESPONSE_BODY = LINE_SEPARATOR + "\\r\\n" + LINE_SEPARATOR + "{}";
     public static final String LOG_RESPONSE_END = LINE_SEPARATOR + "EOF" + LINE_SEPARATOR;
     public static final String VAR_ROUTE_ID = "routeId";

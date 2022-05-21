@@ -34,6 +34,10 @@ spring:
   #      ## If so, print according to the predetermined level, otherwise do not print. If this switch is set to false, printing logs will be
   #      ## permanently disabled (regardless of the request header). and whether the parameters meet the conditions).
   #      enabled: false ## Default by false
+  #      ## It is used to set the execution order of the filter bean. Note: Setting this value to a small or large value will affect the behavior.
+  #      ## For example, if it is set to Ordered.HIGHEST_PRECEDENCE (after the authentication filter), the principal can be printed to the log,
+  #      ## otherwise it will not be available. principal value.
+  #      filterOrder: 0 ## Default by 0
   #      ## The output default level of flight log printing, similar to kubectl design value range: 1-10, 1 is coarse-grained log, 10 is the most fine-grained log.
   #      defaultVerboseLevel: 10 ## Default by 10
   #      ## The request header name used to set the log output verbose level valid only for the current request, This value takes precedence over '#defaultVerboseLevel'

@@ -61,7 +61,7 @@ public abstract class BaseLoggingWebFilter implements WebFilter, Ordered {
      */
     @Override
     public int getOrder() {
-        return 0; // TODO
+        return loggingConfig.getFilterOrder();
     }
 
     @Override

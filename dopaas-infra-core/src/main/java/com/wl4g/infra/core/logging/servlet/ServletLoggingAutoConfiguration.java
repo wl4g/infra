@@ -58,10 +58,11 @@ public class ServletLoggingAutoConfiguration {
 
     @Bean
     public FilterRegistrationBean<LoggingMessageServletFilter> loggingMessageRegistrationBean(
+            LoggingMessageProperties loggingConfig,
             LoggingMessageServletFilter filter) {
         FilterRegistrationBean<LoggingMessageServletFilter> filterBean = new FilterRegistrationBean<>();
         filterBean.setFilter(filter);
-        filterBean.setOrder(0); // TODO
+        filterBean.setOrder(loggingConfig.getFilterOrder());
         return filterBean;
     }
 

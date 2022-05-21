@@ -28,7 +28,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 
 import com.wl4g.infra.core.logging.config.LoggingMessageProperties;
-import com.wl4g.infra.core.logging.servlet.LoggingMessageServletFilter;
 
 /**
  * {@link ReactiveLoggingAutoConfiguration}
@@ -50,10 +49,13 @@ public class ReactiveLoggingAutoConfiguration {
     }
 
     @Bean
-    public LoggingMessageServletFilter loggingMessageServletFilter(
-            LoggingMessageProperties loggingConfig,
-            Environment environment) {
-        return new LoggingMessageServletFilter(loggingConfig, environment);
+    public RequestLoggingWebFilter requestLoggingWebFilter(LoggingMessageProperties loggingConfig, Environment environment) {
+        return new RequestLoggingWebFilter(loggingConfig, environment);
+    }
+
+    @Bean
+    public ResponseLoggingWebFilter responseLoggingWebFilter(LoggingMessageProperties loggingConfig, Environment environment) {
+        return new ResponseLoggingWebFilter(loggingConfig, environment);
     }
 
 }

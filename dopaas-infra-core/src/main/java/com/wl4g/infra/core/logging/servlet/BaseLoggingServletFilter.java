@@ -15,11 +15,13 @@
  */
 package com.wl4g.infra.core.logging.servlet;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
+import static com.wl4g.infra.common.collection.Collectors2.toCaseInsensitiveHashMap;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.lang.FastTimeClock.currentTimeMillis;
 import static java.util.Objects.isNull;
-import static java.util.stream.Collectors.toMap;
+import static org.apache.commons.collections.EnumerationUtils.toList;
 
 import java.io.IOException;
 import java.util.List;
@@ -33,10 +35,9 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections.EnumerationUtils;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
-import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMapAdapter;
 
 import com.wl4g.infra.core.constant.CoreInfraConstants;
 import com.wl4g.infra.core.logging.LoggingMessageUtil;
@@ -120,6 +121,12 @@ public abstract class BaseLoggingServletFilter implements Filter {
         return requestMatcher.matches(new ServletRequsetExtractor(req), loggingConfig.getPreferOpenMatchExpression());
     }
 
+    /**
+     * Determine request logs verbose level.
+     * 
+     * @param request
+     * @return
+     */
     protected int determineRequestVerboseLevel(HttpServletRequest request) {
         int verboseLevel = LoggingMessageUtil.determineRequestVerboseLevel(loggingConfig, new ServletRequsetExtractor(request));
         request.setAttribute(LoggingMessageUtil.KEY_VERBOSE_LEVEL, verboseLevel);
@@ -142,17 +149,17 @@ public abstract class BaseLoggingServletFilter implements Filter {
 
     @SuppressWarnings("unchecked")
     protected HttpHeaders createHttpHeaders(HttpServletRequest request) {
-        List<String> headerNames = safeList(EnumerationUtils.toList(request.getHeaderNames()));
-        Map<String, List<String>> headers = headerNames.stream()
-                .collect(toMap(name -> name, name -> (List<String>) EnumerationUtils.toList(request.getHeaders((String) name))));
-        return new HttpHeaders(new LinkedMultiValueMap<>(headers));
+        List<String> headerNames = safeList(toList(request.getHeaderNames()));
+        Map<String, List<String>> headers = headerNames.stream().collect(
+                toCaseInsensitiveHashMap(name -> name, name -> (List<String>) toList(request.getHeaders((String) name))));
+        return new HttpHeaders(new MultiValueMapAdapter<>(headers));
     }
 
     protected HttpHeaders createHttpHeaders(HttpServletResponse response) {
         List<String> headerNames = safeList(response.getHeaderNames());
         Map<String, List<String>> headers = headerNames.stream()
-                .collect(toMap(name -> name, name -> (List<String>) response.getHeaders((String) name)));
-        return new HttpHeaders(new LinkedMultiValueMap<>(headers));
+                .collect(toCaseInsensitiveHashMap(name -> name, name -> newArrayList(response.getHeaders((String) name))));
+        return new HttpHeaders(new MultiValueMapAdapter<>(headers));
     }
 
 }

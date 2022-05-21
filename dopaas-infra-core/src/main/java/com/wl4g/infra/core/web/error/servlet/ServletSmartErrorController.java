@@ -15,11 +15,15 @@
  */
 package com.wl4g.infra.core.web.error.servlet;
 
+import static com.google.common.base.Charsets.UTF_8;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static com.wl4g.infra.common.web.WebUtils2.isStacktraceRequest;
+import static com.wl4g.infra.common.web.WebUtils2.write;
+import static com.wl4g.infra.common.web.WebUtils2.writeJson;
 import static com.wl4g.infra.core.constant.CoreInfraConstants.TRACE_REQUEST_ID_HEADER;
 import static com.wl4g.infra.core.web.error.handler.AbstractSmartErrorHandler.obtainErrorAttributeOptions;
+import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
 
 import java.util.Map;
 
@@ -40,7 +44,6 @@ import com.wl4g.infra.common.web.WebUtils.WebRequestExtractor;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration.ErrorController;
 import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration.ErrorHandlerProperties;
-import com.wl4g.infra.core.web.error.handler.AbstractSmartErrorHandler;
 import com.wl4g.infra.core.web.error.handler.AbstractSmartErrorHandler.ErrorRender;
 import com.wl4g.infra.core.web.error.handler.CompositeSmartErrorHandler;
 
@@ -60,18 +63,16 @@ public class ServletSmartErrorController extends AbstractErrorController {
     protected final SmartLogger log = getLogger(getClass());
     protected final ErrorHandlerProperties config;
     protected final CompositeSmartErrorHandler errorHandler;
-    protected final AbstractSmartErrorHandler.ErrorRender errorRender;
 
     public ServletSmartErrorController(ErrorHandlerProperties config, ErrorAttributes errorAttributes,
-            CompositeSmartErrorHandler errorHandler, AbstractSmartErrorHandler.ErrorRender errorRender) {
+            CompositeSmartErrorHandler errorHandler) {
         super(errorAttributes);
         this.config = notNullOf(config, "config");
         this.errorHandler = notNullOf(errorHandler, "errorHandler");
-        this.errorRender = notNullOf(errorRender, "errorRender");
     }
 
     /**
-     * DO any servlet request handler errors.
+     * Do any servlet request handler errors.
      * 
      * @param request
      * @param response
@@ -102,17 +103,20 @@ public class ServletSmartErrorController extends AbstractErrorController {
         }, model, th, new ErrorRender() {
             @Override
             public Object renderingJson(Map<String, Object> model, RespBase<Object> resp) throws Exception {
-                return errorRender.renderingJson(model, resp);
+                writeJson((HttpServletResponse) getHttpResponse(), resp.asJson());
+                return null;
             }
 
             @Override
             public Object renderingTemplate(Map<String, Object> model, int status, String templateString) throws Exception {
-                return errorRender.renderingTemplate(model, status, templateString);
+                write((HttpServletResponse) getHttpResponse(), status, TEXT_HTML_VALUE, templateString.getBytes(UTF_8));
+                return null;
             }
 
             @Override
             public Object redirectLocation(Map<String, Object> model, String errorRedirectUri) throws Exception {
-                return errorRender.redirectLocation(model, errorRedirectUri);
+                ((HttpServletResponse) getHttpResponse()).sendRedirect(errorRedirectUri);
+                return null;
             }
 
             @Override

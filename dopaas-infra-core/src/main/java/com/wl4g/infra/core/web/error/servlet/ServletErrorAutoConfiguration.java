@@ -15,25 +15,14 @@
  */
 package com.wl4g.infra.core.web.error.servlet;
 
-import static com.google.common.base.Charsets.UTF_8;
-import static com.wl4g.infra.common.web.WebUtils2.write;
-import static com.wl4g.infra.common.web.WebUtils2.writeJson;
 import static com.wl4g.infra.core.constant.CoreInfraConstants.CONF_PREFIX_INFRA_CORE_WEB_GLOBAL_ERROR;
-import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
 
-import java.util.Map;
-
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.context.annotation.Bean;
 
-import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration;
-import com.wl4g.infra.core.web.error.handler.AbstractSmartErrorHandler;
 import com.wl4g.infra.core.web.error.handler.CompositeSmartErrorHandler;
 
 /**
@@ -47,30 +36,6 @@ import com.wl4g.infra.core.web.error.handler.CompositeSmartErrorHandler;
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 public class ServletErrorAutoConfiguration extends AbstractErrorAutoConfiguration {
 
-    @Bean
-    @ConditionalOnMissingBean
-    public AbstractSmartErrorHandler.ErrorRender defaultServletSmartErrorRender(ErrorHandlerProperties config) {
-        return new AbstractSmartErrorHandler.ErrorRender() {
-            @Override
-            public Object renderingJson(Map<String, Object> model, RespBase<Object> resp) throws Exception {
-                writeJson((HttpServletResponse) getHttpResponse(), resp.asJson());
-                return null;
-            }
-
-            @Override
-            public Object renderingTemplate(Map<String, Object> model, int status, String templateString) throws Exception {
-                write((HttpServletResponse) getHttpResponse(), status, TEXT_HTML_VALUE, templateString.getBytes(UTF_8));
-                return null;
-            }
-
-            @Override
-            public Object redirectLocation(Map<String, Object> model, String errorRedirectUri) throws Exception {
-                ((HttpServletResponse) getHttpResponse()).sendRedirect(errorRedirectUri);
-                return null;
-            }
-        };
-    }
-
     /**
      * {@link ServletErrorHandlerAutoConfirguation}
      * 
@@ -80,9 +45,8 @@ public class ServletErrorAutoConfiguration extends AbstractErrorAutoConfiguratio
     public ServletSmartErrorController servletSmartErrorController(
             ErrorHandlerProperties config,
             ErrorAttributes errorAttributes,
-            CompositeSmartErrorHandler errorHandler,
-            AbstractSmartErrorHandler.ErrorRender errorRender) {
-        return new ServletSmartErrorController(config, errorAttributes, errorHandler, errorRender);
+            CompositeSmartErrorHandler errorHandler) {
+        return new ServletSmartErrorController(config, errorAttributes, errorHandler);
     }
 
 }
