@@ -15,10 +15,10 @@
  */
 package com.wl4g.infra.core.logging.servlet;
 
-import static com.google.common.base.Charsets.UTF_8;
 import static com.wl4g.infra.core.logging.LoggingMessageUtil.isCompatibleWithPlainBody;
 import static com.wl4g.infra.core.logging.LoggingMessageUtil.isDownloadStreamMedia;
 import static com.wl4g.infra.core.logging.LoggingMessageUtil.isUploadStreamMedia;
+import static com.wl4g.infra.core.logging.LoggingMessageUtil.readToLogString;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
@@ -26,14 +26,12 @@ import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
 import static org.springframework.http.MediaType.parseMediaType;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -42,7 +40,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
-import com.google.common.io.ByteStreams;
 import com.wl4g.infra.common.lang.FastTimeClock;
 import com.wl4g.infra.core.logging.LoggingMessageUtil;
 import com.wl4g.infra.core.logging.config.LoggingMessageProperties;
@@ -81,7 +78,7 @@ public class LoggingMessageServletFilter extends BaseLoggingServletFilter {
             logRequest(cacheRequestWrapper, cacheResponseWrapper, traceId); // Logs-request.
             // Fix: Must be called, otherwise the next read from request will
             // have no data.
-            // cacheRequestWrapper.copyBodyToCachedContent();
+            cacheRequestWrapper.getInputStream().reset();
 
             chain.doFilter(cacheRequestWrapper, cacheResponseWrapper);
 
@@ -154,11 +151,8 @@ public class LoggingMessageServletFilter extends BaseLoggingServletFilter {
                 // Note: Only get the first small part of the data of
                 // the request body, which has prevented the amount of
                 // data from being too large.
-                ServletInputStream in = request.getInputStream();
                 int maxLen = loggingConfig.getMaxPrintRequestBodyLength();
-                byte[] requestBodySegment = new byte[maxLen];
-                ByteStreams.read(in, requestBodySegment, 0, maxLen);
-                requestLogArgs.add(new String(requestBodySegment, 0, maxLen, UTF_8));
+                requestLogArgs.add(readToLogString(request.getInputStream(), maxLen));
                 log.info(requestLog.toString(), requestLogArgs.toArray());
             } else if (log3_10) {
                 requestLog.append(LoggingMessageUtil.LOG_REQUEST_END);
@@ -221,11 +215,8 @@ public class LoggingMessageServletFilter extends BaseLoggingServletFilter {
                 // Note: Only get the first small part of the data of
                 // the response body, which has prevented the amount of
                 // data from being too large.
-                InputStream in = response.getContentInputStream();
                 int maxLen = loggingConfig.getMaxPrintResponseBodyLength();
-                byte[] responseBodySegment = new byte[maxLen];
-                ByteStreams.read(in, responseBodySegment, 0, maxLen);
-                responseLogArgs.add(new String(responseBodySegment, 0, maxLen, UTF_8));
+                responseLogArgs.add(readToLogString(response.getContentInputStream(), maxLen));
             }
         }
 

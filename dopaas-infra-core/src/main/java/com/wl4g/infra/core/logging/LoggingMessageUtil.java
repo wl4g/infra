@@ -15,6 +15,7 @@
  */
 package com.wl4g.infra.core.logging;
 
+import static com.google.common.base.Charsets.UTF_8;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -32,12 +33,15 @@ import static org.springframework.http.MediaType.TEXT_HTML;
 import static org.springframework.http.MediaType.TEXT_MARKDOWN;
 import static org.springframework.http.MediaType.TEXT_PLAIN;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
+import com.google.common.io.ByteStreams;
 import com.wl4g.infra.common.lang.TypeConverts;
 import com.wl4g.infra.common.web.WebUtils.WebRequestExtractor;
 import com.wl4g.infra.core.logging.config.LoggingMessageProperties;
@@ -52,6 +56,12 @@ import com.wl4g.infra.core.logging.reactive.BaseLoggingWebFilter;
  */
 public abstract class LoggingMessageUtil {
 
+    /**
+     * Determine request verbose logging level.
+     * 
+     * @param exchange
+     * @return
+     */
     public static int determineRequestVerboseLevel(LoggingMessageProperties loggingConfig, WebRequestExtractor extractor) {
         Integer requestVerboseLevel = TypeConverts
                 .parseIntOrNull(extractor.getHeaderValue(loggingConfig.getVerboseLevelRequestHeader()));
@@ -109,6 +119,25 @@ public abstract class LoggingMessageUtil {
     }
 
     /**
+     * Reading to logging characters from request input stream or response.
+     * 
+     * @param in
+     * @param expectMaxLen
+     * @return
+     * @throws IOException
+     */
+    public static String readToLogString(InputStream in, int expectMaxLen) throws IOException {
+        int moreMaxLen = expectMaxLen + 1;
+        byte[] bs = new byte[moreMaxLen];
+        ByteStreams.read(in, bs, 0, moreMaxLen);
+        // When the readable data length is greater than the maximum read data
+        // length, add the log suffix '...'.
+        boolean flag = (bs[expectMaxLen] != 0); // Check-the-last-character-read
+        String logString = new String(bs, 0, expectMaxLen, UTF_8);
+        return flag ? logString.concat(" ...") : logString;
+    }
+
+    /**
      * Logging for generic HTTP headers.
      */
     public static final List<String> LOG_GENERIC_HEADERS = unmodifiableList(new ArrayList<String>() {
@@ -159,10 +188,10 @@ public abstract class LoggingMessageUtil {
         }
     });
 
-    public static final String LOG_REQUEST_BEGIN = LINE_SEPARATOR + "--- <%s Request> -------" + LINE_SEPARATOR;
+    public static final String LOG_REQUEST_BEGIN = LINE_SEPARATOR + "--- <HTTP Request> -------" + LINE_SEPARATOR;
     public static final String LOG_REQUEST_BODY = LINE_SEPARATOR + "\\r\\n" + LINE_SEPARATOR + "{}";
     public static final String LOG_REQUEST_END = LINE_SEPARATOR + "EOF" + LINE_SEPARATOR;
-    public static final String LOG_RESPONSE_BEGIN = LINE_SEPARATOR + "--- <%s Response> ------" + LINE_SEPARATOR;
+    public static final String LOG_RESPONSE_BEGIN = LINE_SEPARATOR + "--- <HTTP Response> ------" + LINE_SEPARATOR;
     public static final String LOG_RESPONSE_BODY = LINE_SEPARATOR + "\\r\\n" + LINE_SEPARATOR + "{}";
     public static final String LOG_RESPONSE_END = LINE_SEPARATOR + "EOF" + LINE_SEPARATOR;
     public static final String VAR_ROUTE_ID = "routeId";

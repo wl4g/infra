@@ -15,6 +15,7 @@
  */
 package com.wl4g.infra.core.logging.reactive;
 
+import static com.google.common.base.Charsets.UTF_8;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.lang.FastTimeClock.currentTimeMillis;
 
@@ -109,16 +110,39 @@ public abstract class BaseLoggingWebFilter implements WebFilter, Ordered {
         if (!loggingConfig.isEnabled()) {
             return false;
         }
-
         return requestMatcher.matches(new ReactiveRequestExtractor(exchange.getRequest()),
                 loggingConfig.getPreferOpenMatchExpression());
     }
 
+    /**
+     * Determine request verbose logging level.
+     * 
+     * @param exchange
+     * @return
+     */
     protected int determineRequestVerboseLevel(ServerWebExchange exchange) {
         int verboseLevel = LoggingMessageUtil.determineRequestVerboseLevel(loggingConfig,
                 new ReactiveRequestExtractor(exchange.getRequest()));
         exchange.getAttributes().put(LoggingMessageUtil.KEY_VERBOSE_LEVEL, verboseLevel);
         return verboseLevel;
+    }
+
+    /**
+     * Reading to logging characters from request body stream segment or
+     * response body stream segment, and add the log suffix '...' if necessary.
+     * 
+     * @param bodySegment
+     * @param expectMaxLen
+     * @return
+     */
+    public static String readToLogString(byte[] bodySegment, int expectMaxLen) {
+        int readLen = Math.min(bodySegment.length, expectMaxLen);
+        String logString = new String(bodySegment, 0, readLen, UTF_8);
+        // Check if the readable data length is greater than the expected read
+        // length. When the readable data length is greater than the maximum
+        // read data length, add the log suffix '...'.
+        boolean flag = (bodySegment.length > expectMaxLen);
+        return flag ? logString.concat(" ...") : logString;
     }
 
     /**
