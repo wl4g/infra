@@ -56,21 +56,21 @@
 		<version>3.0.0</version>
 	</parent>
 	<modules>
-		<module>dopaas-infra-integration-feign-common</module>
-		<module>dopaas-infra-integration-feign-core</module>
-		<!-- <module>dopaas-infra-integration-feign-dubbo</module> -->
-		<!-- <module>dopaas-infra-integration-feign-dubbo-example</module> -->
-		<module>dopaas-infra-integration-feign-istio</module>
-		<module>dopaas-infra-integration-feign-istio-example</module>
-		<module>dopaas-infra-integration-feign-springcloud</module>
-		<module>dopaas-infra-integration-feign-springcloud-example</module>
-		<!-- <module>dopaas-infra-integration-canal</module> -->
-		<module>dopaas-infra-integration-eureka</module>
-		<!--<module>dopaas-infra-integration-nacos</module> -->
-		<!--<module>dopaas-infra-integration-etcd</module> -->
-		<!--<module>dopaas-infra-integration-consul</module> -->
-		<!--<module>dopaas-infra-integration-zookeeper</module> -->
-		<!-- <module>dopaas-infra-integration-turbine</module> -->
+		<module>integration-feign-common</module>
+		<module>integration-feign-core</module>
+		<!-- <module>integration-feign-dubbo</module> -->
+		<!-- <module>integration-feign-dubbo-example</module> -->
+		<module>integration-feign-istio</module>
+		<module>integration-feign-istio-example</module>
+		<module>integration-feign-springcloud</module>
+		<module>integration-feign-springcloud-example</module>
+		<!-- <module>integration-canal</module> -->
+		<module>integration-eureka</module>
+		<!--<module>integration-nacos</module> -->
+		<!--<module>integration-etcd</module> -->
+		<!--<module>integration-consul</module> -->
+		<!--<module>integration-zookeeper</module> -->
+		<!-- <module>integration-turbine</module> -->
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

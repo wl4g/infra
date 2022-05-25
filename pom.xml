@@ -54,14 +54,14 @@
 		</developer>
 	</developers>
 	<modules>
-		<module>dopaas-infra-bom</module>
-		<module>dopaas-infra-common</module>
-		<module>dopaas-infra-common-shade</module>
-		<module>dopaas-infra-core</module>
-		<module>dopaas-infra-data</module>
-		<module>dopaas-infra-integration</module>
-		<module>dopaas-infra-support</module>
-		<module>dopaas-infra-opencv</module>
+		<module>bom</module>
+		<module>common</module>
+		<module>common-shade</module>
+		<module>core</module>
+		<module>data</module>
+		<module>integration</module>
+		<module>support</module>
+		<module>opencv</module>
 	</modules>
 	<properties>
 		<!-- Basic's. -->

@@ -2,11 +2,11 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>dopaas-infra-integration-feign-istio-example</artifactId>
+	<artifactId>dopaas-infra-integration-feign-dubbo-example</artifactId>
 	<packaging>pom</packaging>
 	<name>DoPaaS Infra Integration Example</name>
 	<url>http://infra.dopaas.wl4g.com</url>
-	<description>DoPaaS infra integration istio examples projects.</description>
+	<description>A DoPaaS Infra Integration Examples Projects.</description>
 	<organization>
 		<name>wl4g</name>
 		<url>https://infra.dopaas.wl4g.com</url>
@@ -57,9 +57,9 @@
 		<version>3.0.0</version>
 	</parent>
 	<modules>
-		<module>dopaas-infra-integration-feign-istio-example-interface</module>
-		<module>dopaas-infra-integration-feign-istio-example-starter-service</module>
-		<module>dopaas-infra-integration-feign-istio-example-starter-web</module>
+		<module>integration-feign-dubbo-example-interface</module>
+		<module>integration-feign-dubbo-example-starter-service</module>
+		<module>integration-feign-dubbo-example-starter-web</module>
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
