@@ -172,6 +172,7 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-freemarker</artifactId>
+			<scope>provided</scope>
 			<exclusions>
 				<exclusion>
 					<groupId>org.apache.tomcat.embed</groupId>
@@ -179,7 +180,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<!-- Spring Cloud. //TODO 待移除，计划后续从springcloud演进到springboot+istio平台 -->
+		<!-- TODO 待移除，计划后续从springcloud演进到springboot+istio平台 -->
 		<!-- <dependency> -->
 		<!-- <groupId>org.springframework.cloud</groupId> -->
 		<!-- <artifactId>spring-cloud-context</artifactId> -->
@@ -192,14 +193,17 @@
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpcore</artifactId>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.yaml</groupId>
 			<artifactId>snakeyaml</artifactId>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.typesafe</groupId>
@@ -225,16 +229,18 @@
 		<dependency>
 			<groupId>io.swagger</groupId>
 			<artifactId>swagger-annotations</artifactId>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>io.swagger.core.v3</groupId>
 			<artifactId>swagger-annotations</artifactId>
+			<scope>provided</scope>
 		</dependency>
 		<!-- Reactor -->
 		<dependency>
 			<groupId>io.projectreactor</groupId>
 			<artifactId>reactor-core</artifactId>
-			<optional>true</optional>
+			<scope>provided</scope>
 		</dependency>
 		<!-- Tests -->
 		<!-- Usually used with dopaas-infra-data. -->
