@@ -38,6 +38,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.wl4g.infra.common.reflect.ResolvableType;
 import com.wl4g.infra.common.reflect.TypeUtils2;
 
@@ -48,6 +51,7 @@ import com.wl4g.infra.common.reflect.TypeUtils2;
  * @version v1.0 2019年05月22日
  * @since
  */
+@SuppressWarnings("deprecation")
 public abstract class JacksonUtils {
 
     /**
@@ -382,6 +386,9 @@ public abstract class JacksonUtils {
     static {
         getDefaultObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         getDefaultObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        getDefaultObjectMapper().registerModule(new SimpleModule());
+        getDefaultObjectMapper().registerModule(new JavaTimeModule());
+        getDefaultObjectMapper().registerModule(new JSR310Module());
     }
 
 }
