@@ -16,7 +16,6 @@
 package com.wl4g.infra.common.cli;
 
 import static com.wl4g.infra.common.lang.Assert2.isTrue;
-import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.findField;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.findMethod;
@@ -55,14 +54,14 @@ import lombok.AllArgsConstructor;
  * @version 2019年12月29日 v1.0.0
  * @see
  */
-public class CommandUtils {
+public class CommandLineTool {
 
     /**
      * New create builder. {@link Builder}
      * 
      * @return
      */
-    public final static Builder newBuilder() {
+    public final static Builder builder() {
         return new Builder();
     }
 
@@ -74,13 +73,9 @@ public class CommandUtils {
      * @since
      */
     public final static class Builder {
-        final protected Logger log = getLogger(getClass());
+        protected final Logger log = getLogger(getClass());
 
-        private RemovableOptions options;
-
-        public Builder() {
-            this.options = new RemovableOptions();
-        }
+        private final RemovableOptions options = new RemovableOptions();
 
         /**
          * Adds option to options.
@@ -96,7 +91,6 @@ public class CommandUtils {
          * @return Argument description
          */
         public Builder option(String opt, String longOpt, String defaultValue, String description) {
-            notNull(options, "Options did not initialize creation");
             boolean required = isNull(defaultValue);
             HelpOption option = new HelpOption(opt, longOpt, defaultValue, required, description);
             option.setRequired(required);
@@ -152,7 +146,7 @@ public class CommandUtils {
                     log.debug("Parsed commond line args: {}", printArgs);
                 }
 
-                return new CommandLineWrapper(line);
+                return new CommandLineWrapper(line, this);
             } catch (ParseException e) {
                 new HelpFormatter().printHelp(120, "\n", "", options, "");
                 System.exit(0);
@@ -238,42 +232,48 @@ public class CommandUtils {
     @AllArgsConstructor
     public static class CommandLineWrapper {
         private final CommandLine line;
+        private final Builder builder;
 
         public String get(String opt) {
             return getString(opt);
         }
 
         public String getString(String opt) {
-            return getOptionValueWithDefault(opt);
+            return getCheckOptionValue(opt);
         }
 
         public Long getLong(String opt) {
-            String value = getOptionValueWithDefault(opt);
+            String value = getCheckOptionValue(opt);
             return isBlank(value) ? null : Long.parseLong(value);
         }
 
         public Integer getInteger(String opt) {
-            String value = getOptionValueWithDefault(opt);
+            String value = getCheckOptionValue(opt);
             return isBlank(value) ? null : Integer.parseInt(value);
         }
 
         public Float getFloat(String opt) {
-            String value = getOptionValueWithDefault(opt);
+            String value = getCheckOptionValue(opt);
             return isBlank(value) ? null : Float.parseFloat(value);
         }
 
         public Double getDouble(String opt) {
-            String value = getOptionValueWithDefault(opt);
+            String value = getCheckOptionValue(opt);
             return isBlank(value) ? null : Double.parseDouble(value);
         }
 
-        private String getOptionValueWithDefault(String opt) {
+        private String getCheckOptionValue(String opt) {
             String value = line.getOptionValue(opt);
             if (isBlank(value)) {
                 makeAccessible(resolveOptionMethod);
                 HelpOption option = (HelpOption) invokeMethod(resolveOptionMethod, line, opt);
                 if (nonNull(option)) {
                     value = option.getDefaultValue();
+                    if (option.isRequired() && isNull(value)) {
+                        String errmsg = format("\nBad command options: '-%s,--%s' is required.\nPlease use: help,--help\n",
+                                option.getOpt(), option.getLongOpt());
+                        builder.printUsage("", errmsg, true);
+                    }
                 }
             }
             return value;
