@@ -18,19 +18,26 @@ package com.wl4g.infra.common.cli;
 import static com.wl4g.infra.common.lang.Assert2.isTrue;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
-import static com.wl4g.infra.common.reflect.ReflectionUtils2.*;
+import static com.wl4g.infra.common.reflect.ReflectionUtils2.findField;
+import static com.wl4g.infra.common.reflect.ReflectionUtils2.findMethod;
+import static com.wl4g.infra.common.reflect.ReflectionUtils2.getField;
+import static com.wl4g.infra.common.reflect.ReflectionUtils2.invokeMethod;
+import static com.wl4g.infra.common.reflect.ReflectionUtils2.makeAccessible;
 import static java.lang.String.format;
-import static java.lang.System.err;
-import static java.util.Arrays.asList;
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
-import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -39,6 +46,8 @@ import org.slf4j.Logger;
 
 import com.wl4g.infra.common.lang.Assert2;
 
+import lombok.AllArgsConstructor;
+
 /**
  * Command utility.
  * 
@@ -46,7 +55,6 @@ import com.wl4g.infra.common.lang.Assert2;
  * @version 2019年12月29日 v1.0.0
  * @see
  */
-@SuppressWarnings("deprecation")
 public class CommandUtils {
 
     /**
@@ -110,30 +118,46 @@ public class CommandUtils {
             return this;
         }
 
+        public void printUsage(String header, String footer, boolean exit) {
+            new HelpFormatter().printHelp(120, "\n", header, options, footer);
+            if (exit) {
+                System.exit(1);
+            }
+        }
+
+        public Builder printUsageIfEmpty(String[] args) {
+            if (isNull(args) || args.length == 0) {
+                printUsage("", "", true);
+            }
+            return this;
+        }
+
         /**
-         * Build parsing required options.
+         * Build parsing to command line.
          * 
          * @param args
          * @return
-         * @throws ParseException
          */
-        public CommandLine build(String args[]) {
-            CommandLine line = null;
+        public CommandLineWrapper build(String args[]) {
             try {
-                line = new BasicParser().parse(options, args);
-                if (log.isInfoEnabled()) {
-                    // Print input argument list.
-                    List<String> printArgs = asList(line.getOptions()).stream()
+                Properties props = new Properties();
+                options.getOptions().forEach(opt -> props.setProperty(opt.getOpt(), trimToEmpty(opt.getValue())));
+                CommandLine line = new DefaultParser().parse(options, args, props);
+
+                if (log.isDebugEnabled()) {
+                    List<String> printArgs = options.getOptions()
+                            .stream()
                             .map(o -> o.getOpt() + "|" + o.getLongOpt() + "=" + o.getValue())
                             .collect(toList());
-                    log.info("Parsed commond line args: {}", printArgs);
+                    log.debug("Parsed commond line args: {}", printArgs);
                 }
+
+                return new CommandLineWrapper(line);
             } catch (ParseException e) {
                 new HelpFormatter().printHelp(120, "\n", "", options, "");
-                err.println(format("Failed execute command: '%s'. please see help", e.getMessage()));
                 System.exit(0);
             }
-            return line;
+            return null;
         }
 
     }
@@ -155,7 +179,7 @@ public class CommandUtils {
 
         public HelpOption(String opt, String longOpt, String defaultValue, boolean required, String description)
                 throws IllegalArgumentException {
-            super(opt, longOpt, true, null);
+            super(opt, longOpt, true, description);
             isTrue(opt.length() == 1,
                     format("Short option: '%s' (%s), non GNU specification, name length must be 1", opt, description));
             this.defaultValue = defaultValue;
@@ -173,13 +197,6 @@ public class CommandUtils {
 
     }
 
-    /**
-     * {@link RemovableOptions}
-     * 
-     * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
-     * @version 2020年5月17日 v1.0.0
-     * @see
-     */
     public static class RemovableOptions extends Options {
         private static final long serialVersionUID = -3292319664089354481L;
 
@@ -216,7 +233,53 @@ public class CommandUtils {
             Field field = findField(Options.class, "requiredOpts");
             return (Map<String, Option>) getField(field, this);
         }
-
     }
+
+    @AllArgsConstructor
+    public static class CommandLineWrapper {
+        private final CommandLine line;
+
+        public String get(String opt) {
+            return getString(opt);
+        }
+
+        public String getString(String opt) {
+            return getOptionValueWithDefault(opt);
+        }
+
+        public Long getLong(String opt) {
+            String value = getOptionValueWithDefault(opt);
+            return isBlank(value) ? null : Long.parseLong(value);
+        }
+
+        public Integer getInteger(String opt) {
+            String value = getOptionValueWithDefault(opt);
+            return isBlank(value) ? null : Integer.parseInt(value);
+        }
+
+        public Float getFloat(String opt) {
+            String value = getOptionValueWithDefault(opt);
+            return isBlank(value) ? null : Float.parseFloat(value);
+        }
+
+        public Double getDouble(String opt) {
+            String value = getOptionValueWithDefault(opt);
+            return isBlank(value) ? null : Double.parseDouble(value);
+        }
+
+        private String getOptionValueWithDefault(String opt) {
+            String value = line.getOptionValue(opt);
+            if (isBlank(value)) {
+                makeAccessible(resolveOptionMethod);
+                HelpOption option = (HelpOption) invokeMethod(resolveOptionMethod, line, opt);
+                if (nonNull(option)) {
+                    value = option.getDefaultValue();
+                }
+            }
+            return value;
+        }
+    }
+
+    private static final Method resolveOptionMethod = findMethod(CommandLine.class, "resolveOption", String.class);
 
 }
