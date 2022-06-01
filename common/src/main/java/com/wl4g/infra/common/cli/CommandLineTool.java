@@ -136,16 +136,19 @@ public class CommandLineTool {
          */
         public CommandLineWrapper build(String args[]) {
             try {
+                // Parsing to Command Line.
                 Properties props = new Properties();
                 options.getOptions().forEach(opt -> props.setProperty(opt.getOpt(), trimToEmpty(opt.getValue())));
                 CommandLine line = new DefaultParser().parse(options, args, props);
 
+                // Debug arguments pre-parse logs.
                 if (log.isDebugEnabled()) {
-                    List<String> printArgs = options.getOptions()
-                            .stream()
-                            .map(o -> o.getOpt() + "|" + o.getLongOpt() + "=" + o.getValue())
-                            .collect(toList());
-                    log.debug("Parsed commond line args: {}", printArgs);
+                    List<String> printArgs = safeArrayToList(line.getOptions()).stream().map(o -> {
+                        String value = o.getValue();
+                        value = isBlank(value) ? ((HelpOption) o).getDefaultValue() : value;
+                        return "-".concat(o.getOpt()).concat(",--").concat(o.getLongOpt()).concat("=").concat(trimToEmpty(value));
+                    }).collect(toList());
+                    log.debug("Parsed args: {}", printArgs);
                 }
 
                 return new CommandLineWrapper(line, this);
@@ -155,7 +158,6 @@ public class CommandLineTool {
             }
             return null;
         }
-
     }
 
     /**
