@@ -81,7 +81,22 @@ public class CommandLineTool {
         private final RemovableOptions options = new RemovableOptions();
 
         /**
-         * Adds option to options.
+         * ADD command option with not default value(ie:required).
+         * 
+         * @param opt
+         *            Short option.
+         * @param longOpt
+         *            Long option.
+         * @param description
+         * @return Argument description
+         */
+        public Builder mustOption(String opt, String longOpt, String description) {
+            options.addOption(new HelpOption(opt, longOpt, null, true, description));
+            return this;
+        }
+
+        /**
+         * ADD command option with default value(ie:not required).
          * 
          * @param opt
          *            Short option.
@@ -94,10 +109,7 @@ public class CommandLineTool {
          * @return Argument description
          */
         public Builder option(String opt, String longOpt, String defaultValue, String description) {
-            boolean required = isNull(defaultValue);
-            HelpOption option = new HelpOption(opt, longOpt, defaultValue, required, description);
-            option.setRequired(required);
-            options.addOption(option);
+            options.addOption(new HelpOption(opt, longOpt, defaultValue, false, description));
             return this;
         }
 
@@ -184,7 +196,7 @@ public class CommandLineTool {
                 throws IllegalArgumentException {
             super(opt, longOpt, true, description);
             isTrue(opt.length() == 1,
-                    format("Short option: '%s' (%s), non GNU specification, name length must be 1", opt, description));
+                    format("Bad short option: '%s' (%s), non GNU specification, name length must be 1", opt, description));
             this.defaultValue = defaultValue;
             setRequired(required);
             if (!isRequired()) {

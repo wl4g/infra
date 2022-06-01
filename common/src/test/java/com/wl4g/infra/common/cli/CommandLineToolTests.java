@@ -37,8 +37,8 @@ public class CommandLineToolTests {
         CommandLineWrapper line = CommandLineTool.builder()
                 .option("n", "name", "my-name1", "The option of name")
                 .option("c", "count", "10", "The option of count")
-                .option("s", "start-time", null, "The option of start time") // required
-                .helpIfEmpty(args)
+                .mustOption("s", "start-time", "The option of start time") // required
+                .helpIfEmpty(args, false)
                 .build(args);
 
         String name = line.get("name");
@@ -48,13 +48,13 @@ public class CommandLineToolTests {
     }
 
     @Test
-    public void testGetInvalidOption() throws ParseException {
+    public void testUseInvalidOption() throws ParseException {
         String[] args = { "--name", "my-name2", "--start-time", "161234567890" };
 
         CommandLineWrapper line = CommandLineTool.builder()
                 .option("n", "name", "my-name1", "The option of name")
-                .option("s", "start-time", null, "The option of start time") // required
-                .helpIfEmpty(args)
+                .mustOption("s", "start-time", "The option of start time") // required
+                .helpIfEmpty(args, false)
                 .build(args);
 
         Assertions.assertThrows(ParseException.class, () -> {
@@ -70,7 +70,8 @@ public class CommandLineToolTests {
         CommandLineWrapper line = CommandLineTool.builder()
                 .option("n", "name", "my-name1", "The option of name")
                 .option("c", "count", "10", "The option of count")
-                .option("s", "start-time", null, "The option of start time") // required
+                .mustOption("s", "start-time", "The option of start time") // required
+                .helpIfEmpty(args, false)
                 .build(args);
 
         String name = line.get("name");
