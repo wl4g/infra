@@ -33,6 +33,7 @@ import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -142,13 +143,13 @@ public class CommandLineTool {
                 CommandLine line = new DefaultParser().parse(options, args, props);
 
                 // Debug arguments pre-parse logs.
-                if (log.isDebugEnabled()) {
+                if (nonNull(System.getProperty("debug"))) {
                     List<String> printArgs = safeArrayToList(line.getOptions()).stream().map(o -> {
                         String value = o.getValue();
                         value = isBlank(value) ? ((HelpOption) o).getDefaultValue() : value;
                         return "-".concat(o.getOpt()).concat(",--").concat(o.getLongOpt()).concat("=").concat(trimToEmpty(value));
                     }).collect(toList());
-                    log.debug("Parsed args: {}", printArgs);
+                    System.out.printf("%s Parsed: %s\n", new Date().toString(), printArgs);
                 }
 
                 return new CommandLineWrapper(line, this);
