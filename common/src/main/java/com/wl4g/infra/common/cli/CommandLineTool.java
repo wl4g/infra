@@ -50,6 +50,8 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 
+import com.sun.istack.NotNull;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -86,6 +88,18 @@ public class CommandLineTool {
         /**
          * ADD command option with not default value(ie:required).
          * 
+         * @param longOpt
+         *            Long option.
+         * @param help
+         * @return
+         */
+        public Builder mustOption(@NotBlank String longOpt, @Nullable String help) {
+            return mustOption(null, longOpt, help);
+        }
+
+        /**
+         * ADD command option with not default value(ie:required).
+         * 
          * @param shortOpt
          *            Short option.
          * @param longOpt
@@ -96,6 +110,21 @@ public class CommandLineTool {
         public Builder mustOption(@Nullable String shortOpt, @NotBlank String longOpt, @Nullable String help) {
             options.addOption(new HelpOption(shortOpt, longOpt, null, true, help));
             return this;
+        }
+
+        /**
+         * ADD command option with default value(ie:not required).
+         * 
+         * @param longOpt
+         *            Long option.
+         * @param defaultValue
+         *            Null means there is no default value, that is, the
+         *            parameter is required
+         * @param help
+         * @return
+         */
+        public Builder option(@NotBlank String longOpt, @Nullable String defaultValue, @Nullable String help) {
+            return option(null, longOpt, defaultValue, help);
         }
 
         /**
@@ -160,7 +189,7 @@ public class CommandLineTool {
          * @param args
          * @return
          */
-        public CommandLineWrapper build(String args[]) {
+        public CommandLineFacade build(String args[]) {
             // If there is only arguments 'help,--help' then print usage and
             // exit.
             if (checkHelp(args)) {
@@ -184,7 +213,7 @@ public class CommandLineTool {
                     System.out.printf("%s Pre parsed: %s\n\n", new Date().toString(), printArgs);
                 }
 
-                return new CommandLineWrapper(line, this);
+                return new CommandLineFacade(line, this);
             } catch (ParseException e) {
                 new HelpFormatter().printHelp(120, "\n", "", options, "");
                 System.exit(0);
@@ -259,7 +288,7 @@ public class CommandLineTool {
     }
 
     @AllArgsConstructor
-    public static class CommandLineWrapper {
+    public static class CommandLineFacade {
         private final CommandLine line;
         private final Builder builder;
 
@@ -289,6 +318,20 @@ public class CommandLineTool {
         public Double getDouble(@NotBlank String opt) throws ParseException {
             String value = getCheckOptionValue(opt);
             return isBlank(value) ? null : Double.parseDouble(value);
+        }
+
+        public Boolean getBoolean(@NotBlank String opt) throws ParseException {
+            String value = getCheckOptionValue(opt);
+            return isBlank(value) ? null : Boolean.parseBoolean(value);
+        }
+
+        public <E extends Enum<?>> E getEnum(@NotBlank String opt, @NotNull Class<E> enumClass) throws ParseException {
+            String value = getCheckOptionValue(opt);
+            return isBlank(value) ? null
+                    : safeArrayToList(enumClass.getEnumConstants()).stream()
+                            .filter(e -> equalsAnyIgnoreCase(value, e.name()))
+                            .findFirst()
+                            .orElse(null);
         }
 
         private String getCheckOptionValue(String opt) throws ParseException {

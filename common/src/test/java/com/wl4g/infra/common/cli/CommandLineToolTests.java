@@ -19,7 +19,7 @@ import org.apache.commons.cli.ParseException;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 
-import com.wl4g.infra.common.cli.CommandLineTool.CommandLineWrapper;
+import com.wl4g.infra.common.cli.CommandLineTool.CommandLineFacade;
 
 /**
  * {@link CommandLineToolTests}
@@ -34,7 +34,7 @@ public class CommandLineToolTests {
     public void testSuccessParseWithNotShortName() throws ParseException {
         String[] args = { "--name", "my-name2", "--start-time", "161234567890" };
 
-        CommandLineWrapper line = CommandLineTool.builder()
+        CommandLineFacade line = CommandLineTool.builder()
                 .option(null, "name", "my-name1", "The option of name")
                 .option("c", "count", "10", "The option of count")
                 .mustOption("s", "start-time", "The option of start time") // required
@@ -51,7 +51,7 @@ public class CommandLineToolTests {
     public void testUseInvalidOption() throws ParseException {
         String[] args = { "--name", "my-name2", "--start-time", "161234567890" };
 
-        CommandLineWrapper line = CommandLineTool.builder()
+        CommandLineFacade line = CommandLineTool.builder()
                 .option("n", "name", "my-name1", "The option of name")
                 .mustOption("s", "start-time", "The option of start time") // required
                 .helpIfEmpty(args, false)
@@ -67,7 +67,7 @@ public class CommandLineToolTests {
     public void testMissingOption() throws ParseException {
         String[] args = {};
 
-        CommandLineWrapper line = CommandLineTool.builder()
+        CommandLineFacade line = CommandLineTool.builder()
                 .option("n", "name", "my-name1", "The option of name")
                 .option("c", "count", "10", "The option of count")
                 .mustOption("s", "start-time", "The option of start time") // required
@@ -84,7 +84,7 @@ public class CommandLineToolTests {
     public void testHelpOnlyOption() throws ParseException {
         String[] args = { "--help" };
 
-        CommandLineWrapper line = CommandLineTool.builder()
+        CommandLineFacade line = CommandLineTool.builder()
                 .option("n", "name", "my-name1", "The option of name.")
                 .option("c", "count", "10", "The option of count.")
                 .helpIfEmpty(args, false)
@@ -93,6 +93,23 @@ public class CommandLineToolTests {
         String name = line.get("name");
         Long count = line.getLong("count");
         System.out.printf("name=%s,count=%s", name, count);
+    }
+
+    @Test
+    public void testEnumParse() throws ParseException {
+        String[] args = { "--type", "A" };
+
+        CommandLineFacade line = CommandLineTool.builder()
+                .mustOption("t", "type", "The option of type.")
+                .helpIfEmpty(args, false)
+                .build(args);
+
+        IPv4Type type = line.getEnum("type", IPv4Type.class);
+        System.out.printf("type=%s", type);
+    }
+
+    static enum IPv4Type {
+        A, B, C
     }
 
 }
