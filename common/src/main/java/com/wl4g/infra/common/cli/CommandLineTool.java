@@ -16,7 +16,8 @@
 package com.wl4g.infra.common.cli;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToList;
-import static com.wl4g.infra.common.lang.Assert2.isTrue;
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.findField;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.findMethod;
@@ -38,6 +39,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotBlank;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -46,9 +50,8 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 
-import com.wl4g.infra.common.lang.Assert2;
-
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * Command utility.
@@ -83,46 +86,50 @@ public class CommandLineTool {
         /**
          * ADD command option with not default value(ie:required).
          * 
-         * @param opt
+         * @param shortOpt
          *            Short option.
          * @param longOpt
          *            Long option.
-         * @param description
-         * @return Argument description
+         * @param help
+         * @return
          */
-        public Builder mustOption(String opt, String longOpt, String description) {
-            options.addOption(new HelpOption(opt, longOpt, null, true, description));
+        public Builder mustOption(@Nullable String shortOpt, @NotBlank String longOpt, @Nullable String help) {
+            options.addOption(new HelpOption(shortOpt, longOpt, null, true, help));
             return this;
         }
 
         /**
          * ADD command option with default value(ie:not required).
          * 
-         * @param opt
+         * @param shortOpt
          *            Short option.
          * @param longOpt
          *            Long option.
          * @param defaultValue
          *            Null means there is no default value, that is, the
          *            parameter is required
-         * @param description
-         * @return Argument description
+         * @param help
+         * @return
          */
-        public Builder option(String opt, String longOpt, String defaultValue, String description) {
-            options.addOption(new HelpOption(opt, longOpt, defaultValue, false, description));
+        public Builder option(
+                @Nullable String shortOpt,
+                @NotBlank String longOpt,
+                @Nullable String defaultValue,
+                @Nullable String help) {
+            options.addOption(new HelpOption(shortOpt, longOpt, defaultValue, false, help));
             return this;
         }
 
         /**
-         * Remove option to options.
+         * Remove option from options.
          * 
          * @param opt
          * @param longOpt
          * @return
          */
-        public Builder removeOption(String opt, String longOpt) {
-            Assert2.notNull(options, "Options did not initialize creation");
-            Option option = new Option(opt, longOpt, true, "");
+        public Builder removeOption(@Nullable String shortOpt, @NotBlank String longOpt) {
+            notNull(options, "Options did not initialize creation");
+            Option option = new Option(shortOpt, hasTextOf(longOpt, "longOpt"), true, "");
             options.removeOption(option);
             return this;
         }
@@ -146,7 +153,7 @@ public class CommandLineTool {
         }
 
         /**
-         * Build parsing to command line.
+         * Build parsing to command line wrapper.
          * 
          * @param args
          * @return
@@ -155,7 +162,7 @@ public class CommandLineTool {
             try {
                 // Parsing to Command Line.
                 Properties props = new Properties();
-                options.getOptions().forEach(opt -> props.setProperty(opt.getOpt(), trimToEmpty(opt.getValue())));
+                options.getOptions().forEach(opt -> props.setProperty(opt.getLongOpt(), trimToEmpty(opt.getValue())));
                 CommandLine line = new DefaultParser().parse(options, args, props);
 
                 // Debug arguments pre-parse logs.
@@ -177,26 +184,18 @@ public class CommandLineTool {
         }
     }
 
-    /**
-     * Help option.</br>
-     * 
-     * @author Wangl.sir <983708408@qq.com>
-     * @version v1.0 2019年5月12日
-     * @since
-     */
+    @Getter
     public static class HelpOption extends Option {
         private static final long serialVersionUID = 1950613325131445963L;
 
-        /**
-         * Shell option default value.
-         */
-        final private String defaultValue;
+        private final String defaultValue;
 
-        public HelpOption(String opt, String longOpt, String defaultValue, boolean required, String description)
-                throws IllegalArgumentException {
-            super(opt, longOpt, true, description);
-            isTrue(opt.length() == 1,
-                    format("Bad short option: '%s' (%s), non GNU specification, name length must be 1", opt, description));
+        public HelpOption(@Nullable String shortOpt, @NotBlank String longOpt, @Nullable String defaultValue, boolean required,
+                @Nullable String help) throws IllegalArgumentException {
+            super(shortOpt, hasTextOf(longOpt, "longOpt"), true, help);
+            // isTrue(shortOpt.length()==1,format("Bad short option: '%s' (%s),
+            // non
+            // GNU specification, name length must be 1", shortOpt, help));
             this.defaultValue = defaultValue;
             setRequired(required);
             if (!isRequired()) {
@@ -205,11 +204,6 @@ public class CommandLineTool {
                 setArgName("required");
             }
         }
-
-        public String getDefaultValue() {
-            return defaultValue;
-        }
-
     }
 
     public static class RemovableOptions extends Options {
@@ -218,15 +212,15 @@ public class CommandLineTool {
         /**
          * Remove an option instance
          *
-         * @param opt
+         * @param option
          *            the option that is to be added
          * @return the resulting Options instance
          */
-        public RemovableOptions removeOption(Option opt) {
-            if (!isNull(opt)) {
-                getShortOpts().remove(opt.getOpt());
-                getLongOpts().remove(opt.getLongOpt());
-                getRequiredOpts().remove(opt.getOpt());
+        public RemovableOptions removeOption(@Nullable Option option) {
+            if (!isNull(option)) {
+                getShortOpts().remove(option.getOpt());
+                getLongOpts().remove(option.getLongOpt());
+                getRequiredOpts().remove(option.getOpt());
             }
             return this;
         }
@@ -255,41 +249,44 @@ public class CommandLineTool {
         private final CommandLine line;
         private final Builder builder;
 
-        public String get(String opt) throws ParseException {
+        public String get(@NotBlank String opt) throws ParseException {
             return getString(opt);
         }
 
-        public String getString(String opt) throws ParseException {
+        public String getString(@NotBlank String opt) throws ParseException {
             return getCheckOptionValue(opt);
         }
 
-        public Long getLong(String opt) throws ParseException {
+        public Long getLong(@NotBlank String opt) throws ParseException {
             String value = getCheckOptionValue(opt);
             return isBlank(value) ? null : Long.parseLong(value);
         }
 
-        public Integer getInteger(String opt) throws ParseException {
+        public Integer getInteger(@NotBlank String opt) throws ParseException {
             String value = getCheckOptionValue(opt);
             return isBlank(value) ? null : Integer.parseInt(value);
         }
 
-        public Float getFloat(String opt) throws ParseException {
+        public Float getFloat(@NotBlank String opt) throws ParseException {
             String value = getCheckOptionValue(opt);
             return isBlank(value) ? null : Float.parseFloat(value);
         }
 
-        public Double getDouble(String opt) throws ParseException {
+        public Double getDouble(@NotBlank String opt) throws ParseException {
             String value = getCheckOptionValue(opt);
             return isBlank(value) ? null : Double.parseDouble(value);
         }
 
         private String getCheckOptionValue(String opt) throws ParseException {
+            hasTextOf(opt, "opt");
+
             // Check for use opt invalid?
             if (!safeArrayToList(line.getOptions()).stream()
                     .anyMatch(o -> equalsAnyIgnoreCase(opt, o.getOpt(), o.getLongOpt()))) {
                 throw new ParseException(format("\nUsing undeclared options: %s\n", opt));
             }
 
+            // Gets argument values from line and default value in turn.
             String value = line.getOptionValue(opt);
             if (isBlank(value)) {
                 makeAccessible(resolveOptionMethod);
