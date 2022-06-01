@@ -20,7 +20,6 @@ import static com.wl4g.infra.common.lang.StringUtils2.startsWithIgnoreCase;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
@@ -32,7 +31,8 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.videoio.VideoCapture;
 
-import com.wl4g.infra.common.cli.CommandUtils;
+import com.wl4g.infra.common.cli.CommandLineTool;
+import com.wl4g.infra.common.cli.CommandLineTool.CommandLineFacade;
 import com.wl4g.infra.common.resource.resolver.ClassPathResourcePatternResolver;
 import com.wl4g.infra.opencv.library.OpenCvNativeLibraryLoader;
 
@@ -40,9 +40,10 @@ public class VideoFaceTests {
 
     public static void main(String[] args) throws IOException, ParseException {
         if (args.length > 0) { // // Load external dylink library.
-            CommandLine line = CommandUtils.newBuilder()
-                    .option("l", "locationPattern", null, "Load external native file location match pattern").build(args);
-            String location = line.getOptionValue("locationPattern");
+            CommandLineFacade line = CommandLineTool.builder()
+                    .option("l", "locationPattern", "Load external native file location match pattern")
+                    .build(args);
+            String location = line.get("locationPattern");
             location = startsWithIgnoreCase(location, "file://") ? location : ("file://" + location);
             OpenCvNativeLibraryLoader.loadLibrarys(location);
         } else {
