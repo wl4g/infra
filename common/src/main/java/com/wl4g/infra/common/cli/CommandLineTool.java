@@ -149,7 +149,7 @@ public class CommandLineTool {
                         value = isBlank(value) ? ((HelpOption) o).getDefaultValue() : value;
                         return "-".concat(o.getOpt()).concat(",--").concat(o.getLongOpt()).concat("=").concat(trimToEmpty(value));
                     }).collect(toList());
-                    System.out.printf("%s Parsed: %s\n", new Date().toString(), printArgs);
+                    System.out.printf("%s Pre parsed: %s\n\n", new Date().toString(), printArgs);
                 }
 
                 return new CommandLineWrapper(line, this);
