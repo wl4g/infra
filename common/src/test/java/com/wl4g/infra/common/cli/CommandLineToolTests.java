@@ -15,6 +15,10 @@
  */
 package com.wl4g.infra.common.cli;
 
+import org.apache.commons.cli.ParseException;
+import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+
 import com.wl4g.infra.common.cli.CommandLineTool.CommandLineWrapper;
 
 /**
@@ -26,20 +30,53 @@ import com.wl4g.infra.common.cli.CommandLineTool.CommandLineWrapper;
  */
 public class CommandLineToolTests {
 
-    public static void main(String[] args) throws Exception {
+    @Test
+    public void testSuccessParse() throws ParseException {
+        String[] args = { "--name", "my-name2", "--start-time", "161234567890" };
+
         CommandLineWrapper line = CommandLineTool.builder()
-                .option("a", "aaa", "111", "The option of aaa")
-                .option("b", "bbb", "222", "The option of bbb")
-                .option("c", "ccc", "333", "The option of ccc")
-                .option("d", "ddd", null, "The option of ddd") // required
-                // .printUsageIfEmpty(args)
+                .option("n", "name", "my-name1", "The option of name")
+                .option("c", "count", "10", "The option of count")
+                .option("s", "start-time", null, "The option of start time") // required
+                .printUsageIfEmpty(args)
                 .build(args);
 
-        String aaa = line.get("aaa");
-        String bbb = line.get("bbb");
-        String ccc = line.get("ccc");
-        Long ddd = line.getLong("ddd");
-        System.out.printf("aaa=%s,bbb=%s,ccc=%s,ddd=%s", aaa, bbb, ccc, ddd);
+        String name = line.get("name");
+        Long count = line.getLong("count");
+        String startTime = line.get("start-time");
+        System.out.printf("name=%s,count=%s,startTime=%s", name, count, startTime);
+    }
+
+    @Test
+    public void testGetInvalidOption() throws ParseException {
+        String[] args = { "--name", "my-name2", "--start-time", "161234567890" };
+
+        CommandLineWrapper line = CommandLineTool.builder()
+                .option("n", "name", "my-name1", "The option of name")
+                .option("s", "start-time", null, "The option of start time") // required
+                .printUsageIfEmpty(args)
+                .build(args);
+
+        Assertions.assertThrows(ParseException.class, () -> {
+            Long count = line.getLong("count"); // use invalid option
+            System.out.printf("count=%s", count);
+        }, "expected invalid option exception");
+    }
+
+    @Test
+    public void testMissingOption() throws ParseException {
+        String[] args = {};
+
+        CommandLineWrapper line = CommandLineTool.builder()
+                .option("n", "name", "my-name1", "The option of name")
+                .option("c", "count", "10", "The option of count")
+                .option("s", "start-time", null, "The option of start time") // required
+                .build(args);
+
+        String name = line.get("name");
+        Long count = line.getLong("count");
+        String startTime = line.get("start-time");
+        System.out.printf("name=%s,count=%s,startTime=%s", name, count, startTime);
     }
 
 }

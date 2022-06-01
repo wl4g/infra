@@ -15,6 +15,7 @@
  */
 package com.wl4g.infra.common.cli;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToList;
 import static com.wl4g.infra.common.lang.Assert2.isTrue;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.findField;
@@ -26,6 +27,7 @@ import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.equalsAnyIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 
@@ -234,35 +236,41 @@ public class CommandLineTool {
         private final CommandLine line;
         private final Builder builder;
 
-        public String get(String opt) {
+        public String get(String opt) throws ParseException {
             return getString(opt);
         }
 
-        public String getString(String opt) {
+        public String getString(String opt) throws ParseException {
             return getCheckOptionValue(opt);
         }
 
-        public Long getLong(String opt) {
+        public Long getLong(String opt) throws ParseException {
             String value = getCheckOptionValue(opt);
             return isBlank(value) ? null : Long.parseLong(value);
         }
 
-        public Integer getInteger(String opt) {
+        public Integer getInteger(String opt) throws ParseException {
             String value = getCheckOptionValue(opt);
             return isBlank(value) ? null : Integer.parseInt(value);
         }
 
-        public Float getFloat(String opt) {
+        public Float getFloat(String opt) throws ParseException {
             String value = getCheckOptionValue(opt);
             return isBlank(value) ? null : Float.parseFloat(value);
         }
 
-        public Double getDouble(String opt) {
+        public Double getDouble(String opt) throws ParseException {
             String value = getCheckOptionValue(opt);
             return isBlank(value) ? null : Double.parseDouble(value);
         }
 
-        private String getCheckOptionValue(String opt) {
+        private String getCheckOptionValue(String opt) throws ParseException {
+            // Check for use opt invalid?
+            if (!safeArrayToList(line.getOptions()).stream()
+                    .anyMatch(o -> equalsAnyIgnoreCase(opt, o.getOpt(), o.getLongOpt()))) {
+                throw new ParseException(format("\nUsing undeclared options: %s\n", opt));
+            }
+
             String value = line.getOptionValue(opt);
             if (isBlank(value)) {
                 makeAccessible(resolveOptionMethod);
@@ -270,7 +278,7 @@ public class CommandLineTool {
                 if (nonNull(option)) {
                     value = option.getDefaultValue();
                     if (option.isRequired() && isNull(value)) {
-                        String errmsg = format("\nBad command options: '-%s,--%s' is required.\nPlease use: help,--help\n",
+                        String errmsg = format("\nBad command option: '-%s,--%s' is missing. Please use: help,--help\n",
                                 option.getOpt(), option.getLongOpt());
                         builder.printUsage("", errmsg, true);
                     }
