@@ -135,7 +135,9 @@ public class CommandLineTool {
         }
 
         public void help(String header, String footer, boolean exit) {
-            new HelpFormatter().printHelp(120, "\n", header, options, footer);
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.setSyntaxPrefix("Usages: [OPTIONS] ...");
+            formatter.printHelp(120, "\n", header, options, footer);
             if (exit) {
                 System.exit(1);
             }
@@ -159,6 +161,13 @@ public class CommandLineTool {
          * @return
          */
         public CommandLineWrapper build(String args[]) {
+            // If there is only arguments 'help,--help' then print usage and
+            // exit.
+            if (checkHelp(args)) {
+                help("", "", true);
+                return null;
+            }
+
             try {
                 // Parsing to Command Line.
                 Properties props = new Properties();
@@ -180,7 +189,12 @@ public class CommandLineTool {
                 new HelpFormatter().printHelp(120, "\n", "", options, "");
                 System.exit(0);
             }
+
             return null;
+        }
+
+        private boolean checkHelp(String args[]) {
+            return isNull(args) || (args.length == 1 && equalsAnyIgnoreCase(args[0], "help", "--help"));
         }
     }
 

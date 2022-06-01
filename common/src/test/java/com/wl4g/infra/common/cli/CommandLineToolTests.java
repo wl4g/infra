@@ -31,7 +31,7 @@ import com.wl4g.infra.common.cli.CommandLineTool.CommandLineWrapper;
 public class CommandLineToolTests {
 
     @Test
-    public void testSuccessParse() throws ParseException {
+    public void testSuccessParseWithNotShortName() throws ParseException {
         String[] args = { "--name", "my-name2", "--start-time", "161234567890" };
 
         CommandLineWrapper line = CommandLineTool.builder()
@@ -78,6 +78,21 @@ public class CommandLineToolTests {
         Long count = line.getLong("count");
         String startTime = line.get("start-time");
         System.out.printf("name=%s,count=%s,startTime=%s", name, count, startTime);
+    }
+
+    @Test
+    public void testHelpOnlyOption() throws ParseException {
+        String[] args = { "--help" };
+
+        CommandLineWrapper line = CommandLineTool.builder()
+                .option("n", "name", "my-name1", "The option of name.")
+                .option("c", "count", "10", "The option of count.")
+                .helpIfEmpty(args, false)
+                .build(args);
+
+        String name = line.get("name");
+        Long count = line.getLong("count");
+        System.out.printf("name=%s,count=%s", name, count);
     }
 
 }
