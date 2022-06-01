@@ -115,18 +115,22 @@ public class CommandLineTool {
             return this;
         }
 
-        public void printUsage(String header, String footer, boolean exit) {
+        public void help(String header, String footer, boolean exit) {
             new HelpFormatter().printHelp(120, "\n", header, options, footer);
             if (exit) {
                 System.exit(1);
             }
         }
 
-        public Builder printUsageIfEmpty(String[] args) {
+        public Builder helpIfEmpty(String[] args, boolean exit) {
             if (isNull(args) || args.length == 0) {
-                printUsage("", "", true);
+                help("", "", exit);
             }
             return this;
+        }
+
+        public Builder helpIfEmpty(String[] args) {
+            return helpIfEmpty(args, true);
         }
 
         /**
@@ -283,7 +287,7 @@ public class CommandLineTool {
                     if (option.isRequired() && isNull(value)) {
                         String errmsg = format("\nBad command option: '-%s,--%s' is missing. Please use: help,--help\n",
                                 option.getOpt(), option.getLongOpt());
-                        builder.printUsage("", errmsg, true);
+                        builder.help("", errmsg, true);
                     }
                 }
             }

@@ -38,7 +38,7 @@ public class CommandLineToolTests {
                 .option("n", "name", "my-name1", "The option of name")
                 .option("c", "count", "10", "The option of count")
                 .option("s", "start-time", null, "The option of start time") // required
-                .printUsageIfEmpty(args)
+                .helpIfEmpty(args)
                 .build(args);
 
         String name = line.get("name");
@@ -54,7 +54,7 @@ public class CommandLineToolTests {
         CommandLineWrapper line = CommandLineTool.builder()
                 .option("n", "name", "my-name1", "The option of name")
                 .option("s", "start-time", null, "The option of start time") // required
-                .printUsageIfEmpty(args)
+                .helpIfEmpty(args)
                 .build(args);
 
         Assertions.assertThrows(ParseException.class, () -> {
