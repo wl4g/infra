@@ -18,6 +18,7 @@ package com.wl4g.infra.common.cli;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToList;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
+import static com.wl4g.infra.common.lang.Exceptions.getStackTraceAsString;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.findField;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.findMethod;
@@ -164,7 +165,7 @@ public class CommandLineTool {
 
         public void help(String header, String footer, boolean exit) {
             HelpFormatter formatter = new HelpFormatter();
-            formatter.setSyntaxPrefix("Usages: [OPTIONS] ...");
+            formatter.setSyntaxPrefix("\nUsage: [OPTIONS] ...\n");
             formatter.printHelp(120, "\n", header, options, footer);
             if (exit) {
                 System.exit(1);
@@ -196,31 +197,37 @@ public class CommandLineTool {
                 return null;
             }
 
+            final boolean isDebug = nonNull(System.getProperty("debug"));
             try {
-                // Parsing to Command Line.
+                // Parsing to command line.
                 Properties props = new Properties();
                 options.getOptions().forEach(opt -> props.setProperty(opt.getLongOpt(), trimToEmpty(opt.getValue())));
                 CommandLine line = new DefaultParser().parse(options, args, props);
 
                 // Debug arguments pre-parse logs.
-                if (nonNull(System.getProperty("debug"))) {
+                if (isDebug) {
                     List<String> printArgs = safeArrayToList(line.getOptions()).stream().map(o -> {
                         String value = o.getValue();
                         value = isBlank(value) ? ((HelpOption) o).getDefaultValue() : value;
                         return "-".concat(o.getOpt()).concat(",--").concat(o.getLongOpt()).concat("=").concat(trimToEmpty(value));
                     }).collect(toList());
-                    System.out.printf("%s Pre parsed: %s\n\n", new Date().toString(), printArgs);
+                    System.out.printf("%s pre-parsed: %s\n\n", new Date().toString(), printArgs);
                 }
 
                 return new CommandLineFacade(line, this);
             } catch (ParseException e) {
-                new HelpFormatter().printHelp(120, "\n", "", options, "");
-                System.exit(0);
+                help("", (isDebug ? getStackTraceAsString(e) : e.getLocalizedMessage()), true);
             }
 
             return null;
         }
 
+        /**
+         * Check for help command.
+         * 
+         * @param args
+         * @return
+         */
         private boolean checkHelp(String args[]) {
             return isNull(args) || (args.length == 1 && equalsAnyIgnoreCase(args[0], "help", "--help"));
         }

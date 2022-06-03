@@ -71,7 +71,7 @@ public class CommandLineToolTests {
                 .option("n", "name", "my-name1", "The option of name")
                 .option("c", "count", "10", "The option of count")
                 .mustOption("s", "start-time", "The option of start time") // required
-                .helpIfEmpty(args, false)
+                // .helpIfEmpty(args)
                 .build(args);
 
         String name = line.get("name");
