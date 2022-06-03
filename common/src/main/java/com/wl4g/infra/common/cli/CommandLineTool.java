@@ -92,7 +92,7 @@ public class CommandLineTool {
          * @param help
          * @return
          */
-        public Builder mustOption(@NotBlank String longOpt, @Nullable String help) {
+        public Builder mustLongOption(@NotBlank String longOpt, @Nullable String help) {
             return mustOption(null, longOpt, help);
         }
 
@@ -122,7 +122,7 @@ public class CommandLineTool {
          * @param help
          * @return
          */
-        public Builder option(@NotBlank String longOpt, @Nullable String defaultValue, @Nullable String help) {
+        public Builder longOption(@NotBlank String longOpt, @Nullable String defaultValue, @Nullable String help) {
             return option(null, longOpt, defaultValue, help);
         }
 

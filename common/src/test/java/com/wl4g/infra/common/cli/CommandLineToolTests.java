@@ -35,7 +35,7 @@ public class CommandLineToolTests {
         String[] args = { "--name", "my-name2", "--start-time", "161234567890" };
 
         CommandLineFacade line = CommandLineTool.builder()
-                .option(null, "name", "my-name1", "The option of name")
+                .longOption("name", "my-name1", "The option of name")
                 .option("c", "count", "10", "The option of count")
                 .mustOption("s", "start-time", "The option of start time") // required
                 .helpIfEmpty(args, false)
