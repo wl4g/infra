@@ -41,7 +41,7 @@ public class VideoFaceTests {
     public static void main(String[] args) throws IOException, ParseException {
         if (args.length > 0) { // // Load external dylink library.
             CommandLineFacade line = CommandLineTool.builder()
-                    .option("l", "locationPattern", "Load external native file location match pattern")
+                    .longOption("l", "locationPattern", "Load external native file location match pattern")
                     .build(args);
             String location = line.get("locationPattern");
             location = startsWithIgnoreCase(location, "file://") ? location : ("file://" + location);
