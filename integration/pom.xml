@@ -1,14 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>dopaas-infra-integration</artifactId>
+	<artifactId>infra-integration</artifactId>
 	<packaging>pom</packaging>
-	<name>DoPaaS Infra Integration</name>
-	<url>http://infra.dopaas.wl4g.com</url>
-	<description>A DoPaaS Infra Integration Projects.</description>
+	<name>Infra Integration</name>
+	<url>http://infra.wl4g.com</url>
+	<description>Infra Integration with Projects.</description>
 	<organization>
 		<name>wl4g</name>
-		<url>https://infra.dopaas.wl4g.com</url>
+		<url>https://infra.wl4g.com</url>
 	</organization>
 	<licenses>
 		<license>
@@ -58,19 +58,17 @@
 	<modules>
 		<module>integration-feign-common</module>
 		<module>integration-feign-core</module>
-		<!-- <module>integration-feign-dubbo</module> -->
-		<!-- <module>integration-feign-dubbo-example</module> -->
 		<module>integration-feign-istio</module>
 		<module>integration-feign-istio-example</module>
 		<module>integration-feign-springcloud</module>
 		<module>integration-feign-springcloud-example</module>
-		<!-- <module>integration-canal</module> -->
+		<!-- <module>integration-feign-dubbo</module> -->
+		<!-- <module>integration-feign-dubbo-example</module> -->
 		<module>integration-eureka</module>
 		<!--<module>integration-nacos</module> -->
 		<!--<module>integration-etcd</module> -->
 		<!--<module>integration-consul</module> -->
 		<!--<module>integration-zookeeper</module> -->
-		<!-- <module>integration-turbine</module> -->
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

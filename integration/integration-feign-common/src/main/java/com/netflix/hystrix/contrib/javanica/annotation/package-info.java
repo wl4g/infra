@@ -20,5 +20,5 @@ package com.netflix.hystrix.contrib.javanica.annotation;
  * `/netflix/hystrix`&nbsp;,&nbsp;`/feign/hystrix`&nbsp;,&nbsp;`/org/springframework`
  * are from the corresponding official source code. The purpose is to be
  * compatible with the migration from `Spring Cloud + Feign` to `Spring Boot +
- * Feign + Istio`. No error will be reported
+ * Feign Istio`. No error will be reported
  */

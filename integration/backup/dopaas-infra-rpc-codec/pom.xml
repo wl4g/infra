@@ -1,14 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>dopaas-infra-integration-codec</artifactId>
+	<artifactId>infra-integration-codec</artifactId>
 	<packaging>jar</packaging>
-	<name>DoPaaS Infra RPC (Binary Protocol) Codec</name>
-	<url>http://infra.dopaas.wl4g.com</url>
-	<description>A DoPaaS Infra RPC (Binary Protocol) Codec Parser.</description>
+	<name>Infra RPC (Binary Protocol) Codec</name>
+	<url>http://infra.wl4g.com</url>
+	<description>A Infra RPC (Binary Protocol) Codec Parser.</description>
 	<organization>
 		<name>wl4g</name>
-		<url>https://infra.dopaas.wl4g.com</url>
+		<url>https://infra.wl4g.com</url>
 	</organization>
 	<licenses>
 		<license>
@@ -52,7 +52,7 @@
 	</developers>
 	<parent>
 		<groupId>com.wl4g</groupId>
-		<artifactId>dopaas-infra-integration</artifactId>
+		<artifactId>infra-integration</artifactId>
 		<version>master</version>
 	</parent>
 	<properties>
@@ -63,7 +63,7 @@
 		<dependencies>
 			<dependency>
 				<groupId>com.wl4g</groupId>
-				<artifactId>dopaas-infra-bom</artifactId>
+				<artifactId>infra-bom</artifactId>
 				<version>${project.parent.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
@@ -73,7 +73,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.wl4g</groupId>
-			<artifactId>dopaas-infra-common</artifactId>
+			<artifactId>infra-common</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>io.netty</groupId>

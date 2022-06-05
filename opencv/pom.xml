@@ -2,11 +2,11 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>dopaas-infra-opencv</artifactId>
+	<artifactId>infra-opencv</artifactId>
 	<packaging>jar</packaging>
-	<name>DoPaaS Infra Opencv</name>
-	<url>http://infra.dopaas.wl4g.com</url>
-	<description>A XCloud components Integration OpenCV.</description>
+	<name>Infra Opencv</name>
+	<url>http://infra.wl4g.com</url>
+	<description>Infra Component Integration with OpenCV Module.</description>
 	<parent>
 		<groupId>com.wl4g</groupId>
 		<artifactId>dopass-infra</artifactId>
@@ -19,7 +19,7 @@
 		<dependencies>
 			<dependency>
 				<groupId>com.wl4g</groupId>
-				<artifactId>dopaas-infra-bom</artifactId>
+				<artifactId>infra-bom</artifactId>
 				<version>3.0.0</version>
 				<type>pom</type>
 				<scope>import</scope>
@@ -29,7 +29,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.wl4g</groupId>
-			<artifactId>dopaas-infra-common</artifactId>
+			<artifactId>infra-common</artifactId>
 		</dependency>
 		<!-- System type, BOM management version number cannot be used! -->
 		<dependency>

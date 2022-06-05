@@ -2,14 +2,14 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>dopaas-infra-common-shade</artifactId>
+	<artifactId>infra-common-shade</artifactId>
 	<packaging>jar</packaging>
-	<name>DoPaaS Infra Common(shade)</name>
-	<url>http://infra.dopaas.wl4g.com</url>
-	<description>A DoPaaS Infra Common(shade).</description>
+	<name>Infra Common (Shade)</name>
+	<url>http://infra.wl4g.com</url>
+	<description>A Infra Common(shade).</description>
 	<organization>
 		<name>wl4g</name>
-		<url>https://infra.dopaas.wl4g.com</url>
+		<url>https://infra.wl4g.com</url>
 	</organization>
 	<licenses>
 		<license>
@@ -65,7 +65,7 @@
 		<dependencies>
 			<dependency>
 				<groupId>com.wl4g</groupId>
-				<artifactId>dopaas-infra-bom</artifactId>
+				<artifactId>infra-bom</artifactId>
 				<version>${project.parent.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
@@ -75,7 +75,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.wl4g</groupId>
-			<artifactId>dopaas-infra-common</artifactId>
+			<artifactId>infra-common</artifactId>
 		</dependency>
 	</dependencies>
 	<build>

@@ -1,14 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>dopaas-infra-integration-eureka</artifactId>
+	<artifactId>infra-integration-eureka</artifactId>
 	<packaging>jar</packaging>
-	<name>DoPaaS Infra Integration Eureka Server</name>
-	<url>http://infra.dopaas.wl4g.com</url>
-	<description>A DoPaaS Infra Integration Eureka Server.</description>
+	<name>Infra Integration Eureka Server</name>
+	<url>http://infra.wl4g.com</url>
+	<description>Infra Integration with Eureka Server.</description>
 	<organization>
 		<name>wl4g</name>
-		<url>https://infra.dopaas.wl4g.com</url>
+		<url>https://infra.wl4g.com</url>
 	</organization>
 	<licenses>
 		<license>
@@ -52,7 +52,7 @@
 	</developers>
 	<parent>
 		<groupId>com.wl4g</groupId>
-		<artifactId>dopaas-infra-integration</artifactId>
+		<artifactId>infra-integration</artifactId>
 		<version>3.0.0</version>
 	</parent>
 	<properties>
@@ -87,7 +87,7 @@
 		<dependencies>
 			<dependency>
 				<groupId>com.wl4g</groupId>
-				<artifactId>dopaas-infra-bom</artifactId>
+				<artifactId>infra-bom</artifactId>
 				<version>${project.parent.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
@@ -97,7 +97,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.wl4g</groupId>
-			<artifactId>dopaas-infra-core</artifactId>
+			<artifactId>infra-core</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>

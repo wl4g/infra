@@ -1,13 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>dopaas-infra-bom</artifactId>
+	<artifactId>infra-bom</artifactId>
 	<packaging>pom</packaging>
-	<name>DoPaaS Infra Dependencies BOM</name>
-	<url>http://infra.dopaas.wl4g.com</url>
+	<name>Infra BOM</name>
+	<url>http://infra.wl4g.com</url>
 	<organization>
 		<name>wl4g</name>
-		<url>https://infra.dopaas.wl4g.com</url>
+		<url>https://infra.wl4g.com</url>
 	</organization>
 	<licenses>
 		<license>
@@ -155,67 +155,67 @@
 			</dependency>
 			<dependency>
 				<groupId>com.wl4g</groupId>
-				<artifactId>dopaas-infra-common</artifactId>
+				<artifactId>infra-common</artifactId>
 				<version>${project.parent.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.wl4g</groupId>
-				<artifactId>dopaas-infra-common-shade</artifactId>
+				<artifactId>infra-common-shade</artifactId>
 				<version>${project.parent.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.wl4g</groupId>
-				<artifactId>dopaas-infra-core</artifactId>
+				<artifactId>infra-core</artifactId>
 				<version>${project.parent.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.wl4g</groupId>
-				<artifactId>dopaas-infra-data</artifactId>
+				<artifactId>infra-data</artifactId>
 				<version>${project.parent.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.wl4g</groupId>
-				<artifactId>dopaas-infra-opencv</artifactId>
+				<artifactId>infra-opencv</artifactId>
 				<version>${project.parent.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.wl4g</groupId>
-				<artifactId>dopaas-infra-support</artifactId>
+				<artifactId>infra-support</artifactId>
 				<version>${project.parent.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.wl4g</groupId>
-				<artifactId>dopaas-infra-integration</artifactId>
+				<artifactId>infra-integration</artifactId>
 				<version>${project.parent.version}</version>
 			</dependency>
 			<!-- <dependency> -->
 			<!-- <groupId>com.wl4g</groupId> -->
-			<!-- <artifactId>dopaas-infra-integration-codec</artifactId> -->
+			<!-- <artifactId>infra-integration-codec</artifactId> -->
 			<!-- <version>${project.parent.version}</version> -->
 			<!-- </dependency> -->
 			<dependency>
 				<groupId>com.wl4g</groupId>
-				<artifactId>dopaas-infra-integration-feign-common</artifactId>
+				<artifactId>infra-integration-feign-common</artifactId>
 				<version>${project.parent.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.wl4g</groupId>
-				<artifactId>dopaas-infra-integration-feign-core</artifactId>
+				<artifactId>infra-integration-feign-core</artifactId>
 				<version>${project.parent.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.wl4g</groupId>
-				<artifactId>dopaas-infra-integration-feign-istio</artifactId>
+				<artifactId>infra-integration-feign-istio</artifactId>
 				<version>${project.parent.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.wl4g</groupId>
-				<artifactId>dopaas-infra-integration-feign-springcloud</artifactId>
+				<artifactId>infra-integration-feign-springcloud</artifactId>
 				<version>${project.parent.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.wl4g</groupId>
-				<artifactId>dopaas-infra-integration-feign-springcloud-dubbo</artifactId>
+				<artifactId>infra-integration-feign-springcloud-dubbo</artifactId>
 				<version>${project.parent.version}</version>
 			</dependency>
 			<!-- Third party dependency librarys -->

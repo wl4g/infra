@@ -2,13 +2,13 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>dopaas-infra-integration-feign-dubbo-example-starter-service</artifactId>
-	<name>DoPaaS Infra Integration Example Starter Service</name>
-	<url>http://infra.dopaas.wl4g.com</url>
-	<description>A DoPaaS Infra Integration Examples Starter Service.</description>
+	<artifactId>infra-integration-feign-dubbo-example-starter-service</artifactId>
+	<name>Infra Integration Feign Dubbo Example Service</name>
+	<url>http://infra.wl4g.com</url>
+	<description>Infra Integration with Examples Starter Service.</description>
 	<organization>
 		<name>wl4g</name>
-		<url>https://infra.dopaas.wl4g.com</url>
+		<url>https://infra.wl4g.com</url>
 	</organization>
 	<licenses>
 		<license>
@@ -52,7 +52,7 @@
 	</developers>
 	<parent>
 		<groupId>com.wl4g</groupId>
-		<artifactId>dopaas-infra-integration-feign-dubbo-example</artifactId>
+		<artifactId>infra-integration-feign-dubbo-example</artifactId>
 		<version>3.0.0</version>
 	</parent>
 	<properties>
@@ -62,12 +62,12 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.wl4g</groupId>
-			<artifactId>dopaas-infra-integration-feign-dubbo-example-interface</artifactId>
+			<artifactId>infra-integration-feign-dubbo-example-interface</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.wl4g</groupId>
-			<artifactId>dopaas-infra-data</artifactId>
+			<artifactId>infra-data</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.h2database</groupId>
