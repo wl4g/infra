@@ -15,17 +15,58 @@
  */
 package com.wl4g.infra.common.reflect;
 
+import static com.wl4g.infra.common.reflect.ReflectionUtils2.findAllDeclaredFields;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.findField;
+
+import java.lang.reflect.Field;
+import java.util.List;
 
 import org.junit.Test;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.wl4g.infra.common.remoting.uri.UriComponentsBuilder;
+
+import lombok.Getter;
+import lombok.Setter;
 
 public class ReflectionUtils2Tests {
 
     @Test
     public void testFindFieldWithTreeObjectUriComponentsBuilder() {
         System.out.println(findField(UriComponentsBuilder.class, "host"));
+    }
+
+    @Test
+    public void testFindAllDeclaredFieldsAndOrder() {
+        List<Field> fields = findAllDeclaredFields(B.class, true);
+        for (Field f : fields) {
+            System.out.println(f);
+        }
+    }
+
+    @Getter
+    @Setter
+    public static class A {
+        @JsonProperty(index = 2)
+        private String name;
+        @JsonProperty(index = 1)
+        private String type;
+    }
+
+    @Getter
+    @Setter
+    public static class B extends A {
+        @JsonProperty(index = 3)
+        private int age;
+        @JsonProperty(index = 4)
+        private C c;
+    }
+
+    @Getter
+    @Setter
+    public static class C {
+        @JsonProperty(index = 0)
+        private boolean enable;
     }
 
 }

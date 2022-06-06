@@ -36,6 +36,7 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,8 @@ import java.util.Map;
 import javax.validation.constraints.NotNull;
 
 import javax.annotation.Nullable;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.wl4g.infra.common.collection.ConcurrentReferenceHashMap;
 
 import static com.wl4g.infra.common.lang.Assert2.*;
@@ -150,7 +153,9 @@ public abstract class ReflectionUtils2 {
      *         {@link #excludeFieldNamePrefixs}
      */
     @SuppressWarnings("unchecked")
-    public static <T> List<T> getFieldValues(@NotNull Object objectOrClass, @Nullable int[] excludeFieldModifiers,
+    public static <T> List<T> getFieldValues(
+            @NotNull Object objectOrClass,
+            @Nullable int[] excludeFieldModifiers,
             @Nullable String... excludeFieldNamePrefixs) {
         notNullOf(objectOrClass, "objectOrClass");
 
@@ -267,6 +272,41 @@ public abstract class ReflectionUtils2 {
             searchType = searchType.getSuperclass();
         }
         return null;
+    }
+
+    /**
+     * Attempt to find a {@link Field field} on the supplied {@link Class} with
+     * the supplied {@code name} and/or {@link Class type}. Searches all
+     * superclasses up to {@link Object}.
+     * 
+     * @param clazz
+     *            the class to introspect
+     * @param orderByJsonPropertyIndex
+     *            Whether to sort according to
+     *            {@link com.fasterxml.jackson.annotation.JsonProperty#index}
+     * @return
+     */
+    public static List<Field> findAllDeclaredFields(@NotNull Class<?> clazz, boolean orderByJsonPropertyIndex) {
+        notNull(clazz, "Class must not be null");
+        List<Field> allFields = new ArrayList<>(32);
+        Class<?> searchType = clazz;
+        while (Object.class != searchType && searchType != null) {
+            Field[] fields = getDeclaredFields(searchType);
+            for (Field f : fields) {
+                allFields.add(f);
+            }
+            searchType = searchType.getSuperclass();
+        }
+        if (orderByJsonPropertyIndex) {
+            Collections.sort(allFields, (f1, f2) -> {
+                JsonProperty jp1 = ((Field) f1).getAnnotation(JsonProperty.class);
+                JsonProperty jp2 = ((Field) f2).getAnnotation(JsonProperty.class);
+                int order1 = nonNull(jp1) ? jp1.index() : Integer.MAX_VALUE;
+                int order2 = nonNull(jp2) ? jp2.index() : Integer.MAX_VALUE;
+                return order1 - order2;
+            });
+        }
+        return allFields;
     }
 
     /**
