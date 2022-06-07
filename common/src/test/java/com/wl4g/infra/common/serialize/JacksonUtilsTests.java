@@ -19,6 +19,7 @@ import static com.wl4g.infra.common.serialize.JacksonUtils.deepClone;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseArrayMapString;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseArrayString;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
+import static com.wl4g.infra.common.serialize.JacksonUtils.parseJsonNode;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.lang.System.out;
 import static java.util.Collections.singletonMap;
@@ -29,11 +30,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -110,6 +113,32 @@ public class JacksonUtilsTests {
         list2.add(map21);
         map2.put("bar2", list2);
         out.println(deepClone(map2));
+    }
+
+    @Test
+    public void testParseToJsonNode() {
+        String json = "{\"name\":\"jack\",\"expire\":1000,\"children\":{\"name\":\"tom\",\"expire\":2000}}";
+        JsonNode jsonNode = parseJSON(json, JsonNode.class);
+        System.out.println(jsonNode);
+
+        String name = jsonNode.at("/name").asText();
+        System.out.println(name);
+        Assertions.assertEquals("jack", name);
+
+        String subname = jsonNode.at("/children/name").asText();
+        System.out.println(subname);
+        Assertions.assertEquals("tom", subname);
+    }
+
+    @Test
+    public void testParseJsonNode() {
+        String json = "{\"name\":\"jack\",\"expire\":1000,\"children\":{\"name\":\"tom\",\"expire\":2000}}";
+        JsonNode jsonNode = parseJsonNode(json, "");
+        System.out.println(jsonNode);
+
+        String subname = jsonNode.at("/children/name").asText();
+        System.out.println(subname);
+        Assertions.assertEquals("tom", subname);
     }
 
     //
