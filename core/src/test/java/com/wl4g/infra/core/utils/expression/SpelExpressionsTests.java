@@ -36,7 +36,7 @@ import com.wl4g.infra.core.utils.expression.SpelExpressions;
 public class SpelExpressionsTests {
 
     @Test
-    public void mapSpelCase() {
+    public void testMapReaderCase() {
         Map<String, Object> model = new HashMap<>();
         model.put("name", "Mia");
         model.put("age", 25);
@@ -72,13 +72,13 @@ public class SpelExpressionsTests {
     }
 
     @Test
-    public void stringMethodSpelCase() {
+    public void testStringCalcSpelCase() {
         String expression = "#{'Hi, everybody'.contains('Hi')}";
         System.out.println("contains: " + SpelExpressions.create().resolve(expression, null));
     }
 
     @Test
-    public void directCallMethodSpelCase() {
+    public void testDirectMethodSpelCase() {
         String expression = "#{T(com.wl4g.infra.core.utils.expression.SpelExpressionsTests.JoinUtil).join(name)}";
         Map<String, Object> model = new HashMap<>();
         model.put("name", "Mia");
@@ -86,7 +86,7 @@ public class SpelExpressionsTests {
     }
 
     @Test
-    public void aliasCallMethodSpelCase() {
+    public void testAliasMethodSpelCase() {
         String expression = "#{T(SpelExpressionsTests$JoinUtil).join(name)}";
         Map<String, Object> model = new HashMap<>();
         model.put("name", "Mia");
@@ -94,7 +94,7 @@ public class SpelExpressionsTests {
     }
 
     @Test
-    public void modelCallMethodSpelCase() {
+    public void testModelMethodSpelCase() {
         String expression = "#{JoinUtil.join(name)}";
         Map<String, Object> model = new HashMap<>();
         model.put("name", "Mia");
@@ -103,13 +103,13 @@ public class SpelExpressionsTests {
     }
 
     @Test
-    public void nonStringArgCallMethodSpelCase() {
+    public void testNonStringArgMethodSpelCase() {
         String expression = "#{T(com.wl4g.infra.core.utils.expression.SpelExpressionsTests.JoinUtil).show(T(String).class)}";
         System.out.println("result: " + SpelExpressions.create().resolve(expression, null));
     }
 
     @Test
-    public void modelCallObjectMethodSpelCase() {
+    public void testModelObjectMethodSpelCase() {
         String expression = "#{joinUtil.join(name)}";
         Map<String, Object> model = new HashMap<>();
         model.put("joinUtil", new JoinUtil());
@@ -140,7 +140,7 @@ public class SpelExpressionsTests {
      * @throws ClassNotFoundException
      */
     @Test
-    public void invokeAttackSpelCase() throws ClassNotFoundException {
+    public void testDirectMethodNegativeSpelCase() throws ClassNotFoundException {
         String expression = "#{T(com.wl4g.infra.common.cli.ProcessUtils).execSingle(\"rm -rf /tmp/test1\")}";
         System.out.println("result: " + SpelExpressions.create().resolve(expression, null));
     }

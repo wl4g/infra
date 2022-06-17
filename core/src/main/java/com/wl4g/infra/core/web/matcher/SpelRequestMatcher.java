@@ -74,6 +74,7 @@ import lombok.extern.slf4j.Slf4j;
  * @version 2022-04-07 v3.0.0
  * @since v3.0.0
  */
+@Getter
 @Slf4j
 public class SpelRequestMatcher {
 

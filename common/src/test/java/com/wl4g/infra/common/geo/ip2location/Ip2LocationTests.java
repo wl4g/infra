@@ -48,6 +48,9 @@ public class Ip2LocationTests {
 
         System.out.println(ipl.IPQuery("61.141.46.255"));
         System.out.println("---------");
+
+        System.out.println(ipl.IPQuery("176.192.102.130"));
+        System.out.println("---------");
     }
 
 }

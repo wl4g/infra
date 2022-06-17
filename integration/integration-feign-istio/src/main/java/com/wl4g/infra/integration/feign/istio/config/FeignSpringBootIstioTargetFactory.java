@@ -97,7 +97,7 @@ public class FeignSpringBootIstioTargetFactory implements FeignSpringBootTargetF
             if (!contains(str, "://")) {
                 uri = URI.create(DEFAULT_SVC_SCHEMA.concat(str));
             }
-            
+
             // Gets serviceId(host)
             String serviceId = str;
             if (!isBlank(uri.getHost())) {
