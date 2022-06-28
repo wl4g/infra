@@ -42,16 +42,16 @@ class DefaultIBootstrappingConfigurer implements IBootstrappingConfigurer {
 	@Override
 	def Properties defaultProperties(Properties prevDefaultProperties) {
 		def defaultProperties = new Properties()
-		// Preset spring.config.name
-		// for example: spring auto load for 'application-dev.yml/application-data-dev.yml'
-        def configName = new StringBuffer("application,iam-web,iam-web-etc")
-        configName.append("application")
+		// Preset 'spring.config.name'
+		// for example: auto load for 'application-dev.yml/application-data-dev.yml'
+        def configName = new StringBuffer("application")
+        configName.append(",application")
         configName.append(",application-data")
         configName.append(",application-service")
         configName.append(",application-web")
 		defaultProperties.put(CONFIG_NAME_PROPERTY, configName.toString())
 
-		// Preset spring.config.location
+		// Preset 'spring.config.location'
 		// for example: spring auto load for 'classpath:/application-data-dev.yml'
 		def location = new StringBuffer("classpath:/")
 		if (isPresent("org.springframework.cloud.openfeign.FeignClient") && isPresent("org.springframework.cloud.openfeign.FeignAutoConfiguration")) {
