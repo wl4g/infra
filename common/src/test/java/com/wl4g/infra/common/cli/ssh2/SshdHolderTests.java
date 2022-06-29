@@ -35,7 +35,7 @@ import static java.util.Objects.nonNull;
 /**
  * {@link SshdHolderTests}
  * 
- * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
  * @author vjay
  * @version 2020年5月23日 v1.0.0
  * @see

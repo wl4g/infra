@@ -47,7 +47,7 @@ import java.util.*;
  * Patterned after Spring Integration IntegrationComponentScanRegistrar and
  * RibbonClientsConfigurationRegistgrar.
  * 
- * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
  * @author Spencer Gibb
  * @author Jakub Narloch
  * @author Venil Noronha

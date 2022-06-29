@@ -33,7 +33,7 @@
 /// **
 // * Utility class to work with meshes.
 // *
-// * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+// * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
 // * @version 2022-03-11 v1.0.0
 // * @see
 /// https://github.com/wl4g-k8s/spring-cloud-kubernetes-with-istio#istio-initial-startup-networking

@@ -99,7 +99,7 @@ red><b>(Optional)</b></font>
  * </pre>
  * 
  * @param <T>
- * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
  * @version 2020年1月9日 v1.0.0
  * @see
  */
@@ -125,7 +125,7 @@ public interface MessageNotifier extends Operator<NotifierKind> {
 	/**
 	 * Notification privoder kind.
 	 * 
-	 * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+	 * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
 	 * @version 2020年1月8日 v1.0.0
 	 * @see
 	 */

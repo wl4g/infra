@@ -32,7 +32,7 @@ import com.wl4g.infra.core.web.versions.annotation.EnableApiVersionManagement;
 /**
  * {@link ApiVersionControllerTests}
  * 
- * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
  * @version v1.0 2020-12-01
  * @sine v1.0
  * @see https://spring.io/guides/gs/testing-web/

@@ -24,7 +24,7 @@ import org.junit.Test;
 /**
  * {@link EncodesTests}
  * 
- * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
  * @version v1.0 2021-06-11
  * @sine v1.0
  * @see

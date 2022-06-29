@@ -55,7 +55,7 @@ import feign.Client;
  * 2)使用{@link Qualifier}可以精确指定bean进行注入,
  * 如在与spring-sleuth/zipkin/seata等整合时容易出现都为了包装{@link FeignClient}而冲突.
  * 
- * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
  * @version v1.0 2021-01-19
  * @sine v1.0
  * @see https://blog.csdn.net/dingmeinai9020/article/details/102069649

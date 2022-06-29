@@ -38,7 +38,7 @@ import static org.apache.commons.lang3.SystemUtils.USER_HOME;
  * {@link SSH2Holders}, generic SSH2 client wrapper tool. </br>
  * Including the implementation of ethz/ssj/ssd.
  * 
- * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
  * @version 2020年1月9日 v1.0.0
  * @see
  */
@@ -216,7 +216,7 @@ public abstract class SSH2Holders<S, F> {
     /**
      * {@link Ssh2ExecResult}
      * 
-     * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+     * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
      * @version 2020年1月9日 v1.0.0
      * @see
      */
@@ -263,7 +263,7 @@ public abstract class SSH2Holders<S, F> {
     /**
      * {@link Ssh2KeyPair}
      * 
-     * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+     * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
      * @version 2020年2月4日 v1.0.0
      * @see
      */
@@ -295,7 +295,7 @@ public abstract class SSH2Holders<S, F> {
     /**
      * {@link AlgorithmType}
      * 
-     * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+     * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
      * @version 2020年2月4日 v1.0.0
      * @see
      */

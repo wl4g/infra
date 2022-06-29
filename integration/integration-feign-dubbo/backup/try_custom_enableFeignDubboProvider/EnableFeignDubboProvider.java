@@ -27,7 +27,7 @@ import java.lang.annotation.*;
  * {@link org.springframework.context.annotation.Configuration
  * <code>@Configuration</code>} classes.</br>
  * 
- * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
  * @author Spencer Gibb
  * @author Dave Syer
  * @version v1.0 2019-11-20

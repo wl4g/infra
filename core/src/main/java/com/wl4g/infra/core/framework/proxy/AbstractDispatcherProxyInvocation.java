@@ -33,7 +33,7 @@ import com.wl4g.infra.common.log.SmartLogger;
 /**
  * {@link AbstractDispatcherProxyInvocation}
  * 
- * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
  * @author liqiu
  * @version v1.0 2019-11-20
  * @sine v1.0

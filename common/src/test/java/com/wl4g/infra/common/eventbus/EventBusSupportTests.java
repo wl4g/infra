@@ -27,7 +27,7 @@ import lombok.ToString;
 /**
  * {@link EventBusSupportTests}
  * 
- * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
  * @version 2021-12-23 v1.0.0
  * @since v1.0.0
  */

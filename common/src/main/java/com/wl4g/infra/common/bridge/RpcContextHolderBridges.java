@@ -40,7 +40,7 @@ import javax.validation.constraints.NotNull;
  * supporting different framework architecture running environments to switch
  * between each other.
  * 
- * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
  * @version v1.0 2021-01-29
  * @sine v1.0
  * @see https://blog.csdn.net/zoinsung_lee/article/details/82529624

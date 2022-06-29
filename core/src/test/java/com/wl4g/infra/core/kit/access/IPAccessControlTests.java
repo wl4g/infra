@@ -24,7 +24,7 @@ import com.wl4g.infra.core.kit.access.IPAccessControl.IPAccessProperties;
 /**
  * {@link IPAccessControlTests}
  * 
- * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
  * @version v1.0 2021-03-10
  * @sine v1.0
  * @see

@@ -51,7 +51,7 @@ import com.wl4g.infra.integration.feign.core.context.RpcContextHolder;
  * request parameters are in the request.body , which may not perform binding to
  * {@link RpcContextHolder}.
  * 
- * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
  * @version v1.0 2020-12-07
  * @sine v1.0
  * @see

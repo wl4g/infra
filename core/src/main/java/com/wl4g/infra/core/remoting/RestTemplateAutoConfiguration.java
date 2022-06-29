@@ -46,7 +46,7 @@ import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 /**
  * {@link RestTemplateAutoConfiguration}
  * 
- * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
  * @version v1.0 2019-12-24
  * @sine v1.0
  * @see

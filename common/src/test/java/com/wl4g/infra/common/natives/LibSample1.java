@@ -20,7 +20,7 @@ import com.sun.jna.Library;
 /**
  * {@link LibSample1}
  * 
- * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
  * @version 2020年6月21日 v1.0.0
  * @see https://studygolang.com/articles/13646
  */

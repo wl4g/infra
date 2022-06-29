@@ -55,7 +55,7 @@ import com.wl4g.infra.core.web.mapping.annotation.WebMvcSmartHandlerMappingConfi
  * {@link ServletHandlerMappingSupport#isHandler} and
  * {@link ReactiveHandlerMappingSupport#isHandler}; </br>
  * 
- * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
  * @version v1.0 2020-12-17
  * @sine v1.0
  * @see

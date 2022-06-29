@@ -30,7 +30,7 @@ import lombok.Setter;
 /**
  * {@link PageHolderTests}
  * 
- * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
  * @version v1.0 2020-11-16
  * @sine v1.0
  * @see

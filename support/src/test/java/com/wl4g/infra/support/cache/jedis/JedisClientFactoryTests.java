@@ -29,7 +29,7 @@ import com.wl4g.infra.support.cache.jedis.JedisClientAutoConfiguration.JedisProp
 /**
  * {@link JedisClientFactoryTests}
  * 
- * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
  * @version 2020年7月18日 v1.0.0
  * @see
  */

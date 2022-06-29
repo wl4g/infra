@@ -263,7 +263,7 @@ public class MyUserInfo implements Serializable {
 	/**
 	 * {@link MyUserInfo} attributes wrapper.
 	 * 
-	 * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+	 * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
 	 * @version 2020年7月7日 v1.0.0
 	 * @see
 	 */
@@ -785,7 +785,7 @@ public class MyUserInfo implements Serializable {
 	/**
 	 * Principal organization tree info.
 	 * 
-	 * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+	 * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
 	 * @version 2020年5月18日 v1.0.0
 	 * @see
 	 */
@@ -864,7 +864,7 @@ public class MyUserInfo implements Serializable {
 	/**
 	 * Organization info.
 	 *
-	 * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+	 * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
 	 * @version 2020年5月18日 v1.0.0
 	 * @see
 	 */

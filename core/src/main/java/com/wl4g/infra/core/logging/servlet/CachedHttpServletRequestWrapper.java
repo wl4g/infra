@@ -35,7 +35,7 @@ import org.springframework.web.util.ContentCachingRequestWrapper;
 /**
  * {@link CachedHttpServletRequestWrapper}
  * 
- * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
  * @version 2022-05-21 v3.0.0
  * @since v3.0.0
  * @see {{@link ContentCachingRequestWrapper}

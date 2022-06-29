@@ -22,7 +22,7 @@ import com.wl4g.infra.common.cli.ssh2.SSH2Holders.Ssh2KeyPair;
 /**
  * {@link JschHolderTests}
  * 
- * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
  * @author vjay
  * @version 2020年5月23日 v1.0.0
  * @see

@@ -60,7 +60,7 @@ import reactor.core.publisher.Mono;
 /**
  * Reactive smart global web error handler.
  * 
- * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
  * @version 2020-09-12
  * @sine v1.0.0
  * @see https://blog.csdn.net/keets1992/article/details/85077874

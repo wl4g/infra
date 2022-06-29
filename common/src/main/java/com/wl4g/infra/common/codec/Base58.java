@@ -24,7 +24,7 @@ import java.io.UnsupportedEncodingException;
 /**
  * Base58 codec utility. {@link Base58}
  * 
- * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
  * @version 2020年3月25日 v1.0.0
  * @see
  */

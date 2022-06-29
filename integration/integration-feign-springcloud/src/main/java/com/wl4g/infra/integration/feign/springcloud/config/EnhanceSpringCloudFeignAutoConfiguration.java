@@ -27,7 +27,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 /**
  * {@link EnhanceSpringCloudFeignAutoConfiguration}
  * 
- * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
  * @version v1.0 2021-02-01
  * @sine v1.0
  * @see

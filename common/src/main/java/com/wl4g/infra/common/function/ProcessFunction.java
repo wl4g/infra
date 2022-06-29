@@ -20,7 +20,7 @@ package com.wl4g.infra.common.function;
  * {@link java.util.function.Function} and {@link java.util.function.Supplier},
  * support for throwing exception was added.
  * 
- * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
  * @version 2020年1月7日 v1.0.0
  */
 @FunctionalInterface

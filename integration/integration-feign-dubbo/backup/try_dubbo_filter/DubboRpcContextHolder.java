@@ -25,7 +25,7 @@ import com.wl4g.infra.integration.feign.context.RpcContextRegistry;
 /**
  * {@link DubboRpcContextHolder}
  * 
- * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
  * @version v1.0 2020-12-17
  * @sine v1.0
  * @see

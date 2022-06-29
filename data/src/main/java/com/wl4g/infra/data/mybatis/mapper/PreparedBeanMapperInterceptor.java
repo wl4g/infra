@@ -59,7 +59,7 @@ import com.wl4g.infra.core.page.PageHolder;
  * ResultHandler：Processing of interception result set</br>
  * StatementHandler：Processing of intercepting SQL syntax construction</br>
  * 
- * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
  * @version v1.0 2020-11-17
  * @sine v1.0
  * @see https://www.jianshu.com/p/0a72bb1f6a21
