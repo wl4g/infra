@@ -69,27 +69,29 @@ public class LoggingMessageServletFilter extends BaseLoggingServletFilter {
             String traceId,
             String requestMethod) throws IOException, ServletException {
 
-        if (nonNull(request.getContentType()) && isUploadStreamMedia(parseMediaType(request.getContentType()))) {
-            chain.doFilter(request, response);
-        } else {
-            CachedHttpServletRequestWrapper cacheRequestWrapper = new CachedHttpServletRequestWrapper(request);
-            ContentCachingResponseWrapper cacheResponseWrapper = new ContentCachingResponseWrapper(response);
-
-            logRequest(cacheRequestWrapper, cacheResponseWrapper, traceId); // Logs-request.
-            // Fix: Must be called, otherwise the next read from request will
-            // have no data.
-            cacheRequestWrapper.getInputStream().reset();
-
-            chain.doFilter(cacheRequestWrapper, cacheResponseWrapper);
-
-            logResponse(cacheRequestWrapper, cacheResponseWrapper, traceId); // Logs-response.
-            // Fix: Must be called, otherwise the response will have no data.
-            cacheResponseWrapper.copyBodyToResponse();
+        CachedHttpServletRequestWrapper cacheRequest = new CachedHttpServletRequestWrapper(request);
+        if (cacheRequest.isCachingBodySupport()) {
+            logRequest(cacheRequest, traceId);
+            try {
+                // Must be called, otherwise the next read from request
+                // will have no data.
+                cacheRequest.getInputStream().reset();
+            } catch (IOException e) {
+                log.warn("Could't to reset with request: {}, input stream: {}, {}", request.getClass(),
+                        request.getInputStream().getClass(), e.getMessage());
+            }
         }
+
+        ContentCachingResponseWrapper cacheResponse = new ContentCachingResponseWrapper(response);
+        chain.doFilter(cacheRequest, cacheResponse);
+
+        logResponse(cacheRequest, cacheResponse, traceId);
+
+        // Must be called, otherwise the response will have no data.
+        cacheResponse.copyBodyToResponse();
     }
 
-    protected void logRequest(HttpServletRequest request, ContentCachingResponseWrapper response, String traceId)
-            throws IOException {
+    protected void logRequest(HttpServletRequest request, String traceId) throws IOException {
         String requestMethod = request.getMethod();
         URI uri = URI.create(request.getRequestURI());
         String requestPath = uri.getPath();
@@ -137,7 +139,7 @@ public class LoggingMessageServletFilter extends BaseLoggingServletFilter {
                 processBodyIfNeed = false;
                 requestLog.append(LoggingMessageUtil.LOG_REQUEST_BODY);
                 requestLog.append(LoggingMessageUtil.LOG_REQUEST_END);
-                requestLogArgs.add("[Upload Binary Data] ...");
+                requestLogArgs.add("[Request Binary Data] ...");
                 log.info(requestLog.toString(), requestLogArgs.toArray());
             } else {
                 requestLog.append(LoggingMessageUtil.LOG_REQUEST_END);
@@ -203,7 +205,7 @@ public class LoggingMessageServletFilter extends BaseLoggingServletFilter {
         // binary.
         if (isDownloadStreamMedia(contentType)) {
             responseLog.append(LoggingMessageUtil.LOG_RESPONSE_BODY);
-            responseLogArgs.add("[Download Binary Data] ...");
+            responseLogArgs.add("[Response Binary Data] ...");
         } else {
             // When the response has no body, print the end flag
             // directly.
