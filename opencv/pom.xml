@@ -9,7 +9,7 @@
 	<description>Infra Component Integration with OpenCV Module.</description>
 	<parent>
 		<groupId>com.wl4g</groupId>
-		<artifactId>dopass-infra</artifactId>
+		<artifactId>infra</artifactId>
 		<version>3.0.0</version>
 	</parent>
 	<properties>

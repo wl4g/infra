@@ -18,8 +18,8 @@
 		</license>
 	</licenses>
 	<scm>
-		<connection>scm:git:git@github.com:wl4g/dopass-infra.git</connection>
-		<developerConnection>scm:git:git@github.com:wl4g/dopass-infra.git</developerConnection>
+		<connection>scm:git:git@github.com:wl4g/infra.git</connection>
+		<developerConnection>scm:git:git@github.com:wl4g/infra.git</developerConnection>
 		<url>https://github.com/wl4g/dopass-infra</url>
 		<tag>HEAD</tag>
 	</scm>
@@ -52,7 +52,7 @@
 	</developers>
 	<parent>
 		<groupId>com.wl4g</groupId>
-		<artifactId>dopass-infra</artifactId>
+		<artifactId>infra</artifactId>
 		<version>3.0.0</version>
 	</parent>
 	<properties>
