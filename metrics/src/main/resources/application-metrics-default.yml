@@ -1,0 +1,70 @@
+# Copyright (c) 2017 ~ 2025, the original author wanglsir individual Inc,
+# All rights reserved. Contact us <wanglsir@gmail.com, 983708408@qq.com>
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+#spring:
+#  infra:
+#    metrics:
+#      #utils:
+#      #  timeoutSeconds: 1 ## Default by 1 sec.
+#      collector:
+#        timing:
+#          enabled: false ## Default by false
+#          initialDelayMs: 3_000 ## Default by 3000ms.
+#          delayMs: 15_000 ## Default by 15000ms.
+#          concurrency: 1 ## Default by 1 threads.
+#      counter:
+#        enabled: false ## Default by false
+#        #expression: execution(public * org.springframework.boot.actuate.health.HealthEndpoint.*(..))
+#      timed:
+#        enabled: false ## Default by false
+#        #expression: execution(public * org.springframework.boot.actuate.health.HealthEndpoint.*(..))
+#      health:
+#        timed:
+#          enabled: false ## Default by false
+#          samples: 32
+#          timeoutThresholdMs: 5_000
+
+# see:https://docs.spring.io/spring-boot/docs/2.3.2.RELEASE/actuator-api/html/#overview
+# see:org.springframework.boot.actuate.autoconfigure.web.server.ManagementServerProperties
+management:
+  server:
+    address: 0.0.0.0
+    port: 10108
+    ssl:
+      enabled: false
+    servlet.contextPath: /
+  security:
+    enabled: false
+    sensitive: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+      jmx:
+        enabled: true
+  endpoints:
+    web:
+      basePath: /actuator
+      exposure:
+        #exclude: /myapi
+        include: '*'
+    health: # see:org.springframework.boot.actuate.autoconfigure.health.HealthEndpointProperties
+      showDetails: always
+      mongo.enabled: false
+      solr.enabled: false
+      db.enabled: true
+
+info:
+  app:
+    name: "@project.name@"
+    description: "@project.description@"
+    version: "@project.version@"
+    encoding: "@project.build.sourceEncoding@"
+    java: "version: @java.version@"
