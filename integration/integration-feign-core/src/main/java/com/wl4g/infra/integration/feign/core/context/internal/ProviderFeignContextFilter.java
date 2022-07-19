@@ -25,11 +25,13 @@ import static com.wl4g.infra.common.lang.ClassUtils2.resolveClassNameNullable;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static com.wl4g.infra.core.utils.web.WebUtils3.currentServletRequest;
 import static com.wl4g.infra.core.utils.web.WebUtils3.currentServletResponse;
+import static java.lang.System.nanoTime;
 import static java.util.Objects.nonNull;
 import static org.springframework.core.annotation.AnnotatedElementUtils.hasAnnotation;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,6 +47,13 @@ import com.wl4g.infra.core.framework.proxy.InvocationChain;
 import com.wl4g.infra.core.framework.proxy.SmartProxyFilter;
 import com.wl4g.infra.integration.feign.core.annotation.FeignConsumer;
 import com.wl4g.infra.integration.feign.core.context.RpcContextHolder;
+import com.wl4g.infra.integration.feign.core.metrics.FeignMetricsUtil;
+import com.wl4g.infra.integration.feign.core.metrics.FeignMetricsUtil.MetricsName;
+import com.wl4g.infra.metrics.MetricsFacade;
+
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Timer;
+import lombok.AllArgsConstructor;
 
 /**
  * Notes: {@link RequestBodyAdvice} should not be used here because not all
@@ -56,8 +65,11 @@ import com.wl4g.infra.integration.feign.core.context.RpcContextHolder;
  * @sine v1.0
  * @see
  */
+@AllArgsConstructor
 public class ProviderFeignContextFilter implements SmartProxyFilter {
     protected final SmartLogger log = getLogger(getClass());
+
+    private final MetricsFacade metricsFacade;
 
     @Override
     public int getOrder() {
@@ -77,9 +89,36 @@ public class ProviderFeignContextFilter implements SmartProxyFilter {
     @Override
     public Object doInvoke(@NotNull InvocationChain chain, @NotNull Object target, @NotNull Method method, Object[] args)
             throws Exception {
+
+        // Gets metrics tags.
+        String[] tags = getMetricsTags(target, method, args);
+
+        // Add total metrics.
+        Counter success = metricsFacade.counter(MetricsName.provider_success.getName(), MetricsName.provider_total.getHelp(),
+                tags);
+        Counter failure = metricsFacade.counter(MetricsName.provider_failure.getName(), MetricsName.provider_failure.getHelp(),
+                tags);
+        Timer cost = metricsFacade.timer(MetricsName.provider_failure.getName(), MetricsName.provider_failure.getHelp(),
+                // TODO use configuration
+                new double[] { 0.3, 0.5, 0.9, 0.95, 0.99 }, tags);
+
         try {
+            final long beginTime = nanoTime();
+
             preHandle(target, method, args);
-            return chain.doInvoke(target, method, args);
+            Object result = chain.doInvoke(target, method, args);
+
+            // Add cost metrics.
+            cost.record(Duration.ofNanos(nanoTime() - beginTime));
+
+            // Add success metrics.
+            success.increment();
+
+            return result;
+        } catch (Exception e) {
+            // Add failure metrics.
+            failure.increment();
+            throw e;
         } finally {
             postHandle(target, method, args);
         }
@@ -124,6 +163,10 @@ public class ProviderFeignContextFilter implements SmartProxyFilter {
                 RpcContextHolder.removeServerContext();
             }
         }
+    }
+
+    private String[] getMetricsTags(Object target, Method method, Object[] args) {
+        return FeignMetricsUtil.getDefaultMetricsTags(target, method, args);
     }
 
     /**

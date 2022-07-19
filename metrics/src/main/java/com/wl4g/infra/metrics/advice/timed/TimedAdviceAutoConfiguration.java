@@ -1,6 +1,6 @@
 package com.wl4g.infra.metrics.advice.timed;
 
-import static com.wl4g.infra.common.lang.Assert2.notNull;
+import static com.wl4g.infra.common.lang.Assert2.hasText;
 import static com.wl4g.infra.metrics.constants.MetricsInfraConstants.CONF_PREFIX_INFRA_TIMED;
 
 import org.springframework.aop.aspectj.AspectJExpressionPointcutAdvisor;
@@ -24,7 +24,7 @@ import lombok.CustomLog;
 @SuppressWarnings("deprecation")
 @CustomLog
 @Configuration
-@ConditionalOnProperty(name = CONF_PREFIX_INFRA_TIMED + ".enabled", matchIfMissing = true)
+@ConditionalOnProperty(name = CONF_PREFIX_INFRA_TIMED + ".enabled", matchIfMissing = false)
 public class TimedAdviceAutoConfiguration {
 
     @Bean
@@ -37,8 +37,9 @@ public class TimedAdviceAutoConfiguration {
     public AspectJExpressionPointcutAdvisor timedAspectJExpressionPointcutAdvisor(
             TimedAdviceProperties config,
             TimedAdvice advice) {
-        notNull(config.getExpression(), "Expression of the timeouts AOP pointcut is null.");
-        log.info("Intializing timing aspectJExpressionPointcutAdvisor. {}", config);
+        hasText(config.getExpression(), "The timed advice pointcut expression '{}' is required.",
+                CONF_PREFIX_INFRA_TIMED + ".expression");
+        log.info("Intializing timed metrics advice. - {}", config);
         AspectJExpressionPointcutAdvisor advisor = new AspectJExpressionPointcutAdvisor();
         advisor.setExpression(config.getExpression());
         advisor.setAdvice(advice);
@@ -46,7 +47,7 @@ public class TimedAdviceAutoConfiguration {
     }
 
     @Bean
-    public TimedAdvice timedAdvice(@Autowired(required = true) TimedHealthIndicator timedIndicator) {
+    public TimedAdvice timedAdvice(@Autowired(required = false) TimedHealthIndicator timedIndicator) {
         return new TimedAdvice(timedIndicator);
     }
 

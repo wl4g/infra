@@ -22,19 +22,27 @@ package com.wl4g.infra.integration.feign.core.context.internal;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.findField;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.getField;
+import static java.lang.System.nanoTime;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.time.Duration;
 import java.util.Map;
 
 import com.wl4g.infra.integration.feign.core.context.internal.FeignContextCoprocessor.Invokers;
+import com.wl4g.infra.integration.feign.core.metrics.FeignMetricsUtil;
+import com.wl4g.infra.integration.feign.core.metrics.FeignMetricsUtil.MetricsName;
+import com.wl4g.infra.metrics.MetricsFacade;
 
 import feign.Feign;
 import feign.InvocationHandlerFactory;
 import feign.InvocationHandlerFactory.MethodHandler;
 import feign.Target;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Timer;
+import lombok.AllArgsConstructor;
 
 /**
  * {@link FeignContextBuilder}
@@ -44,7 +52,10 @@ import feign.Target;
  * @sine v1.0
  * @see
  */
+@AllArgsConstructor
 public class FeignContextBuilder extends Feign.Builder {
+
+    private final MetricsFacade metricsFacade;
 
     /**
      * refer to:{@link feign.hystrix.HystrixFeign.Builder#build} and
@@ -60,7 +71,7 @@ public class FeignContextBuilder extends Feign.Builder {
             @SuppressWarnings("rawtypes")
             @Override
             public InvocationHandler create(Target target, Map<Method, MethodHandler> dispatch) {
-                return new FeignContextInvocationHandler(originalFactory, target, dispatch);
+                return new FeignContextInvocationHandler(metricsFacade, originalFactory, target, dispatch);
             }
         });
 
@@ -76,12 +87,14 @@ public class FeignContextBuilder extends Feign.Builder {
      * @see {@link com.alibaba.cloud.sentinel.feign.SentinelInvocationHandler}
      */
     static class FeignContextInvocationHandler implements InvocationHandler {
-        protected final InvocationHandlerFactory originalFactory;
-        protected final Target<?> target;
-        protected final Map<Method, MethodHandler> dispatch;
+        private final MetricsFacade metricsFacade;
+        private final InvocationHandlerFactory originalFactory;
+        private final Target<?> target;
+        private final Map<Method, MethodHandler> dispatch;
 
-        public FeignContextInvocationHandler(InvocationHandlerFactory originalFactory, Target<?> target,
-                Map<Method, MethodHandler> dispatch) {
+        public FeignContextInvocationHandler(MetricsFacade metricsFacade, InvocationHandlerFactory originalFactory,
+                Target<?> target, Map<Method, MethodHandler> dispatch) {
+            this.metricsFacade = notNullOf(metricsFacade, "metricsFacade");
             this.originalFactory = notNullOf(originalFactory, "originalFactory");
             this.target = notNullOf(target, "target");
             this.dispatch = notNullOf(dispatch, "dispatch");
@@ -109,9 +122,42 @@ public class FeignContextBuilder extends Feign.Builder {
             // Call the coprocessor first.
             Invokers.beforeConsumerExecution(proxy, method, args);
 
-            // @see:feign.ReflectiveFeign.FeignInvocationHandler#invoke
-            return originalFactory.create(target, dispatch).invoke(proxy, method, args);
+            // Gets metrics tags.
+            String[] tags = getMetricsTags(proxy, method, args);
+
+            // Add total metrics.
+            Counter success = metricsFacade.counter(MetricsName.consumer_total.getName(), MetricsName.consumer_total.getHelp(),
+                    tags);
+            Counter failure = metricsFacade.counter(MetricsName.consumer_failure.getName(),
+                    MetricsName.consumer_failure.getHelp(), tags);
+            Timer cost = metricsFacade.timer(MetricsName.consumer_failure.getName(), MetricsName.consumer_failure.getHelp(),
+                    // TODO use configuration
+                    new double[] { 0.3, 0.5, 0.9, 0.95, 0.99 }, tags);
+
+            try {
+                final long beginTime = nanoTime();
+
+                // @see:feign.ReflectiveFeign.FeignInvocationHandler#invoke
+                Object result = originalFactory.create(target, dispatch).invoke(proxy, method, args);
+
+                // Add cost metrics.
+                cost.record(Duration.ofNanos(nanoTime() - beginTime));
+
+                // Add success metrics.
+                success.increment();
+
+                return result;
+            } catch (Exception e) {
+                // Add failure metrics.
+                failure.increment();
+                throw e;
+            }
         }
+
+        private String[] getMetricsTags(Object target, Method method, Object[] args) {
+            return FeignMetricsUtil.getDefaultMetricsTags(target, method, args);
+        }
+
     }
 
     private static final Field invocationHandlerFactoryField = findField(feign.Feign.Builder.class, "invocationHandlerFactory",

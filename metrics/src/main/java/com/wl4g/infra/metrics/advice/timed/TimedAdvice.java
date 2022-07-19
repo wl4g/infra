@@ -19,6 +19,8 @@ import static java.util.Objects.nonNull;
 
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Nullable;
+
 import org.aopalliance.intercept.MethodInvocation;
 
 import com.wl4g.infra.common.lang.FastTimeClock;
@@ -44,6 +46,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class TimedAdvice extends MetricsAdviceBase {
 
+    @Nullable
     private final TimedHealthIndicator timedIndicator; // Optional
 
     @Override

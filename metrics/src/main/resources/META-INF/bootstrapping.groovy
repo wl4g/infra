@@ -14,34 +14,34 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.infra.integration.feign.core.context.internal;
 
-import org.springframework.context.annotation.Bean;
+import static com.wl4g.infra.common.lang.ClassUtils2.isPresent
+import static org.springframework.boot.context.config.ConfigFileApplicationListener.CONFIG_ADDITIONAL_LOCATION_PROPERTY
 
-import com.wl4g.infra.metrics.MetricsFacade;
+import java.util.Set
+import org.springframework.boot.Banner
+import com.wl4g.infra.core.boot.listener.IBootstrappingConfigurer
 
-/***
- * Feign context auto configuration.</br>
- * (consumer/client|provider/server)
- *
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
- * @version v1.0 2020-12-07
- * @sine v1.0
- * @see
+/**
+ * Metrics implementation of {@link IBootstrappingConfigurer}
  */
-public class FeignContextAutoConfiguration {
+class MetricsIBootstrappingConfigurer implements IBootstrappingConfigurer {
 
-    @Bean
-    public ConsumerFeignContextFilter consumerFeignContextFilter() {
-        return new ConsumerFeignContextFilter();
+    @Override
+    def int getOrder() {
+        return 10
     }
 
-    @Bean
-    public ProviderFeignContextFilter providerFeignContextFilter(MetricsFacade metricsFacade) {
-        return new ProviderFeignContextFilter(metricsFacade);
+    def Banner.Mode bannerMode(Banner.Mode prevMode) {
+        return Banner.Mode.LOG;
+    }
+
+    @Override
+    void additionalProfiles(Set<String> prevAdditionalProfiles) {
+        prevAdditionalProfiles.add("metrics-default")
     }
 
 }

@@ -100,24 +100,29 @@ public class MetricsFacade {
 
     // --- Counter. ---
 
-    public Counter counter(String metricsName, String help, String... tags) {
-        return Counter.builder(metricsName).description(help).tags(applyDefaultTags(tags)).register(meterRegistry);
+    public Counter counter(String name, String help, String... tags) {
+        return Counter.builder(name).description(help).tags(applyDefaultTags(tags)).register(meterRegistry);
     }
 
     // --- Gauge. ---
 
-    public Gauge gauge(String metricsName, String help, double number, String... tags) {
-        return gauge(metricsName, help, () -> number, tags);
+    public Gauge gauge(String name, String help, double number, String... tags) {
+        return gauge(name, help, () -> number, tags);
     }
 
-    public Gauge gauge(String metricsName, String help, Supplier<Number> supplier, String... tags) {
-        return Gauge.builder(metricsName, supplier).description(help).tags(applyDefaultTags(tags)).register(meterRegistry);
+    public Gauge gauge(String name, String help, Supplier<Number> supplier, String... tags) {
+        return Gauge.builder(name, supplier).description(help).tags(applyDefaultTags(tags)).register(meterRegistry);
     }
 
     // --- Timer. ---
 
-    public Timer timer(String metricsName, String help, String... tags) {
-        return Timer.builder(metricsName).description(help).tags(applyDefaultTags(tags)).register(meterRegistry);
+    public Timer timer(String name, String help, double[] percentiles, String... tags) {
+        return Timer.builder(name)
+                .description(help)
+                .tags(applyDefaultTags(tags))
+                .publishPercentiles(percentiles)
+                .publishPercentileHistogram()
+                .register(meterRegistry);
     }
 
     // --- Summary. ---
@@ -127,12 +132,40 @@ public class MetricsFacade {
      * {@link DistributionStatisticConfig#DEFAULT}
      * 
      * @param name
+     * @param help
+     * @param scale
+     * @param slos
      * @param tags
      * @return
      */
-    public DistributionSummary summary(String metricsName, String help, double scale, String... tags) {
-        return DistributionSummary.builder(metricsName).description(help).tags(applyDefaultTags(tags)).scale(scale).register(
-                meterRegistry);
+    public DistributionSummary summary(String name, String help, double scale, double[] percentiles, String... tags) {
+        return DistributionSummary.builder(name)
+                .description(help)
+                .tags(applyDefaultTags(tags))
+                .publishPercentiles(percentiles)
+                .publishPercentileHistogram()
+                .scale(scale)
+                .register(meterRegistry);
+    }
+
+    /**
+     * Used default configuration refer to:
+     * {@link DistributionStatisticConfig#DEFAULT}
+     * 
+     * @param name
+     * @param help
+     * @param scale
+     * @param slos
+     * @param tags
+     * @return
+     */
+    public DistributionSummary summarySlos(String name, String help, double scale, double[] slos, String... tags) {
+        return DistributionSummary.builder(name)
+                .description(help)
+                .tags(applyDefaultTags(tags))
+                .serviceLevelObjectives(slos)
+                .scale(scale)
+                .register(meterRegistry);
     }
 
     public DistributionSummary summary(Meter.Id id, DistributionStatisticConfig distributionStatisticConfig, double scale) {
@@ -146,40 +179,40 @@ public class MetricsFacade {
     // --- The Metrics Passive Collector. ---
     //
 
-    public GaugeMetricFamily getGauge(String metricsName, String help, String... labelNames) {
-        MetricFamilySamples samples = sampleRegistry.get(metricsName);
+    public GaugeMetricFamily getGauge(String name, String help, String... labelNames) {
+        MetricFamilySamples samples = sampleRegistry.get(name);
         if (isNull(samples)) {
             synchronized (this) {
-                samples = sampleRegistry.get(metricsName);
+                samples = sampleRegistry.get(name);
                 if (isNull(samples)) {
-                    sampleRegistry.put(metricsName, samples = new GaugeMetricFamily(metricsName, help, asList(labelNames)));
+                    sampleRegistry.put(name, samples = new GaugeMetricFamily(name, help, asList(labelNames)));
                 }
             }
         }
-        samples = new GaugeMetricFamily(metricsName, help, asList(labelNames));
+        samples = new GaugeMetricFamily(name, help, asList(labelNames));
         return (GaugeMetricFamily) samples;
     }
 
-    public CounterMetricFamily getCounter(String metricsName, String help, String... labelNames) {
-        MetricFamilySamples samples = sampleRegistry.get(metricsName);
+    public CounterMetricFamily getCounter(String name, String help, String... labelNames) {
+        MetricFamilySamples samples = sampleRegistry.get(name);
         if (isNull(samples)) {
             synchronized (this) {
-                samples = sampleRegistry.get(metricsName);
+                samples = sampleRegistry.get(name);
                 if (isNull(samples)) {
-                    sampleRegistry.put(metricsName, samples = new CounterMetricFamily(metricsName, help, asList(labelNames)));
+                    sampleRegistry.put(name, samples = new CounterMetricFamily(name, help, asList(labelNames)));
                 }
             }
         }
         return (CounterMetricFamily) samples;
     }
 
-    public SummaryMetricFamily getSummary(String metricsName, String help, String... labelNames) {
-        MetricFamilySamples samples = sampleRegistry.get(metricsName);
+    public SummaryMetricFamily getSummary(String name, String help, String... labelNames) {
+        MetricFamilySamples samples = sampleRegistry.get(name);
         if (isNull(samples)) {
             synchronized (this) {
-                samples = sampleRegistry.get(metricsName);
+                samples = sampleRegistry.get(name);
                 if (isNull(samples)) {
-                    sampleRegistry.put(metricsName, samples = new SummaryMetricFamily(metricsName, help, asList(labelNames)));
+                    sampleRegistry.put(name, samples = new SummaryMetricFamily(name, help, asList(labelNames)));
                 }
             }
         }

@@ -55,7 +55,7 @@ import lombok.CustomLog;
 @Deprecated
 public class TimedHealthIndicator extends AbstractHealthIndicator {
 
-    private final Map<String, Deque<Long>> records = new ConcurrentHashMap<>(64);
+    private final Map<String, Deque<Long>> records = new ConcurrentHashMap<>(32);
     private TimedHealthProperties config;
 
     public TimedHealthIndicator(TimedHealthProperties config) {
@@ -103,13 +103,21 @@ public class TimedHealthIndicator extends AbstractHealthIndicator {
         int latestCount = config.getSamples();
         log.debug("Add times metric: {}, latestCount: {}, time={}", metricName, latestCount, time);
 
-        Deque<Long> deque = records.getOrDefault(metricName, new ConcurrentLinkedDeque<>());
+        Deque<Long> deque = records.get(metricName);
+        if (isNull(deque)) {
+            synchronized (this) {
+                deque = records.get(metricName);
+                if (isNull(deque)) {
+                    records.put(metricName, deque = new ConcurrentLinkedDeque<>());
+                }
+            }
+        }
+
         // Overflow check
         if (deque.size() >= (latestCount - 1)) {
             deque.poll(); // Remove first
         }
         deque.offer(time);
-        records.put(metricName, deque);
     }
 
     /**

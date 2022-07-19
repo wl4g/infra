@@ -143,44 +143,50 @@ public class ConsumerFeignContextFilter implements RequestInterceptor {
         @Override
         public Object decode(Response response, Type type) throws IOException, DecodeException, FeignException {
             try {
-                return decoder.decode(response, type);
-            } finally {
-                // The RPC call has responded and the attachment info should be
-                // extracted from it.
                 try {
-                    FeignRpcContextBinders.bindAttachmentsFromFeignResposne(response);
+                    return decoder.decode(response, type);
+                } finally {
+                    // The RPC call has responded and the attachment info should
+                    // be
+                    // extracted from it.
+                    try {
+                        FeignRpcContextBinders.bindAttachmentsFromFeignResposne(response);
 
-                    // Scheme 1(BUG):
-                    // Refer to
-                    // apache-dubbo-2.7.4.1↓:ConsumerContextFilter.java,
-                    // after called RPC, first cleanup context.
-                    // RpcContextHolder.removeContext();
+                        // Scheme 1(BUG):
+                        // Refer to
+                        // apache-dubbo-2.7.4.1↓:ConsumerContextFilter.java,
+                        // after called RPC, first cleanup context.
+                        // RpcContextHolder.removeContext();
 
-                    // Scheme 2:
-                    // Refer to apache-dubbo-2.7.5↑:ConsumerContextFilter.java,
-                    // after called RPC nothing todo.
-                    /**
-                     * Because when current role is consumer, still need to
-                     * continue to call other services, and must to carry hermit
-                     * parameters, for example pseudo code:
-                     * 
-                     * <pre>
-                     * public class OrderServiceImpl {
-                     *     public void createOrder(Order o) {
-                     *         // e.g: hermits pass authentication info to
-                     *         // provider.
-                     *         storeService.checkAndUpdateStock(o);
-                     *         // e.g: hermits pass authentication info to
-                     *         // provider.
-                     *         orderDal.insertOrder(o);
-                     *     }
-                     * }
-                     * </pre>
-                     */
-                    Invokers.afterConsumerExecution(response, type);
-                } catch (Exception e2) {
-                    log.warn("Cannot bind feign response attachments to current RpcContext", e2);
+                        // Scheme 2:
+                        // Refer to
+                        // apache-dubbo-2.7.5↑:ConsumerContextFilter.java,
+                        // after called RPC nothing todo.
+                        /**
+                         * Because when current role is consumer, still need to
+                         * continue to call other services, and must to carry
+                         * hermit parameters, for example pseudo code:
+                         * 
+                         * <pre>
+                         * public class OrderServiceImpl {
+                         *     public void createOrder(Order o) {
+                         *         // e.g: hermits pass authentication info to
+                         *         // provider.
+                         *         storeService.checkAndUpdateStock(o);
+                         *         // e.g: hermits pass authentication info to
+                         *         // provider.
+                         *         orderDal.insertOrder(o);
+                         *     }
+                         * }
+                         * </pre>
+                         */
+                        Invokers.afterConsumerExecution(response, type);
+                    } catch (Exception e2) {
+                        log.warn("Cannot bind feign response attachments to current RpcContext", e2);
+                    }
                 }
+            } catch (Exception e) {
+                throw e;
             }
         }
     }

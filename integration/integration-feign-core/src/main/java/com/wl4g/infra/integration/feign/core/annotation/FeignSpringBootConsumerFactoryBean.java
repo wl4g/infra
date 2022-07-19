@@ -64,6 +64,7 @@ import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.infra.integration.feign.core.config.FeignSpringBootAutoConfiguration;
 import com.wl4g.infra.integration.feign.core.config.FeignSpringBootProperties;
 import com.wl4g.infra.integration.feign.core.context.internal.ConsumerFeignContextFilter.FeignContextDecoder;
+import com.wl4g.infra.metrics.MetricsFacade;
 import com.wl4g.infra.integration.feign.core.context.internal.FeignContextBuilder;
 
 import feign.Client;
@@ -110,6 +111,7 @@ class FeignSpringBootConsumerFactoryBean<T> implements FactoryBean<T>, Applicati
     private final SmartLogger log = getLogger(feign.Logger.class);
 
     private ApplicationContext applicationContext;
+    private MetricsFacade metricsFacade;
     private FeignSpringBootProperties config;
     private Contract defaultContract;
     private Client client;
@@ -164,6 +166,7 @@ class FeignSpringBootConsumerFactoryBean<T> implements FactoryBean<T>, Applicati
     public T getObject() throws Exception {
         // Notice the invoke order:
         // can't get the bean in InitializingBean#afterPropertiesSet()?
+        this.metricsFacade = obtainMetricsFacade();
         this.config = obtainFeignConfigProperties();
         this.defaultContract = obtainDefaultSpringMvcContract();
         this.client = obtainFeignHttpClientInstance();
@@ -171,7 +174,7 @@ class FeignSpringBootConsumerFactoryBean<T> implements FactoryBean<T>, Applicati
         this.feignTargetFactory = obtainFeignTargetFactory();
 
         // Builder feign
-        Feign.Builder builder = new FeignContextBuilder().client(client);
+        Feign.Builder builder = new FeignContextBuilder(metricsFacade).client(client);
 
         // Sets request interceptor's.
         if (!requestInterceptors.isEmpty()) {
@@ -195,15 +198,35 @@ class FeignSpringBootConsumerFactoryBean<T> implements FactoryBean<T>, Applicati
         return builder.target(feignTargetFactory.create(config, targetClass, name, namespace, url, path));
     }
 
-    private FeignSpringBootTargetFactory obtainFeignTargetFactory() {
-        List<FeignSpringBootTargetFactory> candidates = safeMap(
-                applicationContext.getBeansOfType(FeignSpringBootTargetFactory.class)).values().stream().collect(toList());
-        AnnotationAwareOrderComparator.sort(candidates);
-        // Check target must have only one valid.
-        if (candidates.isEmpty()) {
-            throw new Error(format("Error, shouldn't be here, No found %s feign target factory.", Target.class.getSimpleName()));
+    private MetricsFacade obtainMetricsFacade() {
+        if (nonNull(metricsFacade)) {
+            return metricsFacade;
         }
-        return candidates.get(0);
+        return (metricsFacade = applicationContext.getBean(MetricsFacade.class));
+    }
+
+    private FeignSpringBootProperties obtainFeignConfigProperties() {
+        if (nonNull(config)) {
+            return config;
+        }
+        return (config = applicationContext.getBean(FeignSpringBootProperties.class));
+    }
+
+    private Contract obtainDefaultSpringMvcContract() {
+        return (defaultContract = (Contract) applicationContext
+                .getBean(FeignSpringBootAutoConfiguration.BEAN_SPRINGMVC_CONTRACT));
+    }
+
+    private Client obtainFeignHttpClientInstance() {
+        if (nonNull(client)) {
+            return client;
+        }
+        try {
+            client = applicationContext.getBean(BEAN_DEFAULT_FEIGN_CLIENT, Client.class);
+        } catch (NoSuchBeanDefinitionException e) {
+            throw new IllegalStateException("Without one of [okhttp3, Http2Client] client.");
+        }
+        return client;
     }
 
     private List<RequestInterceptor> obtainFeignRequestInterceptors() {
@@ -219,28 +242,15 @@ class FeignSpringBootConsumerFactoryBean<T> implements FactoryBean<T>, Applicati
         }
     }
 
-    private Contract obtainDefaultSpringMvcContract() {
-        return (defaultContract = (Contract) applicationContext
-                .getBean(FeignSpringBootAutoConfiguration.BEAN_SPRINGMVC_CONTRACT));
-    }
-
-    private FeignSpringBootProperties obtainFeignConfigProperties() {
-        if (nonNull(config)) {
-            return config;
+    private FeignSpringBootTargetFactory obtainFeignTargetFactory() {
+        List<FeignSpringBootTargetFactory> candidates = safeMap(
+                applicationContext.getBeansOfType(FeignSpringBootTargetFactory.class)).values().stream().collect(toList());
+        AnnotationAwareOrderComparator.sort(candidates);
+        // Check target must have only one valid.
+        if (candidates.isEmpty()) {
+            throw new Error(format("Error, shouldn't be here, No found %s feign target factory.", Target.class.getSimpleName()));
         }
-        return (config = applicationContext.getBean(FeignSpringBootProperties.class));
-    }
-
-    private Client obtainFeignHttpClientInstance() {
-        if (nonNull(client)) {
-            return client;
-        }
-        try {
-            client = applicationContext.getBean(BEAN_DEFAULT_FEIGN_CLIENT, Client.class);
-        } catch (NoSuchBeanDefinitionException e) {
-            throw new IllegalStateException("Without one of [okhttp3, Http2Client] client.");
-        }
-        return client;
+        return candidates.get(0);
     }
 
     private Logger.Level getLogLevel() {

@@ -61,6 +61,7 @@ import com.fasterxml.jackson.databind.Module;
 import com.wl4g.infra.integration.feign.core.context.internal.ConsumerFeignContextFilter.FeignContextDecoder;
 import com.wl4g.infra.integration.feign.core.context.internal.FeignContextBuilder;
 import com.wl4g.infra.integration.feign.springcloud.config.EnhanceSpringCloudFeignAutoConfiguration;
+import com.wl4g.infra.metrics.MetricsFacade;
 
 import feign.Contract;
 import feign.Feign;
@@ -174,8 +175,8 @@ public class FeignContextClientsAutoConfiguration {
     @Bean
     @Scope("prototype")
     @ConditionalOnMissingBean
-    public Feign.Builder feignBuilder(Retryer retryer) {
-        return new FeignContextBuilder().retryer(retryer);
+    public Feign.Builder feignBuilder(MetricsFacade metricsFacade, Retryer retryer) {
+        return new FeignContextBuilder(metricsFacade).retryer(retryer);
     }
 
     @Bean

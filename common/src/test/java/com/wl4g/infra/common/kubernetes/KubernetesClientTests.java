@@ -15,9 +15,13 @@
  */
 package com.wl4g.infra.common.kubernetes;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
+import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toList;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
@@ -34,6 +38,7 @@ import io.kubernetes.client.openapi.models.V1Pod;
 import io.kubernetes.client.openapi.models.V1PodList;
 import io.kubernetes.client.openapi.models.V1PodSpec;
 import io.kubernetes.client.openapi.models.V1Service;
+import io.kubernetes.client.openapi.models.V1ServiceList;
 import io.kubernetes.client.util.Config;
 import io.kubernetes.client.util.Watch;
 import okhttp3.Call;
@@ -193,6 +198,75 @@ public class KubernetesClientTests {
 
         V1Pod pod = api.createNamespacedPod("default", body, null, null, null);
         System.out.println(pod);
+    }
+
+    @Test
+    public void testGetNodePortServices() throws Exception {
+        ApiClient client = Config.defaultClient();
+        Configuration.setDefaultApiClient(client);
+
+        CoreV1Api api = new CoreV1Api();
+
+        V1ServiceList services = api.listServiceForAllNamespaces(null, null, null, null, null, null, null, null, null, null);
+        // System.out.println(services);
+
+        safeList(services.getItems()).stream().filter(svc -> svc.getSpec().getType().equals("NodePort")).forEach(svc -> {
+            System.out.println(svc.getMetadata().getName() + "/" + svc.getMetadata().getNamespace());
+            List<String> portString = svc.getSpec().getPorts().stream().map(port -> {
+                return port.getName() + "/" + port.getProtocol() + ":" + port.getPort() + "->" + port.getNodePort();
+            }).collect(toList());
+            System.out.println(portString);
+            System.out.println("---");
+        });
+    }
+
+    @Test
+    public void testWatchNodePortServices() throws Exception {
+        ApiClient client = Config.defaultClient();
+        Configuration.setDefaultApiClient(client);
+
+        CoreV1Api api = new CoreV1Api();
+
+        Call svcCall = api.listNamespacedServiceCall("default", null, false, null, null, null, 10, null, null, null, true, null);
+        // System.out.println(svcCall);
+
+        Watch<V1Service> watch = Watch.createWatch(client, svcCall, new TypeToken<Watch.Response<V1Service>>() {
+        }.getType());
+
+        try {
+            for (Watch.Response<V1Service> item : watch) {
+                System.out.printf("%s : %s%n", item.type,
+                        item.object.getMetadata().getName() + " updated ports: " + item.object.getSpec().getPorts());
+            }
+        } finally {
+            watch.close();
+        }
+    }
+
+    @Test
+    public void testWatchNodePortAllServices() throws Exception {
+        ApiClient client = Config.defaultClient();
+        Configuration.setDefaultApiClient(client);
+
+        CoreV1Api api = new CoreV1Api();
+
+        // Node: It will stop automatically after 60 seconds
+        Call svcCall = api.listServiceForAllNamespacesCall(null, null, null, null, null, null, null, null, 60, true, null);
+        // System.out.println(svcCall);
+
+        Watch<V1Service> watch = Watch.createWatch(client, svcCall, new TypeToken<Watch.Response<V1Service>>() {
+        }.getType());
+
+        try {
+            for (Watch.Response<V1Service> item : watch) {
+                if (nonNull(item.object)) {
+                    System.out.printf("%s : %s%n", item.type, item.object.getMetadata().getName());
+                    System.out.println("Updated ports: " + item.object.getSpec().getPorts());
+                }
+            }
+        } finally {
+            watch.close();
+        }
     }
 
 }

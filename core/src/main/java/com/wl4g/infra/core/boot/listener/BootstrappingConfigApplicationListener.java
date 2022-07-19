@@ -17,9 +17,7 @@ package com.wl4g.infra.core.boot.listener;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static com.wl4g.infra.common.collection.CollectionUtils2.extractFirst;
-import static com.wl4g.infra.common.collection.CollectionUtils2.isEmptyArray;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeArray;
-import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToList;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.infra.common.lang.Assert2.mustAssignableFrom;
 import static com.wl4g.infra.common.lang.StringUtils2.isTrue;
@@ -46,6 +44,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -127,7 +126,7 @@ public class BootstrappingConfigApplicationListener implements GenericApplicatio
                 ApplicationStartingEvent starting = (ApplicationStartingEvent) event;
                 presetSpringApplication(starting, starting.getSpringApplication());
             } catch (Exception e) {
-                throw new IllegalStateException("Cannot preset SpringApplication properties", e);
+                throw new IllegalStateException("Could't preset SpringApplication properties", e);
             }
         }
     }
@@ -179,42 +178,42 @@ public class BootstrappingConfigApplicationListener implements GenericApplicatio
             ApplicationStartingEvent event,
             SpringApplication application,
             List<IBootstrappingConfigurer> configurers) throws Exception {
-        Properties presetProperties = new Properties();
+        Properties mergedProps = new Properties();
         // defaultProperties.put("spring.main.allow-bean-definition-overriding","true");
 
         // Gets default properties in chains.
-        Properties currentDefaultProps = null;
+        Properties addDefaultProps = new Properties();
         for (IBootstrappingConfigurer configure : configurers) {
-            currentDefaultProps = configure.defaultProperties(currentDefaultProps);
-            if (nonNull(currentDefaultProps)) {
-                // Fix safe-value.
-                safeMap(currentDefaultProps).forEach((key, value) -> presetProperties.put(key,
+            configure.defaultProperties(addDefaultProps);
+            if (nonNull(addDefaultProps)) {
+                // Safe clean value.
+                safeMap(addDefaultProps).forEach((key, value) -> mergedProps.put(key,
                         defaultSafeCommClear.apply(defaultTrim2EmptyClear.apply((String) value))));
             }
         }
 
         // Command-line arguments preferred.
         for (String argName : args.getOptionNames()) {
-            presetProperties.remove(argName);
+            mergedProps.remove(argName);
         }
 
         // Merge existing properties(key-values).
-        Map<String, Object> existingDefaultProperties = getField(
-                findField(SpringApplication.class, "defaultProperties", Map.class), application, true);
-        safeMap(existingDefaultProperties).forEach((key, value) -> {
+        Map<String, Object> existingDefaultProps = getField(findField(SpringApplication.class, "defaultProperties", Map.class),
+                application, true);
+        safeMap(existingDefaultProps).forEach((key, value) -> {
             if (DEFAULT_PROPERTIES_MERGE_KEYS.contains(key)) { // Merge(if-necessary)
-                String presetValue = presetProperties.getProperty(key);
+                String presetValue = mergedProps.getProperty(key);
                 if (nonNull(presetValue)) {
                     value = value + "," + presetValue;
                 }
             }
-            presetProperties.put(key, value);
+            mergedProps.put(key, value);
         });
 
         if (isDebug) {
-            log.debug("Preset SpringApplication#setDefaultProperties(Final): {}", presetProperties);
+            log.debug("Preset SpringApplication#setDefaultProperties(Final): {}", mergedProps);
         }
-        application.setDefaultProperties(presetProperties);
+        application.setDefaultProperties(mergedProps);
     }
 
     protected void presetAdditionalProfiles(
@@ -223,14 +222,13 @@ public class BootstrappingConfigApplicationListener implements GenericApplicatio
             ApplicationStartingEvent event,
             SpringApplication application,
             List<IBootstrappingConfigurer> configurers) throws Exception {
-        String[] currentAdditionalProfiles = null;
+        Set<String> currentAdditionalProfiles = new HashSet<>();
         for (IBootstrappingConfigurer configure : configurers) {
-            currentAdditionalProfiles = configure.additionalProfiles(currentAdditionalProfiles);
+            configure.additionalProfiles(currentAdditionalProfiles);
         }
-        if (!isEmptyArray(currentAdditionalProfiles)) {
-            String[] additionalProfiles = safeArrayToList(currentAdditionalProfiles).stream()
-                    .map(p -> defaultTrim2EmptyClear.apply(p))
-                    .toArray(String[]::new);
+        if (!isEmpty(currentAdditionalProfiles)) {
+            String[] additionalProfiles = currentAdditionalProfiles.stream().map(p -> defaultTrim2EmptyClear.apply(p)).toArray(
+                    String[]::new);
             if (isDebug) {
                 log.debug("Preset SpringApplication#setAdditionalProfiles: {}", asList(additionalProfiles));
             }

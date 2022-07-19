@@ -15,47 +15,51 @@
  */
 package com.wl4g.infra.integration.feign.core.metrics;
 
+import java.lang.reflect.Method;
+
+import com.wl4g.infra.core.utils.AopUtils2;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * {@link FeignMetricsConstants}
+ * {@link FeignMetricsUtil}
  * 
  * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version 2022-07-12
  * @since v3.0.0
  */
-public class FeignMetricsConstants {
+public abstract class FeignMetricsUtil {
+
+    public static String[] getDefaultMetricsTags(Object target, Method method, Object[] args) {
+        Object obj = AopUtils2.getTarget(target);
+        String service = obj.getClass().getSimpleName();
+        return new String[] { MetricsTag.SERVICE, service, MetricsTag.METHOD, method.getName() };
+    }
 
     @Getter
     @AllArgsConstructor
     public static enum MetricsName {
 
-        //
-        // .
-        //
+        consumer_total("consumer_total", "The stats of consumer total"),
 
-        SIMPLE_SIGN_BLOOM_SUCCESS_TOTAL("iscg_simple_sign_bloom_success_total",
-                "The total number of success bloom validate for simple signature authenticator"),
+        consumer_success("consumer_success", "The stats of consumer decode success"),
 
-        SIMPLE_SIGN_TIME("iscg_simple_sign_time", "The number of simple signature execution cost time");
+        consumer_failure("consumer_failure", "The stats of consumer decode failure"),
+
+        provider_total("provider_total", "The stats of provider total"),
+
+        provider_success("provider_success", "The stats of provider decode success"),
+
+        provider_failure("provider_failure", "The stats of provider decode failure");
 
         private final String name;
         private final String help;
     }
 
     public static abstract class MetricsTag {
-
-        // for Common tags.
-
-        public static final String ROUTE_ID = "routeId";
-
-        public static final String SELF_INSTANCE_ID = "self";
-
-        // for Security tags.
-
-        public static final String SIGN_ALG = "alg";
-
+        public static final String SERVICE = "service";
+        public static final String METHOD = "method";
     }
 
 }

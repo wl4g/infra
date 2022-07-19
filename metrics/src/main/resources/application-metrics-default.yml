@@ -57,8 +57,8 @@ management:
         include: '*'
     health: # see:org.springframework.boot.actuate.autoconfigure.health.HealthEndpointProperties
       showDetails: always
-      mongo.enabled: false
-      solr.enabled: false
+      mongo.enabled: true
+      solr.enabled: true
       db.enabled: true
 
 info:

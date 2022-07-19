@@ -21,6 +21,7 @@ package com.wl4g.infra.core.boot.listener;
 
 import java.util.Collection;
 import java.util.Properties;
+import java.util.Set;
 
 import org.springframework.boot.ApplicationContextFactory;
 import org.springframework.boot.Banner;
@@ -162,25 +163,21 @@ public interface IBootstrappingConfigurer extends Ordered {
     }
 
     /**
-     * Resolve for preset
+     * Sets additional profiles.
      * {@link SpringApplication#setAdditionalProfiles(String...)}
      * 
      * @param prevAdditionalProfiles
-     * @return
      */
-    default String[] additionalProfiles(String[] prevAdditionalProfiles) {
-        return null;
+    default void additionalProfiles(Set<String> prevAdditionalProfiles) {
     }
 
     /**
-     * Resolve for preset
+     * Sets default properties.
      * {@link SpringApplication#setDefaultProperties(Properties)}
      * 
      * @param prevDefaultProperties
-     * @return
      */
-    default Properties defaultProperties(Properties prevDefaultProperties) {
-        return null;
+    default void defaultProperties(Properties prevDefaultProperties) {
     }
 
 }
