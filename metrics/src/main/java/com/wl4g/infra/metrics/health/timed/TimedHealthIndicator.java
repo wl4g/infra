@@ -62,14 +62,16 @@ public class TimedHealthIndicator extends AbstractHealthIndicator {
         this.config = notNullOf(config, "simpleTimingMetricsConfig");
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void doHealthCheck(Builder builder) throws Exception {
         try {
             // Gets the statistical (MAX/MIN/AVG/LATEST/..).
             TimedStat stat = getLargestStat();
-            log.debug("Times stat: {}", toJSONString(stat));
+            log.debug("Times stat: {}", () -> toJSONString(stat));
+
             if (isNull(stat)) {
-                HealthUtil.down(builder, "No telemetry data");
+                HealthUtil.up(builder, "Healthy (No telemetry data)");
                 return;
             } else if (stat.getMax() < config.getTimeoutThresholdMs()) {
                 HealthUtil.up(builder, "Healthy");
