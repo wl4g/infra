@@ -45,7 +45,7 @@ public abstract class ContainerRuntimeTool {
     private static ContainerEnvType inContainerType0() {
         try {
             if (IS_OS_LINUX) {
-                String res = ProcessUtils.execSimpleString(new String[] { "cat", "/proc/1/cgroup" }, 2_000);
+                String res = ProcessUtils.execSimpleString("cat /proc/1/cgroup", 6_000);
                 for (ContainerEnvType c : ContainerEnvType.values()) {
                     for (String word : c.keywords) {
                         if (containsIgnoreCase(res, word)) {

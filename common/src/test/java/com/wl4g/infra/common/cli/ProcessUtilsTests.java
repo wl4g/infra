@@ -56,9 +56,14 @@ public class ProcessUtilsTests {
         // Generate sample data.
         File file = new File("/tmp/test_vim_file.txt");
         FileUtils.write(file, "abcdefghijklmnopqrstuvwxyz", UTF_8);
-        // Testing
-        String res = ProcessUtils.execSimpleString(new String[] { "vim", file.getAbsolutePath() }, 1_000);
-        System.out.println(res);
+
+        // Blocking...
+        // String res1 = ProcessUtils.execSimpleString("vim " +
+        // file.getAbsolutePath());
+        // System.out.println(res1);
+
+        String res2 = ProcessUtils.execSimpleString("cat /proc/1/cgroup");
+        System.out.println(res2);
     }
 
 }

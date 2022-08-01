@@ -158,7 +158,7 @@ public abstract class ProcessUtils {
     /**
      * Execution multiple row command-line.
      * 
-     * @param multiCmd
+     * @param cmds
      *            multi command string.
      * @param pwdDir
      *            execute context directory.
@@ -177,26 +177,31 @@ public abstract class ProcessUtils {
      * @return
      * @throws IOException
      */
-    public final static DelegateProcess execMulti(final String multiCmd, File pwdDir, final File stdout, final File stderr,
-            final boolean append, final boolean redirectToNullIfNecessary) throws IOException {
+    public final static DelegateProcess execMulti(
+            final String cmds,
+            File pwdDir,
+            final File stdout,
+            final File stderr,
+            final boolean append,
+            final boolean redirectToNullIfNecessary) throws IOException {
         pwdDir = isNull(pwdDir) ? execScriptTmpDir : pwdDir;
         File tmpScript = new File(pwdDir.getAbsoluteFile(),
                 currentTimeMillis() + ".tmpscript" + "." + (IS_OS_WINDOWS ? "bat" : "sh"));
         // Write temporary script.
-        writeFile(tmpScript, multiCmd, false);
+        writeFile(tmpScript, cmds, false);
 
         // Processing windows permission is not implemented yet!!!
-        String callTmpScriptCmd = tmpScript.getAbsolutePath();
+        String callTmpScriptCmds = tmpScript.getAbsolutePath();
         if (!IS_OS_WINDOWS) {
-            callTmpScriptCmd = format("chmod 700 %s && %s", tmpScript.getAbsolutePath(), tmpScript.getAbsolutePath());
+            callTmpScriptCmds = format("chmod 700 %s && %s", tmpScript.getAbsolutePath(), tmpScript.getAbsolutePath());
         }
-        return execSingle(callTmpScriptCmd, null, stdout, stderr, append, redirectToNullIfNecessary);
+        return execSingle(callTmpScriptCmds, null, stdout, stderr, append, redirectToNullIfNecessary);
     }
 
     /**
      * Execution single row command-line.
      * 
-     * @param singleCmd
+     * @param cmds
      *            Single row command string.
      * @param pwdDir
      *            execute context directory.
@@ -214,10 +219,15 @@ public abstract class ProcessUtils {
      * @return
      * @throws IOException
      */
-    public final static DelegateProcess execSingle(final String singleCmd, final File pwdDir, final File stdout,
-            final File stderr, final boolean append, final boolean redirectToNullIfNecessary) throws IOException {
+    public final static DelegateProcess execSingle(
+            final String cmds,
+            final File pwdDir,
+            final File stdout,
+            final File stderr,
+            final boolean append,
+            final boolean redirectToNullIfNecessary) throws IOException {
         Process ps = null;
-        String[] cmdarray = buildCrossSingleCommands(singleCmd, stdout, stderr, append, redirectToNullIfNecessary);
+        String[] cmdarray = buildCrossSingleCommands(cmds, stdout, stderr, append, redirectToNullIfNecessary);
         if (nonNull(pwdDir)) {
             state(pwdDir.exists(), format("No such directory for pwdDir:[%s]", pwdDir));
             ps = getRuntime().exec(cmdarray, null, pwdDir);
@@ -230,13 +240,25 @@ public abstract class ProcessUtils {
     /**
      * Execution simple single row command-line get stdout to string.
      * 
-     * @param cmdarray
+     * @param cmds
      * @param timeoutMs
      * @return
      * @throws Exception
      */
-    public final static String execSimpleString(final String[] cmdarray, long timeoutMs) throws Exception {
-        Process ps = getRuntime().exec(cmdarray);
+    public final static String execSimpleString(final String cmds) throws Exception {
+        return execSimpleString(cmds, 60_000L);
+    }
+
+    /**
+     * Execution simple single row command-line get stdout to string.
+     * 
+     * @param cmds
+     * @param timeoutMs
+     * @return
+     * @throws Exception
+     */
+    public final static String execSimpleString(final String cmds, long timeoutMs) throws Exception {
+        Process ps = execSingle(cmds);
         ps.waitFor(timeoutMs, TimeUnit.MILLISECONDS);
 
         // Reading stderr & check.
@@ -261,27 +283,27 @@ public abstract class ProcessUtils {
     /**
      * Execution single row command-line.
      * 
-     * @param singleCmd
+     * @param cmds
      *            Single row command string.
      * @return
      * @throws IOException
      */
-    public final static Process execSingle(final String singleCmd) throws IOException {
-        String[] cmdarray = buildCrossSingleCommands(singleCmd, null, null, false, false);
+    public final static Process execSingle(final String cmds) throws IOException {
+        String[] cmdarray = buildCrossSingleCommands(cmds, null, null, false, false);
         return getRuntime().exec(cmdarray);
     }
 
     /**
      * Build cross platform single row wide fully qualified command line.
      * 
-     * @param cmd
+     * @param cmds
      *            Execution command string.
      * @param append
      *            Append write?
      * @return
      */
-    public final static String[] buildCrossSingleCommands(final String cmd, final boolean append) {
-        return buildCrossSingleCommands(cmd, null, null, append, true);
+    public final static String[] buildCrossSingleCommands(final String cmds, final boolean append) {
+        return buildCrossSingleCommands(cmds, null, null, append, true);
     }
 
     /**
@@ -314,7 +336,7 @@ public abstract class ProcessUtils {
      * </tr>
      * </table>
      * 
-     * @param cmd
+     * @param cmds
      *            Execution command string.
      * @param stdout
      *            Standard output file.
@@ -329,11 +351,15 @@ public abstract class ProcessUtils {
      *            to the operating system virtual (null) file
      * @return
      */
-    public final static String[] buildCrossSingleCommands(final String cmd, final File stdout, final File stderr,
-            final boolean append, boolean redirectToNullIfNecessary) {
-        hasText(cmd, "Execute command can't empty.");
+    public final static String[] buildCrossSingleCommands(
+            final String cmds,
+            final File stdout,
+            final File stderr,
+            final boolean append,
+            boolean redirectToNullIfNecessary) {
+        hasText(cmds, "Execute command can't empty.");
 
-        StringBuffer cmdStr = new StringBuffer(cmd);
+        StringBuffer cmdStr = new StringBuffer(cmds);
         String mode = append ? ">>" : ">";
         List<String> cmdarray = new ArrayList<>(8);
         if (IS_OS_WINDOWS) {
