@@ -28,14 +28,27 @@ import com.wl4g.infra.core.boot.listener.IBootstrappingConfigurer
 /**
  * Default implementation of {@link IBootstrappingConfigurer}
  */
-class DefaultBootstrappingConfigurer implements IBootstrappingConfigurer {
+class DefaultIBootstrappingConfigurer implements IBootstrappingConfigurer {
 
     @Override
     def int getOrder() {
-        return -1000
+        return -100
     }
 
-    def Banner.Mode bannerMode(Banner.Mode prevMode) {
-        return Banner.Mode.LOG;
+    @Override
+    void defaultProperties(Properties prevDefaultProperties) {
+
+        // According to different heterogeneous runtime environments (multi RPC frameworks),
+        // automatically identify and contain different configuration directories.
+        def location = new StringBuffer("classpath:/")
+        if (isPresent("org.springframework.cloud.openfeign.FeignClient") && isPresent("org.springframework.cloud.openfeign.FeignAutoConfiguration")) {
+            location.append(",classpath:/scf/")
+        } else if (isPresent("com.wl4g.infra.integration.feign.core.annotation.FeignConsumer")) {
+            location.append(",classpath:/sbf/")
+        }
+
+        // Preset 'spring.config.additional-location', external resources does not override resources in classpath.
+        prevDefaultProperties.put(CONFIG_ADDITIONAL_LOCATION_PROPERTY, location.toString())
     }
+
 }
