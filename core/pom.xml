@@ -242,7 +242,7 @@
 			<scope>provided</scope>
 		</dependency>
 		<!-- Tests -->
-		<!-- Usually used with dopaas-infra-data. -->
+		<!-- Usually used with infra-data. -->
 		<dependency>
 			<groupId>com.github.pagehelper</groupId>
 			<artifactId>pagehelper</artifactId>
