@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.wl4g.infra.common.minio;
+package com.wl4g.infra.common.minio.v8_4;
 
 /** Bucket Quota QuotaUnit. */
 public enum QuotaUnit {

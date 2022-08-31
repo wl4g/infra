@@ -99,4 +99,5 @@ public class MinioClientTests {
         System.out.println("sessionToken:" + credentials.sessionToken());
         System.out.println("expired:" + credentials.isExpired());
     }
+
 }

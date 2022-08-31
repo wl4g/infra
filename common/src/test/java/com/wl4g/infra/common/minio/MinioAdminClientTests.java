@@ -26,7 +26,9 @@ import java.util.Map;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.junit.Test;
 
-import com.wl4g.infra.common.minio.UserInfo.Status;
+import com.wl4g.infra.common.minio.v8_4.MinioAdminClient;
+import com.wl4g.infra.common.minio.v8_4.UserInfo;
+import com.wl4g.infra.common.minio.v8_4.UserInfo.Status;
 
 /**
  * {@link MinioAdminClientTests}
