@@ -20,6 +20,7 @@ import java.security.NoSuchAlgorithmException;
 import org.junit.Test;
 
 import io.minio.BucketExistsArgs;
+import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
 import io.minio.credentials.AssumeRoleProvider;
 import io.minio.credentials.Credentials;
@@ -36,6 +37,15 @@ import okhttp3.OkHttpClient;
 public class MinioClientTests {
 
     static OkHttpClient defaultHttpClient = HttpUtils.newDefaultHttpClient(15_000, 15_000, 15_000);
+
+    @Test
+    public void testCreateBucket() throws Exception {
+        MinioClient client = MinioClient.builder()
+                .endpoint("localhost", 9000, false)
+                .credentials("minioadmin", "minioadmin")
+                .build();
+        client.makeBucket(MakeBucketArgs.builder().bucket("test1").build());
+    }
 
     @Test
     public void testBucketExists() throws Exception {
