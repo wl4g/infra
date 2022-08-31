@@ -26,7 +26,7 @@ import org.slf4j.Marker;
 /**
  * Enhanced logger for intelligent/dynamic/humanized wrapper.
  * 
- * @author Wangl.sir &lt;Wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author Wangl.sir &lt;James Wong@gmail.com, 983708408@qq.com&gt;
  * @version v1.0.0 2019-12-13
  * @since
  */

@@ -28,7 +28,7 @@ import com.wl4g.infra.support.cli.command.DestroableCommand;
 /**
  * Local destroable process implements.
  * 
- * @author Wangl.sir &lt;Wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author Wangl.sir &lt;James Wong@gmail.com, 983708408@qq.com&gt;
  * @version v1.0.0 2019-12-06
  * @since
  */

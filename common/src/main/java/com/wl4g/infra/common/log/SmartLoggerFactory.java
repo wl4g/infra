@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  * Enhanced logger factory for intelligent/dynamic/humanized wrapper.
  * {@link SmartLogger}
  * 
- * @author Wangl.sir &lt;Wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author Wangl.sir &lt;James Wong@gmail.com, 983708408@qq.com&gt;
  * @version v1.0.0 2019-12-13
  * @since
  * @see {@link SmartLogger}

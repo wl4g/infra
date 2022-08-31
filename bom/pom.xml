@@ -28,9 +28,9 @@
 	</issueManagement>
 	<developers>
 		<developer>
-			<id>Wanglsir01</id>
-			<name>Wanglsir</name>
-			<email>wanglsir@gmail.com,983708408@qq.com</email>
+			<id>James Wong</id>
+			<name>James Wong</name>
+			<email>jameswong1376@gmail.com</email>
 			<roles>
 				<role>owner</role>
 				<role>maintainer</role>
@@ -81,7 +81,7 @@
 		<slf4j-api.version>1.7.25</slf4j-api.version>
 		<!-- runtime -->
 		<swagger.version>1.6.2</swagger.version>
-		<swagger-v3.version>2.1.6</swagger-v3.version>
+		<swagger-v3.version>2.2.2</swagger-v3.version>
 		<jna.version>5.5.0</jna.version>
 		<!-- common tools -->
 		<guava.version>28.1-jre</guava.version>
@@ -107,9 +107,10 @@
 		<sshj.version>0.27.0</sshj.version>
 		<!-- web compontens -->
 		<user-agent.version>1.2.4</user-agent.version>
-		<feign.version>10.10.1</feign.version>
+		<feign.version>10.12</feign.version>
 		<httpclient.version>4.5.5</httpclient.version>
 		<httpcore.version>4.4.9</httpcore.version>
+		<okhttp.version>4.10.0</okhttp.version>
 		<!-- compression -->
 		<snappy.version>1.1.7.3</snappy.version>
 		<!-- excel/word -->
@@ -143,8 +144,15 @@
 		<druid-spring-boot-starter.version>1.1.10</druid-spring-boot-starter.version>
 		<seata.version>1.4.0</seata.version>
 		<!-- Kubernetes -->
-		<kubernetes-client.version>14.0.0</kubernetes-client.version>
+		<kubernetes-client.version>16.0.0</kubernetes-client.version>
 		<fabric8-kubernetes-client.version>5.12.1</fabric8-kubernetes-client.version>
+		<!-- OSS -->
+		<minio.version>8.4.3</minio.version>
+		<!-- ANTLR -->
+		<antlr4.version>4.10.1</antlr4.version>
+		<antlr3.version>3.5.3</antlr3.version>
+		<!-- SPOTBUGS -->
+		<spotbugs.version>4.1.2</spotbugs.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
@@ -634,6 +642,17 @@
 				<artifactId>httpcore</artifactId>
 				<version>${httpcore.version}</version>
 			</dependency>
+			<!-- okhttp -->
+			<dependency>
+				<groupId>com.squareup.okhttp3</groupId>
+				<artifactId>okhttp</artifactId>
+				<version>${okhttp.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.squareup.okhttp3</groupId>
+				<artifactId>logging-interceptor</artifactId>
+				<version>${okhttp.version}</version>
+			</dependency>
 			<!-- Netty. -->
 			<dependency>
 				<groupId>io.netty</groupId>
@@ -984,6 +1003,39 @@
 				<groupId>io.fabric8</groupId>
 				<artifactId>kubernetes-model-node</artifactId>
 				<version>${fabric8-kubernetes-client.version}</version>
+			</dependency>
+			<!-- OSS -->
+			<dependency>
+				<groupId>io.minio</groupId>
+				<artifactId>minio</artifactId>
+				<version>${minio.version}</version>
+			</dependency>
+			<!-- ANTLR -->
+			<dependency>
+				<groupId>org.antlr</groupId>
+				<artifactId>antlr4</artifactId>
+				<version>${antlr4.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.antlr</groupId>
+				<artifactId>antlr4-runtime</artifactId>
+				<version>${antlr4.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.antlr</groupId>
+				<artifactId>antlr-runtime</artifactId>
+				<version>${antlr3.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.antlr</groupId>
+				<artifactId>antlr</artifactId>
+				<version>${antlr3.version}</version>
+			</dependency>
+			<!-- SPOTBUGS -->
+			<dependency>
+				<groupId>com.github.spotbugs</groupId>
+				<artifactId>spotbugs-annotations</artifactId>
+				<version>${spotbugs.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

@@ -30,7 +30,7 @@ import org.springframework.beans.factory.BeanFactory;
 /**
  * Naming prototype bean factory.</br>
  * 
- * @author Wangl.sir <Wanglsir@gmail.com, 983708408@qq.com>
+ * @author Wangl.sir <James Wong@gmail.com, 983708408@qq.com>
  * @version v1.0.0 2019-10-09
  * @since
  */

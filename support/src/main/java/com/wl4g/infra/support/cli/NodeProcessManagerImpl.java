@@ -43,7 +43,7 @@ import com.wl4g.infra.support.cli.repository.ProcessRepository;
  * Implementation of distributed destroable command process based on jedis
  * cluster.
  * 
- * @author Wangl.sir &lt;Wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author Wangl.sir &lt;James Wong@gmail.com, 983708408@qq.com&gt;
  * @version v1.0.0 2019-10-20
  * @since
  */

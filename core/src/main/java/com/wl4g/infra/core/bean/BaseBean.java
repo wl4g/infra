@@ -37,7 +37,7 @@ import lombok.experimental.SuperBuilder;
 /**
  * DB based bean entity.
  *
- * @author Wangl.sir &lt;Wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author Wangl.sir &lt;James Wong@gmail.com, 983708408@qq.com&gt;
  * @version v1.0.0 2018-09-05
  * @since
  */

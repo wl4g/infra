@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2017 ~ 2025 the original author or authors.
- * <Wanglsir@gmail.com, 983708408@qq.com> Technology CO.LTD.
+ * <James Wong@gmail.com, 983708408@qq.com> Technology CO.LTD.
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,7 +28,7 @@ import com.wl4g.infra.integration.codec.wrap.Wrapper;
  * CodecConfig.java
  * 
  * @version 1.0.0
- * @author Wanglsir
+ * @author James Wong
  */
 public class CodecConfig {
 
@@ -36,7 +36,7 @@ public class CodecConfig {
 	 * Endian type
 	 * 
 	 * @version 1.0.0
-	 * @author Wanglsir
+	 * @author James Wong
 	 */
 	public enum EndianType {
 		LITTLE, BIG
@@ -46,7 +46,7 @@ public class CodecConfig {
 	 * Cache type
 	 * 
 	 * @version 1.0.0
-	 * @author Wanglsir
+	 * @author James Wong
 	 */
 	public enum CacheType {
 		/**
@@ -67,7 +67,7 @@ public class CodecConfig {
 	 * Total length type
 	 * 
 	 * @version 1.0.0
-	 * @author Wanglsir
+	 * @author James Wong
 	 */
 	public enum TotalLengthType {
 		/**

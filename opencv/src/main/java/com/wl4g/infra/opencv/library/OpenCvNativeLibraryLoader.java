@@ -28,7 +28,7 @@ import com.wl4g.infra.common.natives.LoadNativeLibraryError;
 /**
  * OpenCv dynamic link library loader.</br>
  * 
- * @author Wangl.sir &lt;Wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author Wangl.sir &lt;James Wong@gmail.com, 983708408@qq.com&gt;
  * @version v1.0.0 2019-12-01
  * @see <a href=
  *      "https://docs.opencv.org/2.4/doc/tutorials/introduction/desktop_java/java_dev_intro.html">opencv-java-install</a>

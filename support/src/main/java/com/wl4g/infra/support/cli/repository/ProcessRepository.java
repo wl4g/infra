@@ -24,7 +24,7 @@ import com.wl4g.infra.support.cli.process.DestroableProcess;
 /**
  * Command-line process repository interface.
  * 
- * @author Wangl.sir &lt;Wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author Wangl.sir &lt;James Wong@gmail.com, 983708408@qq.com&gt;
  * @version v1.0.0 2019-10-20
  * @since
  */

@@ -30,8 +30,8 @@
 	<developers>
 		<developer>
 			<id>Wangl01</id>
-			<name>Wanglsir</name>
-			<email>wanglsir@gmail.com,983708408@qq.com</email>
+			<name>James Wong</name>
+			<email>jameswong1376@gmail.com</email>
 			<roles>
 				<role>owner</role>
 				<role>maintainer</role>
@@ -151,6 +151,7 @@
 		<dependency>
 			<groupId>com.google.code.findbugs</groupId>
 			<artifactId>jsr305</artifactId>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -159,17 +160,20 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
+			<scope>provided</scope>
 		</dependency>
 		<!-- fix:Java 8 date/time type `java.time.Duration` not supported by default -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
+			<scope>provided</scope>
 		</dependency>
 		<!-- see:https://stackoverflow.com/questions/62170698/jaxb-and-java-11-module-info-java -->
 		<dependency>
 			<groupId>jakarta.xml.bind</groupId>
 			<artifactId>jakarta.xml.bind-api</artifactId>
 			<!-- <version>2.3.3</version> -->
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
@@ -204,22 +208,26 @@
 			<groupId>ch.ethz.ganymed</groupId>
 			<artifactId>ganymed-ssh2</artifactId>
 			<scope>provided</scope>
+			<optional>true</optional>
 		</dependency>
 		<!-- SSHD -->
 		<dependency>
 			<groupId>org.apache.sshd</groupId>
 			<artifactId>sshd-netty</artifactId>
 			<scope>provided</scope>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.sshd</groupId>
 			<artifactId>sshd-scp</artifactId>
 			<scope>provided</scope>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>com.jcraft</groupId>
 			<artifactId>jsch</artifactId>
 			<scope>provided</scope>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -230,6 +238,7 @@
 			<groupId>org.quartz-scheduler</groupId>
 			<artifactId>quartz</artifactId>
 			<scope>provided</scope>
+			<optional>true</optional>
 			<exclusions>
 				<exclusion>
 					<groupId>*</groupId>
@@ -242,17 +251,20 @@
 			<groupId>com.alibaba</groupId>
 			<artifactId>easyexcel</artifactId>
 			<scope>provided</scope>
+			<optional>true</optional>
 		</dependency>
 		<!-- Netty. -->
 		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty-all</artifactId>
 			<scope>provided</scope>
+			<optional>true</optional>
 		</dependency>
 		<!-- Runtime -->
 		<dependency>
 			<groupId>net.java.dev.jna</groupId>
 			<artifactId>jna</artifactId>
+			<scope>provided</scope>
 			<optional>true</optional>
 		</dependency>
 		<!-- Hocon config -->
@@ -260,28 +272,71 @@
 			<groupId>com.typesafe</groupId>
 			<artifactId>config</artifactId>
 			<scope>provided</scope>
+			<optional>true</optional>
 		</dependency>
 		<!-- NLP (pinyin) -->
 		<dependency>
 			<groupId>com.belerweb</groupId>
 			<artifactId>pinyin4j</artifactId>
 			<scope>provided</scope>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>com.vladsch.flexmark</groupId>
 			<artifactId>flexmark-all</artifactId>
 			<scope>provided</scope>
+			<optional>true</optional>
 		</dependency>
 		<!-- Kubernetes -->
 		<dependency>
 			<groupId>io.kubernetes</groupId>
 			<artifactId>client-java-api</artifactId>
 			<scope>provided</scope>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>io.kubernetes</groupId>
 			<artifactId>client-java-extended</artifactId>
 			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
+		<!-- OSS -->
+		<dependency>
+			<groupId>io.minio</groupId>
+			<artifactId>minio</artifactId>
+			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
+		<!-- ANTLR -->
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr4</artifactId>
+			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr4-runtime</artifactId>
+			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr-runtime</artifactId>
+			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr</artifactId>
+			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
+		<!-- SPOTBUGS -->
+		<dependency>
+			<groupId>com.github.spotbugs</groupId>
+			<artifactId>spotbugs-annotations</artifactId>
+			<optional>true</optional>
 		</dependency>
 		<!-- Tests -->
 		<dependency>

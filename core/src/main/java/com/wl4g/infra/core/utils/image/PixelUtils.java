@@ -23,7 +23,7 @@ import java.awt.Color;
  * obsolete as we move to Java2D. Use MiscComposite instead.
  * 
  * @author Jerry Huxtable
- * @author Wangl.sir &lt;Wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author Wangl.sir &lt;James Wong@gmail.com, 983708408@qq.com&gt;
  * @version v1.0.0 2019-12-01
  * @since
  */

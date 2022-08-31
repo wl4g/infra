@@ -196,7 +196,7 @@ public class KubernetesClientTests {
         spec.setContainers(singletonList(c1));
         spec.setRestartPolicy("Always");
 
-        V1Pod pod = api.createNamespacedPod("default", body, null, null, null);
+        V1Pod pod = api.createNamespacedPod("default", body, null, null, null, null);
         System.out.println(pod);
     }
 
