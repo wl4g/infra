@@ -64,7 +64,7 @@
 		<spring-cloud-alibaba.version>2.2.3.RELEASE</spring-cloud-alibaba.version>
 		<resilience4j-spring-boot2.version>1.6.1</resilience4j-spring-boot2.version>
 		<!-- groovy(springboot-2.3.2) -->
-		<groovy.version>2.5.13</groovy.version>
+		<groovy.version>4.0.4</groovy.version>
 		<!-- javax/jsr. -->
 		<javax-inject.version>1</javax-inject.version>
 		<javax-mail.version>1.4.7</javax-mail.version>
@@ -273,12 +273,12 @@
 				<version>${resilience4j-spring-boot2.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.codehaus.groovy</groupId>
+				<groupId>org.apache.groovy</groupId>
 				<artifactId>groovy-all</artifactId>
 				<version>${groovy.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.codehaus.groovy</groupId>
+				<groupId>org.apache.groovy</groupId>
 				<artifactId>groovy</artifactId>
 				<version>${groovy.version}</version>
 			</dependency>

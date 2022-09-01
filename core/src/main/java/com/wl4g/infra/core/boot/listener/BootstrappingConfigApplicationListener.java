@@ -16,7 +16,6 @@
 package com.wl4g.infra.core.boot.listener;
 
 import static com.google.common.base.Charsets.UTF_8;
-import static com.wl4g.infra.common.collection.CollectionUtils2.extractFirst;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeArray;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.infra.common.lang.Assert2.mustAssignableFrom;
@@ -52,6 +51,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 import org.codehaus.groovy.control.CompilationFailedException;
+import org.codehaus.groovy.vmplugin.VMPluginFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationContextFactory;
 import org.springframework.boot.Banner;
@@ -72,6 +72,7 @@ import org.springframework.util.ReflectionUtils;
 
 import com.google.common.io.Resources;
 import com.wl4g.infra.common.collection.CollectionUtils2;
+import com.wl4g.infra.common.lang.Assert2;
 import com.wl4g.infra.common.log.SmartLogger;
 import com.wl4g.infra.common.resource.StreamResource;
 import com.wl4g.infra.common.resource.resolver.ClassPathResourcePatternResolver;
@@ -142,12 +143,12 @@ public class BootstrappingConfigApplicationListener implements GenericApplicatio
         // Parse command-line arguments.
         ApplicationArguments args = new DefaultApplicationArguments(event.getArgs());
         // Enabled bootstrapping?
-        if (!isTrue(extractFirst(args.getOptionValues(PROPERTY_ENABLED)), true)) {
+        if (!isTrue(System.getenv(ENV_ENABLED), true)) {
             return;
         }
 
         // Load BootstrappingConfigurers.
-        boolean isDebug = isTrue(extractFirst(args.getOptionValues(PROPERTY_DEBUG)), false);
+        boolean isDebug = isTrue(System.getenv(ENV_DEBUG), false);
         List<IBootstrappingConfigurer> configurers = loadClassAndInstantiateConfigurers();
         if (!isEmpty(configurers)) {
             presetDefaultProperties(isDebug, args, event, application, configurers);
@@ -381,10 +382,21 @@ public class BootstrappingConfigApplicationListener implements GenericApplicatio
     // Spring boot configuration end comm clear.
     private static final Function<String, String> defaultSafeCommClear = value -> join(split(trimToEmpty(value), ","), ",");
     private static final String BOOTSTRAPPING_RESOURCE_NAME = "classpath*:/META-INF/bootstrapping.groovy";
-    private static final String PROPERTY_ENABLED = "spring.bootstrapping.enabled";
-    private static final String PROPERTY_DEBUG = "spring.bootstrapping.debug";
+    private static final String ENV_ENABLED = "SPRING_BOOTSTRAPPING_ENABLED";
+    private static final String ENV_DEBUG = "SPRING_BOOTSTRAPPING_DEBUG";
     private static final List<String> DEFAULT_PROPERTIES_MERGE_KEYS = asList(ACTIVE_PROFILES_PROPERTY, INCLUDE_PROFILES_PROPERTY,
             CONFIG_NAME_PROPERTY, CONFIG_ADDITIONAL_LOCATION_PROPERTY, CONFIG_LOCATION_PROPERTY);
 
     public static final int DEFAULT_ORDER = Ordered.HIGHEST_PRECEDENCE + 5;
+
+    private static void checkVMPluginSupported() {
+        Assert2.notNull(VMPluginFactory.getPlugin(),
+                "Your JVM version is not supported by groovy. Please check the source codes: org.codehaus.groovy.vmplugin.VMPluginFactory. "
+                        + "Or you can force the bootstrapping features to be disabled with -D%s=false",
+                ENV_ENABLED);
+    }
+
+    static {
+        checkVMPluginSupported();
+    }
 }

@@ -59,72 +59,71 @@ import com.wl4g.infra.common.lang.Assert2;
 import com.wl4g.infra.common.lang.ClassUtils2;
 
 /**
- * {@link org.springframework.core.io.ResourceUtils} Utility methods for
- * resolving resource locations to files in the file system. Mainly for internal
- * use within the framework.
+ * Utility methods for resolving resource locations to files in the file system.
+ * Mainly for internal use within the framework.
  *
  * <p>
  * Consider using Spring's Resource abstraction in the core package for handling
  * all kinds of file resources in a uniform manner.
  * {@link org.springframework.core.io.ResourceLoader}'s {@code getResource()}
  * method can resolve any location to a
- * {@link org.StreamResource.core.io.Resource} object, which in turn allows one
+ * {@link org.springframework.core.io.Resource} object, which in turn allows one
  * to obtain a {@code java.io.File} in the file system through its
  * {@code getFile()} method.
  *
  * @author Juergen Hoeller
  * @since 1.1.5
- * @see org.StreamResource.core.io.Resource
- * @see org.ClassPathStreamResource.core.io.ClassPathResource
- * @see org.FileStreamResource.core.io.FileSystemResource
- * @see org.UrlStreamResource.core.io.UrlResource
- * @see com.wl4g.infra.common.resource.ResourceLoader
+ * @see org.springframework.core.io.Resource
+ * @see org.springframework.core.io.ClassPathResource
+ * @see org.springframework.core.io.FileSystemResource
+ * @see org.springframework.core.io.UrlResource
+ * @see org.springframework.core.io.ResourceLoader
  */
 public abstract class ResourceUtils2 {
 
-    /** Pseudo URL prefix for loading from the class path: "classpath:" */
+    /** Pseudo URL prefix for loading from the class path: "classpath:". */
     public static final String CLASSPATH_URL_PREFIX = "classpath:";
 
-    /** URL prefix for loading from the file system: "file:" */
+    /** URL prefix for loading from the file system: "file:". */
     public static final String FILE_URL_PREFIX = "file:";
 
-    /** URL prefix for loading from a jar file: "jar:" */
+    /** URL prefix for loading from a jar file: "jar:". */
     public static final String JAR_URL_PREFIX = "jar:";
 
-    /** URL prefix for loading from a war file on Tomcat: "war:" */
+    /** URL prefix for loading from a war file on Tomcat: "war:". */
     public static final String WAR_URL_PREFIX = "war:";
 
-    /** URL protocol for a file in the file system: "file" */
+    /** URL protocol for a file in the file system: "file". */
     public static final String URL_PROTOCOL_FILE = "file";
 
-    /** URL protocol for an entry from a jar file: "jar" */
+    /** URL protocol for an entry from a jar file: "jar". */
     public static final String URL_PROTOCOL_JAR = "jar";
 
-    /** URL protocol for an entry from a war file: "war" */
+    /** URL protocol for an entry from a war file: "war". */
     public static final String URL_PROTOCOL_WAR = "war";
 
-    /** URL protocol for an entry from a zip file: "zip" */
+    /** URL protocol for an entry from a zip file: "zip". */
     public static final String URL_PROTOCOL_ZIP = "zip";
 
-    /** URL protocol for an entry from a WebSphere jar file: "wsjar" */
+    /** URL protocol for an entry from a WebSphere jar file: "wsjar". */
     public static final String URL_PROTOCOL_WSJAR = "wsjar";
 
-    /** URL protocol for an entry from a JBoss jar file: "vfszip" */
+    /** URL protocol for an entry from a JBoss jar file: "vfszip". */
     public static final String URL_PROTOCOL_VFSZIP = "vfszip";
 
-    /** URL protocol for a JBoss file system resource: "vfsfile" */
+    /** URL protocol for a JBoss file system resource: "vfsfile". */
     public static final String URL_PROTOCOL_VFSFILE = "vfsfile";
 
-    /** URL protocol for a general JBoss VFS resource: "vfs" */
+    /** URL protocol for a general JBoss VFS resource: "vfs". */
     public static final String URL_PROTOCOL_VFS = "vfs";
 
-    /** File extension for a regular jar file: ".jar" */
+    /** File extension for a regular jar file: ".jar". */
     public static final String JAR_FILE_EXTENSION = ".jar";
 
-    /** Separator between JAR URL and file path within the JAR: "!/" */
+    /** Separator between JAR URL and file path within the JAR: "!/". */
     public static final String JAR_URL_SEPARATOR = "!/";
 
-    /** Special separator between WAR URL and jar part on Tomcat */
+    /** Special separator between WAR URL and jar part on Tomcat. */
     public static final String WAR_URL_SEPARATOR = "*/";
 
     /**
@@ -137,7 +136,7 @@ public abstract class ResourceUtils2 {
      * @see #CLASSPATH_URL_PREFIX
      * @see java.net.URL
      */
-    public static boolean isUrl(String resourceLocation) {
+    public static boolean isUrl(@Nullable String resourceLocation) {
         if (resourceLocation == null) {
             return false;
         }
