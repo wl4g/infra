@@ -15,16 +15,37 @@
  */
 package com.wl4g.infra.common.minio;
 
-import java.security.NoSuchAlgorithmException;
+import static com.wl4g.infra.common.lang.FastTimeClock.currentTimeMillis;
+import static com.wl4g.infra.common.minio.MinioAdminClientTests.ENDPOINT;
+import static com.wl4g.infra.common.minio.MinioAdminClientTests.REGION;
+import static com.wl4g.infra.common.minio.MinioAdminClientTests.SUPER_ADMIN_ACCESSKEY;
+import static com.wl4g.infra.common.minio.MinioAdminClientTests.TENANT_ACCESSKEY;
+import static com.wl4g.infra.common.minio.MinioAdminClientTests.TENANT_BUCKET;
+import static com.wl4g.infra.common.minio.MinioAdminClientTests.TENANT_SECRETKEY;
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+
+import java.io.File;
+import java.io.FileInputStream;
 
 import org.junit.Test;
+
+import com.wl4g.infra.common.io.FileIOUtils;
+import com.wl4g.infra.common.minio.S3Policy.EffectType;
+import com.wl4g.infra.common.minio.S3Policy.Statement;
 
 import io.minio.BucketExistsArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
+import io.minio.ObjectWriteResponse;
+import io.minio.PutObjectArgs;
 import io.minio.credentials.AssumeRoleProvider;
 import io.minio.credentials.Credentials;
+import io.minio.credentials.Provider;
+import io.minio.errors.ErrorResponseException;
 import io.minio.http.HttpUtils;
+import io.minio.messages.Bucket;
 import okhttp3.OkHttpClient;
 
 /**
@@ -36,32 +57,107 @@ import okhttp3.OkHttpClient;
  */
 public class MinioClientTests {
 
-    static OkHttpClient defaultHttpClient = HttpUtils.newDefaultHttpClient(15_000, 15_000, 15_000);
+    public static final OkHttpClient defaultHttpClient = HttpUtils.newDefaultHttpClient(15_000, 15_000, 15_000);
+
+    // STS temporary user
+    public static final String USER_PREFIX = "library";
+    public static final String USER_OBJECT_NAME = "test1.txt";
+
+    public static final String USER_POLICY_NAME = "tenant1001policy2";
 
     @Test
-    public void testCreateBucket() throws Exception {
+    public void testBucketExistsWithinVisiblePermissions() throws Exception {
         MinioClient client = MinioClient.builder()
-                .endpoint("localhost", 9000, false)
-                .credentials("minioadmin", "minioadmin")
+                .endpoint(ENDPOINT)
+                .region(REGION)
+                .credentials(TENANT_ACCESSKEY, TENANT_SECRETKEY)
                 .build();
-        client.makeBucket(MakeBucketArgs.builder().bucket("test1").build());
+        boolean exists = client.bucketExists(BucketExistsArgs.builder().bucket(TENANT_BUCKET).build());
+        System.out.println(exists);
+    }
+
+    // MiniIO only super administrators can create buckets???
+    @Test
+    public void testCreateBucketWithSuperAdminIfNotExist() throws Exception {
+        MinioClient client = MinioClient.builder()
+                .endpoint(ENDPOINT)
+                .region(REGION)
+                .credentials(SUPER_ADMIN_ACCESSKEY, SUPER_ADMIN_ACCESSKEY)
+                .build();
+        if (!client.bucketExists(BucketExistsArgs.builder().bucket(TENANT_BUCKET).build())) {
+            client.makeBucket(MakeBucketArgs.builder().bucket(TENANT_BUCKET).build());
+        }
     }
 
     @Test
-    public void testBucketExists() throws Exception {
+    public void testListBucketsWithinVisiblePermissions() throws Exception {
         MinioClient client = MinioClient.builder()
-                .endpoint("localhost", 9000, false)
-                .credentials("minioadmin", "minioadmin")
+                .endpoint(ENDPOINT)
+                .region(REGION)
+                .credentials(TENANT_ACCESSKEY, TENANT_SECRETKEY)
                 .build();
-        boolean exists = client.bucketExists(BucketExistsArgs.builder().bucket("test1").build());
-        System.out.println(exists);
+        for (Bucket bucket : client.listBuckets()) {
+            System.out.println("bucketName: " + bucket.name());
+            System.out.println("bucketCreationDate: " + bucket.creationDate());
+        }
+    }
+
+    @Test
+    public void testUseAssumeSTSAndPutObjectSuccess() throws Exception {
+        Provider provider = createSTSAssumeCredentialsProvider();
+
+        // 创建测试文件
+        File testfile = new File("/tmp/s3test-" + currentTimeMillis());
+        FileIOUtils.writeFile(testfile, "abcdefghijklmnopqrstuvwxyz");
+
+        // 使用 STS 测试 PutObject
+        MinioClient client = MinioClient.builder().endpoint(ENDPOINT).region(REGION).credentialsProvider(provider).build();
+        ObjectWriteResponse resp = client.putObject(PutObjectArgs.builder()
+                .bucket(TENANT_BUCKET)
+                // .object(USER_OBJECT_NAME)
+                .object(USER_PREFIX + "/" + USER_OBJECT_NAME)
+                .stream(new FileInputStream(testfile), testfile.length(), 5 * 1024 * 1024)
+                .build());
+
+        System.out.println("result bucket: " + resp.bucket());
+        System.out.println("result object: " + resp.object());
+        System.out.println("result versionId: " + resp.versionId());
+        System.out.println("result etag: " + resp.etag());
+        System.out.println("-------------------------------");
+        System.out.println("result headers: \n" + resp.headers());
+    }
+
+    @Test
+    public void testUseAssumeSTSAndPutObject403() throws Exception {
+        Provider provider = createSTSAssumeCredentialsProvider();
+
+        // 创建测试文件
+        File testfile = new File("/tmp/s3test-" + currentTimeMillis());
+        FileIOUtils.writeFile(testfile, "abcdefghijklmnopqrstuvwxyz");
+
+        // 使用 STS 测试 PutObject
+        MinioClient client = MinioClient.builder().endpoint(ENDPOINT).region(REGION).credentialsProvider(provider).build();
+        try {
+            client.putObject(PutObjectArgs.builder()
+                    .bucket(TENANT_BUCKET)
+                    .object(USER_OBJECT_NAME)
+                    .stream(new FileInputStream(testfile), testfile.length(), 5 * 1024 * 1024)
+                    .build());
+        } catch (ErrorResponseException e) {
+            if (e.errorResponse().code().equals("AccessDenied")) {
+                System.out.println(
+                        format("No permission to write object to '%s/%s' tested succeeded.", TENANT_BUCKET, USER_OBJECT_NAME));
+            } else {
+                throw e;
+            }
+        }
     }
 
     /**
      * <pre>
      * 前置条件:
-     * 1. 在 MinIO 控制台新建存储桶 test_tenant1001
-     * 2. 在 MinIO 控制台新建策略 test_tenant1001_policy1, 其策略值例如(对桶 test_tenant1001/ 下的所有对象授权了3种操作权限):
+     * 1. 在 MinIO 控制台新建存储桶 tenant1001
+     * 2. 在 MinIO 控制台新建策略 tenant1001policy1, 其策略值例如(对桶 tenant1001/ 下的所有对象授权了3种操作权限):
      *    {
      *        "Version": "2012-10-17", // 版本号固定值
      *        "Statement": [
@@ -70,44 +166,54 @@ public class MinioClientTests {
      *                "Action": [
      *                    "s3:GetBucketLocation",
      *                    "s3:GetObject",
-     *                    "s3:PutObject"
+     *                    "s3:PutObject",
+     *                    "s3:ListBucket",
+     *                    "s3:GetBucketPolicyStatus"
      *                ],
      *                "Resource": [
-     *                    "arn:aws:s3:::test_tenant1001/*"
+     *                    "arn:aws:s3:::tenant1001/*"
      *                ]
      *            }
      *        ]
      *    }
-     * 3. 在 MinIO 控制台新建用户 accessKey=test_tenant1001_user1, secretKey=12345678
-     * 4. 在 MinIO 控制台给用户 test_tenant1001_user1 分配策略 test_tenant1001_policy1
+     * 3. 在 MinIO 控制台新建用户 accessKey=tenant1001, secretKey=12345678
+     * 4. 在 MinIO 控制台给用户 tenant1001 分配策略 tenant1001policy1
      * </pre>
      *
-     * 也可以使用如{@link com.wl4g.infra.common.minio.MinioAdminClientTests#testCreatePolicy()}的SDK实现自动创建.
+     * 等价的使用 Java-SDK 客户端自动创建, 参见
+     * {@link com.wl4g.infra.common.minio.MinioAdminClientTests#testCreatePolicy()}
      * 
      * @see https://github.com/minio/minio/delete/8.4.3/docs/sts/client-grants.md
      */
-    @Test
-    public void testGetSTSWithAssumeRoleWithClientGrants() throws NoSuchAlgorithmException {
-        String stsEndpoint = "http://localhost:9000";
-        String accessKey = "test_tenant1001_user1";
-        String secretKey = "12345678";
+    private Provider createSTSAssumeCredentialsProvider() throws Exception {
+        /**
+         * 为本次操作申请的最小权限策略, 最多可对桶
+         * {@link MinioAdminClientTests#TENANT_POLICY_JSON} 申请
+         * {@link MinioAdminClientTests#TENANT_POLICY_JSON} 种权限
+         */
+        S3Policy applyPolicy = S3Policy.builder()
+                .version(S3Policy.DEFAULT_POLICY_VERSION)
+                .statement(singletonList(Statement.builder()
+                        .effect(EffectType.Allow)
+                        .action(asList("s3:PutObject"))
+                        // 资源标识
+                        .resource(singletonList("arn:aws:s3:::" + TENANT_BUCKET + "/" + USER_PREFIX + "/*"))
+                        .build()))
+                .build();
         int durationSeconds = 5 * 60;
-        // 本次操作需要申请的策略(最多可对桶 tenant1001/* 申请3种权限)
-        String applyPolicy = "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":[\"s3:GetObject\"],\"Resource\":[\"arn:aws:s3:::test_tenant1001/*\"]}]}";
-        String region = "us-east-1";
         String roleSessionName = "anySession"; // 任意
-        // 本次申请资源标识
-        String roleArn = "arn:aws:s3:::test_tenant1001/*";
         String externalId = "myapp";
 
-        AssumeRoleProvider provider = new AssumeRoleProvider(stsEndpoint, accessKey, secretKey, durationSeconds, applyPolicy,
-                region, roleArn, roleSessionName, externalId, defaultHttpClient);
-
+        // 获取有限权限的STS(临时)
+        Provider provider = new AssumeRoleProvider(ENDPOINT, TENANT_ACCESSKEY, TENANT_SECRETKEY, durationSeconds,
+                applyPolicy.toString(), REGION, null, roleSessionName, externalId, defaultHttpClient);
         Credentials credentials = provider.fetch();
-        System.out.println("accessKey:" + credentials.accessKey());
-        System.out.println("secretKey:" + credentials.secretKey());
-        System.out.println("sessionToken:" + credentials.sessionToken());
-        System.out.println("expired:" + credentials.isExpired());
+        System.out.println("assume sts accessKey:" + credentials.accessKey());
+        System.out.println("assume sts secretKey:" + credentials.secretKey());
+        System.out.println("assume sts sessionToken:" + credentials.sessionToken());
+        System.out.println("assume sts expired:" + credentials.isExpired());
+        System.out.println("-------------------------------");
+        return provider;
     }
 
 }

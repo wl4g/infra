@@ -15,6 +15,8 @@
  */
 package com.wl4g.infra.common.minio;
 
+import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
+
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -35,12 +37,16 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @SuperBuilder
-@ToString
 @NoArgsConstructor
 public class S3Policy {
 
     private @JsonProperty("Version") String version;
     private @JsonProperty("Statement") List<Statement> statement;
+
+    @Override
+    public String toString() {
+        return toJSONString(this);
+    }
 
     @Getter
     @Setter
