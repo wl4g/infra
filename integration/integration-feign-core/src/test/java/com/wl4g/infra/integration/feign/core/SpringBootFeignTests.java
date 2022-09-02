@@ -30,7 +30,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.google.gson.Gson;
-import com.wl4g.infra.core.boot.BootstrappingAutoConfiguration;
+import com.wl4g.infra.context.boot.BootstrappingAutoConfiguration;
 import com.wl4g.infra.integration.feign.core.GithubService1.GitHubContributor;
 import com.wl4g.infra.integration.feign.core.SpringBootFeignTests.SampleRetryer;
 import com.wl4g.infra.integration.feign.core.annotation.EnableFeignConsumers;

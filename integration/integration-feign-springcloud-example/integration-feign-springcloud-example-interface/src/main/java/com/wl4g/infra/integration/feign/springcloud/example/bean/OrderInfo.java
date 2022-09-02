@@ -21,7 +21,7 @@ package com.wl4g.infra.integration.feign.springcloud.example.bean;
 
 import java.util.Properties;
 
-import com.wl4g.infra.core.bean.BaseBean;
+import com.wl4g.infra.context.bean.BaseBean;
 
 /**
  * {@link OrderInfo}

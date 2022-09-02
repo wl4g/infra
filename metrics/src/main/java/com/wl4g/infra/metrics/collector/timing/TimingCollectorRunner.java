@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.boot.ApplicationArguments;
 
 import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor;
-import com.wl4g.infra.core.task.ApplicationTaskRunner;
+import com.wl4g.infra.context.task.ApplicationTaskRunner;
 import com.wl4g.infra.metrics.MetricsFacade;
 import com.wl4g.infra.metrics.collector.timing.TimingCollectorAutoConfiguration.ScrapeCollectorProperties;
 

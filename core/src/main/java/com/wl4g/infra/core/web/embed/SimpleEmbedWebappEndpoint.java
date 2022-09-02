@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import com.wl4g.infra.common.resource.StreamResource;
 import com.wl4g.infra.common.resource.resolver.ClassPathResourcePatternResolver;
 import com.wl4g.infra.common.resource.resolver.ResourcePatternResolver;
-import com.wl4g.infra.core.web.BaseController;
+import com.wl4g.infra.context.web.BaseController;
 import com.wl4g.infra.core.web.embed.EmbedWebappAutoConfiguration.SimpleEmbedWebappProperties;
 import com.wl4g.infra.core.web.embed.WebResourceCache.*;
 

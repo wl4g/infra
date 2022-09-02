@@ -40,7 +40,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.wl4g.infra.common.lang.period.PeriodFormatter;
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.infra.core.bean.BaseBean;
+import com.wl4g.infra.context.bean.BaseBean;
 import com.wl4g.infra.core.framework.proxy.InvocationChain;
 import com.wl4g.infra.core.framework.proxy.SmartProxyFilter;
 

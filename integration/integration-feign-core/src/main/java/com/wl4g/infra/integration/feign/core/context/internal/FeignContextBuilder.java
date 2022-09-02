@@ -130,7 +130,7 @@ public class FeignContextBuilder extends Feign.Builder {
                     tags);
             Counter failure = metricsFacade.counter(MetricsName.consumer_failure.getName(),
                     MetricsName.consumer_failure.getHelp(), tags);
-            Timer cost = metricsFacade.timer(MetricsName.consumer_failure.getName(), MetricsName.consumer_failure.getHelp(),
+            Timer cost = metricsFacade.timer(MetricsName.consumer_cost.getName(), MetricsName.consumer_cost.getHelp(),
                     // TODO use configuration
                     new double[] { 0.3, 0.5, 0.9, 0.95, 0.99 }, tags);
 

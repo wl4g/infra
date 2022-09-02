@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.wl4g.infra.common.log.SmartLogger;
-import com.wl4g.infra.core.page.PageHolder;
+import com.wl4g.infra.context.page.PageHolder;
 import com.wl4g.infra.integration.feign.istio.example.bean.OrderInfo;
 import com.wl4g.infra.integration.feign.istio.example.service.OrderService;
 import com.wl4g.infra.integration.feign.istio.example.dao.OrderDao;

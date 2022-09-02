@@ -23,8 +23,8 @@ import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToList;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.lang.ClassUtils2.resolveClassNameNullable;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
-import static com.wl4g.infra.core.utils.web.WebUtils3.currentServletRequest;
-import static com.wl4g.infra.core.utils.web.WebUtils3.currentServletResponse;
+import static com.wl4g.infra.context.utils.web.WebUtils3.currentServletRequest;
+import static com.wl4g.infra.context.utils.web.WebUtils3.currentServletResponse;
 import static java.lang.System.nanoTime;
 import static java.util.Objects.nonNull;
 import static org.springframework.core.annotation.AnnotatedElementUtils.hasAnnotation;
@@ -98,7 +98,7 @@ public class ProviderFeignContextFilter implements SmartProxyFilter {
                 tags);
         Counter failure = metricsFacade.counter(MetricsName.provider_failure.getName(), MetricsName.provider_failure.getHelp(),
                 tags);
-        Timer cost = metricsFacade.timer(MetricsName.provider_failure.getName(), MetricsName.provider_failure.getHelp(),
+        Timer cost = metricsFacade.timer(MetricsName.provider_cost.getName(), MetricsName.provider_cost.getHelp(),
                 // TODO use configuration
                 new double[] { 0.3, 0.5, 0.9, 0.95, 0.99 }, tags);
 

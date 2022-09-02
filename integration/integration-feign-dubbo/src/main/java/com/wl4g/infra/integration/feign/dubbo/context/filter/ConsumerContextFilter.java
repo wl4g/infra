@@ -21,7 +21,7 @@ import static com.wl4g.infra.common.reflect.ReflectionUtils2.findMethod;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.invokeMethod;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.makeAccessible;
 import static com.wl4g.infra.common.web.WebUtils2.getFirstParameters;
-import static com.wl4g.infra.core.utils.web.WebUtils3.currentServletRequest;
+import static com.wl4g.infra.context.utils.web.WebUtils3.currentServletRequest;
 import static java.util.Objects.nonNull;
 
 import java.lang.reflect.Method;

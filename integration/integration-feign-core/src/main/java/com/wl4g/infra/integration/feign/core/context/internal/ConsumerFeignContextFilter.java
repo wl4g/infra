@@ -41,7 +41,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.wl4g.infra.common.log.SmartLogger;
-import com.wl4g.infra.core.utils.web.WebUtils3;
+import com.wl4g.infra.context.utils.web.WebUtils3;
 import com.wl4g.infra.integration.feign.core.context.RpcContextHolder;
 import com.wl4g.infra.integration.feign.core.context.internal.FeignContextCoprocessor.Invokers;
 

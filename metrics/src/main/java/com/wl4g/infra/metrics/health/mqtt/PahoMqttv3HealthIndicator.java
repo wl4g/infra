@@ -33,7 +33,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.wl4g.infra.common.log.SmartLogger;
-import com.wl4g.infra.core.utils.context.SpringContextHolder;
+import com.wl4g.infra.context.utils.SpringContextHolder;
 import com.wl4g.infra.metrics.health.HealthUtil;
 
 /**

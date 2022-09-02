@@ -32,7 +32,7 @@
 	</issueManagement>
 	<developers>
 		<developer>
-			<id>Wangl01</id>
+			<id>James Wong</id>
 			<name>James Wong</name>
 			<email>jameswong1376@gmail.com</email>
 			<roles>
@@ -57,6 +57,7 @@
 		<module>bom</module>
 		<module>common</module>
 		<module>common-shade</module>
+		<module>context</module>
 		<module>core</module>
 		<module>data</module>
 		<module>integration</module>

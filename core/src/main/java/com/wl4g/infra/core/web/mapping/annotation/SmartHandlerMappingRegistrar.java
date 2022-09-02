@@ -22,7 +22,7 @@ package com.wl4g.infra.core.web.mapping.annotation;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToList;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
-import static com.wl4g.infra.core.utils.context.SpringContextHolder.isReactiveWebApplication;
+import static com.wl4g.infra.context.utils.SpringContextHolder.isReactiveWebApplication;
 import static com.wl4g.infra.core.web.mapping.annotation.EnableSmartRequestMapping.FILTERS;
 import static com.wl4g.infra.core.web.mapping.annotation.EnableSmartRequestMapping.OVERRIDE_AMBIGUOUS;
 import static com.wl4g.infra.core.web.mapping.annotation.EnableSmartRequestMapping.PACKAGE_PATTERNS;

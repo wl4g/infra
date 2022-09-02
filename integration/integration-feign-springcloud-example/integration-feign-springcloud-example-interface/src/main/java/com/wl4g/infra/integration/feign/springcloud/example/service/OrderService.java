@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.wl4g.infra.core.page.PageHolder;
+import com.wl4g.infra.context.page.PageHolder;
 import com.wl4g.infra.integration.feign.core.annotation.FeignConsumer;
 import com.wl4g.infra.integration.feign.springcloud.example.bean.OrderInfo;
 

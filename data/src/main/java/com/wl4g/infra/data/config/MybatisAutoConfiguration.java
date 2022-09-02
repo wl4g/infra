@@ -33,7 +33,7 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
 import com.github.pagehelper.PageHelper;
-import com.wl4g.infra.core.annotation.condition.ConditionalOnJdwpDebug;
+import com.wl4g.infra.context.annotation.condition.ConditionalOnJdwpDebug;
 import com.wl4g.infra.data.mybatis.loader.SqlSessionMapperHotspotLoader;
 import com.wl4g.infra.data.mybatis.loader.SqlSessionMapperHotspotLoader.HotspotLoaderProperties;
 import com.wl4g.infra.data.mybatis.mapper.IdGenerator;

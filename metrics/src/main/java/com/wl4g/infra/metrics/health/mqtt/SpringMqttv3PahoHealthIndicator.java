@@ -40,7 +40,7 @@ import org.springframework.messaging.MessageHandler;
 
 import com.wl4g.infra.common.lang.Assert2;
 import com.wl4g.infra.common.log.SmartLogger;
-import com.wl4g.infra.core.utils.context.SpringContextHolder;
+import com.wl4g.infra.context.utils.SpringContextHolder;
 import com.wl4g.infra.metrics.health.HealthUtil;
 
 /**

@@ -42,8 +42,8 @@ import com.github.pagehelper.SqlUtil;
 import com.wl4g.infra.common.bridge.RpcContextHolderBridges;
 import com.wl4g.infra.common.bridge.RpcContextIamSecurityBridges;
 import com.wl4g.infra.common.log.SmartLogger;
-import com.wl4g.infra.core.bean.BaseBean;
-import com.wl4g.infra.core.page.PageHolder;
+import com.wl4g.infra.context.bean.BaseBean;
+import com.wl4g.infra.context.page.PageHolder;
 
 /**
  * General {@link BaseBean} property functions handle interceptors in a unified
@@ -171,7 +171,7 @@ public class PreparedBeanMapperInterceptor implements Interceptor {
          */
         if (isNull(SqlUtil.getLocalPage())) { // Not paging
             // Obtain page from rpc context.
-            com.wl4g.infra.core.page.PageHolder.Page<?> page = PageHolder.Util.current(false);
+            com.wl4g.infra.context.page.PageHolder.Page<?> page = PageHolder.Util.current(false);
             if (nonNull(page)) {
                 log.debug("Begin current paging of: {}", page);
                 PageHelper.startPage(page.getPageNum(), page.getPageSize(), page.isCount());
@@ -255,7 +255,7 @@ public class PreparedBeanMapperInterceptor implements Interceptor {
         // Update executed paging info to rpc server context.
         if (result instanceof Page) {
             com.github.pagehelper.Page<?> helperPage = (com.github.pagehelper.Page<?>) result;
-            com.wl4g.infra.core.page.PageHolder.Page<?> currentPage = PageHolder.Util.current(false);
+            com.wl4g.infra.context.page.PageHolder.Page<?> currentPage = PageHolder.Util.current(false);
             if (nonNull(currentPage)) {
                 copyProperties(helperPage, currentPage);
                 // Re-bind executed page information to rpc server context,

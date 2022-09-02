@@ -39,7 +39,7 @@ import javax.validation.constraints.NotNull;
 
 import org.apache.commons.beanutils.ConvertUtilsBean;
 
-import com.wl4g.infra.core.utils.context.SpringContextHolder;
+import com.wl4g.infra.context.utils.SpringContextHolder;
 
 /**
  * {@link RpcContextHolder}

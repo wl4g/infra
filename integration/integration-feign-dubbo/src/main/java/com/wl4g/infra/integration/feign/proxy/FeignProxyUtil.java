@@ -23,7 +23,7 @@ import static org.springframework.util.StringUtils.uncapitalize;
 import org.springframework.beans.factory.config.BeanDefinition;
 
 import com.wl4g.infra.common.lang.ClassUtils2;
-import com.wl4g.infra.core.utils.AopUtils2;
+import com.wl4g.infra.context.utils.AopUtils2;
 import com.wl4g.infra.integration.feign.proxy.FeignProviderProxiesConfigurer;
 import com.wl4g.infra.integration.feign.proxy.FeignProxyController;
 import com.wl4g.infra.integration.feign.proxy.FeignProxyUtil;

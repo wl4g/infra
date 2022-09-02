@@ -45,7 +45,7 @@ import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 
 import com.wl4g.infra.common.codec.CodecSource;
 import com.wl4g.infra.common.log.SmartLogger;
-import com.wl4g.infra.core.utils.context.SpringContextHolder;
+import com.wl4g.infra.context.utils.SpringContextHolder;
 
 /**
  * {@link RpcContextHolder}

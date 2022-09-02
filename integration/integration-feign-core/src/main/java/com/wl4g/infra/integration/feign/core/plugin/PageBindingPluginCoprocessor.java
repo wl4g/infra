@@ -23,7 +23,7 @@ import java.lang.reflect.Type;
 
 import javax.validation.constraints.NotNull;
 
-import com.wl4g.infra.core.page.PageHolder;
+import com.wl4g.infra.context.page.PageHolder;
 import com.wl4g.infra.integration.feign.core.context.internal.FeignContextCoprocessor;
 
 import feign.Response;

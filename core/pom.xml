@@ -29,7 +29,7 @@
 	</issueManagement>
 	<developers>
 		<developer>
-			<id>Wangl01</id>
+			<id>James Wong</id>
 			<name>James Wong</name>
 			<email>jameswong1376@gmail.com</email>
 			<roles>
@@ -74,6 +74,10 @@
 		<dependency>
 			<groupId>com.wl4g</groupId>
 			<artifactId>infra-common</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.wl4g</groupId>
+			<artifactId>infra-context</artifactId>
 		</dependency>
 		<!-- Spring based -->
 		<dependency>

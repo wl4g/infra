@@ -178,6 +178,11 @@
 			</dependency>
 			<dependency>
 				<groupId>com.wl4g</groupId>
+				<artifactId>infra-context</artifactId>
+				<version>${project.parent.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.wl4g</groupId>
 				<artifactId>infra-data</artifactId>
 				<version>${project.parent.version}</version>
 			</dependency>

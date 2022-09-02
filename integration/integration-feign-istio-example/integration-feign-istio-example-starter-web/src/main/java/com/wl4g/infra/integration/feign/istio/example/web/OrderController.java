@@ -29,8 +29,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.infra.core.page.PageHolder;
-import com.wl4g.infra.core.web.BaseController;
+import com.wl4g.infra.context.page.PageHolder;
+import com.wl4g.infra.context.web.BaseController;
 import com.wl4g.infra.integration.feign.istio.example.bean.OrderInfo;
 import com.wl4g.infra.integration.feign.istio.example.service.OrderService;
 

@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import com.wl4g.infra.core.boot.BootstrappingAutoConfiguration;
+import com.wl4g.infra.context.boot.BootstrappingAutoConfiguration;
 import com.wl4g.infra.core.web.versions.annotation.ApiVersion;
 import com.wl4g.infra.core.web.versions.annotation.ApiVersionMapping;
 import com.wl4g.infra.core.web.versions.annotation.EnableApiVersionManagement;

@@ -19,6 +19,8 @@
  */
 package com.wl4g.infra.core.constant;
 
+import com.wl4g.infra.context.constant.BaseConstants;
+
 /**
  * {@link CoreInfraConstants}
  * 

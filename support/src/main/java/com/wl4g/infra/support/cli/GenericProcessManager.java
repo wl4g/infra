@@ -47,7 +47,7 @@ import com.wl4g.infra.common.cli.ProcessUtils.DelegateProcess;
 import com.wl4g.infra.common.cli.ssh2.SSH2Holders;
 import com.wl4g.infra.common.cli.ssh2.SshjHolder.CommandSessionWrapper;
 import com.wl4g.infra.common.task.RunnerProperties;
-import com.wl4g.infra.core.task.ApplicationTaskRunner;
+import com.wl4g.infra.context.task.ApplicationTaskRunner;
 import com.wl4g.infra.support.cli.command.DestroableCommand;
 import com.wl4g.infra.support.cli.command.LocalDestroableCommand;
 import com.wl4g.infra.support.cli.command.RemoteDestroableCommand;

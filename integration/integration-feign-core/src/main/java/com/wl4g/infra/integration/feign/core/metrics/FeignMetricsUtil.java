@@ -17,7 +17,7 @@ package com.wl4g.infra.integration.feign.core.metrics;
 
 import java.lang.reflect.Method;
 
-import com.wl4g.infra.core.utils.AopUtils2;
+import com.wl4g.infra.context.utils.AopUtils2;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -47,11 +47,15 @@ public abstract class FeignMetricsUtil {
 
         consumer_failure("consumer_failure", "The stats of consumer decode failure"),
 
+        consumer_cost("consumer_cost", "The stats of consumer call cost"),
+
         provider_total("provider_total", "The stats of provider total"),
 
         provider_success("provider_success", "The stats of provider decode success"),
 
-        provider_failure("provider_failure", "The stats of provider decode failure");
+        provider_failure("provider_failure", "The stats of provider decode failure"),
+
+        provider_cost("provider_cost", "The stats of provider call cost");
 
         private final String name;
         private final String help;
