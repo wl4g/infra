@@ -1,3 +1,3 @@
 ### This folder contains only native libraries built on the Mac of unix platform.
 
-> [OpenCV-4.1.1-Mac Download](https://github.com/wl4g/dopaas-infra-opencv-native/tree/master/4.1.1/mac
+> [OpenCV-4.1.1-Mac Download](https://github.com/wl4g/infra-opencv-native/tree/master/4.1.1/mac

@@ -289,7 +289,7 @@ Command 03:parameter
 
 Simple Serialization
 --------------------
-To replace the large bytes and coding slowly of JAVA serialization, we can use dopaas-infra-integration-codec's simple serialization instead.
+To replace the large bytes and coding slowly of JAVA serialization, we can use infra-integration-codec's simple serialization instead.
 It only contains the full name of main class and object's data. Even it can use ObjectCoder's setting such as wrappers, total length and so on.
 Object doesn't needs to implement interface java.io.Serializable. It can be serialized directly.
 <br/>
@@ -339,7 +339,7 @@ Object result = ObjectSerial.decode(coder, bytes);
 
 Fields Cache
 -----------------
-To encode or decode object, dopaas-infra-integration-codec will get object's valid fields. We can use field cache to improve the speed
+To encode or decode object, infra-integration-codec will get object's valid fields. We can use field cache to improve the speed
  of getting fields. Cache have LOCAL and GLOBAL type. Default NONE.<br/>
 LOCAL : Local cache is available in current ObjectCoder.<br/>
 GLOBAL: Global cache is available in all ObjectCoder as global static object.<br/>
@@ -470,4 +470,4 @@ Developers can encrypt message bytes to ensure information secure.
   coder.getCodecConfig().addWrap(new CipherWrapper(new CustomCipher()));
 </pre>
 
-I wish you a pleasant to use dopaas-infra-integration-codec. If you have some good advice or bug report, please share with us. Thank you!
+I wish you a pleasant to use infra-integration-codec. If you have some good advice or bug report, please share with us. Thank you!

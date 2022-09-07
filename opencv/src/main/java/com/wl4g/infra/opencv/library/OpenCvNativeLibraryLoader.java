@@ -76,8 +76,8 @@ public final class OpenCvNativeLibraryLoader {
             } catch (LoadNativeLibraryError e) {
                 throw new LoadNativeLibraryError(
                         "Failed to load opencv dylib. missing native lib file to run? you can download and "
-                                + "install it see: https://github.com/wl4g/dopaas-infra-opencv-native"
-                                + " or https://gitee.com/wl4g/dopaas-infra-opencv-native",
+                                + "install it see: https://github.com/wl4g/infra-opencv-native"
+                                + " or https://gitee.com/wl4g/infra-opencv-native",
                         e);
             }
         }

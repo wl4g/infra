@@ -340,7 +340,7 @@ public class PreparedBeanMapperInterceptor implements Interceptor {
                 log.warn("Cannot get currentIamPrincipalId. - {}", e.getMessage());
             }
         } else {
-            log.warn("Saving unable to set currentIamPrincipalId! Please check if 'dopaas-iam-common' dependency exists!");
+            log.warn("Saving unable to set currentIamPrincipalId! Please check if 'iam-common' dependency exists!");
         }
         return BaseBean.UNKNOWN_USER_ID;
     }

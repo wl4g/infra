@@ -1,12 +1,12 @@
 # DoPaaS Infra Integration Feign(Istio) Examples
 
-> This example demonstrates how to use `dopaas-infra-integration-feign-istio` to quickly integrate feign based distributed architecture based on external integration locally.
+> This example demonstrates how to use `infra-integration-feign-istio` to quickly integrate feign based distributed architecture based on external integration locally.
 
 ## Quick start
 
-- 1. Start-up the [FeginIstioExampleService](dopaas-infra-integration-feign-istio-example-starter-service/src/main/java/com/wl4g/FeginIstioExampleService.java)
+- 1. Start-up the [FeginIstioExampleService](infra-integration-feign-istio-example-starter-service/src/main/java/com/wl4g/FeginIstioExampleService.java)
 
-- 2. Start-up the [FeginIstioExampleWeb](dopaas-infra-integration-feign-istio-example-starter-web/src/main/java/com/wl4g/FeginIstioExampleWeb.java)
+- 2. Start-up the [FeginIstioExampleWeb](infra-integration-feign-istio-example-starter-web/src/main/java/com/wl4g/FeginIstioExampleWeb.java)
 
 - 3. for testing
 

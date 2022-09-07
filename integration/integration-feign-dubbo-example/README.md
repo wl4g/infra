@@ -1,13 +1,13 @@
 # DoPaaS Infra Integration Feign(SpringCloud) Examples
 
-> This example demonstrates how to use `dopaas-infra-integration-feign-springcloud` to quickly integrate feign based distributed architecture based on external integration locally.
+> This example demonstrates how to use `infra-integration-feign-springcloud` to quickly integrate feign based distributed architecture based on external integration locally.
 
 ## Quick start
-- 1. [Start-up the Eureka service locally first](../dopaas-infra-integration-eureka/README.md)
+- 1. [Start-up the Eureka service locally first](../infra-integration-eureka/README.md)
 
-- 2. Start-up the [FeginSpringCloudExampleService](dopaas-infra-integration-feign-springcloud-example-starter-service/src/main/java/com/wl4g/FeginSpringCloudExampleService.java)
+- 2. Start-up the [FeginSpringCloudExampleService](infra-integration-feign-springcloud-example-starter-service/src/main/java/com/wl4g/FeginSpringCloudExampleService.java)
 
-- 3. Start-up the [FeginSpringCloudExampleWeb](dopaas-infra-integration-feign-springcloud-example-starter-web/src/main/java/com/wl4g/FeginSpringCloudExampleWeb.java)
+- 3. Start-up the [FeginSpringCloudExampleWeb](infra-integration-feign-springcloud-example-starter-web/src/main/java/com/wl4g/FeginSpringCloudExampleWeb.java)
 
 - 4. for testing
 

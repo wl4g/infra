@@ -15,8 +15,8 @@ Relevant open source project reference:</br>
 &nbsp;&nbsp;&nbsp;&nbsp;[https://github.com/opencv/opencv](https://github.com/opencv/opencv)</br>
 
 More compiled opencv native libraries references:</br>
-&nbsp;&nbsp;&nbsp;&nbsp;[https://github.com/wl4g/dopaas-infra-opencv-native](https://github.com/wl4g/dopaas-infra-opencv-native)</br>
-&nbsp;&nbsp;&nbsp;&nbsp;[https://gitee.com/wl4g/dopaas-infra-opencv-native](https://gitee.com/wl4g/dopaas-infra-opencv-native)
+&nbsp;&nbsp;&nbsp;&nbsp;[https://github.com/wl4g/infra-opencv-native](https://github.com/wl4g/infra-opencv-native)</br>
+&nbsp;&nbsp;&nbsp;&nbsp;[https://gitee.com/wl4g/infra-opencv-native](https://gitee.com/wl4g/infra-opencv-native)
 
 We fully retain and abide by the opencv license agreement, please refer to:
     https://github.com/opencv/opencv/blob/master/license
