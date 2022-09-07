@@ -13,6 +13,7 @@
 ├── infra-bom # dopass-infra公共依赖
 ├── infra-common # 常用Utils、Helpers等, 如 SSH2Holders/SnowflakeIdGenerator/Encodes/ClassPathResourcePatternResolver等
 ├── infra-common-shade # infra-common模块的集成包
+├── infra-context # 基于springboot context 特性增强，如支持自定义SpringApplication#setDefaultProperties覆盖配置(META-INF/bootstrapping.groovy)、内置request/response body调试日志输出、集成opentelemetry追踪等
 ├── infra-core # 基于springboot体系特性增强, 如增强springMvc请求版本映射、统一异常处理、框架式自动配置spring.config.name等
 ├── infra-data # DB/Mybatis相关封装, 如mybatis热加载、多数据源等
 ├── infra-opencv # opencv的java版封装, 使在spring应用直接执行视觉功能任务成为可能

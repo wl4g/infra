@@ -13,6 +13,7 @@
 ├── infra-bom # dopass-infra Public dependence
 ├── infra-common # Commonly used utils and helpers, e.g SSH2Holders/SnowflakeIdGenerator/Encodes/, etc
 ├── infra-common-shade # infra-common Integration package for modules
+├── infra-context # Enhancements based on springboot context features, such as support for custom SpringApplication#setDefaultProperties coverage configuration (META-INF/bootstrapping.groovy), built-in request/response body debug log output, integrated opentelemetry tracking, etc.
 ├── infra-core # Based on the spring boot system features enhancement, such as enhanced spring MVC request version mapping, unified exception handling, framework automatic configuration spring.config.name etc.
 ├── infra-data # Db/Mybatis related packages, such as mybatis hot loading, multi data sources, etc
 ├── infra-opencv # The Java version of OpenCV makes it possible to perform visual functions directly in spring applications
