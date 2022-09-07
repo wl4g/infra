@@ -20,7 +20,7 @@
 
 import static com.wl4g.infra.common.lang.ClassUtils2.isPresent
 import static org.springframework.boot.context.config.ConfigFileApplicationListener.*
-import com.wl4g.infra.core.boot.listener.IBootstrappingConfigurer
+import com.wl4g.infra.context.boot.listener.IBootstrappingConfigurer
 
 /**
  * Example facade implementation of {@link IBootstrappingConfigurer}

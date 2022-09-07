@@ -1,14 +1,14 @@
 # Application Listeners
 org.springframework.context.ApplicationListener=\
-com.wl4g.infra.core.boot.listener.BootstrappingConfigApplicationListener
+com.wl4g.infra.context.boot.listener.BootstrappingConfigApplicationListener
 
 # Application Auto Configuration.
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.wl4g.infra.core.boot.BootstrappingAutoConfiguration,\
-com.wl4g.infra.core.framework.beans.NamingPrototypeBeanAutoConfiguration,\
-com.wl4g.infra.core.framework.operator.GenericOperatorAutoConfiguration,\
-com.wl4g.infra.core.utils.context.SpringContextHolder,\
-com.wl4g.infra.core.logging.reactive.ReactiveLoggingAutoConfiguration,\
-com.wl4g.infra.core.logging.servlet.ServletLoggingAutoConfiguration,\
-com.wl4g.infra.core.trace.reactive.SimpleReactiveTraceAutoConfiguration,\
-com.wl4g.infra.core.trace.servlet.SimpleServletTraceAutoConfiguration
+com.wl4g.infra.context.boot.BootstrappingAutoConfiguration,\
+com.wl4g.infra.context.framework.beans.NamingPrototypeBeanAutoConfiguration,\
+com.wl4g.infra.context.framework.operator.GenericOperatorAutoConfiguration,\
+com.wl4g.infra.context.utils.SpringContextHolder,\
+com.wl4g.infra.context.logging.reactive.ReactiveLoggingAutoConfiguration,\
+com.wl4g.infra.context.logging.servlet.ServletLoggingAutoConfiguration,\
+com.wl4g.infra.context.trace.reactive.SimpleReactiveTraceAutoConfiguration,\
+com.wl4g.infra.context.trace.servlet.SimpleServletTraceAutoConfiguration

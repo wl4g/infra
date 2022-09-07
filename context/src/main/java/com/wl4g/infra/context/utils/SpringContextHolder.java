@@ -51,7 +51,7 @@ import com.wl4g.infra.common.log.SmartLogger;
  * @version v1.0.0 2019-07-12
  * @since
  */
-@Component("xcloudComponentSpringContextHolder")
+@Component("infraContextSpringContextHolder")
 @Lazy(false)
 public class SpringContextHolder implements ApplicationContextAware, DisposableBean {
 
