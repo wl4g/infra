@@ -19,6 +19,8 @@
  */
 package com.wl4g.infra.context.constant;
 
+import com.wl4g.infra.common.lang.EnvironmentUtil;
+
 /**
  * {@link ContextInfraConstants}
  * 
@@ -27,7 +29,7 @@ package com.wl4g.infra.context.constant;
  * @sine v1.0
  * @see
  */
-public abstract class ContextInfraConstants extends BaseConstants {
+public abstract class ContextInfraConstants extends EnvironmentUtil {
 
     // Configuration key.
 
@@ -71,6 +73,6 @@ public abstract class ContextInfraConstants extends BaseConstants {
      * Iam-Gateway project, you need to take care of him, hereby the default
      * definition is: -50
      */
-    public static final int TRACE_ORDER = getIntegerProperty("TRACE_ORDER", -50);
+    public static final int TRACE_ORDER = getIntProperty("TRACE_ORDER", -50);
 
 }

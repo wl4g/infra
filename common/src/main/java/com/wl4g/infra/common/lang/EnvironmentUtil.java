@@ -17,8 +17,10 @@
  * 
  * Reference to website: http://wl4g.com
  */
-package com.wl4g.infra.context.constant;
+package com.wl4g.infra.common.lang;
 
+import static com.wl4g.infra.common.lang.TypeConverts.parseDoubleOrNull;
+import static com.wl4g.infra.common.lang.TypeConverts.parseFloatOrNull;
 import static com.wl4g.infra.common.lang.TypeConverts.parseIntOrNull;
 import static com.wl4g.infra.common.lang.TypeConverts.parseLongOrNull;
 import static java.lang.System.getProperty;
@@ -31,14 +33,14 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 /**
- * {@link BaseConstants}
+ * {@link EnvironmentUtil}
  * 
  * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
  * @version v1.0 2021-01-05
  * @sine v1.0
  * @see
  */
-public abstract class BaseConstants {
+public abstract class EnvironmentUtil {
 
     /** OS environment map cache. */
     public static final Map<String, String> ENV = Collections.unmodifiableMap(System.getenv());
@@ -47,14 +49,29 @@ public abstract class BaseConstants {
         return getProperty(key, defaultValue);
     }
 
-    public static Long getLongProperty(@NotNull String key, @Nullable Long defaultValue) {
+    public static long getLongProperty(@NotNull String key, @Nullable long defaultValue) {
         Long value = parseLongOrNull(getProperty(key));
         return nonNull(value) ? value : defaultValue;
     }
 
-    public static Integer getIntegerProperty(@NotNull String key, @Nullable Integer defaultValue) {
+    public static int getIntProperty(@NotNull String key, @Nullable int defaultValue) {
         Integer value = parseIntOrNull(getProperty(key));
         return nonNull(value) ? value : defaultValue;
+    }
+
+    public static float getFloatProperty(@NotNull String key, @Nullable float defaultValue) {
+        Float value = parseFloatOrNull(getProperty(key));
+        return nonNull(value) ? value : defaultValue;
+    }
+
+    public static double getDoubleProperty(@NotNull String key, @Nullable double defaultValue) {
+        Double value = parseDoubleOrNull(getProperty(key));
+        return nonNull(value) ? value : defaultValue;
+    }
+
+    public static boolean getBooleanProperty(@NotNull String key, @Nullable boolean defaultValue) {
+        String value = getProperty(key);
+        return nonNull(value) ? Boolean.parseBoolean(value) : defaultValue;
     }
 
 }

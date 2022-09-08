@@ -31,12 +31,25 @@ import org.junit.Test;
 public class Collector2Tests {
 
     @Test
-    public void toLinkedHashMapCase1() {
+    public void testToLinkedHashMap() {
         List<String> list = new ArrayList<>();
         list.add("jack1");
         list.add("tom2");
         list.add("mary3");
+        list.add("MARY3");
         Map<String, Integer> result = list.stream().collect(Collectors2.toLinkedHashMap(e -> e, e -> 1));
+        System.out.println(result.getClass());
+        System.out.println(result);
+    }
+
+    @Test
+    public void testToCaseInsensitiveHashMap() {
+        List<String> list = new ArrayList<>();
+        list.add("jack1");
+        list.add("tom2");
+        list.add("mary3");
+        list.add("MARY3");
+        Map<String, Integer> result = list.stream().collect(Collectors2.toCaseInsensitiveHashMap(e -> e, e -> 1));
         System.out.println(result.getClass());
         System.out.println(result);
     }

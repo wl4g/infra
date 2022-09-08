@@ -15,11 +15,8 @@
  */
 package com.wl4g.infra.common.collection;
 
-import static com.wl4g.infra.common.lang.ClassUtils2.getMethodIfAvailable;
-import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toMap;
 
-import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -175,19 +172,23 @@ public abstract class Collectors2 {
      * @see #toMap(Function, Function)
      * @see #toMap(Function, Function, BinaryOperator)
      * @see #toConcurrentMap(Function, Function, BinaryOperator, Supplier)
+     * @see https://github.com/openjdk/jdk/blob/jdk8-b120/jdk/src/share/classes/java/util/stream/Collectors.java
      */
     @SuppressWarnings("unchecked")
     public static <T, K, U, M extends Map<K, U>> Collector<T, ?, M> toCaseInsensitiveHashMap(
             Function<? super T, ? extends K> keyMapper,
             Function<? super T, ? extends U> valueMapper) {
-        if (nonNull(TOMAP_METHOD_WITH_JDK11_PLUS)) {
-            return (Collector<T, ?, M>) toMap(keyMapper, valueMapper, (oldValue, newValue) -> oldValue,
-                    () -> (M) new CaseInsensitiveMap());
-        }
-        return (Collector<T, ?, M>) toMap(keyMapper, valueMapper, (oldValue, newValue) -> oldValue, CaseInsensitiveMap::new);
+        // if (java.util.Objects.nonNull(TOMAP_METHOD_WITH_JDK11_PLUS)) {
+        return (Collector<T, ?, M>) toMap(keyMapper, valueMapper, (oldValue, newValue) -> oldValue,
+                () -> (M) new CaseInsensitiveMap());
+        // }
+        // return (Collector<T, ?, M>) toMap(keyMapper, valueMapper,
+        // (oldValue,newValue) -> oldValue, CaseInsensitiveMap::new);
     }
 
-    public static final Method TOMAP_METHOD_WITH_JDK11_PLUS = getMethodIfAvailable(Collectors.class, "toMap", Function.class,
-            Function.class, BinaryOperator.class, Supplier.class);
+    // public static final java.lang.reflect.Method
+    // TOMAP_METHOD_WITH_JDK11_PLUS =
+    // com.wl4g.infra.common.lang.ClassUtils2.getMethodIfAvailable(Collectors.class,
+    // "toMap",Function.class,Function.class,BinaryOperator.class,Supplier.class);
 
 }
