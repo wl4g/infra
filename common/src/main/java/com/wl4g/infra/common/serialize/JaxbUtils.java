@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ~ 2025 the original author or authors. <wanglsir@gmail.com, 983708408@qq.com>
+ * Copyright 2017 ~ 2025 the original author or authors. <James Wong <jameswong1376@gmail.com>>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ import org.apache.commons.lang3.StringUtils;
  * {@link com.wl4g.infra.common.serialize.JaxbUtilsTests}
  * </p>
  * 
- * @author Wangl.sir <wanglsir@gmail.com, 983708408@qq.com>
+ * @author Wangl.sir <James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2020-07-21
  * @since
  */
@@ -152,7 +152,7 @@ public abstract class JaxbUtils {
     /**
      * {@link JaxbConverter}
      *
-     * @author Wangl.sir <wanglsir@gmail.com, 983708408@qq.com>
+     * @author Wangl.sir <James Wong <jameswong1376@gmail.com>>
      * @version v1.0 2020-07-21
      * @since
      */
@@ -282,7 +282,7 @@ public abstract class JaxbUtils {
         /**
          * Encapsulate the case that the root element is a collection. . *
          * 
-         * @author Wangl.sir <wanglsir@gmail.com, 983708408@qq.com>
+         * @author Wangl.sir <James Wong <jameswong1376@gmail.com>>
          * @version v1.0 2020-07-20
          * @since
          */

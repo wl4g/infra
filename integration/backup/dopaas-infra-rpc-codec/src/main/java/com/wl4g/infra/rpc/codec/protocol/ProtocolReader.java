@@ -31,7 +31,7 @@ import java.io.Serializable;
 /**
  * Read remote output byte stream message to local object.
  * 
- * @author Wangl.sir <983708408@qq.com>
+ * @author James Wong <jameswong1376@gmail.com>
  * @version v1.0
  * @time 2016年9月21日
  * @since

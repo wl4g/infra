@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ~ 2025 the original author or authors. <wanglsir@gmail.com, 983708408@qq.com>
+ * Copyright 2017 ~ 2025 the original author or authors. <James Wong <jameswong1376@gmail.com>>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package com.wl4g.infra.common.view;
 
+import static com.wl4g.infra.common.view.Freemarkers.renderingTemplateToString;
 import static java.lang.String.format;
 
 import java.io.IOException;
@@ -24,8 +25,6 @@ import java.util.Map;
 import org.junit.Test;
 
 import freemarker.template.TemplateException;
-
-import static com.wl4g.infra.common.view.Freemarkers.renderingTemplateToString;
 
 /**
  * {@link FreemarkersTests}

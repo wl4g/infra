@@ -246,19 +246,22 @@ public class SimpleHTTPServer {
          * stream and limit.
          *
          * @param in
-         *            the underlying input stream
+         *                                  the underlying input stream
          * @param limit
-         *            the maximum number of bytes that may be consumed from the
-         *            underlying stream before this stream ends. If zero or
-         *            negative, this stream will be at its end from
-         *            initialization.
+         *                                  the maximum number of bytes that may
+         *                                  be consumed from the underlying
+         *                                  stream before this stream ends. If
+         *                                  zero or negative, this stream will
+         *                                  be at its end from initialization.
          * @param prematureEndException
-         *            specifies the stream's behavior when the underlying stream
-         *            end is reached before the limit is reached: if true, an
-         *            exception is thrown, otherwise this stream reaches its end
-         *            as well (i.e. read() returns -1)
+         *                                  specifies the stream's behavior when
+         *                                  the underlying stream end is reached
+         *                                  before the limit is reached: if
+         *                                  true, an exception is thrown,
+         *                                  otherwise this stream reaches its
+         *                                  end as well (i.e. read() returns -1)
          * @throws NullPointerException
-         *             if the given stream is null
+         *                                  if the given stream is null
          */
         public LimitedInputStream(InputStream in, long limit, boolean prematureEndException) {
             super(in);
@@ -325,12 +328,13 @@ public class SimpleHTTPServer {
          * added.
          *
          * @param in
-         *            the underlying "chunked"-encoded input stream
+         *                    the underlying "chunked"-encoded input stream
          * @param headers
-         *            the headers container to which the stream's trailing
-         *            headers will be added, or null if they are to be discarded
+         *                    the headers container to which the stream's
+         *                    trailing headers will be added, or null if they
+         *                    are to be discarded
          * @throws NullPointerException
-         *             if the given stream is null
+         *                                  if the given stream is null
          */
         public ChunkedInputStream(InputStream in, Headers headers) {
             super(in, 0, true);
@@ -354,7 +358,8 @@ public class SimpleHTTPServer {
          * @return the length of the chunk, or -1 if the end of stream has been
          *         reached
          * @throws IOException
-         *             if an IO error occurs or the stream is corrupt
+         *                         if an IO error occurs or the stream is
+         *                         corrupt
          */
         protected long initChunk() throws IOException {
             if (limit == 0) { // finished previous chunk
@@ -378,10 +383,11 @@ public class SimpleHTTPServer {
          * Parses a chunk-size line.
          *
          * @param line
-         *            the chunk-size line to parse
+         *                 the chunk-size line to parse
          * @return the chunk size
          * @throws IllegalArgumentException
-         *             if the chunk-size line is invalid
+         *                                      if the chunk-size line is
+         *                                      invalid
          */
         protected static long parseChunkSize(String line) throws IllegalArgumentException {
             int pos = line.indexOf(';');
@@ -414,10 +420,10 @@ public class SimpleHTTPServer {
          * Constructs a ChunkedOutputStream with the given underlying stream.
          *
          * @param out
-         *            the underlying output stream to which the chunked stream
-         *            is written
+         *                the underlying output stream to which the chunked
+         *                stream is written
          * @throws NullPointerException
-         *             if the given stream is null
+         *                                  if the given stream is null
          */
         public ChunkedOutputStream(OutputStream out) {
             super(out);
@@ -429,12 +435,12 @@ public class SimpleHTTPServer {
          * Initializes a new chunk with the given size.
          *
          * @param size
-         *            the chunk size (must be positive)
+         *                 the chunk size (must be positive)
          * @throws IllegalArgumentException
-         *             if size is negative
+         *                                      if size is negative
          * @throws IOException
-         *             if an IO error occurs, or the stream has already been
-         *             ended
+         *                                      if an IO error occurs, or the
+         *                                      stream has already been ended
          */
         protected void initChunk(long size) throws IOException {
             if (size < 0)
@@ -453,9 +459,9 @@ public class SimpleHTTPServer {
          * Writes the trailing chunk which marks the end of the stream.
          *
          * @param headers
-         *            the (optional) trailing headers to write, or null
+         *                    the (optional) trailing headers to write, or null
          * @throws IOException
-         *             if an error occurs
+         *                         if an error occurs
          */
         public void writeTrailingChunk(Headers headers) throws IOException {
             initChunk(0); // zero-sized chunk marks the end of the stream
@@ -471,9 +477,9 @@ public class SimpleHTTPServer {
          * new chunk of size 1, and then writes the byte as the chunk data.
          *
          * @param b
-         *            the byte to write as a chunk
+         *              the byte to write as a chunk
          * @throws IOException
-         *             if an error occurs
+         *                         if an error occurs
          */
         @Override
         public void write(int b) throws IOException {
@@ -485,16 +491,17 @@ public class SimpleHTTPServer {
          * new chunk of the given size, and then writes the chunk data.
          *
          * @param b
-         *            an array containing the bytes to write
+         *                an array containing the bytes to write
          * @param off
-         *            the offset within the array where the data starts
+         *                the offset within the array where the data starts
          * @param len
-         *            the length of the data in bytes
+         *                the length of the data in bytes
          * @throws IOException
-         *             if an error occurs
+         *                                       if an error occurs
          * @throws IndexOutOfBoundsException
-         *             if the given offset or length are outside the bounds of
-         *             the given array
+         *                                       if the given offset or length
+         *                                       are outside the bounds of the
+         *                                       given array
          */
         @Override
         public void write(byte[] b, int off, int len) throws IOException {
@@ -508,7 +515,7 @@ public class SimpleHTTPServer {
          * stream.
          *
          * @throws IOException
-         *             if an error occurs
+         *                         if an error occurs
          */
         @Override
         public void close() throws IOException {
@@ -529,7 +536,7 @@ public class SimpleHTTPServer {
          * Constructs a ResponseOutputStream.
          *
          * @param out
-         *            the underlying output stream
+         *                the underlying output stream
          */
         public ResponseOutputStream(OutputStream out) {
             super(out);
@@ -568,13 +575,15 @@ public class SimpleHTTPServer {
          * Constructs a MultipartInputStream with the given underlying stream.
          *
          * @param in
-         *            the underlying multipart stream
+         *                     the underlying multipart stream
          * @param boundary
-         *            the multipart boundary
+         *                     the multipart boundary
          * @throws NullPointerException
-         *             if the given stream or boundary is null
+         *                                      if the given stream or boundary
+         *                                      is null
          * @throws IllegalArgumentException
-         *             if the given boundary's size is not between 1 and 70
+         *                                      if the given boundary's size is
+         *                                      not between 1 and 70
          */
         protected MultipartInputStream(InputStream in, byte[] boundary) {
             super(in);
@@ -631,7 +640,7 @@ public class SimpleHTTPServer {
          *
          * @return true if successful, or false if there are no more parts
          * @throws IOException
-         *             if an error occurs
+         *                         if an error occurs
          */
         public boolean nextPart() throws IOException {
             while (skip(buf.length) != 0)
@@ -652,7 +661,8 @@ public class SimpleHTTPServer {
          * @return true if there is available data for the current part, or
          *         false if the current part's end has been reached
          * @throws IOException
-         *             if an error occurs or the input format is invalid
+         *                         if an error occurs or the input format is
+         *                         invalid
          */
         protected boolean fill() throws IOException {
             // check if we already have more available data
@@ -702,7 +712,8 @@ public class SimpleHTTPServer {
          * data. Updates tail, length and state fields accordingly.
          *
          * @throws IOException
-         *             if an error occurs or the input format is invalid
+         *                         if an error occurs or the input format is
+         *                         invalid
          */
         protected void findBoundary() throws IOException {
             // see RFC2046#5.1.1 for boundary syntax
@@ -829,7 +840,7 @@ public class SimpleHTTPServer {
              *
              * @return the part's body as a string
              * @throws IOException
-             *             if an IO error occurs
+             *                         if an IO error occurs
              */
             public String getString() throws IOException {
                 String charset = headers.getParams("Content-Type").get("charset");
@@ -844,12 +855,13 @@ public class SimpleHTTPServer {
          * Creates a new MultipartIterator from the given request.
          *
          * @param req
-         *            the multipart/form-data request
+         *                the multipart/form-data request
          * @throws IOException
-         *             if an IO error occurs
+         *                                      if an IO error occurs
          * @throws IllegalArgumentException
-         *             if the given request's content type is not
-         *             multipart/form-data, or is missing the boundary
+         *                                      if the given request's content
+         *                                      type is not multipart/form-data,
+         *                                      or is missing the boundary
          */
         public MultipartIterator(Request req) throws IOException {
             Map<String, String> ct = req.getHeaders().getParams("Content-Type");
@@ -908,7 +920,7 @@ public class SimpleHTTPServer {
              * Constructs a ContextInfo with the given context path.
              *
              * @param path
-             *            the context path (without trailing slash)
+             *                 the context path (without trailing slash)
              */
             public ContextInfo(String path) {
                 this.path = path;
@@ -938,10 +950,10 @@ public class SimpleHTTPServer {
              * Adds (or replaces) a context handler for the given HTTP methods.
              *
              * @param handler
-             *            the context handler
+             *                    the context handler
              * @param methods
-             *            the HTTP methods supported by the handler (default is
-             *            "GET")
+             *                    the HTTP methods supported by the handler
+             *                    (default is "GET")
              */
             public void addHandler(ContextHandler handler, String... methods) {
                 if (methods.length == 0)
@@ -966,7 +978,7 @@ public class SimpleHTTPServer {
          * Constructs a VirtualHost with the given name.
          *
          * @param name
-         *            the host's name, or null if it is the default host
+         *                 the host's name, or null if it is the default host
          */
         public VirtualHost(String name) {
             this.name = name;
@@ -986,7 +998,7 @@ public class SimpleHTTPServer {
          * Adds an alias for this host.
          *
          * @param alias
-         *            the alias
+         *                  the alias
          */
         public void addAlias(String alias) {
             aliases.add(alias);
@@ -1011,8 +1023,8 @@ public class SimpleHTTPServer {
          * index file is "index.html".
          *
          * @param directoryIndex
-         *            the directory index file, or null if no index file should
-         *            be used
+         *                           the directory index file, or null if no
+         *                           index file should be used
          */
         public void setDirectoryIndex(String directoryIndex) {
             this.directoryIndex = directoryIndex;
@@ -1032,7 +1044,7 @@ public class SimpleHTTPServer {
          * directory resource is requested, an error will be returned instead.
          *
          * @param allowed
-         *            specifies whether generated indices are allowed
+         *                    specifies whether generated indices are allowed
          */
         public void setAllowGeneratedIndex(boolean allowed) {
             this.allowGeneratedIndex = allowed;
@@ -1067,7 +1079,7 @@ public class SimpleHTTPServer {
          * context is returned.
          *
          * @param path
-         *            the context's path
+         *                 the context's path
          * @return the context info for the given path, or an empty context if
          *         none exists
          */
@@ -1086,14 +1098,14 @@ public class SimpleHTTPServer {
          * Paths are normalized by removing trailing slashes (except the root).
          *
          * @param path
-         *            the context's path (must start with '/')
+         *                    the context's path (must start with '/')
          * @param handler
-         *            the context handler for the given path
+         *                    the context handler for the given path
          * @param methods
-         *            the HTTP methods supported by the context handler (default
-         *            is "GET")
+         *                    the HTTP methods supported by the context handler
+         *                    (default is "GET")
          * @throws IllegalArgumentException
-         *             if path is malformed
+         *                                      if path is malformed
          */
         public void addContext(String path, ContextHandler handler, String... methods) {
             if (path == null || !path.startsWith("/") && !path.equals("*"))
@@ -1110,10 +1122,11 @@ public class SimpleHTTPServer {
          * with the {@link Context} annotation.
          *
          * @param o
-         *            the object whose annotated methods are added
+         *              the object whose annotated methods are added
          * @throws IllegalArgumentException
-         *             if a Context-annotated method has an {@link Context
-         *             invalid signature}
+         *                                      if a Context-annotated method
+         *                                      has an {@link Context invalid
+         *                                      signature}
          */
         public void addContexts(Object o) throws IllegalArgumentException {
             for (Class<?> c = o.getClass(); c != null; c = c.getSuperclass()) {
@@ -1171,16 +1184,16 @@ public class SimpleHTTPServer {
          * Serves the given request using the given response.
          *
          * @param req
-         *            the request to be served
+         *                 the request to be served
          * @param resp
-         *            the response to be filled
+         *                 the response to be filled
          * @return an HTTP status code, which will be used in returning a
          *         default response appropriate for this status. If this method
          *         invocation already sent anything in the response (headers or
          *         content), it must return 0, and no further processing will be
          *         done
          * @throws IOException
-         *             if an IO error occurs
+         *                         if an IO error occurs
          */
         int serve(Request req, Response resp) throws IOException;
     }
@@ -1249,13 +1262,13 @@ public class SimpleHTTPServer {
          * trailing whitespace are trimmed.
          *
          * @param name
-         *            the header name
+         *                  the header name
          * @param value
-         *            the header value
+         *                  the header value
          * @throws NullPointerException
-         *             if name or value is null
+         *                                      if name or value is null
          * @throws IllegalArgumentException
-         *             if name is empty
+         *                                      if name is empty
          */
         public Header(String name, String value) {
             this.name = name.trim();
@@ -1314,7 +1327,7 @@ public class SimpleHTTPServer {
          * Returns the value of the first header with the given name.
          *
          * @param name
-         *            the header name (case insensitive)
+         *                 the header name (case insensitive)
          * @return the header value, or null if none exists
          */
         public String get(String name) {
@@ -1328,7 +1341,7 @@ public class SimpleHTTPServer {
          * Returns the Date value of the header with the given name.
          *
          * @param name
-         *            the header name (case insensitive)
+         *                 the header name (case insensitive)
          * @return the header value as a Date, or null if none exists or if the
          *         value is not in any supported date format
          */
@@ -1345,7 +1358,7 @@ public class SimpleHTTPServer {
          * Returns whether there exists a header with the given name.
          *
          * @param name
-         *            the header name (case insensitive)
+         *                 the header name (case insensitive)
          * @return whether there exists a header with the given name
          */
         public boolean contains(String name) {
@@ -1357,9 +1370,9 @@ public class SimpleHTTPServer {
          * collection of headers. Leading and trailing whitespace are trimmed.
          *
          * @param name
-         *            the header name (case insensitive)
+         *                  the header name (case insensitive)
          * @param value
-         *            the header value
+         *                  the header value
          */
         public void add(String name, String value) {
             Header header = new Header(name, value); // also validates
@@ -1377,7 +1390,7 @@ public class SimpleHTTPServer {
          * their original order.
          *
          * @param headers
-         *            the headers to add
+         *                    the headers to add
          */
         public void addAll(Headers headers) {
             for (Header header : headers)
@@ -1390,9 +1403,9 @@ public class SimpleHTTPServer {
          * with the same name, it is added as in {@link #add}.
          *
          * @param name
-         *            the header name (case insensitive)
+         *                  the header name (case insensitive)
          * @param value
-         *            the header value
+         *                  the header value
          * @return the replaced header, or null if none existed
          */
         public Header replace(String name, String value) {
@@ -1411,7 +1424,7 @@ public class SimpleHTTPServer {
          * Removes all headers with the given name (if any exist).
          *
          * @param name
-         *            the header name (case insensitive)
+         *                 the header name (case insensitive)
          */
         public void remove(String name) {
             int j = 0;
@@ -1426,9 +1439,9 @@ public class SimpleHTTPServer {
          * Writes the headers to the given stream (including trailing CRLF).
          *
          * @param out
-         *            the stream to write the headers to
+         *                the stream to write the headers to
          * @throws IOException
-         *             if an error occurs
+         *                         if an error occurs
          */
         public void writeTo(OutputStream out) throws IOException {
             for (int i = 0; i < count; i++) {
@@ -1444,7 +1457,7 @@ public class SimpleHTTPServer {
          * parameters.
          *
          * @param name
-         *            the header name (case insensitive)
+         *                 the header name (case insensitive)
          * @return the header's parameter names and values
          */
         public Map<String, String> getParams(String name) {
@@ -1493,11 +1506,11 @@ public class SimpleHTTPServer {
          * Constructs a Request from the data in the given input stream.
          *
          * @param in
-         *            the input stream from which the request is read
+         *                 the input stream from which the request is read
          * @param sock
-         *            the underlying connected socket
+         *                 the underlying connected socket
          * @throws IOException
-         *             if an error occurs
+         *                         if an error occurs
          */
         public Request(InputStream in, Socket sock) throws IOException {
             this.sock = sock;
@@ -1592,9 +1605,9 @@ public class SimpleHTTPServer {
          * rewriting, etc.
          *
          * @param path
-         *            the path to set
+         *                 the path to set
          * @throws IllegalArgumentException
-         *             if the given path is malformed
+         *                                      if the given path is malformed
          */
         public void setPath(String path) {
             try {
@@ -1650,7 +1663,7 @@ public class SimpleHTTPServer {
          * @return the request parameters name-value pairs, or an empty list if
          *         there are none
          * @throws IOException
-         *             if an error occurs
+         *                         if an error occurs
          * @see SimpleHTTPServer#parseParamsList(String)
          */
         public List<String[]> getParamsList() throws IOException {
@@ -1683,7 +1696,7 @@ public class SimpleHTTPServer {
          * @return the request parameters name-value pairs, or an empty map if
          *         there are none
          * @throws IOException
-         *             if an error occurs
+         *                         if an error occurs
          * @see #getParamsList()
          */
         public Map<String, String> getParams() throws IOException {
@@ -1698,7 +1711,7 @@ public class SimpleHTTPServer {
          * containing all of them is returned.
          *
          * @param length
-         *            the full length of the requested resource
+         *                   the full length of the requested resource
          * @return the requested range, or null if the Range header is missing
          *         or invalid
          */
@@ -1711,9 +1724,10 @@ public class SimpleHTTPServer {
          * Reads the request line, parsing the method, URI and version string.
          *
          * @param in
-         *            the input stream from which the request line is read
+         *               the input stream from which the request line is read
          * @throws IOException
-         *             if an error occurs or the request line is invalid
+         *                         if an error occurs or the request line is
+         *                         invalid
          */
         protected void readRequestLine(InputStream in) throws IOException {
             // RFC2616#4.1: should accept empty lines before request line
@@ -1783,7 +1797,7 @@ public class SimpleHTTPServer {
          * Constructs a Response whose output is written to the given stream.
          *
          * @param out
-         *            the stream to which the response is written
+         *                the stream to which the response is written
          */
         public Response(OutputStream out) {
             this.out = out;
@@ -1794,7 +1808,7 @@ public class SimpleHTTPServer {
          * Sets whether this response's body is discarded or sent.
          *
          * @param discardBody
-         *            specifies whether the body is discarded or not
+         *                        specifies whether the body is discarded or not
          */
         public void setDiscardBody(boolean discardBody) {
             this.discardBody = discardBody;
@@ -1805,7 +1819,7 @@ public class SimpleHTTPServer {
          * supported by the client (e.g. compression, encoding, etc.)
          *
          * @param req
-         *            the request
+         *                the request
          */
         public void setClientCapabilities(Request req) {
             this.req = req;
@@ -1854,7 +1868,7 @@ public class SimpleHTTPServer {
          *         or null if the body should not be written (e.g. it is
          *         discarded)
          * @throws IOException
-         *             if an error occurs
+         *                         if an error occurs
          */
         public OutputStream getBody() throws IOException {
             if (encodedOut != null || discardBody)
@@ -1878,7 +1892,7 @@ public class SimpleHTTPServer {
          * Closes this response and flushes all output.
          *
          * @throws IOException
-         *             if an error occurs
+         *                         if an error occurs
          */
         public void close() throws IOException {
             state = -1; // closed
@@ -1896,9 +1910,10 @@ public class SimpleHTTPServer {
          * must be set before sending the headers.
          *
          * @param status
-         *            the response status
+         *                   the response status
          * @throws IOException
-         *             if an error occurs or headers were already sent
+         *                         if an error occurs or headers were already
+         *                         sent
          * @see #sendHeaders(int, long, long, String, String, long[])
          */
         public void sendHeaders(int status) throws IOException {
@@ -1922,27 +1937,28 @@ public class SimpleHTTPServer {
          * calculated as well, with a 200 status changed to a 206 status.
          *
          * @param status
-         *            the response status
+         *                         the response status
          * @param length
-         *            the response body length, or zero if there is no body, or
-         *            negative if there is a body but its length is not yet
-         *            known
+         *                         the response body length, or zero if there is
+         *                         no body, or negative if there is a body but
+         *                         its length is not yet known
          * @param lastModified
-         *            the last modified date of the response resource, or
-         *            non-positive if unknown. A time in the future will be
-         *            replaced with the current system time.
+         *                         the last modified date of the response
+         *                         resource, or non-positive if unknown. A time
+         *                         in the future will be replaced with the
+         *                         current system time.
          * @param etag
-         *            the ETag of the response resource, or null if unknown (see
-         *            RFC2616#3.11)
+         *                         the ETag of the response resource, or null if
+         *                         unknown (see RFC2616#3.11)
          * @param contentType
-         *            the content type of the response resource, or null if
-         *            unknown (in which case "application/octet-stream" will be
-         *            sent)
+         *                         the content type of the response resource, or
+         *                         null if unknown (in which case
+         *                         "application/octet-stream" will be sent)
          * @param range
-         *            the content range that will be sent, or null if the entire
-         *            resource will be sent
+         *                         the content range that will be sent, or null
+         *                         if the entire resource will be sent
          * @throws IOException
-         *             if an error occurs
+         *                         if an error occurs
          */
         public void sendHeaders(int status, long length, long lastModified, String etag, String contentType, long[] range)
                 throws IOException {
@@ -2002,11 +2018,11 @@ public class SimpleHTTPServer {
          * {@link SimpleHTTPServer#escapeHTML escaped}) HTML.
          *
          * @param status
-         *            the response status
+         *                   the response status
          * @param text
-         *            the text body (sent as text/html)
+         *                   the text body (sent as text/html)
          * @throws IOException
-         *             if an error occurs
+         *                         if an error occurs
          */
         public void send(int status, String text) throws IOException {
             byte[] content = text.getBytes("UTF-8");
@@ -2025,11 +2041,11 @@ public class SimpleHTTPServer {
          * {@link SimpleHTTPServer#escapeHTML escape} method.
          *
          * @param status
-         *            the response status
+         *                   the response status
          * @param text
-         *            the text body (sent as text/html)
+         *                   the text body (sent as text/html)
          * @throws IOException
-         *             if an error occurs
+         *                         if an error occurs
          */
         public void sendError(int status, String text) throws IOException {
             send(status,
@@ -2043,9 +2059,9 @@ public class SimpleHTTPServer {
          * Sends an error response with the given status and default body.
          *
          * @param status
-         *            the response status
+         *                   the response status
          * @throws IOException
-         *             if an error occurs
+         *                         if an error occurs
          */
         public void sendError(int status) throws IOException {
             String text = status < 400 ? ":)" : "sorry it didn't work out :(";
@@ -2057,15 +2073,15 @@ public class SimpleHTTPServer {
          * response headers have been sent (and indicate that there is a body).
          *
          * @param body
-         *            a stream containing the response body
+         *                   a stream containing the response body
          * @param length
-         *            the full length of the response body, or -1 for the whole
-         *            stream
+         *                   the full length of the response body, or -1 for the
+         *                   whole stream
          * @param range
-         *            the sub-range within the response body that should be
-         *            sent, or null if the entire body should be sent
+         *                   the sub-range within the response body that should
+         *                   be sent, or null if the entire body should be sent
          * @throws IOException
-         *             if an error occurs
+         *                         if an error occurs
          */
         public void sendBody(InputStream body, long length, long[] range) throws IOException {
             OutputStream out = getBody();
@@ -2088,12 +2104,13 @@ public class SimpleHTTPServer {
          * Sends a 301 or 302 response, redirecting the client to the given URL.
          *
          * @param url
-         *            the absolute URL to which the client is redirected
+         *                      the absolute URL to which the client is
+         *                      redirected
          * @param permanent
-         *            specifies whether a permanent (301) or temporary (302)
-         *            redirect status is sent
+         *                      specifies whether a permanent (301) or temporary
+         *                      (302) redirect status is sent
          * @throws IOException
-         *             if an IO error occurs or url is malformed
+         *                         if an IO error occurs or url is malformed
          */
         public void redirect(String url, boolean permanent) throws IOException {
             try {
@@ -2174,7 +2191,7 @@ public class SimpleHTTPServer {
      * connections.
      *
      * @param port
-     *            the port on which this server will accept connections
+     *                 the port on which this server will accept connections
      */
     public SimpleHTTPServer(int port) {
         setPort(port);
@@ -2194,7 +2211,7 @@ public class SimpleHTTPServer {
      * Sets the port on which this server will accept connections.
      *
      * @param port
-     *            the port on which this server will accept connections
+     *                 the port on which this server will accept connections
      */
     public void setPort(int port) {
         this.port = port;
@@ -2213,7 +2230,7 @@ public class SimpleHTTPServer {
      * {@code javax.net.ssl.keyStorePassword}.
      *
      * @param factory
-     *            the server socket factory to use
+     *                    the server socket factory to use
      */
     public void setServerSocketFactory(ServerSocketFactory factory) {
         this.serverSocketFactory = factory;
@@ -2224,7 +2241,7 @@ public class SimpleHTTPServer {
      * Sets the socket timeout for established connections.
      *
      * @param timeout
-     *            the socket timeout in milliseconds
+     *                    the socket timeout in milliseconds
      */
     public void setSocketTimeout(int timeout) {
         this.socketTimeout = timeout;
@@ -2236,7 +2253,7 @@ public class SimpleHTTPServer {
      * provided executor when necessary.
      *
      * @param executor
-     *            the executor to use
+     *                     the executor to use
      */
     public void setExecutor(Executor executor) {
         this.executor = executor;
@@ -2246,8 +2263,8 @@ public class SimpleHTTPServer {
      * Returns the virtual host with the given name.
      *
      * @param name
-     *            the name of the virtual host to return, or null for the
-     *            default virtual host
+     *                 the name of the virtual host to return, or null for the
+     *                 default virtual host
      * @return the virtual host with the given name, or null if it doesn't exist
      */
     public VirtualHost getVirtualHost(String name) {
@@ -2268,7 +2285,7 @@ public class SimpleHTTPServer {
      * already exist, they are overwritten.
      *
      * @param host
-     *            the virtual host to add
+     *                 the virtual host to add
      */
     public void addVirtualHost(VirtualHost host) {
         String name = host.getName();
@@ -2285,7 +2302,7 @@ public class SimpleHTTPServer {
      *
      * @return the created server socket
      * @throws IOException
-     *             if the socket cannot be created
+     *                         if the socket cannot be created
      */
     protected ServerSocket createServerSocket() throws IOException {
         ServerSocket serv = serverSocketFactory.createServerSocket();
@@ -2301,7 +2318,7 @@ public class SimpleHTTPServer {
      * server must first be stopped.
      *
      * @throws IOException
-     *             if the server cannot begin accepting connections
+     *                         if the server cannot begin accepting connections
      */
     public synchronized void start() throws IOException {
         if (serv != null)
@@ -2343,13 +2360,13 @@ public class SimpleHTTPServer {
      * closed after the transaction ends.
      *
      * @param in
-     *            the stream from which the incoming requests are read
+     *                 the stream from which the incoming requests are read
      * @param out
-     *            the stream into which the outgoing responses are written
+     *                 the stream into which the outgoing responses are written
      * @param sock
-     *            the connected socket
+     *                 the connected socket
      * @throws IOException
-     *             if an error occurs
+     *                         if an error occurs
      */
     protected void handleConnection(InputStream in, OutputStream out, Socket sock) throws IOException {
         in = new BufferedInputStream(in, 4096);
@@ -2409,11 +2426,12 @@ public class SimpleHTTPServer {
      * processing in some other way.
      *
      * @param req
-     *            the transaction request
+     *                 the transaction request
      * @param resp
-     *            the transaction response (into which the response is written)
+     *                 the transaction response (into which the response is
+     *                 written)
      * @throws IOException
-     *             if and error occurs
+     *                         if and error occurs
      */
     protected void handleTransaction(Request req, Response resp) throws IOException {
         resp.setClientCapabilities(req);
@@ -2427,14 +2445,13 @@ public class SimpleHTTPServer {
      * response.
      *
      * @param req
-     *            the request
+     *                 the request
      * @param resp
-     *            the response
+     *                 the response
      * @return whether further processing should be performed on the transaction
      * @throws IOException
-     *             if an error occurs
+     *                         if an error occurs
      */
-    @SuppressWarnings("resource")
     protected boolean preprocessTransaction(Request req, Response resp) throws IOException {
         Headers reqHeaders = req.getHeaders();
         // validate request
@@ -2473,11 +2490,12 @@ public class SimpleHTTPServer {
      * Handles a transaction according to the request method.
      *
      * @param req
-     *            the transaction request
+     *                 the transaction request
      * @param resp
-     *            the transaction response (into which the response is written)
+     *                 the transaction response (into which the response is
+     *                 written)
      * @throws IOException
-     *             if and error occurs
+     *                         if and error occurs
      */
     protected void handleMethod(Request req, Response resp) throws IOException {
         String method = req.getMethod();
@@ -2516,11 +2534,11 @@ public class SimpleHTTPServer {
      * Handles a TRACE method request.
      *
      * @param req
-     *            the request
+     *                 the request
      * @param resp
-     *            the response into which the content is written
+     *                 the response into which the content is written
      * @throws IOException
-     *             if an error occurs
+     *                         if an error occurs
      */
     public void handleTrace(Request req, Response resp) throws IOException {
         resp.sendHeaders(200, -1, -1, null, "message/http", null);
@@ -2536,11 +2554,11 @@ public class SimpleHTTPServer {
      * requested context (path) and HTTP method.
      *
      * @param req
-     *            the request
+     *                 the request
      * @param resp
-     *            the response into which the content is written
+     *                 the response into which the content is written
      * @throws IOException
-     *             if an error occurs
+     *                         if an error occurs
      */
     protected void serve(Request req, Response resp) throws IOException {
         long begin = currentTimeMillis();
@@ -2586,12 +2604,12 @@ public class SimpleHTTPServer {
      * case-insensitive, and contentType is converted to lowercase.
      *
      * @param contentType
-     *            the content type (MIME type) to be associated with the given
-     *            path suffixes
+     *                        the content type (MIME type) to be associated with
+     *                        the given path suffixes
      * @param suffixes
-     *            the path suffixes which will be associated with the
-     *            contentType, e.g. the file extensions of served files
-     *            (excluding the '.' character)
+     *                        the path suffixes which will be associated with
+     *                        the contentType, e.g. the file extensions of
+     *                        served files (excluding the '.' character)
      */
     public static void addContentType(String contentType, String... suffixes) {
         for (String suffix : suffixes)
@@ -2602,11 +2620,12 @@ public class SimpleHTTPServer {
      * Adds Content-Type mappings from a standard mime.types file.
      *
      * @param in
-     *            a stream containing a mime.types file
+     *               a stream containing a mime.types file
      * @throws IOException
-     *             if an error occurs
+     *                                   if an error occurs
      * @throws FileNotFoundException
-     *             if the file is not found or cannot be read
+     *                                   if the file is not found or cannot be
+     *                                   read
      */
     public static void addContentTypes(InputStream in) throws IOException {
         try {
@@ -2630,10 +2649,10 @@ public class SimpleHTTPServer {
      * the given default content type if none can be determined.
      *
      * @param path
-     *            the path whose content type is requested
+     *                 the path whose content type is requested
      * @param def
-     *            a default content type which is returned if none can be
-     *            determined
+     *                 a default content type which is returned if none can be
+     *                 determined
      * @return the content type for the given path, or the given default
      */
     public static String getContentType(String path, String def) {
@@ -2647,7 +2666,7 @@ public class SimpleHTTPServer {
      * compressible.
      *
      * @param contentType
-     *            the content type
+     *                        the content type
      * @return true if the data is compressible, false if not
      */
     public static boolean isCompressible(String contentType) {
@@ -2688,7 +2707,7 @@ public class SimpleHTTPServer {
      * The list retains the original order of the parameters.
      *
      * @param s
-     *            an "application/x-www-form-urlencoded" string
+     *              an "application/x-www-form-urlencoded" string
      * @return the parameter name-value pairs parsed from the given string, or
      *         an empty list if there are none
      */
@@ -2718,12 +2737,12 @@ public class SimpleHTTPServer {
      * map retains the original collection's iteration order.
      *
      * @param pairs
-     *            a collection of arrays, each containing a key and
-     *            corresponding value
+     *                  a collection of arrays, each containing a key and
+     *                  corresponding value
      * @param <K>
-     *            the key type
+     *                  the key type
      * @param <V>
-     *            the value type
+     *                  the value type
      * @return a map containing the paired keys and values, or an empty map
      */
     @SuppressWarnings("unchecked")
@@ -2743,9 +2762,9 @@ public class SimpleHTTPServer {
      * containing all of them is returned.
      *
      * @param range
-     *            the string containing the range description
+     *                   the string containing the range description
      * @param length
-     *            the full length of the requested resource
+     *                   the full length of the requested resource
      * @return the requested range, or null if the range value is invalid
      */
     public static long[] parseRange(String range, long length) {
@@ -2788,13 +2807,15 @@ public class SimpleHTTPServer {
      * it starts with an ASCII minus sign ('-') or plus sign ('+').
      *
      * @param s
-     *            the String containing the long representation to be parsed
+     *                  the String containing the long representation to be
+     *                  parsed
      * @param radix
-     *            the radix to be used while parsing s
+     *                  the radix to be used while parsing s
      * @return the long represented by s in the specified radix
      * @throws NumberFormatException
-     *             if the string does not contain a parsable long, or if it
-     *             starts with an ASCII minus sign or plus sign
+     *                                   if the string does not contain a
+     *                                   parsable long, or if it starts with an
+     *                                   ASCII minus sign or plus sign
      */
     public static long parseULong(String s, int radix) throws NumberFormatException {
         long val = Long.parseLong(s, radix); // throws NumberFormatException
@@ -2812,11 +2833,12 @@ public class SimpleHTTPServer {
      * ANSI C's asctime() format
      *
      * @param time
-     *            a string representation of a time value
+     *                 a string representation of a time value
      * @return the parsed date value
      * @throws IllegalArgumentException
-     *             if the given string does not contain a valid date format in
-     *             any of the supported formats
+     *                                      if the given string does not contain
+     *                                      a valid date format in any of the
+     *                                      supported formats
      */
     public static Date parseDate(String time) {
         for (String pattern : DATE_PATTERNS) {
@@ -2835,7 +2857,8 @@ public class SimpleHTTPServer {
      * Formats the given time value as a string in RFC 1123 format.
      *
      * @param time
-     *            the time in milliseconds since January 1, 1970, 00:00:00 GMT
+     *                 the time in milliseconds since January 1, 1970, 00:00:00
+     *                 GMT
      * @return the given time value as a string in RFC 1123 format
      */
     public static String formatDate(long time) {
@@ -2879,9 +2902,10 @@ public class SimpleHTTPServer {
      * ignored).
      *
      * @param list
-     *            the element list string
+     *                  the element list string
      * @param lower
-     *            specifies whether the list elements should be lower-cased
+     *                  specifies whether the list elements should be
+     *                  lower-cased
      * @return the non-empty elements in the list, or an empty array
      */
     public static String[] splitElements(String list, boolean lower) {
@@ -2895,12 +2919,13 @@ public class SimpleHTTPServer {
      * String.split()), trimming the elements and removing empty ones.
      *
      * @param str
-     *            the string to split
+     *                       the string to split
      * @param delimiters
-     *            the characters used as the delimiters between elements
+     *                       the characters used as the delimiters between
+     *                       elements
      * @param limit
-     *            if positive, limits the returned array size (remaining of str
-     *            in last element)
+     *                       if positive, limits the returned array size
+     *                       (remaining of str in last element)
      * @return the non-empty elements in the string, or an empty array
      */
     public static String[] split(String str, String delimiters, int limit) {
@@ -2926,11 +2951,12 @@ public class SimpleHTTPServer {
      * iterated objects (in order), with the delimiter inserted between them.
      *
      * @param delim
-     *            the delimiter that is inserted between the joined strings
+     *                  the delimiter that is inserted between the joined
+     *                  strings
      * @param items
-     *            the items whose string representations are joined
+     *                  the items whose string representations are joined
      * @param <T>
-     *            the item type
+     *                  the item type
      * @return the joined string
      */
     public static <T> String join(String delim, Iterable<T> items) {
@@ -2944,7 +2970,7 @@ public class SimpleHTTPServer {
      * Returns the parent of the given path.
      *
      * @param path
-     *            the path whose parent is returned (must start with '/')
+     *                 the path whose parent is returned (must start with '/')
      * @return the parent of the given path (excluding trailing slash), or null
      *         if given path is the root path
      */
@@ -2959,9 +2985,9 @@ public class SimpleHTTPServer {
      * removed from its right side.
      *
      * @param s
-     *            the string to trim
+     *              the string to trim
      * @param c
-     *            the character to remove
+     *              the character to remove
      * @return the trimmed string
      */
     public static String trimRight(String s, char c) {
@@ -2977,9 +3003,9 @@ public class SimpleHTTPServer {
      * removed from its left side.
      *
      * @param s
-     *            the string to trim
+     *              the string to trim
      * @param c
-     *            the character to remove
+     *              the character to remove
      * @return the trimmed string
      */
     public static String trimLeft(String s, char c) {
@@ -2995,9 +3021,9 @@ public class SimpleHTTPServer {
      * given string, replacing them with a single instance of the character.
      *
      * @param s
-     *            the string to trim
+     *              the string to trim
      * @param c
-     *            the character to trim
+     *              the character to trim
      * @return the given string with duplicate consecutive occurrences of c
      *         replaced by a single instance of c
      */
@@ -3018,7 +3044,7 @@ public class SimpleHTTPServer {
      * "316", "1.8K", "324M", etc.
      *
      * @param size
-     *            the size to display
+     *                 the size to display
      * @return a human-friendly string approximating the given data size
      */
     public static String toSizeApproxString(long size) {
@@ -3038,7 +3064,7 @@ public class SimpleHTTPServer {
      * generating both HTML and XHTML valid content.
      *
      * @param s
-     *            the string to escape
+     *              the string to escape
      * @return the escaped string
      * @see <a href="http://www.w3.org/International/questions/qa-escapes">The
      *      W3C FAQ</a>
@@ -3080,7 +3106,8 @@ public class SimpleHTTPServer {
      * are provided, their bytes are concatenated.
      *
      * @param strings
-     *            the strings to convert (containing only ISO-8859-1 chars)
+     *                    the strings to convert (containing only ISO-8859-1
+     *                    chars)
      * @return the byte array
      */
     public static byte[] getBytes(String... strings) {
@@ -3099,15 +3126,17 @@ public class SimpleHTTPServer {
      * Transfers data from an input stream to an output stream.
      *
      * @param in
-     *            the input stream to transfer from
+     *                the input stream to transfer from
      * @param out
-     *            the output stream to transfer to (or null to discard output)
+     *                the output stream to transfer to (or null to discard
+     *                output)
      * @param len
-     *            the number of bytes to transfer. If negative, the entire
-     *            contents of the input stream are transferred.
+     *                the number of bytes to transfer. If negative, the entire
+     *                contents of the input stream are transferred.
      * @throws IOException
-     *             if an IO error occurs or the input stream ends before the
-     *             requested number of bytes have been read
+     *                         if an IO error occurs or the input stream ends
+     *                         before the requested number of bytes have been
+     *                         read
      */
     public static void transfer(InputStream in, OutputStream out, long len) throws IOException {
         if (len == 0 || out == null && len < 0 && in.read() < 0)
@@ -3133,22 +3162,24 @@ public class SimpleHTTPServer {
      * LF is specified as the delimiter, a CRLF pair is also treated as one.
      *
      * @param in
-     *            the stream from which the token is read
+     *                      the stream from which the token is read
      * @param delim
-     *            the byte value which marks the end of the token, or -1 if the
-     *            token ends at the end of the stream
+     *                      the byte value which marks the end of the token, or
+     *                      -1 if the token ends at the end of the stream
      * @param enc
-     *            a character-encoding name
+     *                      a character-encoding name
      * @param maxLength
-     *            the maximum length (in bytes) to read
+     *                      the maximum length (in bytes) to read
      * @return the read token, excluding the delimiter
      * @throws UnsupportedEncodingException
-     *             if the encoding is not supported
+     *                                          if the encoding is not supported
      * @throws EOFException
-     *             if the stream end is reached before a delimiter is found
+     *                                          if the stream end is reached
+     *                                          before a delimiter is found
      * @throws IOException
-     *             if an IO error occurs, or the maximum length is reached
-     *             before the token end is reached
+     *                                          if an IO error occurs, or the
+     *                                          maximum length is reached before
+     *                                          the token end is reached
      */
     public static String readToken(InputStream in, int delim, String enc, int maxLength) throws IOException {
         // note: we avoid using a ByteArrayOutputStream here because it
@@ -3183,13 +3214,15 @@ public class SimpleHTTPServer {
      * position and ending at the first occurrence of the LF character.
      *
      * @param in
-     *            the stream from which the line is read
+     *               the stream from which the line is read
      * @return the read string, excluding the terminating LF character and (if
      *         exists) the CR character immediately preceding it
      * @throws EOFException
-     *             if the stream end is reached before an LF character is found
+     *                          if the stream end is reached before an LF
+     *                          character is found
      * @throws IOException
-     *             if an IO error occurs, or the line is longer than 8192 bytes
+     *                          if an IO error occurs, or the line is longer
+     *                          than 8192 bytes
      * @see #readToken(InputStream, int, String, int)
      */
     public static String readLine(InputStream in) throws IOException {
@@ -3203,11 +3236,11 @@ public class SimpleHTTPServer {
      * whitespace is removed.
      *
      * @param in
-     *            the stream from which the headers are read
+     *               the stream from which the headers are read
      * @return the read headers (possibly empty, if none exist)
      * @throws IOException
-     *             if an IO error occurs or the headers are malformed or there
-     *             are more than 100 header lines
+     *                         if an IO error occurs or the headers are
+     *                         malformed or there are more than 100 header lines
      */
     public static Headers readHeaders(InputStream in) throws IOException {
         Headers headers = new Headers();
@@ -3248,12 +3281,12 @@ public class SimpleHTTPServer {
      * RFC2616#3.11, RFC2616#13.3.3.
      *
      * @param strong
-     *            if true, strong comparison is used, otherwise weak comparison
-     *            is used
+     *                   if true, strong comparison is used, otherwise weak
+     *                   comparison is used
      * @param etags
-     *            the ETags to match against
+     *                   the ETags to match against
      * @param etag
-     *            the ETag to match
+     *                   the ETag to match
      * @return true if the ETag is matched, false otherwise
      */
     public static boolean match(boolean strong, String[] etags, String etag) {
@@ -3271,11 +3304,11 @@ public class SimpleHTTPServer {
      * present in the request.
      *
      * @param req
-     *            the request
+     *                         the request
      * @param lastModified
-     *            the resource's last modified time
+     *                         the resource's last modified time
      * @param etag
-     *            the resource's ETag
+     *                         the resource's ETag
      * @return the appropriate response status for the request
      */
     public static int getConditionalStatus(Request req, long lastModified, String etag) {
@@ -3324,16 +3357,16 @@ public class SimpleHTTPServer {
      * partial retrievals according to the RFC.
      *
      * @param base
-     *            the base directory to which the context is mapped
+     *                    the base directory to which the context is mapped
      * @param context
-     *            the context which is mapped to the base directory
+     *                    the context which is mapped to the base directory
      * @param req
-     *            the request
+     *                    the request
      * @param resp
-     *            the response into which the content is written
+     *                    the response into which the content is written
      * @return the HTTP status code to return, or 0 if a response was sent
      * @throws IOException
-     *             if an error occurs
+     *                         if an error occurs
      */
     public static int serveFile(File base, String context, Request req, Response resp) throws IOException {
         String relativePath = req.getPath().substring(context.length());
@@ -3365,13 +3398,13 @@ public class SimpleHTTPServer {
      * according to the RFC.
      *
      * @param file
-     *            the existing and readable file whose contents are served
+     *                 the existing and readable file whose contents are served
      * @param req
-     *            the request
+     *                 the request
      * @param resp
-     *            the response into which the content is written
+     *                 the response into which the content is written
      * @throws IOException
-     *             if an error occurs
+     *                         if an error occurs
      */
     public static void serveFileContent(File file, Request req, Response resp) throws IOException {
         long len = file.length();
@@ -3439,9 +3472,10 @@ public class SimpleHTTPServer {
      * Serves the contents of a directory as an HTML file index.
      *
      * @param dir
-     *            the existing and readable directory whose contents are served
+     *                 the existing and readable directory whose contents are
+     *                 served
      * @param path
-     *            the displayed base path corresponding to dir
+     *                 the displayed base path corresponding to dir
      * @return an HTML string containing the file index for the directory
      */
     public static String createIndex(File dir, String path) {
@@ -3482,7 +3516,7 @@ public class SimpleHTTPServer {
      * Starts a stand-alone HTTP server, serving files from disk.
      *
      * @param args
-     *            the command line arguments
+     *                 the command line arguments
      */
     public static void main(String[] args) {
         try {

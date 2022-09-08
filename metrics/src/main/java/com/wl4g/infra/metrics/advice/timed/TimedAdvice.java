@@ -36,7 +36,7 @@ import lombok.AllArgsConstructor;
  * more comprehensive APM analysis, please use frameworks such as
  * skywalking/elasticAPM/zipkin</br>
  * 
- * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author Wangl.sir &lt;James Wong <jameswong1376@gmail.com>&gt;
  * @version 2021-11-19 v1.0.0
  * @since v1.0
  * @see https://github.com/apache/skywalking/pull/1118

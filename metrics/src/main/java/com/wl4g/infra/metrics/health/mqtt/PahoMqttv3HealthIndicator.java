@@ -39,7 +39,7 @@ import com.wl4g.infra.metrics.health.HealthUtil;
 /**
  * Eclipse PAHO client(v3) health indicator.
  * 
- * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author Wangl.sir &lt;James Wong <jameswong1376@gmail.com>&gt;
  * @version 2021-11-19 v1.0.0
  * @since v1.0.0
  */

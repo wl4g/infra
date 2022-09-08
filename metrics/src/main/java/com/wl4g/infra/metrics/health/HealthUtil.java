@@ -21,7 +21,7 @@ import org.springframework.boot.actuate.health.Status;
 /**
  * Health tools
  * 
- * @author Wangl.sir <983708408@qq.com>
+ * @author James Wong <jameswong1376@gmail.com>
  * @version v1.0 2018年6月3日
  * @since
  */

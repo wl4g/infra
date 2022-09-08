@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ~ 2025 the original author or authors. <wanglsir@gmail.com, 983708408@qq.com>
+ * Copyright 2017 ~ 2025 the original author or authors. <James Wong <jameswong1376@gmail.com>>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,22 +15,20 @@
  */
 package com.wl4g.infra.common.cli.ssh2;
 
-import net.schmizz.sshj.SSHClient;
-import net.schmizz.sshj.connection.channel.direct.Session;
-import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
-import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
+import static com.wl4g.infra.common.io.ByteStreamUtils.readFullyToString;
+import static java.util.Objects.nonNull;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.wl4g.infra.common.cli.ssh2.SSH2Holders;
-import com.wl4g.infra.common.cli.ssh2.SshjHolder;
 import com.wl4g.infra.common.resource.ResourceUtils2;
 
-import static com.wl4g.infra.common.io.ByteStreamUtils.readFullyToString;
-import static java.util.Objects.nonNull;
+import net.schmizz.sshj.SSHClient;
+import net.schmizz.sshj.connection.channel.direct.Session;
+import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
+import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
 
 /**
  * {@link SshjHolderTests}

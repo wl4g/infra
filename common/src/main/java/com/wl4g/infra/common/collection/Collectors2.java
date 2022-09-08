@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ~ 2025 the original author or authors. <wanglsir@gmail.com, 983708408@qq.com>
+ * Copyright 2017 ~ 2025 the original author or authors. <James Wong <jameswong1376@gmail.com>>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,11 @@
  */
 package com.wl4g.infra.common.collection;
 
+import static com.wl4g.infra.common.lang.ClassUtils2.getMethodIfAvailable;
+import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toMap;
 
+import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -36,7 +39,7 @@ import org.apache.commons.collections.map.CaseInsensitiveMap;
  * 
  * {@link Collectors}
  * 
- * @author wanglsir@gmail.com, 983708408@qq.com
+ * @author James Wong <jameswong1376@gmail.com>
  * @version 2019年12月26日 v1.0.0
  * @see
  */
@@ -54,7 +57,7 @@ public abstract class Collectors2 {
      * Collector.
      *
      * @param <T>
-     *            the type of the input elements
+     *                the type of the input elements
      * @return a {@code Collector} which collects all the input elements into a
      *         {@code Set}
      */
@@ -86,24 +89,26 @@ public abstract class Collectors2 {
      *           may offer better parallel performance.
      *
      * @param <T>
-     *            the type of the input elements
+     *                          the type of the input elements
      * @param <K>
-     *            the output type of the key mapping function
+     *                          the output type of the key mapping function
      * @param <U>
-     *            the output type of the value mapping function
+     *                          the output type of the value mapping function
      * @param <M>
-     *            the type of the resulting {@code Map}
+     *                          the type of the resulting {@code Map}
      * @param keyMapper
-     *            a mapping function to produce keys
+     *                          a mapping function to produce keys
      * @param valueMapper
-     *            a mapping function to produce values
+     *                          a mapping function to produce values
      * @param mergeFunction
-     *            a merge function, used to resolve collisions between values
-     *            associated with the same key, as supplied to
-     *            {@link Map#merge(Object, Object, BiFunction)}
+     *                          a merge function, used to resolve collisions
+     *                          between values associated with the same key, as
+     *                          supplied to
+     *                          {@link Map#merge(Object, Object, BiFunction)}
      * @param mapSupplier
-     *            a function which returns a new, empty {@code Map} into which
-     *            the results will be inserted
+     *                          a function which returns a new, empty
+     *                          {@code Map} into which the results will be
+     *                          inserted
      * @return a {@code Collector} which collects elements into a {@code Map}
      *         whose keys are the result of applying a key mapping function to
      *         the input elements, and whose values are the result of applying a
@@ -141,24 +146,26 @@ public abstract class Collectors2 {
      *           may offer better parallel performance.
      *
      * @param <T>
-     *            the type of the input elements
+     *                          the type of the input elements
      * @param <K>
-     *            the output type of the key mapping function
+     *                          the output type of the key mapping function
      * @param <U>
-     *            the output type of the value mapping function
+     *                          the output type of the value mapping function
      * @param <M>
-     *            the type of the resulting {@code Map}
+     *                          the type of the resulting {@code Map}
      * @param keyMapper
-     *            a mapping function to produce keys
+     *                          a mapping function to produce keys
      * @param valueMapper
-     *            a mapping function to produce values
+     *                          a mapping function to produce values
      * @param mergeFunction
-     *            a merge function, used to resolve collisions between values
-     *            associated with the same key, as supplied to
-     *            {@link Map#merge(Object, Object, BiFunction)}
+     *                          a merge function, used to resolve collisions
+     *                          between values associated with the same key, as
+     *                          supplied to
+     *                          {@link Map#merge(Object, Object, BiFunction)}
      * @param mapSupplier
-     *            a function which returns a new, empty {@code Map} into which
-     *            the results will be inserted
+     *                          a function which returns a new, empty
+     *                          {@code Map} into which the results will be
+     *                          inserted
      * @return a {@code Collector} which collects elements into a {@code Map}
      *         whose keys are the result of applying a key mapping function to
      *         the input elements, and whose values are the result of applying a
@@ -173,7 +180,14 @@ public abstract class Collectors2 {
     public static <T, K, U, M extends Map<K, U>> Collector<T, ?, M> toCaseInsensitiveHashMap(
             Function<? super T, ? extends K> keyMapper,
             Function<? super T, ? extends U> valueMapper) {
+        if (nonNull(TOMAP_METHOD_WITH_JDK11_PLUS)) {
+            return (Collector<T, ?, M>) toMap(keyMapper, valueMapper, (oldValue, newValue) -> oldValue,
+                    () -> (M) new CaseInsensitiveMap());
+        }
         return (Collector<T, ?, M>) toMap(keyMapper, valueMapper, (oldValue, newValue) -> oldValue, CaseInsensitiveMap::new);
     }
+
+    public static final Method TOMAP_METHOD_WITH_JDK11_PLUS = getMethodIfAvailable(Collectors.class, "toMap", Function.class,
+            Function.class, BinaryOperator.class, Supplier.class);
 
 }

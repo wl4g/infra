@@ -46,7 +46,7 @@ import lombok.CustomLog;
  * but should be checked uniformly on the prometheus server side (which is also
  * convenient for unified configuration)
  * 
- * @author Wangl.sir <983708408@qq.com>
+ * @author James Wong <jameswong1376@gmail.com>
  * @version v1.0
  * @date 2018年6月1日
  * @since

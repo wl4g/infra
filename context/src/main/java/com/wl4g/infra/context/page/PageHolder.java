@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ~ 2025 the original author or authors. <wanglsir@gmail.com, 983708408@qq.com>
+ * Copyright 2017 ~ 2025 the original author or authors. <James Wong <jameswong1376@gmail.com>>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ import io.swagger.annotations.ApiParam;
  * very grateful for {@link com.github.pagehelper.Page} work and fully abide by
  * your agreements.
  * 
- * @auhtor Wangl.sir <wanglsir@gmail.com, 983708408@qq.com>
+ * @auhtor Wangl.sir <James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2018年9月7日
  * @since
  * @see https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/Interceptor.md

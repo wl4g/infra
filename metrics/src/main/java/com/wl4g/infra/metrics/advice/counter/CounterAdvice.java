@@ -26,7 +26,7 @@ import io.micrometer.core.instrument.Counter;
  * It can be used to monitor the execution time of any method it is called.<br/>
  * Thank you for the references: https://www.jianshu.com/p/e20a5f42a395
  * 
- * @author Wangl.sir <983708408@qq.com>
+ * @author James Wong <jameswong1376@gmail.com>
  * @version v1.0 2018-05-26
  * @since
  * @see {@link io.micrometer.core.aop.CountedAspect}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ~ 2025 the original author or authors. <wanglsir@gmail.com, 983708408@qq.com>
+ * Copyright 2017 ~ 2025 the original author or authors. <James Wong <jameswong1376@gmail.com>>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import static org.springframework.util.Assert.notNull;
 /**
  * Command-line process signal model.
  * 
- * @author Wangl.sir <wanglsir@gmail.com, 983708408@qq.com>
+ * @author Wangl.sir <James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2019年10月21日
  * @since
  */
@@ -78,7 +78,7 @@ public class DestroySignalMessage extends DestroySignal {
 	/**
 	 * {@link DestroyState}
 	 * 
-	 * @author Wangl.sir <wanglsir@gmail.com, 983708408@qq.com>
+	 * @author Wangl.sir <James Wong <jameswong1376@gmail.com>>
 	 * @version v1.0 2019年12月25日
 	 * @since
 	 */

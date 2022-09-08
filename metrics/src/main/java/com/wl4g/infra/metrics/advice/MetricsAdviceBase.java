@@ -35,7 +35,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 /**
  * AOP mode service monitoring section based on spring boot admin.<br/>
  * 
- * @author Wangl.sir <983708408@qq.com>
+ * @author James Wong <jameswong1376@gmail.com>
  * @version v1.0
  * @date 2018年5月30日
  * @since

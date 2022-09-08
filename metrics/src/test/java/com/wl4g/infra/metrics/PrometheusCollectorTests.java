@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.collect.Maps;
-import com.wl4g.infra.metrics.MetricsFacade;
 
 import io.micrometer.core.instrument.Counter;
 import io.prometheus.client.Collector;

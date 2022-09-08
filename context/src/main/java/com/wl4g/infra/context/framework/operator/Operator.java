@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ~ 2025 the original author or authors. <wanglsir@gmail.com, 983708408@qq.com>
+ * Copyright 2017 ~ 2025 the original author or authors. <James Wong <jameswong1376@gmail.com>>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import java.lang.reflect.Method;
  * Generic operator adapter.
  * 
  * @param <K>
- * @author wanglsir@gmail.com, 983708408@qq.com
+ * @author James Wong <jameswong1376@gmail.com>
  * @version 2020年1月6日 v1.0.0
  * @see
  */

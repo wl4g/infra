@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ~ 2025 the original author or authors. <wanglsir@gmail.com, 983708408@qq.com>
+ * Copyright 2017 ~ 2025 the original author or authors. <James Wong <jameswong1376@gmail.com>>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,10 @@
  */
 package com.wl4g.infra.common.codec;
 
+import static com.wl4g.infra.common.lang.TypeConverts.byte2short;
 import static java.lang.System.out;
 
 import org.apache.commons.codec.binary.Hex;
-import com.wl4g.infra.common.codec.Encodes;
-import static com.wl4g.infra.common.lang.TypeConverts.*;
 
 public class BinaryCodecTests {
 

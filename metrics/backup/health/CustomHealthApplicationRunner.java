@@ -32,7 +32,7 @@ import lombok.CustomLog;
  * Note: if you change it into an internal class `@Component`, it doesn't seem
  * to work.
  * 
- * @author Wangl.sir <983708408@qq.com>
+ * @author James Wong <jameswong1376@gmail.com>
  * @version v1.0
  * @date 2018年6月7日
  * @since

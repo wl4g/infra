@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ~ 2025 the original author or authors. <wanglsir@gmail.com, 983708408@qq.com>
+ * Copyright 2017 ~ 2025 the original author or authors. <James Wong <jameswong1376@gmail.com>>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,20 @@
  * limitations under the License.
  */
 package com.wl4g.infra.common.web;
+
+import static com.wl4g.infra.common.web.WebUtils.applyQueryURL;
+import static com.wl4g.infra.common.web.WebUtils.cleanURI;
+import static com.wl4g.infra.common.web.WebUtils.extDomainString;
+import static com.wl4g.infra.common.web.WebUtils.extTopDomainString;
+import static com.wl4g.infra.common.web.WebUtils.extractWildcardEndpoint;
+import static com.wl4g.infra.common.web.WebUtils.getBaseURIForDefault;
+import static com.wl4g.infra.common.web.WebUtils.isEqualWithDomain;
+import static com.wl4g.infra.common.web.WebUtils.isRelativeUri;
+import static com.wl4g.infra.common.web.WebUtils.isSameWildcardOrigin;
+import static com.wl4g.infra.common.web.WebUtils.toQueryParams;
+import static com.wl4g.infra.common.web.WebUtils2.rejectRequestMethod;
+import static java.lang.System.out;
+import static java.util.Collections.singletonMap;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -41,10 +55,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.Part;
-
-import static com.wl4g.infra.common.web.WebUtils2.*;
-import static java.lang.System.*;
-import static java.util.Collections.singletonMap;
 
 public class WebUtils2Tests {
 

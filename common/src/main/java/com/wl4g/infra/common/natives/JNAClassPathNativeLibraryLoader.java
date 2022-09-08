@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ~ 2025 the original author or authors. <wanglsir@gmail.com, 983708408@qq.com>
+ * Copyright 2017 ~ 2025 the original author or authors. <James Wong <jameswong1376@gmail.com>>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import com.sun.jna.Native;
 /**
  * {@link JNAClassPathNativeLibraryLoader}
  *
- * @author Wangl.sir <wanglsir@gmail.com, 983708408@qq.com>
+ * @author Wangl.sir <James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2020年6月22日
  * @since
  * @see https://www.cnblogs.com/gwd1154978352/p/6831927.html

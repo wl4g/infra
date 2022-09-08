@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ~ 2025 the original author or authors. <wanglsir@gmail.com, 983708408@qq.com>
+ * Copyright 2017 ~ 2025 the original author or authors. <James Wong <jameswong1376@gmail.com>>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,19 @@
  */
 package com.wl4g.infra.common.remoting;
 
+import static com.google.common.base.Charsets.UTF_8;
+import static io.netty.buffer.Unpooled.copiedBuffer;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST;
+import static io.netty.handler.codec.http.HttpResponseStatus.FORBIDDEN;
+import static io.netty.handler.codec.http.HttpResponseStatus.FOUND;
+import static io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR;
+import static io.netty.handler.codec.http.HttpResponseStatus.METHOD_NOT_ALLOWED;
+import static io.netty.handler.codec.http.HttpResponseStatus.NOT_MODIFIED;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import static io.netty.handler.codec.http.HttpVersion.HTTP_1_0;
+import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.util.Objects.isNull;
@@ -31,9 +44,14 @@ import java.net.URI;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
@@ -44,9 +62,6 @@ import org.junit.Test;
 import com.wl4g.infra.common.collection.multimap.LinkedMultiValueMap;
 import com.wl4g.infra.common.collection.multimap.MultiValueMap;
 import com.wl4g.infra.common.io.ByteStreamUtils;
-import com.wl4g.infra.common.remoting.HttpEntity;
-import com.wl4g.infra.common.remoting.HttpResponseEntity;
-import com.wl4g.infra.common.remoting.RestClient;
 import com.wl4g.infra.common.remoting.standard.HttpHeaders;
 import com.wl4g.infra.common.remoting.standard.HttpMediaType;
 import com.wl4g.infra.common.resource.FileStreamResource;
@@ -55,6 +70,7 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
@@ -82,16 +98,29 @@ import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpObject;
 import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpUtil;
+import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.LastHttpContent;
+import io.netty.handler.codec.http.QueryStringDecoder;
+import io.netty.handler.codec.http.cookie.Cookie;
+import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
+import io.netty.handler.codec.http.cookie.ServerCookieEncoder;
+import io.netty.handler.codec.http.multipart.Attribute;
 import io.netty.handler.codec.http.multipart.DefaultHttpDataFactory;
+import io.netty.handler.codec.http.multipart.DiskAttribute;
+import io.netty.handler.codec.http.multipart.DiskFileUpload;
 import io.netty.handler.codec.http.multipart.FileUpload;
+import io.netty.handler.codec.http.multipart.HttpData;
 import io.netty.handler.codec.http.multipart.HttpDataFactory;
 import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
+import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder.EndOfDataDecoderException;
+import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder.ErrorDataDecoderException;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData.HttpDataType;
 import io.netty.handler.logging.LogLevel;
@@ -101,40 +130,13 @@ import io.netty.handler.stream.ChunkedFile;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.handler.traffic.ChannelTrafficShapingHandler;
-import io.netty.util.internal.SystemPropertyUtil;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.HttpRequestDecoder;
-import io.netty.handler.codec.http.HttpVersion;
-import io.netty.handler.codec.http.QueryStringDecoder;
-import io.netty.handler.codec.http.cookie.Cookie;
-import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
-import io.netty.handler.codec.http.cookie.ServerCookieEncoder;
-import io.netty.handler.codec.http.multipart.Attribute;
-import io.netty.handler.codec.http.multipart.DiskAttribute;
-import io.netty.handler.codec.http.multipart.DiskFileUpload;
-import io.netty.handler.codec.http.multipart.HttpData;
-import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder.EndOfDataDecoderException;
-import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder.ErrorDataDecoderException;
 import io.netty.util.CharsetUtil;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import static io.netty.buffer.Unpooled.*;
-
-import static com.google.common.base.Charsets.UTF_8;
-import static io.netty.handler.codec.http.HttpMethod.*;
-import static io.netty.handler.codec.http.HttpResponseStatus.*;
-import static io.netty.handler.codec.http.HttpVersion.*;
+import io.netty.util.internal.SystemPropertyUtil;
 
 /**
  * {@link RestClientStreamingTests}
  *
- * @author Wangl.sir <wanglsir@gmail.com, 983708408@qq.com>
+ * @author Wangl.sir <James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2020年7月10日
  * @since
  */
@@ -676,6 +678,7 @@ public class RestClientStreamingTests {
             }
         }
 
+        @SuppressWarnings("resource")
         @Override
         public void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
             System.out.println(format("channelRead, ctx: %s, msg: %s", ctx, request));
@@ -877,7 +880,7 @@ public class RestClientStreamingTests {
          * send a "304 Not Modified"
          *
          * @param ctx
-         *            Context
+         *                Context
          */
         private void sendNotModified(ChannelHandlerContext ctx, FullHttpRequest request) {
             FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, NOT_MODIFIED, Unpooled.EMPTY_BUFFER);
@@ -918,7 +921,7 @@ public class RestClientStreamingTests {
          * Sets the Date header for the HTTP response
          *
          * @param response
-         *            HTTP response
+         *                     HTTP response
          */
         private static void setDateHeader(FullHttpResponse response) {
             SimpleDateFormat dateFormatter = new SimpleDateFormat(HTTP_DATE_FORMAT, Locale.US);
@@ -932,9 +935,9 @@ public class RestClientStreamingTests {
          * Sets the Date and Cache headers for the HTTP Response
          *
          * @param response
-         *            HTTP response
+         *                        HTTP response
          * @param fileToCache
-         *            file to extract content type
+         *                        file to extract content type
          */
         private static void setDateAndCacheHeaders(HttpResponse response, File fileToCache) {
             SimpleDateFormat dateFormatter = new SimpleDateFormat(HTTP_DATE_FORMAT, Locale.US);
@@ -955,9 +958,9 @@ public class RestClientStreamingTests {
          * Sets the content type header for the HTTP Response
          *
          * @param response
-         *            HTTP response
+         *                     HTTP response
          * @param file
-         *            file to extract content type
+         *                     file to extract content type
          */
         private static void setContentTypeHeader(HttpResponse response, File file) {
             MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();

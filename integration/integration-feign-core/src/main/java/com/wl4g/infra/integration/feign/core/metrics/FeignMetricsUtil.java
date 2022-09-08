@@ -25,7 +25,7 @@ import lombok.Getter;
 /**
  * {@link FeignMetricsUtil}
  * 
- * @author Wangl.sir &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
+ * @author Wangl.sir &lt;James Wong <jameswong1376@gmail.com>&gt;
  * @version 2022-07-12
  * @since v3.0.0
  */

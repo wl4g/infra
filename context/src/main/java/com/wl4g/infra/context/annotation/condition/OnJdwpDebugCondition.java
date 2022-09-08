@@ -2,7 +2,7 @@
  * Check whether the current JVM process is started in the debugging mode of
  * jdwp, otherwise the condition is not tenable. {@link ConditionalOnJdwpDebug}
  * 
- * @author Wangl.sir <wanglsir@gmail.com, 983708408@qq.com>
+ * @author Wangl.sir <James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2019年12月26日
  * @since
  */
