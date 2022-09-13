@@ -28,6 +28,11 @@ import static java.util.Collections.singletonList;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.Proxy.Type;
+import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
@@ -44,9 +49,9 @@ import io.minio.credentials.AssumeRoleProvider;
 import io.minio.credentials.Credentials;
 import io.minio.credentials.Provider;
 import io.minio.errors.ErrorResponseException;
-import io.minio.http.HttpUtils;
 import io.minio.messages.Bucket;
 import okhttp3.OkHttpClient;
+import okhttp3.Protocol;
 
 /**
  * {@link MinioClientTests}
@@ -57,7 +62,15 @@ import okhttp3.OkHttpClient;
  */
 public class MinioClientTests {
 
-    public static final OkHttpClient defaultHttpClient = HttpUtils.newDefaultHttpClient(15_000, 15_000, 15_000);
+    // public static final OkHttpClient defaultHttpClient =
+    // io.minio.http.HttpUtils.newDefaultHttpClient(15_000, 15_000, 15_000);
+    public static final OkHttpClient defaultHttpClient = new OkHttpClient().newBuilder()
+            .connectTimeout(15_000, TimeUnit.MILLISECONDS)
+            .writeTimeout(15_000, TimeUnit.MILLISECONDS)
+            .readTimeout(15_000, TimeUnit.MILLISECONDS)
+            .protocols(Arrays.asList(Protocol.HTTP_1_1))
+            .proxy(new Proxy(Type.SOCKS, new InetSocketAddress("localhost", 8889)))
+            .build();
 
     // STS temporary user
     public static final String USER_PREFIX = "library";
@@ -111,7 +124,15 @@ public class MinioClientTests {
         FileIOUtils.writeFile(testfile, "abcdefghijklmnopqrstuvwxyz");
 
         // 使用 STS 测试 PutObject
-        MinioClient client = MinioClient.builder().endpoint(ENDPOINT).region(REGION).credentialsProvider(provider).build();
+        MinioClient client = MinioClient.builder()
+                .endpoint(ENDPOINT)
+                .region(REGION)
+                .httpClient(defaultHttpClient)
+                .credentialsProvider(provider)
+                .build();
+
+        // Use credentials to see:
+        // https://github.com/minio/minio-java/blob/8.4.3/api/src/main/java/io/minio/S3Base.java#L495
         ObjectWriteResponse resp = client.putObject(PutObjectArgs.builder()
                 .bucket(TENANT_BUCKET)
                 // .object(USER_OBJECT_NAME)
@@ -136,8 +157,16 @@ public class MinioClientTests {
         FileIOUtils.writeFile(testfile, "abcdefghijklmnopqrstuvwxyz");
 
         // 使用 STS 测试 PutObject
-        MinioClient client = MinioClient.builder().endpoint(ENDPOINT).region(REGION).credentialsProvider(provider).build();
+        MinioClient client = MinioClient.builder()
+                .endpoint(ENDPOINT)
+                .region(REGION)
+                .httpClient(defaultHttpClient)
+                .credentialsProvider(provider)
+                .build();
+
         try {
+            // Use credentials to see:
+            // https://github.com/minio/minio-java/blob/8.4.3/api/src/main/java/io/minio/S3Base.java#L495
             client.putObject(PutObjectArgs.builder()
                     .bucket(TENANT_BUCKET)
                     .object(USER_OBJECT_NAME)
