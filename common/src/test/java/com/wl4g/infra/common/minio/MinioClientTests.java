@@ -28,9 +28,6 @@ import static java.util.Collections.singletonList;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
-import java.net.Proxy.Type;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
@@ -69,7 +66,8 @@ public class MinioClientTests {
             .writeTimeout(15_000, TimeUnit.MILLISECONDS)
             .readTimeout(15_000, TimeUnit.MILLISECONDS)
             .protocols(Arrays.asList(Protocol.HTTP_1_1))
-            .proxy(new Proxy(Type.SOCKS, new InetSocketAddress("localhost", 8889)))
+            // .proxy(new java.net.Proxy(java.net.Proxy.Type.SOCKS, new
+            // java.net.InetSocketAddress("localhost", 8889)))
             .build();
 
     // STS temporary user
