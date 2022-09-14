@@ -22,6 +22,7 @@ import static com.wl4g.infra.common.minio.MinioAdminClientTests.SUPER_ADMIN_ACCE
 import static com.wl4g.infra.common.minio.MinioAdminClientTests.TENANT_ACCESSKEY;
 import static com.wl4g.infra.common.minio.MinioAdminClientTests.TENANT_BUCKET;
 import static com.wl4g.infra.common.minio.MinioAdminClientTests.TENANT_SECRETKEY;
+import static com.wl4g.infra.common.minio.S3Policy.Action.GetBucketLocationAction;
 import static com.wl4g.infra.common.minio.S3Policy.Action.GetObjectAction;
 import static com.wl4g.infra.common.minio.S3Policy.Action.PutObjectAction;
 import static java.lang.String.format;
@@ -228,8 +229,11 @@ public class MinioClientTests {
                         .resource(singletonList("arn:aws:s3:::" + TENANT_BUCKET + "/" + USER_PREFIX + "/*"))
                         // 授权操作标识
                         // ========== [注]: ==========
-                        // 必须要设置 s3:GetObject 权限, 因为 minio-js 的 putObject()
-                        // 函数中会发送请求如:GET-http://localhost:9000/tenant1001/library/1.txt
+                        // 对于MinIO-JS 客户端的 putObject() 函数有以下区别:
+                        // 当 region 有值时需要 s3:GetObject 权限
+                        // 对于请求如:GET-http://localhost:9000/tenant1001/library/1.txt??uploads&delimiter=&max-uploads=1000&prefix=library%2F1.txt
+                        // 当 region 为空时需要 s3:GetBucketLocation 权限
+                        // 对于请求如:GET-http://localhost:9000/tenant1001?location
                         // 来获取当前上传对象的分段信息. MinIO 源码分析参见:
                         // see:https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/router.go#L95
                         // see:https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/object-handler.go#L345
@@ -237,7 +241,7 @@ public class MinioClientTests {
                         // see:https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1754
                         // see:https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1680
                         // see:https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1723
-                        .action(asList(PutObjectAction, GetObjectAction))
+                        .action(asList(GetBucketLocationAction, PutObjectAction, GetObjectAction))
                         .build()))
                 .build();
         int durationSeconds = 5 * 60;
