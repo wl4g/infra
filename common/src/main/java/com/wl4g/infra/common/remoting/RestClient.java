@@ -606,7 +606,10 @@ public class RestClient {
      * @since 3.0.2
      * @see HttpEntity
      */
-    public <T> HttpResponseEntity<T> postForEntity(String url, @Nullable Object request, Class<T> responseType,
+    public <T> HttpResponseEntity<T> postForEntity(
+            String url,
+            @Nullable Object request,
+            Class<T> responseType,
             Object... uriVariables) throws RestClientException {
 
         RequestProcessor requestProcessor = requestEntityProcessor(request, responseType);
@@ -633,7 +636,10 @@ public class RestClient {
      * @since 3.0.2
      * @see HttpEntity
      */
-    public <T> HttpResponseEntity<T> postForEntity(String url, @Nullable Object request, Class<T> responseType,
+    public <T> HttpResponseEntity<T> postForEntity(
+            String url,
+            @Nullable Object request,
+            Class<T> responseType,
             Map<String, ?> uriVariables) throws RestClientException {
         RequestProcessor requestProcessor = requestEntityProcessor(request, responseType);
         ResponseProcessor<HttpResponseEntity<T>> responseExtractor = responseEntityProcessor(responseType);
@@ -792,8 +798,12 @@ public class RestClient {
      * @return the response as entity
      * @since 3.0.2
      */
-    public <T> HttpResponseEntity<T> exchange(String url, HttpMethod method, @Nullable HttpEntity<?> requestEntity,
-            Class<T> responseType, Object... uriVariables) throws RestClientException {
+    public <T> HttpResponseEntity<T> exchange(
+            String url,
+            HttpMethod method,
+            @Nullable HttpEntity<?> requestEntity,
+            Class<T> responseType,
+            Object... uriVariables) throws RestClientException {
 
         RequestProcessor requestProcessor = requestEntityProcessor(requestEntity, responseType);
         ResponseProcessor<HttpResponseEntity<T>> responseExtractor = responseEntityProcessor(responseType);
@@ -822,8 +832,12 @@ public class RestClient {
      * @return the response as entity
      * @since 3.0.2
      */
-    public <T> HttpResponseEntity<T> exchange(String url, HttpMethod method, @Nullable HttpEntity<?> requestEntity,
-            Class<T> responseType, Map<String, ?> uriVariables) throws RestClientException {
+    public <T> HttpResponseEntity<T> exchange(
+            String url,
+            HttpMethod method,
+            @Nullable HttpEntity<?> requestEntity,
+            Class<T> responseType,
+            Map<String, ?> uriVariables) throws RestClientException {
 
         RequestProcessor requestProcessor = requestEntityProcessor(requestEntity, responseType);
         ResponseProcessor<HttpResponseEntity<T>> responseExtractor = responseEntityProcessor(responseType);
@@ -847,7 +861,10 @@ public class RestClient {
      * @return the response as entity
      * @since 3.0.2
      */
-    public <T> HttpResponseEntity<T> exchange(URI uri, HttpMethod method, @Nullable HttpEntity<?> requestEntity,
+    public <T> HttpResponseEntity<T> exchange(
+            URI uri,
+            HttpMethod method,
+            @Nullable HttpEntity<?> requestEntity,
             Class<T> responseType) throws RestClientException {
 
         RequestProcessor requestProcessor = requestEntityProcessor(requestEntity, responseType);
@@ -881,8 +898,12 @@ public class RestClient {
      * @return the response as entity
      * @since 3.2
      */
-    public <T> HttpResponseEntity<T> exchange(String url, HttpMethod method, @Nullable HttpEntity<?> requestEntity,
-            ParameterizedTypeReference<T> responseType, Object... uriVariables) throws RestClientException {
+    public <T> HttpResponseEntity<T> exchange(
+            String url,
+            HttpMethod method,
+            @Nullable HttpEntity<?> requestEntity,
+            ParameterizedTypeReference<T> responseType,
+            Object... uriVariables) throws RestClientException {
 
         Type type = responseType.getType();
         RequestProcessor requestProcessor = requestEntityProcessor(requestEntity, type);
@@ -916,8 +937,12 @@ public class RestClient {
      * @return the response as entity
      * @since 3.2
      */
-    public <T> HttpResponseEntity<T> exchange(String url, HttpMethod method, @Nullable HttpEntity<?> requestEntity,
-            ParameterizedTypeReference<T> responseType, Map<String, ?> uriVariables) throws RestClientException {
+    public <T> HttpResponseEntity<T> exchange(
+            String url,
+            HttpMethod method,
+            @Nullable HttpEntity<?> requestEntity,
+            ParameterizedTypeReference<T> responseType,
+            Map<String, ?> uriVariables) throws RestClientException {
 
         Type type = responseType.getType();
         RequestProcessor requestProcessor = requestEntityProcessor(requestEntity, type);
@@ -949,7 +974,10 @@ public class RestClient {
      * @return the response as entity
      * @since 3.2
      */
-    public <T> HttpResponseEntity<T> exchange(URI uri, HttpMethod method, @Nullable HttpEntity<?> requestEntity,
+    public <T> HttpResponseEntity<T> exchange(
+            URI uri,
+            HttpMethod method,
+            @Nullable HttpEntity<?> requestEntity,
             ParameterizedTypeReference<T> responseType) throws RestClientException {
 
         Type type = responseType.getType();
@@ -1029,8 +1057,12 @@ public class RestClient {
      * </ul>
      */
     @Nullable
-    public <T> T execute(String url, HttpMethod method, @Nullable RequestProcessor requestProcessor,
-            @Nullable ResponseProcessor<T> responseExtractor, Object... uriVariables) throws RestClientException {
+    public <T> T execute(
+            String url,
+            HttpMethod method,
+            @Nullable RequestProcessor requestProcessor,
+            @Nullable ResponseProcessor<T> responseExtractor,
+            Object... uriVariables) throws RestClientException {
 
         URI expanded = getUriTemplateHandler().expand(url, uriVariables);
         return doExecute(expanded, method, requestProcessor, responseExtractor);
@@ -1049,8 +1081,12 @@ public class RestClient {
      * </ul>
      */
     @Nullable
-    public <T> T execute(String url, HttpMethod method, @Nullable RequestProcessor requestProcessor,
-            @Nullable ResponseProcessor<T> responseExtractor, Map<String, ?> uriVariables) throws RestClientException {
+    public <T> T execute(
+            String url,
+            HttpMethod method,
+            @Nullable RequestProcessor requestProcessor,
+            @Nullable ResponseProcessor<T> responseExtractor,
+            Map<String, ?> uriVariables) throws RestClientException {
 
         URI expanded = getUriTemplateHandler().expand(url, uriVariables);
         return doExecute(expanded, method, requestProcessor, responseExtractor);
@@ -1069,7 +1105,10 @@ public class RestClient {
      * </ul>
      */
     @Nullable
-    public <T> T execute(URI uri, HttpMethod method, @Nullable RequestProcessor requestProcessor,
+    public <T> T execute(
+            URI uri,
+            HttpMethod method,
+            @Nullable RequestProcessor requestProcessor,
             @Nullable ResponseProcessor<T> responseExtractor) throws RestClientException {
 
         return doExecute(uri, method, requestProcessor, responseExtractor);
@@ -1094,7 +1133,10 @@ public class RestClient {
      * @return an arbitrary object, as returned by the {@link ResponseProcessor}
      */
     @Nullable
-    protected <T> T doExecute(URI uri, @Nullable HttpMethod method, @Nullable RequestProcessor requestProcessor,
+    protected <T> T doExecute(
+            URI uri,
+            @Nullable HttpMethod method,
+            @Nullable RequestProcessor requestProcessor,
             @Nullable ResponseProcessor<T> responseProcessor) throws RestClientException {
 
         notNull(uri, "URI is required");

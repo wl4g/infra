@@ -54,7 +54,7 @@ public abstract class Collectors2 {
      * Collector.
      *
      * @param <T>
-     *                the type of the input elements
+     *            the type of the input elements
      * @return a {@code Collector} which collects all the input elements into a
      *         {@code Set}
      */
@@ -86,26 +86,24 @@ public abstract class Collectors2 {
      *           may offer better parallel performance.
      *
      * @param <T>
-     *                          the type of the input elements
+     *            the type of the input elements
      * @param <K>
-     *                          the output type of the key mapping function
+     *            the output type of the key mapping function
      * @param <U>
-     *                          the output type of the value mapping function
+     *            the output type of the value mapping function
      * @param <M>
-     *                          the type of the resulting {@code Map}
+     *            the type of the resulting {@code Map}
      * @param keyMapper
-     *                          a mapping function to produce keys
+     *            a mapping function to produce keys
      * @param valueMapper
-     *                          a mapping function to produce values
+     *            a mapping function to produce values
      * @param mergeFunction
-     *                          a merge function, used to resolve collisions
-     *                          between values associated with the same key, as
-     *                          supplied to
-     *                          {@link Map#merge(Object, Object, BiFunction)}
+     *            a merge function, used to resolve collisions between values
+     *            associated with the same key, as supplied to
+     *            {@link Map#merge(Object, Object, BiFunction)}
      * @param mapSupplier
-     *                          a function which returns a new, empty
-     *                          {@code Map} into which the results will be
-     *                          inserted
+     *            a function which returns a new, empty {@code Map} into which
+     *            the results will be inserted
      * @return a {@code Collector} which collects elements into a {@code Map}
      *         whose keys are the result of applying a key mapping function to
      *         the input elements, and whose values are the result of applying a
@@ -143,26 +141,24 @@ public abstract class Collectors2 {
      *           may offer better parallel performance.
      *
      * @param <T>
-     *                          the type of the input elements
+     *            the type of the input elements
      * @param <K>
-     *                          the output type of the key mapping function
+     *            the output type of the key mapping function
      * @param <U>
-     *                          the output type of the value mapping function
+     *            the output type of the value mapping function
      * @param <M>
-     *                          the type of the resulting {@code Map}
+     *            the type of the resulting {@code Map}
      * @param keyMapper
-     *                          a mapping function to produce keys
+     *            a mapping function to produce keys
      * @param valueMapper
-     *                          a mapping function to produce values
+     *            a mapping function to produce values
      * @param mergeFunction
-     *                          a merge function, used to resolve collisions
-     *                          between values associated with the same key, as
-     *                          supplied to
-     *                          {@link Map#merge(Object, Object, BiFunction)}
+     *            a merge function, used to resolve collisions between values
+     *            associated with the same key, as supplied to
+     *            {@link Map#merge(Object, Object, BiFunction)}
      * @param mapSupplier
-     *                          a function which returns a new, empty
-     *                          {@code Map} into which the results will be
-     *                          inserted
+     *            a function which returns a new, empty {@code Map} into which
+     *            the results will be inserted
      * @return a {@code Collector} which collects elements into a {@code Map}
      *         whose keys are the result of applying a key mapping function to
      *         the input elements, and whose values are the result of applying a

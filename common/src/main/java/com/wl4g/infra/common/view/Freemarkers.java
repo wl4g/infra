@@ -248,7 +248,9 @@ public abstract class Freemarkers {
      * @throws freemarker.template.TemplateException
      *             if rendering failed
      */
-    public static String renderingTemplateToString(@NotBlank String templateName, @NotBlank String templateString,
+    public static String renderingTemplateToString(
+            @NotBlank String templateName,
+            @NotBlank String templateString,
             @Nullable Object model) throws IOException, TemplateException {
         hasTextOf(templateName, "templateName");
         hasTextOf(templateString, "templateString");

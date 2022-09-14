@@ -78,29 +78,30 @@ public class MailMessageNotifier extends AbstractMessageNotifier<MailNotifyPrope
     public void send(GenericNotifyMessage msg) {
         String mailMsgType = msg.getParameterAsString(KEY_MAILMSG_TYPE, "simple");
         switch (mailMsgType) {
-            case KEY_MAILMSG_VALUE_SIMPLE:
-                SimpleMailMessage simpleMsg = new SimpleMailMessage();
-                // Add "<>" symbol to send out?
-                /*
-                 * Preset from account, otherwise it would be wrong: 501 mail from
-                 * address must be same as authorization user.
-                 */
-                simpleMsg.setFrom(config.getUsername() + "<" + config.getUsername() + ">");
-                simpleMsg.setTo(msg.getToObjects().stream().map(to -> to = to + "<" + to + ">").collect(toList()).toArray(new String[]{}));
-                simpleMsg.setSubject(msg.getParameterAsString(KEY_MAILMSG_SUBJECT, "Super Devops Messages"));
-                simpleMsg.setSentDate(msg.getParameter(KEY_MSG_SENDDATE, new Date()));
-                simpleMsg.setBcc(safeList(msg.getParameter(KEY_MAILMSG_BCC)).toArray(new String[]{}));
-                simpleMsg.setCc(safeList(msg.getParameter(KEY_MAILMSG_CC)).toArray(new String[]{}));
-                simpleMsg.setReplyTo(msg.getParameter(KEY_MAILMSG_REPLYTO));
-                simpleMsg.setText(config.getResolvedMessage(msg.getTemplateKey(), msg.getParameters()));
+        case KEY_MAILMSG_VALUE_SIMPLE:
+            SimpleMailMessage simpleMsg = new SimpleMailMessage();
+            // Add "<>" symbol to send out?
+            /*
+             * Preset from account, otherwise it would be wrong: 501 mail from
+             * address must be same as authorization user.
+             */
+            simpleMsg.setFrom(config.getUsername() + "<" + config.getUsername() + ">");
+            simpleMsg.setTo(
+                    msg.getToObjects().stream().map(to -> to = to + "<" + to + ">").collect(toList()).toArray(new String[] {}));
+            simpleMsg.setSubject(msg.getParameterAsString(KEY_MAILMSG_SUBJECT, "Super Devops Messages"));
+            simpleMsg.setSentDate(msg.getParameter(KEY_MSG_SENDDATE, new Date()));
+            simpleMsg.setBcc(safeList(msg.getParameter(KEY_MAILMSG_BCC)).toArray(new String[] {}));
+            simpleMsg.setCc(safeList(msg.getParameter(KEY_MAILMSG_CC)).toArray(new String[] {}));
+            simpleMsg.setReplyTo(msg.getParameter(KEY_MAILMSG_REPLYTO));
+            simpleMsg.setText(config.resolveMessage(msg.getTemplateKey(), msg.getParameters()));
 
-                mailSender.send(simpleMsg);
-                break;
-            case KEY_MAILMSG_VALUE_MIME: // TODO implements!!!
-                log.warn("No implements MimeMailMessage!!!");
-                break;
-            default:
-                throw new UnsupportedOperationException(format("No supported mail message type of %s", mailMsgType));
+            mailSender.send(simpleMsg);
+            break;
+        case KEY_MAILMSG_VALUE_MIME: // TODO implements!!!
+            log.warn("No implements MimeMailMessage!!!");
+            break;
+        default:
+            throw new UnsupportedOperationException(format("No supported mail message type of %s", mailMsgType));
         }
 
     }

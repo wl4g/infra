@@ -59,7 +59,9 @@ import com.wl4g.infra.support.notification.wechat.WechatNotifyProperties;
  */
 public class NotificationAutoConfiguration {
 
+    //
     // --- Notify properties. ---
+    //
 
     @Bean(name = "apnsNotifyProperties")
     @ConditionalOnProperty(name = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".apns.enabled", matchIfMissing = false)
@@ -131,7 +133,9 @@ public class NotificationAutoConfiguration {
         return new TwitterNotifyProperties();
     }
 
+    //
     // --- Message notifier. ---
+    //
 
     @Bean
     @ConditionalOnBean(ApnsNotifyProperties.class)

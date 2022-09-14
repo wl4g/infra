@@ -168,7 +168,10 @@ public abstract class Assert2 {
      * @throws IllegalArgumentException
      *             if {@code expression} is {@code false}
      */
-    public static void isTrue(boolean expression, Class<? extends RuntimeException> exceptionClass, String fmtMessage,
+    public static void isTrue(
+            boolean expression,
+            Class<? extends RuntimeException> exceptionClass,
+            String fmtMessage,
             Object... args) {
         if (!expression) {
             doWrapException(exceptionClass, fmtMessage, args);
@@ -193,7 +196,9 @@ public abstract class Assert2 {
      * @throws IllegalArgumentException
      *             if {@code expression} is {@code false}
      */
-    public static void isTrue(boolean expression, Class<? extends RuntimeException> exceptionClass,
+    public static void isTrue(
+            boolean expression,
+            Class<? extends RuntimeException> exceptionClass,
             Supplier<String> messageSupplier) {
         if (!expression) {
             doWrapException(exceptionClass, nullSafeGet(messageSupplier));
@@ -262,7 +267,10 @@ public abstract class Assert2 {
      *             if the object is {@code null}
      */
     @SuppressWarnings("unchecked")
-    public static <T> T isNull(Object object, Class<? extends RuntimeException> exceptionClass, String fmtMessage,
+    public static <T> T isNull(
+            Object object,
+            Class<? extends RuntimeException> exceptionClass,
+            String fmtMessage,
             Object... args) {
         if (object != null) {
             doWrapException(exceptionClass, fmtMessage, args);
@@ -343,7 +351,10 @@ public abstract class Assert2 {
      *             if the object is {@code null}
      */
     @SuppressWarnings("unchecked")
-    public static <T> T notNull(Object object, Class<? extends RuntimeException> exceptionClass, String fmtMessage,
+    public static <T> T notNull(
+            Object object,
+            Class<? extends RuntimeException> exceptionClass,
+            String fmtMessage,
             Object... args) {
         if (object == null) {
             doWrapException(exceptionClass, fmtMessage, args);
@@ -369,7 +380,9 @@ public abstract class Assert2 {
      *             if the object is {@code null}
      */
     @SuppressWarnings("unchecked")
-    public static <T> T notNull(Object object, Class<? extends RuntimeException> exceptionClass,
+    public static <T> T notNull(
+            Object object,
+            Class<? extends RuntimeException> exceptionClass,
             Supplier<String> messageSupplier) {
         if (object == null) {
             doWrapException(exceptionClass, nullSafeGet(messageSupplier));
@@ -509,7 +522,10 @@ public abstract class Assert2 {
      *             if the text does not contain valid text content
      */
     @SuppressWarnings("unchecked")
-    public static <T> T hasText(String text, Class<? extends RuntimeException> exceptionClass, String fmtMessage,
+    public static <T> T hasText(
+            String text,
+            Class<? extends RuntimeException> exceptionClass,
+            String fmtMessage,
             Object... args) {
         if (!isNotBlank(text)) {
             doWrapException(exceptionClass, fmtMessage, args);
@@ -676,7 +692,10 @@ public abstract class Assert2 {
      *             if the object array is {@code null} or contains no elements
      */
     @SuppressWarnings("unchecked")
-    public static <T> T notEmpty(Object[] array, Class<? extends RuntimeException> exceptionClass, String fmtMessage,
+    public static <T> T notEmpty(
+            Object[] array,
+            Class<? extends RuntimeException> exceptionClass,
+            String fmtMessage,
             Object... args) {
         if (array == null || array.length == 0) {
             doWrapException(exceptionClass, fmtMessage, args);
@@ -703,7 +722,9 @@ public abstract class Assert2 {
      *             if the object array is {@code null} or contains no elements
      */
     @SuppressWarnings("unchecked")
-    public static <T> T notEmpty(Object[] array, Class<? extends RuntimeException> exceptionClass,
+    public static <T> T notEmpty(
+            Object[] array,
+            Class<? extends RuntimeException> exceptionClass,
             Supplier<String> messageSupplier) {
         if (array == null || array.length == 0) {
             doWrapException(exceptionClass, nullSafeGet(messageSupplier));
@@ -784,7 +805,10 @@ public abstract class Assert2 {
      * @throws IllegalArgumentException
      *             if the object array contains a {@code null} element
      */
-    public static void noNullElements(Object[] array, Class<? extends RuntimeException> exceptionClass, String fmtMessage,
+    public static void noNullElements(
+            Object[] array,
+            Class<? extends RuntimeException> exceptionClass,
+            String fmtMessage,
             Object... args) {
         if (array != null) {
             for (Object element : array) {
@@ -847,7 +871,10 @@ public abstract class Assert2 {
      *             if the collection is {@code null} or contains no elements
      */
     @SuppressWarnings("unchecked")
-    public static <T> T notEmpty(Collection<?> collection, Class<? extends RuntimeException> exceptionClass, String fmtMessage,
+    public static <T> T notEmpty(
+            Collection<?> collection,
+            Class<? extends RuntimeException> exceptionClass,
+            String fmtMessage,
             Object... args) {
         if (collection == null || collection.isEmpty()) {
             doWrapException(exceptionClass, fmtMessage, args);
@@ -887,7 +914,10 @@ public abstract class Assert2 {
      *             if the map is {@code null} or contains no entries
      */
     @SuppressWarnings("unchecked")
-    public static <T> T notEmpty(Map<?, ?> map, Class<? extends RuntimeException> exceptionClass, String fmtMessage,
+    public static <T> T notEmpty(
+            Map<?, ?> map,
+            Class<? extends RuntimeException> exceptionClass,
+            String fmtMessage,
             Object... args) {
         if (map == null || map.isEmpty()) {
             doWrapException(exceptionClass, fmtMessage, args);
@@ -1082,8 +1112,12 @@ public abstract class Assert2 {
      *             if the object is not an instance of type
      */
     @SuppressWarnings("unchecked")
-    public static <T> T isInstanceOf(Class<?> type, Object obj, Class<? extends RuntimeException> exceptionClass,
-            String fmtMessage, Object... args) {
+    public static <T> T isInstanceOf(
+            Class<?> type,
+            Object obj,
+            Class<? extends RuntimeException> exceptionClass,
+            String fmtMessage,
+            Object... args) {
         notNull(type, "Type to check against must not be null");
         if (!type.isInstance(obj)) {
             instanceCheckFailed(type, obj, exceptionClass, doFormat(fmtMessage, args));
@@ -1111,7 +1145,10 @@ public abstract class Assert2 {
      *             if the object is not an instance of type
      */
     @SuppressWarnings("unchecked")
-    public static <T> T isInstanceOf(Class<?> type, Object obj, Class<? extends RuntimeException> exceptionClass,
+    public static <T> T isInstanceOf(
+            Class<?> type,
+            Object obj,
+            Class<? extends RuntimeException> exceptionClass,
             Supplier<String> messageSupplier) {
         notNull(type, "Type to check against must not be null");
         if (!type.isInstance(obj)) {
@@ -1191,8 +1228,12 @@ public abstract class Assert2 {
      * @throws IllegalArgumentException
      *             if the classes are not assignable
      */
-    public static void isAssignable(Class<?> superType, Class<?> subType, Class<? extends RuntimeException> exceptionClass,
-            String fmtMessage, Object... args) {
+    public static void isAssignable(
+            Class<?> superType,
+            Class<?> subType,
+            Class<? extends RuntimeException> exceptionClass,
+            String fmtMessage,
+            Object... args) {
         notNull(superType, "Super type to check against must not be null");
         if (subType == null || !superType.isAssignableFrom(subType)) {
             assignableCheckFailed(superType, subType, exceptionClass, doFormat(fmtMessage, args));
@@ -1276,7 +1317,10 @@ public abstract class Assert2 {
      * @param exceptionClass
      * @param msg
      */
-    private static void instanceCheckFailed(Class<?> type, Object obj, Class<? extends RuntimeException> exceptionClass,
+    private static void instanceCheckFailed(
+            Class<?> type,
+            Object obj,
+            Class<? extends RuntimeException> exceptionClass,
             String msg) {
         String className = (obj != null ? obj.getClass().getName() : "null");
         String result = "";
@@ -1304,8 +1348,11 @@ public abstract class Assert2 {
      * @param exceptionClass
      * @param msg
      */
-    private static void assignableCheckFailed(Class<?> superType, Class<?> subType,
-            Class<? extends RuntimeException> exceptionClass, String msg) {
+    private static void assignableCheckFailed(
+            Class<?> superType,
+            Class<?> subType,
+            Class<? extends RuntimeException> exceptionClass,
+            String msg) {
         String result = "";
         boolean defaultMessage = true;
         if (isNotBlank(msg)) {

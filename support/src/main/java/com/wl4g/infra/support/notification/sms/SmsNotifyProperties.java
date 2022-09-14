@@ -19,6 +19,8 @@ import javax.validation.constraints.NotBlank;
 
 import com.wl4g.infra.support.notification.AbstractNotifyProperties;
 import com.wl4g.infra.support.notification.NotifyProperties;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * {@link SmsNotifyProperties}
@@ -27,98 +29,27 @@ import com.wl4g.infra.support.notification.NotifyProperties;
  * @version 2020年1月9日 v1.0.0
  * @see
  */
+@Getter
+@Setter
 public class SmsNotifyProperties implements NotifyProperties {
 
-	private AliyunSmsNotifyProperties aliyun = new AliyunSmsNotifyProperties();
+    private AliyunSmsNotifyProperties aliyun = new AliyunSmsNotifyProperties();
 
-	public AliyunSmsNotifyProperties getAliyun() {
-		return aliyun;
-	}
+    @Override
+    public void validate() {
+    }
 
-	public void setAliyun(AliyunSmsNotifyProperties aliyun) {
-		this.aliyun = aliyun;
-	}
-
-	@Override
-	public void validate() {
-
-	}
-
-	public static class AliyunSmsNotifyProperties extends AbstractNotifyProperties {
-
-		/**
-		 * e.g. cn-hangzhou
-		 */
-		@NotBlank
-		private String regionId = "cn-hangzhou";
-
-		// @NotBlank
-		// private String product = "Dysmsapi";
-		// @NotBlank
-		// private String domain = "dysmsapi.aliyuncs.com";
-
-		@NotBlank
-		private String accessKeyId;
-
-		@NotBlank
-		private String accessKeySecret;
-
-		@NotBlank
-		private String signName;
-
-		@NotBlank
-		private String defaultConnectTimeout = "5_000";
-
-		@NotBlank
-		private String defaultReadTimeout = "10_000";
-
-		public String getRegionId() {
-			return regionId;
-		}
-
-		public void setRegionId(String regionId) {
-			this.regionId = regionId;
-		}
-
-		public String getAccessKeyId() {
-			return accessKeyId;
-		}
-
-		public void setAccessKeyId(String accessKeyId) {
-			this.accessKeyId = accessKeyId;
-		}
-
-		public String getAccessKeySecret() {
-			return accessKeySecret;
-		}
-
-		public void setAccessKeySecret(String accessKeySecret) {
-			this.accessKeySecret = accessKeySecret;
-		}
-
-		public String getSignName() {
-			return signName;
-		}
-
-		public void setSignName(String signName) {
-			this.signName = signName;
-		}
-
-		public String getDefaultConnectTimeout() {
-			return defaultConnectTimeout;
-		}
-
-		public void setDefaultConnectTimeout(String defaultConnectTimeout) {
-			this.defaultConnectTimeout = defaultConnectTimeout;
-		}
-
-		public String getDefaultReadTimeout() {
-			return defaultReadTimeout;
-		}
-
-		public void setDefaultReadTimeout(String defaultReadTimeout) {
-			this.defaultReadTimeout = defaultReadTimeout;
-		}
-	}
+    @Getter
+    @Setter
+    public static class AliyunSmsNotifyProperties extends AbstractNotifyProperties {
+        private @NotBlank String regionId = "cn-hangzhou";
+        // private @NotBlank String product = "Dysmsapi";
+        // private @NotBlank String domain = "dysmsapi.aliyuncs.com";
+        private @NotBlank String accessKeyId;
+        private @NotBlank String accessKeySecret;
+        private @NotBlank String signName;
+        private @NotBlank String defaultConnectTimeout = "5_000";
+        private @NotBlank String defaultReadTimeout = "10_000";
+    }
 
 }

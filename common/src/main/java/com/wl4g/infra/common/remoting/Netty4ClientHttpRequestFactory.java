@@ -226,8 +226,9 @@ public class Netty4ClientHttpRequestFactory implements ClientHttpRequestFactory,
 
     private Bootstrap createBootstrap(final URI uri, final boolean isSecure, final HttpHeaders requestHeaders) {
         Bootstrap bootstrap = new Bootstrap();
-        bootstrap.group(eventLoopGroup).channel(NioSocketChannel.class).handler(
-                new HttpChannelInitializer(uri, isSecure, requestHeaders));
+        bootstrap.group(eventLoopGroup)
+                .channel(NioSocketChannel.class)
+                .handler(new HttpChannelInitializer(uri, isSecure, requestHeaders));
         return bootstrap;
     }
 

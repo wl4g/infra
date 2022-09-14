@@ -20,17 +20,16 @@ import java.util.Map;
 
 public class NotifierPropertiesTests {
 
-	public static void main(String[] args) {
-		Map<String, Object> parameters = new HashMap<>();
-		parameters.put("name", "jack");
-		// parameters.put("status", "OK");
+    public static void main(String[] args) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("name", "jack");
+        // parameters.put("status", "OK");
 
-		AbstractNotifyProperties config = new AbstractNotifyProperties() {
-		};
-		config.getTemplates().put("tpl1", "测试消息，名称：${name}，当前状态为：${status}");
+        AbstractNotifyProperties config = new AbstractNotifyProperties() {
+        };
+        config.getTemplates().put("tpl1", "测试消息，名称：${name}，当前状态为：${status}");
 
-		System.out.println(config.getResolvedMessage("tpl1", parameters));
-
-	}
+        System.out.println(config.resolveMessage("tpl1", parameters));
+    }
 
 }

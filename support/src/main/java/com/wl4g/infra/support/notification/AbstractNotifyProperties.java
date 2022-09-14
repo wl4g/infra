@@ -39,121 +39,119 @@ import static org.springframework.util.CollectionUtils.isEmpty;
  * @since
  */
 public abstract class AbstractNotifyProperties implements NotifyProperties {
+    protected final SmartLogger log = getLogger(getClass());
 
-	final protected SmartLogger log = getLogger(getClass());
+    /**
+     * Case sensitive when parsing template parameters.
+     */
+    private boolean caseSensitive = false;
 
-	/**
-	 * Case sensitive when parsing template parameters.
-	 */
-	private boolean caseSensitive = false;
+    /**
+     * Notification message template IDS.
+     * 
+     * @see http://www.bejson.com/convert/unicode_chinese/
+     */
+    @NotEmpty
+    private Properties templates = new Properties();
 
-	/**
-	 * Notification message template IDS.
-	 * 
-	 * @see http://www.bejson.com/convert/unicode_chinese/
-	 */
-	@NotEmpty
-	private Properties templates = new Properties();
+    public boolean isCaseSensitive() {
+        return caseSensitive;
+    }
 
-	public boolean isCaseSensitive() {
-		return caseSensitive;
-	}
+    public void setCaseSensitive(boolean caseSensitive) {
+        this.caseSensitive = caseSensitive;
+    }
 
-	public void setCaseSensitive(boolean caseSensitive) {
-		this.caseSensitive = caseSensitive;
-	}
+    public Properties getTemplates() {
+        return templates;
+    }
 
-	public Properties getTemplates() {
-		return templates;
-	}
+    public void setTemplates(Properties templates) {
+        if (!isEmpty(templates)) {
+            // Check and sets
+            this.templates.putAll(templates.entrySet().stream().map(e -> {
+                if (isNull(e.getKey()) || isNull(e.getValue()) || isBlank((String) e.getKey())) {
+                    throw new IllegalArgumentException(
+                            format("Cannot configure empty template, key: %s, value: %s", e.getKey(), e.getValue()));
+                }
+                return e;
+            }).collect(toMap(e -> e.getKey(), e -> e.getValue())));
+        }
+    }
 
-	public void setTemplates(Properties templates) {
-		if (!isEmpty(templates)) {
-			// Check and sets
-			this.templates.putAll(templates.entrySet().stream().map(e -> {
-				if (isNull(e.getKey()) || isNull(e.getValue()) || isBlank((String) e.getKey())) {
-					throw new IllegalArgumentException(
-							format("Cannot configure empty template, key: %s, value: %s", e.getKey(), e.getValue()));
-				}
-				return e;
-			}).collect(toMap(e -> e.getKey(), e -> e.getValue())));
-		}
-	}
+    /**
+     * Gets resolved template message.
+     * 
+     * @param templateKey
+     * @param parameters
+     * @return
+     */
+    public String resolveMessage(String templateKey, Map<String, Object> parameters) {
+        hasTextOf(templateKey, "templateKey");
+        notNullOf(parameters, "parameters");
 
-	/**
-	 * Gets resolved template message.
-	 * 
-	 * @param templateKey
-	 * @param parameters
-	 * @return
-	 */
-	public String getResolvedMessage(String templateKey, Map<String, Object> parameters) {
-		hasTextOf(templateKey, "notifyTemplateKey");
-		notNullOf(parameters, "notifyTemplateParameters");
+        // Gets template content
+        String tplContent = getTemplates().getProperty(templateKey);
+        hasTextOf(tplContent, format("No such notification template content key of: %s", templateKey));
 
-		// Gets template content
-		String tplContent = getTemplates().getProperty(templateKey);
-		hasTextOf(tplContent, format("No such notification template content key of: %s", templateKey));
+        // Resolving from template
+        StringBuffer template = new StringBuffer(tplContent);
+        parameters.forEach((k, v) -> {
+            String template0 = template.toString();
+            template.setLength(0);
+            String key = "${" + k + "}";
+            if (isCaseSensitive()) {
+                template.append(replace(template0, key, valueOf(v)));
+            } else {
+                template.append(replaceIgnoreCase(template0, key, valueOf(v)));
+            }
+        });
 
-		// Resolving template message
-		StringBuffer template = new StringBuffer(tplContent);
-		parameters.forEach((k, v) -> {
-			String template0 = template.toString();
-			template.setLength(0);
-			String key = "${" + k + "}";
-			if (isCaseSensitive()) {
-				template.append(replace(template0, key, valueOf(v)));
-			} else {
-				template.append(replaceIgnoreCase(template0, key, valueOf(v)));
-			}
-		});
+        // Check full resolved
+        String message = template.toString();
+        checkAllResolved(message);
+        return message;
+    }
 
-		// Check full resolved
-		String message = template.toString();
-		checkHasFullyResolved(message);
-		return message;
-	}
+    /**
+     * Check if the specified template exists.
+     * 
+     * @param templateKey
+     * @return
+     */
+    public boolean hasTemplateKey(String templateKey) {
+        return getTemplates().containsKey(templateKey);
+    }
 
-	/**
-	 * Check if the specified template exists.
-	 * 
-	 * @param templateKey
-	 * @return
-	 */
-	public boolean hasTemplateKey(String templateKey) {
-		return getTemplates().containsKey(templateKey);
-	}
+    /**
+     * Check that the template message has been fully parsed, that is, there is
+     * no: ${VAR1} variable in the body of the message
+     * 
+     * @param tplMessage
+     * @return
+     * @throws NotificationMessageParseException
+     */
+    private void checkAllResolved(String tplMessage) throws NotificationMessageParseException {
+        int firstStart = tplMessage.indexOf("$");
+        if (firstStart > -1) {
+            int firstEnd = tplMessage.indexOf("}");
+            isTrue(firstEnd > -1, NotificationMessageParseException.class,
+                    "Notification message template syntax error, No ending '}' after start index: %s", firstStart);
 
-	/**
-	 * Check that the template message has been fully parsed, that is, there is
-	 * no: ${VAR1} variable in the body of the message
-	 * 
-	 * @param tplMessage
-	 * @return
-	 * @throws NotificationMessageParseException
-	 */
-	public void checkHasFullyResolved(String tplMessage) throws NotificationMessageParseException {
-		int firstStart = tplMessage.indexOf("$");
-		if (firstStart > -1) {
-			int firstEnd = tplMessage.indexOf("}");
-			isTrue(firstEnd > -1, NotificationMessageParseException.class,
-					"Notification message template syntax error, No ending '}' after start index: %s", firstStart);
+            String firstVar = EMPTY;
+            if ((firstEnd + 1) == tplMessage.length()) {
+                firstVar = tplMessage.substring(firstStart);
+            } else {
+                firstVar = tplMessage.substring(firstStart, firstEnd + 1);
+            }
+            throw new NotificationMessageParseException(format(
+                    "Notification template parsing error, and unresolved symbol variable: %s, => %s", firstVar, tplMessage));
+        }
+    }
 
-			String firstVar = EMPTY;
-			if ((firstEnd + 1) == tplMessage.length()) {
-				firstVar = tplMessage.substring(firstStart);
-			} else {
-				firstVar = tplMessage.substring(firstStart, firstEnd + 1);
-			}
-			throw new NotificationMessageParseException(format(
-					"Notification template parsing error, and unresolved symbol variable: %s, => %s", firstVar, tplMessage));
-		}
+    @Override
+    public void validate() {
 
-	}
-
-	@Override
-	public void validate() {
-
-	}
+    }
 
 }

@@ -17,11 +17,18 @@ package com.wl4g.infra.support.notification.dingtalk;
 
 import com.wl4g.infra.support.notification.NotifyProperties;
 
+/**
+ * {@link DingtalkNotifyProperties}
+ * 
+ * @author James Wong
+ * @version 2022-09-15
+ * @since v3.0.0
+ * @see https://open-dev.dingtalk.com/apiExplorer?#/?devType=org&api=dingtalk.oapi.gettoken
+ */
 public class DingtalkNotifyProperties implements NotifyProperties {
 
-	@Override
-	public void validate() {
-
-	}
+    @Override
+    public void validate() {
+    }
 
 }

@@ -27,23 +27,23 @@ import com.wl4g.infra.support.notification.GenericNotifyMessage;
  */
 public class DingtalkMessageNotifier extends AbstractMessageNotifier<DingtalkNotifyProperties> {
 
-	public DingtalkMessageNotifier(DingtalkNotifyProperties config) {
-		super(config);
-	}
+    public DingtalkMessageNotifier(DingtalkNotifyProperties config) {
+        super(config);
+    }
 
-	@Override
-	public NotifierKind kind() {
-		return NotifierKind.Apns;
-	}
+    @Override
+    public NotifierKind kind() {
+        return NotifierKind.Apns;
+    }
 
-	@Override
-	public void send(GenericNotifyMessage message) {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public void send(GenericNotifyMessage message) {
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public <R> R sendForReply(GenericNotifyMessage message) {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public <R> R sendForReply(GenericNotifyMessage message) {
+        throw new UnsupportedOperationException();
+    }
 
 }

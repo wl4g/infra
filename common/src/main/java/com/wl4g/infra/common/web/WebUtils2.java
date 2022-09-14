@@ -260,8 +260,9 @@ public abstract class WebUtils2 extends WebUtils {
      * @return
      */
     public static Map<String, String> getFirstParameters(@Nullable ServletRequest request) {
-        return nonNull(request) ? safeMap(request.getParameterMap()).entrySet().stream().collect(
-                toMap(e -> e.getKey(), e -> isEmptyArray(e.getValue()) ? null : e.getValue()[0])) : emptyMap();
+        return nonNull(request) ? safeMap(request.getParameterMap()).entrySet()
+                .stream()
+                .collect(toMap(e -> e.getKey(), e -> isEmptyArray(e.getValue()) ? null : e.getValue()[0])) : emptyMap();
     }
 
     /**

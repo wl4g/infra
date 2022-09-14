@@ -73,7 +73,10 @@ public abstract class AbstractClientHttpRequestFactoryWrapper implements ClientH
      * @throws IOException
      *             in case of I/O errors
      */
-    protected abstract ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod, ClientHttpRequestFactory requestFactory,
+    protected abstract ClientHttpRequest createRequest(
+            URI uri,
+            HttpMethod httpMethod,
+            ClientHttpRequestFactory requestFactory,
             HttpHeaders requestHeaders) throws IOException;
 
 }

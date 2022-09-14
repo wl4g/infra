@@ -37,11 +37,11 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.wl4g.infra.common.bloom.BloomGenerator;
 import com.wl4g.infra.common.lang.StringUtils2;
 import com.wl4g.infra.common.log.SmartLogger;
 import com.wl4g.infra.common.serialize.JdkSerializeUtils;
 import com.wl4g.infra.common.serialize.ProtostuffUtils;
-import com.wl4g.infra.support.cache.bloom.BloomConfig;
 import com.wl4g.infra.support.cache.jedis.ScanCursor.ClusterScanParams;
 
 /**
@@ -483,7 +483,7 @@ public class JedisService {
      * @param key
      * @param value
      */
-    public <T> void bloomAdd(@NotNull BloomConfig<T> bfConfig, String key, T value) {
+    public <T> void bloomAdd(@NotNull BloomGenerator<T> bfConfig, String key, T value) {
         Preconditions.checkArgument(bfConfig != null, "bloomFilter config is required");
         doExecuteWithRedis(adapter -> {
             log.debug("bloomFilterAdd {}: {}", key, value);
@@ -499,7 +499,7 @@ public class JedisService {
      * Determines whether a value exists based on the given bloom filter
      * configuration.
      */
-    public <T> boolean bloomExist(@NotNull BloomConfig<T> bfConfig, String key, T value) {
+    public <T> boolean bloomExist(@NotNull BloomGenerator<T> bfConfig, String key, T value) {
         Preconditions.checkArgument(bfConfig != null, "bloomFilter config is required");
         return doExecuteWithRedis(adapter -> {
             log.debug("bloomFilterExist {}: {}", key, value);

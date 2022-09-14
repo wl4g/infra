@@ -547,22 +547,46 @@ public interface JedisClient extends Closeable {
         throw new UnsupportedOperationException();
     }
 
-    default List<byte[]> xclaim(byte[] key, byte[] group, byte[] consumername, long minIdleTime, XClaimParams params,
+    default List<byte[]> xclaim(
+            byte[] key,
+            byte[] group,
+            byte[] consumername,
+            long minIdleTime,
+            XClaimParams params,
             byte[]... ids) {
         throw new UnsupportedOperationException();
     }
 
-    default List<byte[]> xclaim$JedisCommands(byte[] key, byte[] groupname, byte[] consumername, long minIdleTime,
-            long newIdleTime, int retries, boolean force, byte[]... ids) {
+    default List<byte[]> xclaim$JedisCommands(
+            byte[] key,
+            byte[] groupname,
+            byte[] consumername,
+            long minIdleTime,
+            long newIdleTime,
+            int retries,
+            boolean force,
+            byte[]... ids) {
         throw new UnsupportedOperationException();
     }
 
-    default List<byte[]> xclaim$JedisClusterCommands(byte[] key, byte[] groupname, byte[] consumername, long minIdleTime,
-            long newIdleTime, int retries, boolean force, byte[][] ids) {
+    default List<byte[]> xclaim$JedisClusterCommands(
+            byte[] key,
+            byte[] groupname,
+            byte[] consumername,
+            long minIdleTime,
+            long newIdleTime,
+            int retries,
+            boolean force,
+            byte[][] ids) {
         throw new UnsupportedOperationException();
     }
 
-    default List<byte[]> xclaimJustId(byte[] key, byte[] group, byte[] consumername, long minIdleTime, XClaimParams params,
+    default List<byte[]> xclaimJustId(
+            byte[] key,
+            byte[] group,
+            byte[] consumername,
+            long minIdleTime,
+            XClaimParams params,
             byte[]... ids) {
         throw new UnsupportedOperationException();
     }
@@ -579,12 +603,20 @@ public interface JedisClient extends Closeable {
         throw new UnsupportedOperationException();
     }
 
-    default List<byte[]> xreadGroup(byte[] groupname, byte[] consumer, int count, long block, boolean noAck,
+    default List<byte[]> xreadGroup(
+            byte[] groupname,
+            byte[] consumer,
+            int count,
+            long block,
+            boolean noAck,
             Map<byte[], byte[]> streams) {
         throw new UnsupportedOperationException();
     }
 
-    default List<byte[]> xreadGroup(byte[] groupname, byte[] consumer, XReadGroupParams xReadGroupParams,
+    default List<byte[]> xreadGroup(
+            byte[] groupname,
+            byte[] consumer,
+            XReadGroupParams xReadGroupParams,
             Entry<byte[], byte[]>... streams) {
         throw new UnsupportedOperationException();
     }
@@ -613,13 +645,21 @@ public interface JedisClient extends Closeable {
         throw new UnsupportedOperationException();
     }
 
-    default List<Entry<String, List<StreamEntry>>> xreadGroup(String groupname, String consumer, int count, long block,
-            boolean noAck, Entry<String, StreamEntryID>... streams) {
+    default List<Entry<String, List<StreamEntry>>> xreadGroup(
+            String groupname,
+            String consumer,
+            int count,
+            long block,
+            boolean noAck,
+            Entry<String, StreamEntryID>... streams) {
         throw new UnsupportedOperationException();
     }
 
-    default List<Entry<String, List<StreamEntry>>> xreadGroup(String groupname, String consumer,
-            XReadGroupParams xReadGroupParams, Map<String, StreamEntryID> streams) {
+    default List<Entry<String, List<StreamEntry>>> xreadGroup(
+            String groupname,
+            String consumer,
+            XReadGroupParams xReadGroupParams,
+            Map<String, StreamEntryID> streams) {
         throw new UnsupportedOperationException();
     }
 
@@ -643,7 +683,11 @@ public interface JedisClient extends Closeable {
         throw new UnsupportedOperationException();
     }
 
-    default List<GeoRadiusResponse> georadiusByMember(byte[] key, byte[] member, double radius, GeoUnit unit,
+    default List<GeoRadiusResponse> georadiusByMember(
+            byte[] key,
+            byte[] member,
+            double radius,
+            GeoUnit unit,
             GeoRadiusParam param) {
         throw new UnsupportedOperationException();
     }
@@ -652,7 +696,11 @@ public interface JedisClient extends Closeable {
         throw new UnsupportedOperationException();
     }
 
-    default List<GeoRadiusResponse> georadiusByMemberReadonly(byte[] key, byte[] member, double radius, GeoUnit unit,
+    default List<GeoRadiusResponse> georadiusByMemberReadonly(
+            byte[] key,
+            byte[] member,
+            double radius,
+            GeoUnit unit,
             GeoRadiusParam param) {
         throw new UnsupportedOperationException();
     }
@@ -661,7 +709,11 @@ public interface JedisClient extends Closeable {
         throw new UnsupportedOperationException();
     }
 
-    default List<GeoRadiusResponse> georadiusByMemberReadonly(String key, String member, double radius, GeoUnit unit,
+    default List<GeoRadiusResponse> georadiusByMemberReadonly(
+            String key,
+            String member,
+            double radius,
+            GeoUnit unit,
             GeoRadiusParam param) {
         throw new UnsupportedOperationException();
     }
@@ -670,7 +722,11 @@ public interface JedisClient extends Closeable {
         throw new UnsupportedOperationException();
     }
 
-    default List<GeoRadiusResponse> georadiusByMember(String key, String member, double radius, GeoUnit unit,
+    default List<GeoRadiusResponse> georadiusByMember(
+            String key,
+            String member,
+            double radius,
+            GeoUnit unit,
             GeoRadiusParam param) {
         throw new UnsupportedOperationException();
     }
@@ -679,27 +735,50 @@ public interface JedisClient extends Closeable {
         throw new UnsupportedOperationException();
     }
 
-    default List<GeoRadiusResponse> georadius(byte[] key, double longitude, double latitude, double radius, GeoUnit unit,
+    default List<GeoRadiusResponse> georadius(
+            byte[] key,
+            double longitude,
+            double latitude,
+            double radius,
+            GeoUnit unit,
             GeoRadiusParam param) {
         throw new UnsupportedOperationException();
     }
 
-    default List<GeoRadiusResponse> georadiusReadonly(byte[] key, double longitude, double latitude, double radius,
+    default List<GeoRadiusResponse> georadiusReadonly(
+            byte[] key,
+            double longitude,
+            double latitude,
+            double radius,
             GeoUnit unit) {
         throw new UnsupportedOperationException();
     }
 
-    default List<GeoRadiusResponse> georadiusReadonly(byte[] key, double longitude, double latitude, double radius, GeoUnit unit,
+    default List<GeoRadiusResponse> georadiusReadonly(
+            byte[] key,
+            double longitude,
+            double latitude,
+            double radius,
+            GeoUnit unit,
             GeoRadiusParam param) {
         throw new UnsupportedOperationException();
     }
 
-    default List<GeoRadiusResponse> georadiusReadonly(String key, double longitude, double latitude, double radius,
+    default List<GeoRadiusResponse> georadiusReadonly(
+            String key,
+            double longitude,
+            double latitude,
+            double radius,
             GeoUnit unit) {
         throw new UnsupportedOperationException();
     }
 
-    default List<GeoRadiusResponse> georadiusReadonly(String key, double longitude, double latitude, double radius, GeoUnit unit,
+    default List<GeoRadiusResponse> georadiusReadonly(
+            String key,
+            double longitude,
+            double latitude,
+            double radius,
+            GeoUnit unit,
             GeoRadiusParam param) {
         throw new UnsupportedOperationException();
     }
@@ -708,7 +787,12 @@ public interface JedisClient extends Closeable {
         throw new UnsupportedOperationException();
     }
 
-    default List<GeoRadiusResponse> georadius(String key, double longitude, double latitude, double radius, GeoUnit unit,
+    default List<GeoRadiusResponse> georadius(
+            String key,
+            double longitude,
+            double latitude,
+            double radius,
+            GeoUnit unit,
             GeoRadiusParam param) {
         throw new UnsupportedOperationException();
     }
@@ -801,17 +885,34 @@ public interface JedisClient extends Closeable {
         throw new UnsupportedOperationException();
     }
 
-    default List<StreamEntryID> xclaimJustId(String key, String group, String consumername, long minIdleTime, XClaimParams params,
+    default List<StreamEntryID> xclaimJustId(
+            String key,
+            String group,
+            String consumername,
+            long minIdleTime,
+            XClaimParams params,
             StreamEntryID... ids) {
         throw new UnsupportedOperationException();
     }
 
-    default List<StreamEntry> xclaim(String key, String group, String consumername, long minIdleTime, long newIdleTime,
-            int retries, boolean force, StreamEntryID... ids) {
+    default List<StreamEntry> xclaim(
+            String key,
+            String group,
+            String consumername,
+            long minIdleTime,
+            long newIdleTime,
+            int retries,
+            boolean force,
+            StreamEntryID... ids) {
         throw new UnsupportedOperationException();
     }
 
-    default List<StreamEntry> xclaim(String key, String group, String consumername, long minIdleTime, XClaimParams params,
+    default List<StreamEntry> xclaim(
+            String key,
+            String group,
+            String consumername,
+            long minIdleTime,
+            XClaimParams params,
             StreamEntryID... ids) {
         throw new UnsupportedOperationException();
     }
@@ -840,7 +941,12 @@ public interface JedisClient extends Closeable {
         throw new UnsupportedOperationException();
     }
 
-    default List<StreamPendingEntry> xpending(String key, String groupname, StreamEntryID start, StreamEntryID end, int count,
+    default List<StreamPendingEntry> xpending(
+            String key,
+            String groupname,
+            StreamEntryID start,
+            StreamEntryID end,
+            int count,
             String consumername) {
         throw new UnsupportedOperationException();
     }
@@ -1109,22 +1215,44 @@ public interface JedisClient extends Closeable {
         throw new UnsupportedOperationException();
     }
 
-    default Long georadiusByMemberStore(byte[] key, byte[] member, double radius, GeoUnit unit, GeoRadiusParam param,
+    default Long georadiusByMemberStore(
+            byte[] key,
+            byte[] member,
+            double radius,
+            GeoUnit unit,
+            GeoRadiusParam param,
             GeoRadiusStoreParam storeParam) {
         throw new UnsupportedOperationException();
     }
 
-    default Long georadiusByMemberStore(String key, String member, double radius, GeoUnit unit, GeoRadiusParam param,
+    default Long georadiusByMemberStore(
+            String key,
+            String member,
+            double radius,
+            GeoUnit unit,
+            GeoRadiusParam param,
             GeoRadiusStoreParam storeParam) {
         throw new UnsupportedOperationException();
     }
 
-    default Long georadiusStore(byte[] key, double longitude, double latitude, double radius, GeoUnit unit, GeoRadiusParam param,
+    default Long georadiusStore(
+            byte[] key,
+            double longitude,
+            double latitude,
+            double radius,
+            GeoUnit unit,
+            GeoRadiusParam param,
             GeoRadiusStoreParam storeParam) {
         throw new UnsupportedOperationException();
     }
 
-    default Long georadiusStore(String key, double longitude, double latitude, double radius, GeoUnit unit, GeoRadiusParam param,
+    default Long georadiusStore(
+            String key,
+            double longitude,
+            double latitude,
+            double radius,
+            GeoUnit unit,
+            GeoRadiusParam param,
             GeoRadiusStoreParam storeParam) {
         throw new UnsupportedOperationException();
     }

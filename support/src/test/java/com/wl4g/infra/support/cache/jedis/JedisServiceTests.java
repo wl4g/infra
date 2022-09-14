@@ -24,7 +24,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.google.common.hash.Funnel;
-import com.wl4g.infra.support.cache.bloom.BloomConfig;
+import com.wl4g.infra.common.bloom.BloomGenerator;
 import com.wl4g.infra.support.cache.jedis.JedisClientAutoConfiguration.JedisProperties;
 
 /**
@@ -51,7 +51,7 @@ public class JedisServiceTests {
 
     @Test
     public void testBloomfilterValid() throws Exception {
-        BloomConfig<String> bfConfig = new BloomConfig<>((Funnel<String>) (from, into) -> into.putString(from, UTF_8), 1000,
+        BloomGenerator<String> bfConfig = new BloomGenerator<>((Funnel<String>) (from, into) -> into.putString(from, UTF_8), 1000,
                 0.01);
 
         // In order to ensure that the test environment is fast, a unique key is
@@ -75,7 +75,7 @@ public class JedisServiceTests {
 
     @Test
     public void testBloomfilterFailOutOfExpectedInsertions() throws Exception {
-        BloomConfig<String> bfConfig = new BloomConfig<>((Funnel<String>) (from, into) -> into.putString(from, UTF_8), 100, 0.01);
+        BloomGenerator<String> bfConfig = new BloomGenerator<>((Funnel<String>) (from, into) -> into.putString(from, UTF_8), 100, 0.01);
 
         // In order to ensure that the test environment is fast, a unique key is
         // generated here.

@@ -20,23 +20,23 @@ import com.wl4g.infra.support.notification.GenericNotifyMessage;
 
 public class QqMessageNotifier extends AbstractMessageNotifier<QqNotifyProperties> {
 
-	public QqMessageNotifier(QqNotifyProperties config) {
-		super(config);
-	}
+    public QqMessageNotifier(QqNotifyProperties config) {
+        super(config);
+    }
 
-	@Override
-	public NotifierKind kind() {
-		return NotifierKind.Apns;
-	}
+    @Override
+    public NotifierKind kind() {
+        return NotifierKind.Apns;
+    }
 
-	@Override
-	public void send(GenericNotifyMessage message) {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public void send(GenericNotifyMessage message) {
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public <R> R sendForReply(GenericNotifyMessage message) {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public <R> R sendForReply(GenericNotifyMessage message) {
+        throw new UnsupportedOperationException();
+    }
 
 }

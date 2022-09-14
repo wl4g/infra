@@ -24,31 +24,31 @@ package com.wl4g.infra.support.notification;
  */
 public class NoOpMessageNotifier extends AbstractMessageNotifier<NotifyProperties> {
 
-	final public static MessageNotifier DefaultNoOp = new NoOpMessageNotifier(new NotifyProperties() {
-		@Override
-		public void validate() {
-		}
-	});
+    final public static MessageNotifier DefaultNoOp = new NoOpMessageNotifier(new NotifyProperties() {
+        @Override
+        public void validate() {
+        }
+    });
 
-	public NoOpMessageNotifier(NotifyProperties config) {
-		super(config);
-	}
+    public NoOpMessageNotifier(NotifyProperties config) {
+        super(config);
+    }
 
-	@Override
-	public NotifierKind kind() {
-		return NotifierKind.NoOp;
-	}
+    @Override
+    public NotifierKind kind() {
+        return NotifierKind.NoOp;
+    }
 
-	@Override
-	public void send(GenericNotifyMessage msg) {
-		log.warn("Lost!!! this is an empty message notifier. Please check if the notifier is configured correctly!");
-	}
+    @Override
+    public void send(GenericNotifyMessage msg) {
+        log.warn("Lost!!! this is an empty message notifier. Please check if the notifier is configured correctly!");
+    }
 
-	@SuppressWarnings({ "unchecked" })
-	@Override
-	public Object sendForReply(GenericNotifyMessage msg) {
-		log.warn("Lost!!! this is an empty message notifier. Please check if the notifier is configured correctly!");
-		return null;
-	}
+    @SuppressWarnings({ "unchecked" })
+    @Override
+    public Object sendForReply(GenericNotifyMessage msg) {
+        log.warn("Lost!!! this is an empty message notifier. Please check if the notifier is configured correctly!");
+        return null;
+    }
 
 }

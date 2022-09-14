@@ -120,7 +120,10 @@ public abstract class FileDeleteUtil {
      *             may result in some files not being deleted.
      * @throws IOException
      */
-    private static final void doDeleteFileOrDirectories(String globPathPattern, File path, boolean retainDirectory,
+    private static final void doDeleteFileOrDirectories(
+            String globPathPattern,
+            File path,
+            boolean retainDirectory,
             boolean fastfail) throws IllegalStateException, IOException {
         notNullOf(path, "path");
 

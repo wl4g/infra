@@ -455,8 +455,9 @@ public abstract class FileIOUtils extends FileUtils {
 
         @Override
         public String toString() {
-            return ReadTailFrame.class.getName().concat(" (startPos=" + startPos + ", endPos=" + endPos + ", length=" + length
-                    + ", lines=" + lines + ", hasNext=" + hasNext + ")");
+            return ReadTailFrame.class.getName()
+                    .concat(" (startPos=" + startPos + ", endPos=" + endPos + ", length=" + length + ", lines=" + lines
+                            + ", hasNext=" + hasNext + ")");
         }
 
     }

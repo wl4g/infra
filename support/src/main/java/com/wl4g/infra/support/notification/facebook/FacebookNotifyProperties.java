@@ -20,9 +20,9 @@ import com.wl4g.infra.support.notification.NotifyProperties;
 
 public class FacebookNotifyProperties extends BasedSocialProperties implements NotifyProperties {
 
-	@Override
-	public void validate() {
+    @Override
+    public void validate() {
 
-	}
+    }
 
 }

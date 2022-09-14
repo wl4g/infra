@@ -18,13 +18,19 @@ package com.wl4g.infra.common.minio;
 import static com.wl4g.infra.common.lang.FastTimeClock.currentTimeMillis;
 import static com.wl4g.infra.common.minio.MinioAdminClientTests.ENDPOINT;
 import static com.wl4g.infra.common.minio.MinioAdminClientTests.REGION;
-import static com.wl4g.infra.common.minio.MinioAdminClientTests.SUPER_ADMIN_ACCESSKEY;
 import static com.wl4g.infra.common.minio.MinioAdminClientTests.TENANT_ACCESSKEY;
 import static com.wl4g.infra.common.minio.MinioAdminClientTests.TENANT_BUCKET;
 import static com.wl4g.infra.common.minio.MinioAdminClientTests.TENANT_SECRETKEY;
 import static com.wl4g.infra.common.minio.S3Policy.Action.GetBucketLocationAction;
+import static com.wl4g.infra.common.minio.S3Policy.Action.GetBucketPolicyStatusAction;
 import static com.wl4g.infra.common.minio.S3Policy.Action.GetObjectAction;
+import static com.wl4g.infra.common.minio.S3Policy.Action.GetObjectLegalHoldAction;
+import static com.wl4g.infra.common.minio.S3Policy.Action.ListAllMyBucketsAction;
+import static com.wl4g.infra.common.minio.S3Policy.Action.ListBucketAction;
+import static com.wl4g.infra.common.minio.S3Policy.Action.ListBucketMultipartUploadsAction;
+import static com.wl4g.infra.common.minio.S3Policy.Action.ListMultipartUploadPartsAction;
 import static com.wl4g.infra.common.minio.S3Policy.Action.PutObjectAction;
+import static com.wl4g.infra.common.minio.S3Policy.Action.PutObjectLegalHoldAction;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -85,10 +91,13 @@ public class MinioClientTests {
         MinioClient client = MinioClient.builder()
                 .endpoint(ENDPOINT)
                 .region(REGION)
-                .credentials(SUPER_ADMIN_ACCESSKEY, SUPER_ADMIN_ACCESSKEY)
+                .credentials(TENANT_ACCESSKEY, TENANT_SECRETKEY)
                 .build();
         if (!client.bucketExists(BucketExistsArgs.builder().bucket(TENANT_BUCKET).build())) {
             client.makeBucket(MakeBucketArgs.builder().bucket(TENANT_BUCKET).build());
+            System.out.println("Created bucket for " + TENANT_BUCKET);
+        } else {
+            System.out.println("Already bucket for " + TENANT_BUCKET);
         }
     }
 
@@ -136,7 +145,6 @@ public class MinioClientTests {
         // https://github.com/minio/minio-java/blob/8.4.3/api/src/main/java/io/minio/S3Base.java#L495
         ObjectWriteResponse resp = client.putObject(PutObjectArgs.builder()
                 .bucket(TENANT_BUCKET)
-                // .object(USER_OBJECT_NAME)
                 .object(USER_PREFIX + "/" + USER_OBJECT_NAME)
                 .stream(new FileInputStream(testfile), testfile.length(), 5 * 1024 * 1024)
                 .build());
@@ -194,9 +202,10 @@ public class MinioClientTests {
      *            {
      *                "Effect": "Allow",
      *                "Action": [
-     *                    "s3:GetBucketLocation",
      *                    "s3:ListBucket",
+     *                    "s3:GetBucketLocation",
      *                    "s3:GetBucketPolicyStatus",
+     *                    "s3:ListBucketMultipartUploads",
      *                    "s3:GetObject",
      *                    "s3:PutObject"
      *                ],
@@ -225,32 +234,34 @@ public class MinioClientTests {
                 .version(S3Policy.DEFAULT_POLICY_VERSION)
                 .statement(singletonList(Statement.builder()
                         .effect(EffectType.Allow)
+                        //
                         // 授权资源标识
-                        .resource(singletonList("arn:aws:s3:::" + TENANT_BUCKET + "/" + USER_PREFIX + "/*"))
+                        .resource(singletonList(format("arn:aws:s3:::%s/%s/*", TENANT_BUCKET, USER_PREFIX)))
+                        //
                         // 授权操作标识
                         // ========== [注]: ==========
-                        // 对于MinIO-JS 客户端的 putObject() 函数有以下区别:
+                        // 对于 MinIO-JS 客户端的 putObject() 函数有以下区别:
                         // 当 region 有值时需要 s3:GetObject 权限
-                        // 对于请求如:GET-http://localhost:9000/tenant1001/library/1.txt??uploads&delimiter=&max-uploads=1000&prefix=library%2F1.txt
+                        // 会请求如:GET-http://localhost:9000/tenant1001/library/1.txt??uploads&delimiter=&max-uploads=1000&prefix=library%2F1.txt
                         // 当 region 为空时需要 s3:GetBucketLocation 权限
-                        // 对于请求如:GET-http://localhost:9000/tenant1001?location
-                        // 来获取当前上传对象的分段信息. MinIO 源码分析参见:
+                        // 会请求获取上传分段信息如:GET-http://localhost:9000/tenant1001?location
+                        // MinIO 源码分析参见:
                         // see:https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/router.go#L95
                         // see:https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/object-handler.go#L345
                         // see:https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/auth-handler.go#L391
                         // see:https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1754
                         // see:https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1680
                         // see:https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1723
-                        .action(asList(GetBucketLocationAction, PutObjectAction, GetObjectAction))
+                        .action(asList(GetBucketLocationAction, GetBucketPolicyStatusAction, ListBucketAction,
+                                ListAllMyBucketsAction, ListBucketMultipartUploadsAction, ListMultipartUploadPartsAction,
+                                PutObjectAction, PutObjectLegalHoldAction, GetObjectAction, GetObjectLegalHoldAction))
                         .build()))
                 .build();
         int durationSeconds = 5 * 60;
-        String roleSessionName = "anySession"; // 任意
-        String externalId = "myapp";
 
         // 获取有限权限的STS(临时)
         Provider provider = new AssumeRoleProvider(ENDPOINT, TENANT_ACCESSKEY, TENANT_SECRETKEY, durationSeconds,
-                applyPolicy.toString(), REGION, null, roleSessionName, externalId, defaultHttpClient);
+                applyPolicy.toString(), REGION, null, null, null, defaultHttpClient);
         Credentials credentials = provider.fetch();
         System.out.println("assume sts accessKey:" + credentials.accessKey());
         System.out.println("assume sts secretKey:" + credentials.secretKey());

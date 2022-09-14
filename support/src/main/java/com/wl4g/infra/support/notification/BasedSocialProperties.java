@@ -24,30 +24,30 @@ package com.wl4g.infra.support.notification;
  */
 public abstract class BasedSocialProperties {
 
-	/**
-	 * Application id.
-	 */
-	private String appId;
+    /**
+     * Application id.
+     */
+    private String appId;
 
-	/**
-	 * Application secret.
-	 */
-	private String appSecret;
+    /**
+     * Application secret.
+     */
+    private String appSecret;
 
-	public String getAppId() {
-		return this.appId;
-	}
+    public String getAppId() {
+        return this.appId;
+    }
 
-	public void setAppId(String appId) {
-		this.appId = appId;
-	}
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
 
-	public String getAppSecret() {
-		return this.appSecret;
-	}
+    public String getAppSecret() {
+        return this.appSecret;
+    }
 
-	public void setAppSecret(String appSecret) {
-		this.appSecret = appSecret;
-	}
+    public void setAppSecret(String appSecret) {
+        this.appSecret = appSecret;
+    }
 
 }

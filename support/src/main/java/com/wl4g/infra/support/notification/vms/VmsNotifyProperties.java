@@ -15,83 +15,31 @@
  */
 package com.wl4g.infra.support.notification.vms;
 
-import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
-
 import javax.validation.constraints.NotBlank;
 
 import com.wl4g.infra.support.notification.AbstractNotifyProperties;
 import com.wl4g.infra.support.notification.NotifyProperties;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class VmsNotifyProperties implements NotifyProperties {
 
-	private AliyunVmsProperties aliyun = new AliyunVmsProperties();
+    private AliyunVmsProperties aliyun = new AliyunVmsProperties();
 
-	public AliyunVmsProperties getAliyun() {
-		return aliyun;
-	}
+    @Override
+    public void validate() {
+    }
 
-	public void setAliyun(AliyunVmsProperties aliyun) {
-		this.aliyun = aliyun;
-	}
-
-	@Override
-	public void validate() {
-	}
-
-	public static class AliyunVmsProperties extends AbstractNotifyProperties {
-
-		/**
-		 * Called show number
-		 */
-		@NotBlank
-		private String calledShowNumber;
-
-		/**
-		 * e.g. cn-hangzhou
-		 */
-		@NotBlank
-		private String regionId;
-
-		@NotBlank
-		private String accessKeyId;
-
-		@NotBlank
-		private String accessKeySecret;
-
-		public String getCalledShowNumber() {
-			return calledShowNumber;
-		}
-
-		public AliyunVmsProperties setCalledShowNumber(String calledShowNumber) {
-			hasTextOf(calledShowNumber, "calledShowNumber");
-			this.calledShowNumber = calledShowNumber;
-			return this;
-		}
-
-		public String getRegionId() {
-			return regionId;
-		}
-
-		public void setRegionId(String regionId) {
-			this.regionId = regionId;
-		}
-
-		public String getAccessKeyId() {
-			return accessKeyId;
-		}
-
-		public void setAccessKeyId(String accessKeyId) {
-			this.accessKeyId = accessKeyId;
-		}
-
-		public String getAccessKeySecret() {
-			return accessKeySecret;
-		}
-
-		public void setAccessKeySecret(String secret) {
-			this.accessKeySecret = secret;
-		}
-
-	}
+    @Getter
+    @Setter
+    public static class AliyunVmsProperties extends AbstractNotifyProperties {
+        private @NotBlank String calledShowNumber;
+        private @NotBlank String regionId;
+        private @NotBlank String accessKeyId;
+        private @NotBlank String accessKeySecret;
+    }
 
 }

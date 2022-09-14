@@ -35,6 +35,7 @@ import java.lang.reflect.Method;
  * @sine v1.0
  * @see https://blog.csdn.net/zoinsung_lee/article/details/82529624
  */
+@Deprecated
 public abstract class IamSecurityHolderBridges {
 
     public static Object invokeGetPrincipalInfo() {

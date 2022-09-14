@@ -20,23 +20,23 @@ import com.wl4g.infra.support.notification.GenericNotifyMessage;
 
 public class TwitterMessageNotifier extends AbstractMessageNotifier<TwitterNotifyProperties> {
 
-	public TwitterMessageNotifier(TwitterNotifyProperties config) {
-		super(config);
-	}
+    public TwitterMessageNotifier(TwitterNotifyProperties config) {
+        super(config);
+    }
 
-	@Override
-	public NotifierKind kind() {
-		return NotifierKind.Twitter;
-	}
+    @Override
+    public NotifierKind kind() {
+        return NotifierKind.Twitter;
+    }
 
-	@Override
-	public void send(GenericNotifyMessage message) {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public void send(GenericNotifyMessage message) {
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public <R> R sendForReply(GenericNotifyMessage message) {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public <R> R sendForReply(GenericNotifyMessage message) {
+        throw new UnsupportedOperationException();
+    }
 
 }

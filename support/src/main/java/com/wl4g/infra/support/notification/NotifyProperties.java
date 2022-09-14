@@ -26,14 +26,14 @@ import org.springframework.beans.factory.InitializingBean;
  */
 public interface NotifyProperties extends InitializingBean {
 
-	@Override
-	default public void afterPropertiesSet() throws Exception {
-		validate();
-	}
+    @Override
+    default public void afterPropertiesSet() throws Exception {
+        validate();
+    }
 
-	/**
-	 * Validation notify properties.
-	 */
-	void validate();
+    /**
+     * Validation notify properties.
+     */
+    void validate();
 
 }

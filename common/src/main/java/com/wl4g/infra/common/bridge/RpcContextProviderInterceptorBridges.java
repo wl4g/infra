@@ -38,6 +38,7 @@ import java.lang.reflect.Method;
  * @sine v1.0
  * @see https://blog.csdn.net/zoinsung_lee/article/details/82529624
  */
+@Deprecated
 public abstract class RpcContextProviderInterceptorBridges {
 
     public static int invokeFieldOrder() {
@@ -55,7 +56,10 @@ public abstract class RpcContextProviderInterceptorBridges {
         return false;
     }
 
-    public static boolean invokeCheckSupportMethodProxy(Object target, Method method, Class<?> actualOriginalTargetClass,
+    public static boolean invokeCheckSupportMethodProxy(
+            Object target,
+            Method method,
+            Class<?> actualOriginalTargetClass,
             Object... args) {
         if (nonNull(checkSupportMethodProxyMethod)) {
             makeAccessible(checkSupportMethodProxyMethod);

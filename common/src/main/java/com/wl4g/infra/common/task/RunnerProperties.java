@@ -156,8 +156,9 @@ public class RunnerProperties implements Serializable {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName().concat(format("[concurrency=%s, keepAliveTime=%s, acceptQueue=%s, reject=%s]",
-                concurrency, keepAliveTime, acceptQueue, reject));
+        return getClass().getSimpleName()
+                .concat(format("[concurrency=%s, keepAliveTime=%s, acceptQueue=%s, reject=%s]", concurrency, keepAliveTime,
+                        acceptQueue, reject));
     }
 
     public static enum StartupMode {

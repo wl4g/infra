@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.support.cache.bloom;
+package com.wl4g.infra.common.bloom;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
@@ -24,7 +24,7 @@ import com.google.common.hash.Funnel;
 import com.google.common.hash.Hashing;
 
 /**
- * {@link BloomConfig}
+ * {@link BloomGenerator}
  * 
  * <p>
  * 1. What is the definition of Bloom-filter?
@@ -73,13 +73,13 @@ import com.google.common.hash.Hashing;
  * Counting Bloom Filter can be used
  * </p>
  */
-public class BloomConfig<T> {
+public class BloomGenerator<T> {
     private final Funnel<T> funnel;
     private final int numHashFunctions;
     private final int bitSize;
 
     /**
-     * Build of {@link BloomConfig} instance.
+     * Build of {@link BloomGenerator} instance.
      * 
      * @param funnel
      * @param expectedInsertions
@@ -87,7 +87,7 @@ public class BloomConfig<T> {
      * @param fpp
      *            error tolerance rate
      */
-    public BloomConfig(@NotNull Funnel<T> funnel, int expectedInsertions, double fpp) {
+    public BloomGenerator(@NotNull Funnel<T> funnel, int expectedInsertions, double fpp) {
         this.funnel = notNullOf(funnel, "funnel");
         this.bitSize = optimalNumOfBits(expectedInsertions, fpp);
         this.numHashFunctions = optimalNumOfHashFunctions(expectedInsertions, bitSize);
@@ -137,6 +137,6 @@ public class BloomConfig<T> {
      * Default bloom filter configuration. For safety, for example, the maximum
      * value of redis setbit offset is 2^32
      */
-    public static final BloomConfig<String> DEFAULT_BLOOM_CONFIG = new BloomConfig<>(
+    public static final BloomGenerator<String> DEFAULT_BLOOM = new BloomGenerator<>(
             (Funnel<String>) (from, into) -> into.putString(from, UTF_8), Integer.MAX_VALUE, 0.01);
 }

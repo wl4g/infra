@@ -15,12 +15,17 @@
  */
 package com.wl4g.infra.common.minio;
 
+import static com.wl4g.infra.common.minio.S3Policy.Action.CreateBucketAction;
 import static com.wl4g.infra.common.minio.S3Policy.Action.GetBucketLocationAction;
 import static com.wl4g.infra.common.minio.S3Policy.Action.GetBucketPolicyStatusAction;
 import static com.wl4g.infra.common.minio.S3Policy.Action.GetObjectAction;
+import static com.wl4g.infra.common.minio.S3Policy.Action.GetObjectLegalHoldAction;
 import static com.wl4g.infra.common.minio.S3Policy.Action.ListAllMyBucketsAction;
 import static com.wl4g.infra.common.minio.S3Policy.Action.ListBucketAction;
+import static com.wl4g.infra.common.minio.S3Policy.Action.ListBucketMultipartUploadsAction;
+import static com.wl4g.infra.common.minio.S3Policy.Action.ListMultipartUploadPartsAction;
 import static com.wl4g.infra.common.minio.S3Policy.Action.PutObjectAction;
+import static com.wl4g.infra.common.minio.S3Policy.Action.PutObjectLegalHoldAction;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -64,23 +69,13 @@ public class MinioAdminClientTests {
             .statement(singletonList(Statement.builder()
                     .effect(EffectType.Allow)
                     // see:https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazons3.html#amazons3-actions-as-permissions
-                    .action(asList(GetBucketLocationAction, GetBucketPolicyStatusAction, ListBucketAction, ListAllMyBucketsAction,
-                            PutObjectAction, GetObjectAction))
+                    .action(asList(CreateBucketAction, GetBucketLocationAction, GetBucketPolicyStatusAction, ListBucketAction,
+                            ListAllMyBucketsAction, ListBucketMultipartUploadsAction, ListMultipartUploadPartsAction,
+                            PutObjectAction, PutObjectLegalHoldAction, GetObjectAction, GetObjectLegalHoldAction))
                     .resource(singletonList("arn:aws:s3:::" + TENANT_BUCKET + "/*"))
                     .build()))
             .build()
             .toString();
-
-    @Test
-    public void testGetUsers() throws InvalidKeyException, NoSuchAlgorithmException, InvalidCipherTextException, IOException {
-        MinioAdminClient adminCilent = MinioAdminClient.builder()
-                .endpoint(ENDPOINT)
-                .region(REGION)
-                .credentials(SUPER_ADMIN_ACCESSKEY, SUPER_ADMIN_SECRETKEY)
-                .build();
-        Map<String, UserInfo> users = adminCilent.listUsers();
-        System.out.println(toJSONString(users));
-    }
 
     @Test
     public void testCreatePolicy() throws InvalidKeyException, NoSuchAlgorithmException, InvalidCipherTextException, IOException {
@@ -90,6 +85,7 @@ public class MinioAdminClientTests {
                 .credentials(SUPER_ADMIN_ACCESSKEY, SUPER_ADMIN_SECRETKEY)
                 .build();
         adminCilent.addCannedPolicy(TENANT_POLICY_NAME, TENANT_POLICY_JSON);
+        System.out.println("Create tenant policy for " + TENANT_POLICY_JSON);
     }
 
     @Test
@@ -101,6 +97,7 @@ public class MinioAdminClientTests {
                 .build();
         // Won't automatically assign policies? ? ?
         adminCilent.addUser(TENANT_ACCESSKEY, Status.ENABLED, TENANT_SECRETKEY, TENANT_POLICY_NAME, emptyList());
+        System.out.println("Create tenant user for " + TENANT_ACCESSKEY);
     }
 
     @Test
@@ -112,6 +109,18 @@ public class MinioAdminClientTests {
                 .credentials(SUPER_ADMIN_ACCESSKEY, SUPER_ADMIN_SECRETKEY)
                 .build();
         adminCilent.setPolicy(TENANT_ACCESSKEY, false, TENANT_POLICY_NAME);
+        System.out.println("Assigned tenant policy to user for " + TENANT_ACCESSKEY);
+    }
+
+    @Test
+    public void testGetUsers() throws InvalidKeyException, NoSuchAlgorithmException, InvalidCipherTextException, IOException {
+        MinioAdminClient adminCilent = MinioAdminClient.builder()
+                .endpoint(ENDPOINT)
+                .region(REGION)
+                .credentials(SUPER_ADMIN_ACCESSKEY, SUPER_ADMIN_SECRETKEY)
+                .build();
+        Map<String, UserInfo> users = adminCilent.listUsers();
+        System.out.println(toJSONString(users));
     }
 
 }

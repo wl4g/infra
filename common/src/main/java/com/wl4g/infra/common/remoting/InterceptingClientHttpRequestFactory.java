@@ -51,7 +51,10 @@ public class InterceptingClientHttpRequestFactory extends AbstractClientHttpRequ
     }
 
     @Override
-    protected ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod, ClientHttpRequestFactory requestFactory,
+    protected ClientHttpRequest createRequest(
+            URI uri,
+            HttpMethod httpMethod,
+            ClientHttpRequestFactory requestFactory,
             HttpHeaders requestHeaders) {
         return new InterceptingClientHttpRequest(requestFactory, this.interceptors, uri, httpMethod, requestHeaders);
     }

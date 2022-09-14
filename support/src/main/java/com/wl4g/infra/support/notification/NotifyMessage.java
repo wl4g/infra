@@ -30,63 +30,63 @@ import javax.validation.constraints.NotBlank;
  */
 public interface NotifyMessage extends Serializable {
 
-	/**
-	 * Gets notification target objects.
-	 * 
-	 * @return
-	 */
-	List<String> getToObjects();
+    /**
+     * Gets notification target objects.
+     * 
+     * @return
+     */
+    List<String> getToObjects();
 
-	/**
-	 * Gets notification message content template ID
-	 * 
-	 * @return
-	 */
-	String getTemplateKey();
+    /**
+     * Gets notification message content template ID
+     * 
+     * @return
+     */
+    String getTemplateKey();
 
-	/**
-	 * Gets the value list of the notification message content placeholder
-	 * parameter.
-	 * 
-	 * @return
-	 */
-	Map<String, Object> getParameters();
+    /**
+     * Gets the value list of the notification message content placeholder
+     * parameter.
+     * 
+     * @return
+     */
+    Map<String, Object> getParameters();
 
-	/**
-	 * Gets parameter value by key.
-	 * 
-	 * @param key
-	 * @return
-	 */
-	default <T> T getParameter(@NotBlank String key) {
-		return getParameter(key, null);
-	}
+    /**
+     * Gets parameter value by key.
+     * 
+     * @param key
+     * @return
+     */
+    default <T> T getParameter(@NotBlank String key) {
+        return getParameter(key, null);
+    }
 
-	/**
-	 * Gets parameter value by key.
-	 * 
-	 * @param key
-	 * @param defaultValue
-	 * @return
-	 */
-	<T> T getParameter(@NotBlank String key, Object defaultValue);
+    /**
+     * Gets parameter value by key.
+     * 
+     * @param key
+     * @param defaultValue
+     * @return
+     */
+    <T> T getParameter(@NotBlank String key, Object defaultValue);
 
-	/**
-	 * Gets parameter value by key to string.
-	 * 
-	 * @param key
-	 * @param defaultValue
-	 * @return
-	 */
-	String getParameterAsString(@NotBlank String key, Object defaultValue);
+    /**
+     * Gets parameter value by key to string.
+     * 
+     * @param key
+     * @param defaultValue
+     * @return
+     */
+    String getParameterAsString(@NotBlank String key, Object defaultValue);
 
-	/**
-	 * Gets notification receipt ID, which can be used to process reliable
-	 * message confirmation application (optional), string type, 1-15 bytes
-	 * long.
-	 * 
-	 * @return
-	 */
-	String getCallbackId();
+    /**
+     * Gets notification receipt ID, which can be used to process reliable
+     * message confirmation application (optional), string type, 1-15 bytes
+     * long.
+     * 
+     * @return
+     */
+    String getCallbackId();
 
 }

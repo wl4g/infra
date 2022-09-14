@@ -214,9 +214,9 @@ public abstract class GenericProcessManager extends ApplicationTaskRunner<Runner
     protected DestroableProcess doExecRemote(RemoteDestroableCommand cmd) throws InterruptedException, Exception {
         log.info("Exec remote command: {}", cmd.getCmd());
 
-        return (DestroableProcess) SSH2Holders.getDefault().execWaitForComplete(cmd.getHost(), cmd.getUser(),
-                cmd.getPemPrivateKey(), cmd.getPassword(), cmd.getCmd(), s -> wrapDestroableProcess(cmd.getProcessId(), cmd, s),
-                cmd.getTimeoutMs());
+        return (DestroableProcess) SSH2Holders.getDefault()
+                .execWaitForComplete(cmd.getHost(), cmd.getUser(), cmd.getPemPrivateKey(), cmd.getPassword(), cmd.getCmd(),
+                        s -> wrapDestroableProcess(cmd.getProcessId(), cmd, s), cmd.getTimeoutMs());
     }
 
     @Override
@@ -311,8 +311,13 @@ public abstract class GenericProcessManager extends ApplicationTaskRunner<Runner
      * @param iserr
      * @throws IOException
      */
-    private final void readInputStream(InputStream in, Executor executor, CountDownLatch latch, ProcessCallback callback,
-            DestroableProcess dpw, boolean iserr) {
+    private final void readInputStream(
+            InputStream in,
+            Executor executor,
+            CountDownLatch latch,
+            ProcessCallback callback,
+            DestroableProcess dpw,
+            boolean iserr) {
         notNull(dpw, "DestroableProcess can't null.");
         notNull(in, "Process inputStream can't null");
         notNull(callback, "Process callback can't null");

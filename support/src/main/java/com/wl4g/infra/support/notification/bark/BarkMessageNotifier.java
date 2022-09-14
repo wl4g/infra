@@ -20,23 +20,23 @@ import com.wl4g.infra.support.notification.GenericNotifyMessage;
 
 public class BarkMessageNotifier extends AbstractMessageNotifier<BarkNotifyProperties> {
 
-	public BarkMessageNotifier(BarkNotifyProperties config) {
-		super(config);
-	}
+    public BarkMessageNotifier(BarkNotifyProperties config) {
+        super(config);
+    }
 
-	@Override
-	public NotifierKind kind() {
-		return NotifierKind.Apns;
-	}
+    @Override
+    public NotifierKind kind() {
+        return NotifierKind.Apns;
+    }
 
-	@Override
-	public void send(GenericNotifyMessage message) {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public void send(GenericNotifyMessage message) {
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public <R> R sendForReply(GenericNotifyMessage message) {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public <R> R sendForReply(GenericNotifyMessage message) {
+        throw new UnsupportedOperationException();
+    }
 
 }

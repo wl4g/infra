@@ -1310,7 +1310,9 @@ public class ResolvableType implements Serializable {
      * @return a {@link ResolvableType} for the specified constructor parameter
      * @see #forConstructorParameter(Constructor, int)
      */
-    public static ResolvableType forConstructorParameter(Constructor<?> constructor, int parameterIndex,
+    public static ResolvableType forConstructorParameter(
+            Constructor<?> constructor,
+            int parameterIndex,
             Class<?> implementationClass) {
 
         Assert2.notNull(constructor, "Constructor must not be null");
@@ -1416,7 +1418,8 @@ public class ResolvableType implements Serializable {
      * @return a {@link ResolvableType} for the specified method parameter
      * @see #forMethodParameter(MethodParameter)
      */
-    public static ResolvableType forMethodParameter(MethodParameter methodParameter,
+    public static ResolvableType forMethodParameter(
+            MethodParameter methodParameter,
             @Nullable ResolvableType implementationType) {
 
         Assert2.notNull(methodParameter, "MethodParameter must not be null");
@@ -1563,7 +1566,9 @@ public class ResolvableType implements Serializable {
      * @return a {@link ResolvableType} for the specified {@link Type} and
      *         {@link VariableResolver}
      */
-    static ResolvableType forType(@Nullable Type type, @Nullable TypeProvider typeProvider,
+    static ResolvableType forType(
+            @Nullable Type type,
+            @Nullable TypeProvider typeProvider,
             @Nullable VariableResolver variableResolver) {
 
         if (type == null && typeProvider != null) {

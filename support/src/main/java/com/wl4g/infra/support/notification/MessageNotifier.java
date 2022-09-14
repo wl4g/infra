@@ -105,66 +105,66 @@ red><b>(Optional)</b></font>
  */
 public interface MessageNotifier extends Operator<NotifierKind> {
 
-	/**
-	 * Sending notification message.
-	 * 
-	 * @param msg
-	 */
-	void send(GenericNotifyMessage msg);
+    /**
+     * Sending notification message.
+     * 
+     * @param msg
+     */
+    void send(GenericNotifyMessage msg);
 
-	/**
-	 * Sending notification message for complete reply.
-	 * 
-	 * @param <T>
-	 * @param <R>
-	 * @param msg
-	 * @return
-	 */
-	<R> R sendForReply(GenericNotifyMessage msg);
+    /**
+     * Sending notification message for complete reply.
+     * 
+     * @param <T>
+     * @param <R>
+     * @param msg
+     * @return
+     */
+    <R> R sendForReply(GenericNotifyMessage msg);
 
-	/**
-	 * Notification privoder kind.
-	 * 
-	 * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
-	 * @version 2020年1月8日 v1.0.0
-	 * @see
-	 */
-	public static enum NotifierKind {
+    /**
+     * Notification privoder kind.
+     * 
+     * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+     * @version 2020年1月8日 v1.0.0
+     * @see
+     */
+    public static enum NotifierKind {
 
-		/**
-		 * MessageNotifier that must be instantiated. The default implementation
-		 * when all other message notifiers are not available solves the spring
-		 * bean injection problem.
-		 * 
-		 * @see {@link com.wl4g.infra.support.notification.NoOpMessageNotifier}
-		 */
-		NoOp,
+        /**
+         * MessageNotifier that must be instantiated. The default implementation
+         * when all other message notifiers are not available solves the spring
+         * bean injection problem.
+         * 
+         * @see {@link com.wl4g.infra.support.notification.NoOpMessageNotifier}
+         */
+        NoOp,
 
-		Apns,
+        Apns,
 
-		Bark,
+        Bark,
 
-		Dingtalk,
+        Dingtalk,
 
-		Facebook,
+        Facebook,
 
-		Mail,
+        Mail,
 
-		Qq,
+        Qq,
 
-		AliyunSms,
+        AliyunSms,
 
-		AliyunVms,
+        AliyunVms,
 
-		WechatMp,
+        WechatMp,
 
-		Twitter;
+        Twitter;
 
-	}
+    }
 
-	/**
-	 * Notification message sendDate keyname.
-	 */
-	final public static String KEY_MSG_SENDDATE = "msgSendDate";
+    /**
+     * Notification message sendDate keyname.
+     */
+    final public static String KEY_MSG_SENDDATE = "msgSendDate";
 
 }

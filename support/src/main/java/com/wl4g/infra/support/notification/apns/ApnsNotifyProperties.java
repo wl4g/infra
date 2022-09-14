@@ -19,9 +19,9 @@ import com.wl4g.infra.support.notification.NotifyProperties;
 
 public class ApnsNotifyProperties implements NotifyProperties {
 
-	@Override
-	public void validate() {
+    @Override
+    public void validate() {
 
-	}
+    }
 
 }
