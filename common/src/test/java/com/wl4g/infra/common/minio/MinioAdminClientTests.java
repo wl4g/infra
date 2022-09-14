@@ -15,6 +15,12 @@
  */
 package com.wl4g.infra.common.minio;
 
+import static com.wl4g.infra.common.minio.S3Policy.Action.GetBucketLocationAction;
+import static com.wl4g.infra.common.minio.S3Policy.Action.GetBucketPolicyStatusAction;
+import static com.wl4g.infra.common.minio.S3Policy.Action.GetObjectAction;
+import static com.wl4g.infra.common.minio.S3Policy.Action.ListAllMyBucketsAction;
+import static com.wl4g.infra.common.minio.S3Policy.Action.ListBucketAction;
+import static com.wl4g.infra.common.minio.S3Policy.Action.PutObjectAction;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -58,8 +64,8 @@ public class MinioAdminClientTests {
             .statement(singletonList(Statement.builder()
                     .effect(EffectType.Allow)
                     // see:https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazons3.html#amazons3-actions-as-permissions
-                    .action(asList("s3:GetBucketLocation", "s3:GetBucketPolicyStatus", "s3:ListBucket", "s3:ListAllMyBuckets",
-                            "s3:GetObject", "s3:PutObject"))
+                    .action(asList(GetBucketLocationAction, GetBucketPolicyStatusAction, ListBucketAction, ListAllMyBucketsAction,
+                            PutObjectAction, GetObjectAction))
                     .resource(singletonList("arn:aws:s3:::" + TENANT_BUCKET + "/*"))
                     .build()))
             .build()

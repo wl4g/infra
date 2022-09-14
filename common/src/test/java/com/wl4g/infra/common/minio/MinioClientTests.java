@@ -22,6 +22,8 @@ import static com.wl4g.infra.common.minio.MinioAdminClientTests.SUPER_ADMIN_ACCE
 import static com.wl4g.infra.common.minio.MinioAdminClientTests.TENANT_ACCESSKEY;
 import static com.wl4g.infra.common.minio.MinioAdminClientTests.TENANT_BUCKET;
 import static com.wl4g.infra.common.minio.MinioAdminClientTests.TENANT_SECRETKEY;
+import static com.wl4g.infra.common.minio.S3Policy.Action.GetObjectAction;
+import static com.wl4g.infra.common.minio.S3Policy.Action.PutObjectAction;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -225,7 +227,7 @@ public class MinioClientTests {
                         // 授权资源标识
                         .resource(singletonList("arn:aws:s3:::" + TENANT_BUCKET + "/" + USER_PREFIX + "/*"))
                         // 授权操作标识
-                        // ===== [注]: =====
+                        // ========== [注]: ==========
                         // 必须要设置 s3:GetObject 权限, 因为 minio-js 的 putObject()
                         // 函数中会发送请求如:GET-http://localhost:9000/tenant1001/library/1.txt
                         // 来获取当前上传对象的分段信息. MinIO 源码分析参见:
@@ -235,7 +237,7 @@ public class MinioClientTests {
                         // see:https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1754
                         // see:https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1680
                         // see:https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1723
-                        .action(asList("s3:PutObject", "s3:GetObject"))
+                        .action(asList(PutObjectAction, GetObjectAction))
                         .build()))
                 .build();
         int durationSeconds = 5 * 60;
