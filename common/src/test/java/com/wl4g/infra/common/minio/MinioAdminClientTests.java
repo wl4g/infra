@@ -58,8 +58,8 @@ public class MinioAdminClientTests {
             .statement(singletonList(Statement.builder()
                     .effect(EffectType.Allow)
                     // see:https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazons3.html#amazons3-actions-as-permissions
-                    .action(asList("s3:GetBucketLocation", "s3:GetBucketPolicyStatus", "s3:ListBucket", "s3:GetObject",
-                            "s3:PutObject"))
+                    .action(asList("s3:GetBucketLocation", "s3:GetBucketPolicyStatus", "s3:ListBucket", "s3:ListAllMyBuckets",
+                            "s3:GetObject", "s3:PutObject"))
                     .resource(singletonList("arn:aws:s3:::" + TENANT_BUCKET + "/*"))
                     .build()))
             .build()

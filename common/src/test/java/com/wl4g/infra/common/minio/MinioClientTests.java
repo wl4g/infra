@@ -76,17 +76,6 @@ public class MinioClientTests {
 
     public static final String USER_POLICY_NAME = "tenant1001policy2";
 
-    @Test
-    public void testBucketExistsWithinVisiblePermissions() throws Exception {
-        MinioClient client = MinioClient.builder()
-                .endpoint(ENDPOINT)
-                .region(REGION)
-                .credentials(TENANT_ACCESSKEY, TENANT_SECRETKEY)
-                .build();
-        boolean exists = client.bucketExists(BucketExistsArgs.builder().bucket(TENANT_BUCKET).build());
-        System.out.println(exists);
-    }
-
     // MiniIO only super administrators can create buckets???
     @Test
     public void testCreateBucketWithSuperAdminIfNotExist() throws Exception {
@@ -98,6 +87,17 @@ public class MinioClientTests {
         if (!client.bucketExists(BucketExistsArgs.builder().bucket(TENANT_BUCKET).build())) {
             client.makeBucket(MakeBucketArgs.builder().bucket(TENANT_BUCKET).build());
         }
+    }
+
+    @Test
+    public void testBucketExistsWithinVisiblePermissions() throws Exception {
+        MinioClient client = MinioClient.builder()
+                .endpoint(ENDPOINT)
+                .region(REGION)
+                .credentials(TENANT_ACCESSKEY, TENANT_SECRETKEY)
+                .build();
+        boolean exists = client.bucketExists(BucketExistsArgs.builder().bucket(TENANT_BUCKET).build());
+        System.out.println(exists);
     }
 
     @Test
@@ -184,21 +184,21 @@ public class MinioClientTests {
      * <pre>
      * 前置条件:
      * 1. 在 MinIO 控制台新建存储桶 tenant1001
-     * 2. 在 MinIO 控制台新建策略 tenant1001policy1, 其策略值例如(对桶 tenant1001/ 下的所有对象授权了3种操作权限):
+     * 2. 在 MinIO 控制台新建策略 tenant1001policy1, 其策略值例如(对桶下路径 tenant1001/library/ 下的所有对象授权了3种操作权限):
      *    {
-     *        "Version": "2012-10-17", // 版本号固定值
+     *        "Version": "2012-10-17", // 版本号为固定值
      *        "Statement": [
      *            {
      *                "Effect": "Allow",
      *                "Action": [
      *                    "s3:GetBucketLocation",
-     *                    "s3:GetObject",
-     *                    "s3:PutObject",
      *                    "s3:ListBucket",
-     *                    "s3:GetBucketPolicyStatus"
+     *                    "s3:GetBucketPolicyStatus",
+     *                    "s3:GetObject",
+     *                    "s3:PutObject"
      *                ],
      *                "Resource": [
-     *                    "arn:aws:s3:::tenant1001/*"
+     *                    "arn:aws:s3:::tenant1001/library/*"
      *                ]
      *            }
      *        ]
@@ -222,9 +222,20 @@ public class MinioClientTests {
                 .version(S3Policy.DEFAULT_POLICY_VERSION)
                 .statement(singletonList(Statement.builder()
                         .effect(EffectType.Allow)
-                        .action(asList("s3:PutObject"))
-                        // 资源标识
+                        // 授权资源标识
                         .resource(singletonList("arn:aws:s3:::" + TENANT_BUCKET + "/" + USER_PREFIX + "/*"))
+                        // 授权操作标识
+                        // ===== [注]: =====
+                        // 必须要设置 s3:GetObject 权限, 因为 minio-js 的 putObject()
+                        // 函数中会发送请求如:GET-http://localhost:9000/tenant1001/library/1.txt
+                        // 来获取当前上传对象的分段信息. MinIO 源码分析参见:
+                        // see:https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/router.go#L95
+                        // see:https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/object-handler.go#L345
+                        // see:https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/auth-handler.go#L391
+                        // see:https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1754
+                        // see:https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1680
+                        // see:https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1723
+                        .action(asList("s3:PutObject", "s3:GetObject"))
                         .build()))
                 .build();
         int durationSeconds = 5 * 60;
