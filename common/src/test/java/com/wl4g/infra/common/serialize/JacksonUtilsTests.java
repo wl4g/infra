@@ -39,6 +39,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -143,7 +144,7 @@ public class JacksonUtilsTests {
     }
 
     //
-    // ----- Sub type parse. -----
+    // ----- Sub-type parse. -----
     //
 
     @Test
@@ -161,6 +162,7 @@ public class JacksonUtilsTests {
         TestVehicle vehicle1 = parseJSON(json1, TestVehicle.class);
         out.println("object: " + vehicle1);
         out.println("class: " + vehicle1.getClass());
+        Assertions.assertEquals(vehicle1.getType(), "car");
 
         out.println("-----------------");
 
@@ -168,6 +170,7 @@ public class JacksonUtilsTests {
         TestVehicle vehicle2 = parseJSON(json2, TestVehicle.class);
         out.println("object: " + vehicle2);
         out.println("class: " + vehicle2.getClass());
+        Assertions.assertEquals(vehicle2.getType(), "bicycle");
     }
 
     @Test
@@ -177,17 +180,21 @@ public class JacksonUtilsTests {
         });
         out.println("array vehicle: " + vehicles);
         out.println("class: " + vehicles.toString());
+        // Assertions.assertEquals(vehicles.get(0).getType(), "car");
     }
 
-    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
-    @JsonSubTypes({ @Type(value = TestCar.class, name = "car"), @Type(value = TestBicycle.class, name = "bicycle"), })
+    // 1.多态参见:https://swagger.io/docs/specification/data-models/inheritance-and-polymorphism/
+    // 2.对应swagger3注解,父类必须是抽象的，否则swagger3页面请求参数schemas展开后会以父类名重复展示3个.
+    @Schema(oneOf = { TestCar.class, TestBicycle.class }, discriminatorProperty = "@type")
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type", visible = true)
+    @JsonSubTypes({ @Type(value = TestCar.class, name = "car"), @Type(value = TestBicycle.class, name = "bicycle") })
     @Getter
     @Setter
     @SuperBuilder
     @ToString
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class TestVehicle {
+    public static abstract class TestVehicle {
         private String model;
         private @JsonProperty(value = "@type") String type;
     }
