@@ -23,11 +23,16 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.wl4g.infra.common.bridge.RpcContextHolderBridges;
 
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiModelProperty.AccessMode;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.annotations.ApiParam;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -48,9 +53,9 @@ import lombok.experimental.SuperBuilder;
 public abstract class BaseBean implements Serializable {
     private static final long serialVersionUID = 8940373806493080114L;
 
-    /**
-     * Unique primary key ID
-     */
+    // Hide when used as input parameter (ie add operation), not hidden when
+    // used as return parameter (ie query operation)
+    @Schema(hidden = false, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY)
     @ApiModelProperty(readOnly = true, accessMode = AccessMode.READ_ONLY)
     @ApiParam(readOnly = true, hidden = true)
     // Because feign remote call requires readability and writability, while
@@ -59,15 +64,16 @@ public abstract class BaseBean implements Serializable {
     // @JsonIgnoreProperties(allowGetters = true, allowSetters = true)
     private Long id;
 
-    private Integer enable;
+    private @NotNull @Min(0) @Max(1) Integer enable;
 
     /**
-     * for control queries data permission scope.
+     * For data permission scopes.
      */
     private String organizationCode;
 
     private String remark;
 
+    @Schema(hidden = false, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY)
     @ApiModelProperty(readOnly = true, accessMode = AccessMode.READ_ONLY)
     @ApiParam(readOnly = true, hidden = true)
     // Because feign remote call requires readability and writability, while
@@ -76,6 +82,7 @@ public abstract class BaseBean implements Serializable {
     // @JsonIgnoreProperties(allowGetters = true, allowSetters = false)
     private Long createBy;
 
+    @Schema(hidden = false, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(readOnly = true, accessMode = AccessMode.READ_ONLY)
     @ApiParam(readOnly = true, hidden = true)
@@ -85,6 +92,7 @@ public abstract class BaseBean implements Serializable {
     // @JsonIgnoreProperties(allowGetters = true, allowSetters = false)
     private Date createDate;
 
+    @Schema(hidden = false, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY)
     @ApiModelProperty(readOnly = true, accessMode = AccessMode.READ_ONLY)
     @ApiParam(readOnly = true, hidden = true)
     // Because feign remote call requires readability and writability, while
@@ -93,6 +101,7 @@ public abstract class BaseBean implements Serializable {
     // @JsonIgnoreProperties(allowGetters = true, allowSetters = false)
     private Long updateBy;
 
+    @Schema(hidden = false, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(readOnly = true, accessMode = AccessMode.READ_ONLY)
     @ApiParam(readOnly = true, hidden = true)
