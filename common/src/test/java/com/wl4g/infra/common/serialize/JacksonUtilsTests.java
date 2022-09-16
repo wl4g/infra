@@ -32,6 +32,7 @@ import java.util.Map;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -188,7 +189,7 @@ public class JacksonUtilsTests {
     @NoArgsConstructor
     public static class TestVehicle {
         private String model;
-        private String type;
+        private @JsonProperty(value = "@type") String type;
     }
 
     @Getter
