@@ -83,8 +83,6 @@ public class MinioClientTests {
     public static final String USER_PREFIX = "library";
     public static final String USER_OBJECT_NAME = "test1.txt";
 
-    public static final String USER_POLICY_NAME = "tenant1001policy2";
-
     // MiniIO only super administrators can create buckets???
     @Test
     public void testCreateBucketWithSuperAdminIfNotExist() throws Exception {
