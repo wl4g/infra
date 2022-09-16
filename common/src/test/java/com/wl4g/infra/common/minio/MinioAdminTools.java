@@ -63,11 +63,11 @@ public final class MinioAdminTools {
     public static final String DEFAULT_ADMIN_ACCESSKEY = "minioadmin";
     public static final String DEFAULT_ADMIN_SECRETKEY = "minioadmin";
 
-    public static final String DEFAULT_RENGINE_ACCESSKEY = "tenant01";
-    public static final String DEFAULT_RENGINE_SECRETKEY = "12345678";
-    public static final String DEFAULT_RENGINE_BUCKET = "tenant01";
+    public static final String DEFAULT_TENANT_ACCESSKEY = "tenant01";
+    public static final String DEFAULT_TENANT_SECRETKEY = "12345678";
+    public static final String DEFAULT_TENANT_BUCKET = DEFAULT_TENANT_ACCESSKEY;
 
-    public static final String DEFAULT_RENGINE_POLICY_NAME = "tenant1001_readwrite";
+    public static final String DEFAULT_TENANT_POLICY_NAME = DEFAULT_TENANT_ACCESSKEY + "_readwrite";
 
     public static void main(String[] args) throws Exception {
         CommandLineFacade line = CommandLineTool.builder()
@@ -75,10 +75,10 @@ public final class MinioAdminTools {
                 .option("r", "region", DEFAULT_REGION, "MinIO server region.")
                 .option("A", "adminAccessKey", DEFAULT_ADMIN_ACCESSKEY, "Admin accessKey.")
                 .option("S", "adminSecretKey", DEFAULT_ADMIN_SECRETKEY, "Admin secretKey.")
-                .option("a", "tenantAccessKey", DEFAULT_RENGINE_ACCESSKEY, "Tenant accessKey.")
-                .option("s", "tenantSecretKey", DEFAULT_RENGINE_SECRETKEY, "Tenant secretKey.")
-                .option("b", "tenantBucket", DEFAULT_RENGINE_BUCKET, "Tenant bucket.")
-                .option("n", "policyName", DEFAULT_RENGINE_POLICY_NAME, "Tenant policy name.")
+                .option("a", "tenantAccessKey", DEFAULT_TENANT_ACCESSKEY, "Tenant accessKey.")
+                .option("s", "tenantSecretKey", DEFAULT_TENANT_SECRETKEY, "Tenant secretKey.")
+                .option("b", "tenantBucket", DEFAULT_TENANT_BUCKET, "Tenant bucket.")
+                .option("n", "policyName", DEFAULT_TENANT_POLICY_NAME, "Tenant policy name.")
                 .option("j", "policyJson", null, "Tenant policy json.")
                 .build(args);
         String endpoint = line.get("e");
