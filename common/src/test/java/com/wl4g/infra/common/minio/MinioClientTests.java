@@ -225,18 +225,21 @@ public class MinioClientTests {
      * @see https://github.com/minio/minio/delete/8.4.3/docs/sts/client-grants.md
      */
     private Provider createSTSAssumeCredentialsProvider() throws Exception {
+        // 或使用: format("arn:aws:s3:::%s/%s/*", TENANT_BUCKET, USER_PREFIX);
+        String resource = format("arn:aws:s3:::%s/%s/%s", TENANT_BUCKET, USER_PREFIX, USER_OBJECT_NAME);
+
         /**
          * 为本次操作申请的最小权限策略, 最多可对桶
          * {@link MinioAdminClientTests#TENANT_POLICY_JSON} 申请
          * {@link MinioAdminClientTests#TENANT_POLICY_JSON} 种权限
          */
-        S3Policy applyPolicy = S3Policy.builder()
+        S3Policy applyStsPolicy = S3Policy.builder()
                 .version(S3Policy.DEFAULT_POLICY_VERSION)
                 .statement(singletonList(Statement.builder()
                         .effect(EffectType.Allow)
                         //
                         // 授权资源标识
-                        .resource(singletonList(format("arn:aws:s3:::%s/%s/*", TENANT_BUCKET, USER_PREFIX)))
+                        .resource(singletonList(resource))
                         //
                         // 授权操作标识
                         // ========== [注]: ==========
@@ -245,7 +248,9 @@ public class MinioClientTests {
                         // 会请求如:GET-http://localhost:9000/tenant1001/library/1.txt??uploads&delimiter=&max-uploads=1000&prefix=library%2F1.txt
                         // 当 region 为空时需要 s3:GetBucketLocation 权限
                         // 会请求获取上传分段信息如:GET-http://localhost:9000/tenant1001?location
-                        // MinIO 源码分析参见:
+                        // 参见源码:
+                        // see:https://github.com/minio/minio-js/blob/7.0.32/src/main/minio.js#L1212
+                        // see:https://github.com/minio/minio-js/blob/7.0.32/src/main/object-uploader.js#L75
                         // see:https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/router.go#L95
                         // see:https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/object-handler.go#L345
                         // see:https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/auth-handler.go#L391
@@ -261,7 +266,7 @@ public class MinioClientTests {
 
         // 获取有限权限的STS(临时)
         Provider provider = new AssumeRoleProvider(ENDPOINT, TENANT_ACCESSKEY, TENANT_SECRETKEY, durationSeconds,
-                applyPolicy.toString(), REGION, null, null, null, defaultHttpClient);
+                applyStsPolicy.toString(), REGION, null, null, null, defaultHttpClient);
         Credentials credentials = provider.fetch();
         System.out.println("assume sts accessKey:" + credentials.accessKey());
         System.out.println("assume sts secretKey:" + credentials.secretKey());
