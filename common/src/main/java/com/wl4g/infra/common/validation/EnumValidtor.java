@@ -20,6 +20,7 @@ import static com.wl4g.infra.common.reflect.ReflectionUtils2.getField;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.makeAccessible;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -48,7 +49,7 @@ public class EnumValidtor implements ConstraintValidator<EnumValue, Object> {
     }
 
     @Override
-    public boolean isValid(Object value, ConstraintValidatorContext context) { 
+    public boolean isValid(Object value, ConstraintValidatorContext context) {
         if (value != null && value.toString().length() > 0 && enumClass.length > 0) {
             for (Class<?> cl : enumClass) {
                 if (cl.isEnum()) {
@@ -64,15 +65,19 @@ public class EnumValidtor implements ConstraintValidator<EnumValue, Object> {
                             }
                         }
                         // 匹配枚举常量的属性值
-                        Field field = findField(cl, fieldName);
-                        makeAccessible(field);
-                        for (Object constant : constants) {
-                            Object fieldValue = getField(field, constant);
-                            if (nonNull(fieldValue)) {
-                                String fieldValueStr = fieldValue.toString();
-                                if (caseSensitive ? fieldValueStr.equals(value.toString())
-                                        : equalsIgnoreCase(fieldValueStr, value.toString())) {
-                                    return true;
+                        if (!isBlank(fieldName)) {
+                            Field field = findField(cl, fieldName);
+                            if (nonNull(field)) {
+                                makeAccessible(field);
+                                for (Object constant : constants) {
+                                    Object fieldValue = getField(field, constant);
+                                    if (nonNull(fieldValue)) {
+                                        String fieldValueStr = fieldValue.toString();
+                                        if (caseSensitive ? fieldValueStr.equals(value.toString())
+                                                : equalsIgnoreCase(fieldValueStr, value.toString())) {
+                                            return true;
+                                        }
+                                    }
                                 }
                             }
                         }

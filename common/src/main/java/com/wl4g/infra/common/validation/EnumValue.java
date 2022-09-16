@@ -47,5 +47,5 @@ public @interface EnumValue {
 
     Class<?>[] enumCls() default {};
 
-    String enumField() default "code";
+    String enumField() default "";
 }
