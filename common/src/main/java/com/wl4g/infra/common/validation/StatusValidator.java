@@ -13,48 +13,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.context.validation;
+package com.wl4g.infra.common.validation;
 
+import static com.wl4g.infra.common.lang.StringUtils2.eqIgnCase;
+import static java.util.Arrays.asList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-import java.text.ParseException;
+import java.util.List;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import org.apache.commons.lang3.time.DateUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
- * {@link DateValidator}
+ * {@link StatusValidator}
  * 
  * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
  * @version 2022-04-03 v3.0.0
  * @since v3.0.0
  */
-public class DateValidator implements ConstraintValidator<DateValue, String> {
+public class StatusValidator implements ConstraintValidator<StatusValue, String> {
 
     private Boolean required;
-    private String format;
+    private Boolean caseSensitive;
+    private List<String> options;
 
     @Override
-    public void initialize(DateValue constraintAnnotation) {
+    public void initialize(StatusValue constraintAnnotation) {
         this.required = constraintAnnotation.required();
-        this.format = constraintAnnotation.format();
+        this.caseSensitive = constraintAnnotation.caseSensitive();
+        this.options = asList(constraintAnnotation.options());
     }
 
     @Override
-    public boolean isValid(String dateValue, ConstraintValidatorContext context) {
-        if (isBlank(dateValue)) {
-            // If it is not a required parameter, it means legal.
-            return !required;
-        } else {
-            try {
-                // Check date format.
-                DateUtils.parseDate(dateValue, format);
-                return true;
-            } catch (ParseException e) {
+    public boolean isValid(String statusValue, ConstraintValidatorContext context) {
+        if (isBlank(statusValue)) {
+            if (required) {
                 return false;
+            } else {
+                return true;
             }
+        } else {
+            if (caseSensitive) {
+                return options.stream().anyMatch(o -> StringUtils.equals(o, statusValue));
+            }
+            return options.stream().anyMatch(o -> eqIgnCase(o, statusValue));
         }
     }
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.context.validation;
+package com.wl4g.infra.common.validation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -25,32 +25,35 @@ import javax.validation.Constraint;
 import javax.validation.Payload;
 
 /**
- * {@link DateValue}
+ * {@link PhoneValue}
  * 
  * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
  * @version 2022-04-03 v3.0.0
  * @since v3.0.0
  */
-@Constraint(validatedBy = DateValidator.class)
+@Constraint(validatedBy = PhoneValidator.class)
+@Documented
 @Target({ ElementType.FIELD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
-@Documented
-public @interface DateValue {
-
-    String message() default "Incorrect date format";
+public @interface PhoneValue {
+    String message() default "Mobile number format is incorrect";
 
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
 
-    String format() default "yyyy-MM-dd HH:mm:ss";
-
     boolean required() default true;
+
+    /**
+     * E.g:https://codingnconcepts.com/java/java-regex-to-validate-phone-number/
+     */
+    String regex() default "^(\\+\\d{1,3}( )?)?((\\(\\d{3}\\))|\\d{3})[- .]?\\d{3}[- .]?\\d{4}$";
 
     @Target({ ElementType.FIELD, ElementType.PARAMETER })
     @Retention(RetentionPolicy.RUNTIME)
     @Documented
     @interface List {
-        DateValue[] value();
+        PhoneValue[] value();
     }
+
 }

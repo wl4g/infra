@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.context.validation;
+package com.wl4g.infra.common.validation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -25,19 +25,19 @@ import javax.validation.Constraint;
 import javax.validation.Payload;
 
 /**
- * {@link StatusValue}
+ * {@link FlagValue}
  * 
  * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
  * @version 2022-04-03 v3.0.0
  * @since v3.0.0
  */
-@Constraint(validatedBy = StatusValidator.class)
+@Constraint(validatedBy = FlagValidator.class)
 @Target({ ElementType.FIELD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface StatusValue {
+public @interface FlagValue {
 
-    String message() default "Incorrect status identification";
+    String message() default "Incorrect flag identification. options(Y|N)";
 
     Class<?>[] groups() default {};
 
@@ -47,15 +47,10 @@ public @interface StatusValue {
 
     boolean caseSensitive() default false;
 
-    String[] options() default { ENABLED, DISABLED };
-
     @Target({ ElementType.FIELD, ElementType.PARAMETER })
     @Retention(RetentionPolicy.RUNTIME)
     @Documented
     @interface List {
-        StatusValue[] value();
+        FlagValue[] value();
     }
-
-    public static final String ENABLED = "enabled";
-    public static final String DISABLED = "disabled";
 }
