@@ -159,25 +159,25 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <scope>provided</scope>
+            <!-- <scope>provided</scope> -->
         </dependency>
         <!-- fix:Java 8 date/time type `java.time.Duration` not supported by default -->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
-            <scope>provided</scope>
+            <!-- <scope>provided</scope> -->
         </dependency>
         <!-- see:https://stackoverflow.com/questions/62170698/jaxb-and-java-11-module-info-java -->
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
             <artifactId>jakarta.xml.bind-api</artifactId>
             <!-- <version>2.3.3</version> -->
-            <scope>provided</scope>
+            <!-- <scope>provided</scope> -->
         </dependency>
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
-            <scope>runtime</scope>
+            <!-- <scope>provided</scope> -->
         </dependency>
         <!-- Swagger -->
         <dependency>
@@ -188,7 +188,7 @@
         <dependency>
             <groupId>io.swagger.core.v3</groupId>
             <artifactId>swagger-annotations</artifactId>
-            <scope>provided</scope>
+            <!-- <scope>provided</scope> -->
         </dependency>
         <!-- Compression's -->
         <dependency>
