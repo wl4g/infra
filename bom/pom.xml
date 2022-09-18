@@ -105,6 +105,8 @@
 		<ganymed-ssh2.version>262</ganymed-ssh2.version>
 		<sshd.version>2.8.0</sshd.version>
 		<sshj.version>0.27.0</sshj.version>
+		<!-- metrics -->
+		<micrometer.version>1.9.3</micrometer.version>
 		<!-- web compontens -->
 		<user-agent.version>1.2.4</user-agent.version>
 		<feign.version>10.12</feign.version>
@@ -127,7 +129,7 @@
 		<!-- <protobuf.version>2.5.0</protobuf.version> hbase-1.2.5 dependency -->
 		<protostuff.version>1.6.0</protostuff.version>
 		<!-- networking -->
-		<netty.version>4.1.76.Final</netty.version>
+		<netty.version>4.1.79.Final</netty.version>
 		<!-- cache -->
 		<jedis.version>3.6.1</jedis.version>
 		<lettuce.version>6.1.8.RELEASE</lettuce.version>
@@ -484,19 +486,25 @@
 				<artifactId>sshj</artifactId>
 				<version>${sshj.version}</version>
 			</dependency>
-			<!-- Web tool's. -->
+			<!-- Metrics. -->
+			 <dependency>
+              <groupId>io.micrometer</groupId>
+              <artifactId>micrometer-registry-prometheus</artifactId>
+     	      <version>${micrometer.version}</version>
+            </dependency>
+			<!-- Web tools. -->
 			<dependency>
 				<groupId>nl.bitwalker</groupId>
 				<artifactId>UserAgentUtils</artifactId>
 				<version>${user-agent.version}</version>
 			</dependency>
-			<!-- Compression's. -->
+			<!-- Compressions. -->
 			<dependency>
 				<groupId>org.xerial.snappy</groupId>
 				<artifactId>snappy-java</artifactId>
 				<version>${snappy.version}</version>
 			</dependency>
-			<!-- Excel/word's. -->
+			<!-- Excel/words. -->
 			<dependency>
 				<groupId>com.alibaba</groupId>
 				<artifactId>easyexcel</artifactId>

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.metrics;
+package com.wl4g.infra.common.metrics;
 
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.util.Arrays.asList;
@@ -21,9 +21,10 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import java.time.Duration;
 
+import javax.validation.constraints.NotNull;
+
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.mock.env.MockEnvironment;
 
 import com.wl4g.infra.common.net.InetUtils;
 import com.wl4g.infra.common.net.InetUtils.InetUtilsProperties;
@@ -49,34 +50,28 @@ import io.micrometer.prometheus.PrometheusMeterRegistry;
  * @since v1.0.0
  * @see https://www.baeldung.com/micrometer
  */
-public class MetricsFacadeTests {
+public class PrometheusMeterFacadeTests {
 
-    // Simulate spring to instantiated bean, the production environment should
-    // use spring injection.
-    private MetricsFacade metricsFacade;
+    private @NotNull PrometheusMeterFacade facade;
 
     @Before
     public void init() {
-        MockEnvironment env = new MockEnvironment();
-        env.setActiveProfiles("dev");
-        env.setProperty("server.ssl.enabled", "false");
-        env.setProperty("spring.application.name", "testApp");
-        env.setProperty("server.port", "8080");
         InetUtils inet = new InetUtils(new InetUtilsProperties());
-        this.metricsFacade = new MetricsFacade(env, new PrometheusMeterRegistry(PrometheusConfig.DEFAULT), inet);
+        this.facade = new PrometheusMeterFacade(new PrometheusMeterRegistry(PrometheusConfig.DEFAULT), "testApp", false, inet,
+                8080);
     }
 
     @Test
     public void testNewConstructor() {
         Meter.Id id = new Meter.Id("test_metric1", Tags.empty(), "", "Nothing", Type.COUNTER);
-        PrometheusCounter counter = MetricsFacade.newConstructor(PrometheusCounter.class, id);
+        PrometheusCounter counter = PrometheusMeterFacade.newConstructor(PrometheusCounter.class, id);
         System.out.println(counter);
     }
 
     @Test
     public void testUseCounter() {
         // Gets or create counter by metrics name and tags.
-        Counter counter = metricsFacade.counter("test_metric2", "", "key1", "value1");
+        Counter counter = facade.counter("test_metric2", "", "key1", "value1");
 
         // increment by 1
         counter.increment(1);
@@ -88,7 +83,7 @@ public class MetricsFacadeTests {
     @Test
     public void testUseTimer() {
         // Gets or create timer by metrics name and tags.
-        Timer timer = metricsFacade.timer("test_metric3", "", new double[] { 0.3, 0.5, 0.9, 0.95 }, "key1", "value1");
+        Timer timer = facade.timer("test_metric3", "", new double[] { 0.3, 0.5, 0.9, 0.95 }, "key1", "value1");
 
         // For the convenience of calculation, the test data set are all
         // integers.
@@ -133,14 +128,14 @@ public class MetricsFacadeTests {
     public void testUseGauge() {
         // Gets or create gauge by metrics name and tags, and record statistics
         // value.
-        Gauge gauge = metricsFacade.gauge("test_metric4", "", 100.123d, "key1", "value1");
+        Gauge gauge = facade.gauge("test_metric4", "", 100.123d, "key1", "value1");
         System.out.println(gauge);
     }
 
     @Test
     public void testUseSummary() {
         // Gets or create distribution summary by metrics name and tags.
-        DistributionSummary summary = metricsFacade.summary("test_metric5", "", 1d, new double[] { 0.2, 0.5, 0.9, 0.95 }, "key1",
+        DistributionSummary summary = facade.summary("test_metric5", "", 1d, new double[] { 0.2, 0.5, 0.9, 0.95 }, "key1",
                 "value1");
 
         // statistics cost time
@@ -181,8 +176,7 @@ public class MetricsFacadeTests {
     @Test
     public void testUseSummary2() {
         // Gets or create distribution summary by metrics name and tags.
-        DistributionSummary summary = metricsFacade.summarySlos("test_metric5", "", 0.1d, new double[] { 1, 10, 5 }, "key1",
-                "value1");
+        DistributionSummary summary = facade.summarySlos("test_metric5", "", 0.1d, new double[] { 1, 10, 5 }, "key1", "value1");
 
         // statistics cost time
         summary.record(301.133d);
@@ -219,7 +213,7 @@ public class MetricsFacadeTests {
 
         // Gets or create distribution summary by configuration.
         Meter.Id id = new Meter.Id("test_metric6", Tags.empty(), "", "Nothing", Type.DISTRIBUTION_SUMMARY);
-        DistributionSummary summary = metricsFacade.summary(id, dsconfig, 0.1d);
+        DistributionSummary summary = facade.summary(id, dsconfig, 0.1d);
 
         // statistics cost time
         summary.record(300.123d);

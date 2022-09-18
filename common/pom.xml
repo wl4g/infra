@@ -129,6 +129,11 @@
             <groupId>io.protostuff</groupId>
             <artifactId>protostuff-runtime</artifactId>
         </dependency>
+        <dependency>
+          <groupId>io.micrometer</groupId>
+          <artifactId>micrometer-registry-prometheus</artifactId>
+          <scope>provided</scope>
+        </dependency>
         <!-- User Agent -->
         <dependency>
             <groupId>nl.bitwalker</groupId>
@@ -190,7 +195,7 @@
             <artifactId>swagger-annotations</artifactId>
             <!-- <scope>provided</scope> -->
         </dependency>
-        <!-- Compression's -->
+        <!-- Compression -->
         <dependency>
             <groupId>org.xerial.snappy</groupId>
             <artifactId>snappy-java</artifactId>
@@ -213,7 +218,7 @@
             <artifactId>sshj</artifactId>
             <!-- @see com.wl4g.infra.common.cli.ssh2.SSH2Holders#getDefault() -->
         </dependency>
-        <!-- Ethz SSH2 -->
+        <!-- Ethz -->
         <dependency>
             <groupId>ch.ethz.ganymed</groupId>
             <artifactId>ganymed-ssh2</artifactId>
