@@ -37,8 +37,6 @@ import static java.util.Collections.singletonList;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
@@ -57,7 +55,6 @@ import io.minio.credentials.Provider;
 import io.minio.errors.ErrorResponseException;
 import io.minio.messages.Bucket;
 import okhttp3.OkHttpClient;
-import okhttp3.Protocol;
 
 /**
  * {@link MinioClientTests}
@@ -68,16 +65,10 @@ import okhttp3.Protocol;
  */
 public class MinioClientTests {
 
-    // public static final OkHttpClient defaultHttpClient =
-    // io.minio.http.HttpUtils.newDefaultHttpClient(15_000, 15_000, 15_000);
-    public static final OkHttpClient defaultHttpClient = new OkHttpClient().newBuilder()
-            .connectTimeout(15_000, TimeUnit.MILLISECONDS)
-            .writeTimeout(15_000, TimeUnit.MILLISECONDS)
-            .readTimeout(15_000, TimeUnit.MILLISECONDS)
-            .protocols(Arrays.asList(Protocol.HTTP_1_1))
-            // .proxy(new java.net.Proxy(java.net.Proxy.Type.SOCKS, new
-            // java.net.InetSocketAddress("localhost", 8889)))
-            .build();
+    public static final OkHttpClient defaultHttpClient = OkHttpClientConfig.builder()
+            // .proxy(OkHttpClientConfig.DEFAULT_PROXY)
+            .build()
+            .newOkHttpClient();
 
     // STS temporary user
     public static final String USER_PREFIX = "library";

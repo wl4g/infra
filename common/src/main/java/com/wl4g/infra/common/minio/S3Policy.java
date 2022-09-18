@@ -254,9 +254,9 @@ public class S3Policy {
         private final String value;
 
         @JsonCreator
-        public static Action actionCreate(String action) {
+        public static Action of(String action) {
             for (Action a : values()) {
-                if (a.getValue().equalsIgnoreCase(action)) {
+                if (a.getValue().equals(action)) {
                     return a;
                 }
             }
