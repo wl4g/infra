@@ -16,17 +16,83 @@
 package com.wl4g.infra.common.lang;
 
 import static com.wl4g.infra.common.lang.Assert2.isAssignable;
+import static com.wl4g.infra.common.lang.Assert2.notNull;
+
+import org.junit.Test;
 
 public class AssertTests {
 
-    public static void main(String[] args) {
-        // isTrue(false, IllegalArgumentException.class, "Failed to for aa=%s",
+    @Test
+    public void testIncompatible() {
+        try {
+            isAssignable(int.class, String.class, "Incompatible types");
+        } catch (IllegalArgumentException e) {
+            // success
+        }
+        // isTrue(false, IllegalArgumentException.class, "Failed to for
+        // aa=%s",
         // "11");
-        // notNull(null, IllegalArgumentException.class, "Must be not null");
-        // hasText(null, IllegalArgumentException.class, "Must be not empty");
+        // notNull(null, IllegalArgumentException.class, "Must be not
+        // null");
+        // hasText(null, IllegalArgumentException.class, "Must be not
+        // empty");
         // isInstanceOf(String.class, new Object(), "Must be not empty");
-        isAssignable(int.class, String.class, "Incompatible types");
+    }
 
+    @Test
+    public void testAssertionWithExceptionClassSuccess() {
+        Object obj = null;
+        try {
+            notNull(obj, MyRuntimeException1.class, "Failed to xxx1");
+            throw new IllegalStateException("Assertion failed");
+        } catch (MyRuntimeException1 | IllegalArgumentException e) {
+            // success
+            System.out.println("Assertion Result: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testAssertionWithExceptionClassFailure() {
+        try {
+            Object obj = null;
+            notNull(obj, MyRuntimeException2.class, "Failed to xxx2");
+        } catch (Error e) {
+            // success
+            System.out.println("Assertion Result: " + e.getMessage());
+        } catch (Throwable e) {
+            // failure
+            throw e;
+        }
+    }
+
+    public static class MyRuntimeException1 extends RuntimeException {
+        private static final long serialVersionUID = 5430673385973945882L;
+        private String name;
+
+        public MyRuntimeException1() {
+            super();
+        }
+
+        public MyRuntimeException1(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+    }
+
+    public static class MyRuntimeException2 extends RuntimeException {
+        private static final long serialVersionUID = 5430673385973945181L;
+        private final String name;
+
+        public MyRuntimeException2(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
     }
 
 }

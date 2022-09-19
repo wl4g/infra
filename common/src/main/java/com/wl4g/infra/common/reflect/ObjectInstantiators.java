@@ -15,6 +15,7 @@
  */
 package com.wl4g.infra.common.reflect;
 
+import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 
 import java.lang.reflect.Constructor;
@@ -39,13 +40,19 @@ public abstract class ObjectInstantiators {
      */
     @SuppressWarnings("unchecked")
     public static <T> T newInstance(Class<T> objectClass) {
-        try {
-            if (!Objects.isNull(objenesis)) {
+        if (!Objects.isNull(objenesis)) {
+            try {
                 return (T) objenesisStdNewInstanceMethod.invoke(objenesis, new Object[] { objectClass });
+            } catch (Exception ex) {
+                throw new Error("Unexpected reflection exception - " + ex.getClass().getName() + ": " + ex.getMessage());
             }
+        }
+        try {
             return (T) objectClass.newInstance();
-        } catch (Exception ex) {
-            throw new Error("Unexpected reflection exception - " + ex.getClass().getName() + ": " + ex.getMessage());
+        } catch (IllegalAccessException e) {
+            throw new Error(format("Instantiate class without access: %s", objectClass));
+        } catch (InstantiationException e) {
+            throw new Error(format("Cannot instantiate class without default constructor: %s", objectClass));
         }
     }
 

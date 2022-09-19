@@ -15,6 +15,13 @@
  */
 package com.wl4g.infra.common.lang;
 
+import static java.lang.Math.max;
+import static java.lang.String.format;
+import static java.lang.System.getenv;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.startsWithAny;
+import static org.apache.commons.lang3.SystemUtils.JAVA_VERSION;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,11 +31,10 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
-import com.wl4g.infra.common.reflect.ObjectInstantiators;
 
-import static com.wl4g.infra.common.lang.StringUtils2.*;
-import static java.lang.Math.max;
-import static java.lang.String.format;
+import org.apache.commons.lang3.StringUtils;
+
+import com.wl4g.infra.common.reflect.ObjectInstantiators;
 
 /**
  * Assertion utility class that assists in validating arguments.
@@ -1397,16 +1403,36 @@ public abstract class Assert2 {
         return (messageSupplier != null ? messageSupplier.get() : null);
     }
 
+    private static void doWrapException(Class<? extends RuntimeException> exceptionClass, String fmtMessage, Object... args) {
+        //
+        // The in the environment of Quarkus2.12+java16, although I tried to
+        // increase the --add-opens JVM arguments, it still failed (no private
+        // access permit), so for compatibility support fallback processing.
+        // see:https://stackoverflow.com/questions/69631653/quarkus-optaplanner-illegal-reflective-call
+        //
+        if (ENABLE_WRAP_EXCEPTION_WITH_REFLECTION) {
+            doWrapExceptionReflection(exceptionClass, fmtMessage, args);
+        } else {
+            doWrapExceptionWithJava9PlusFallback(exceptionClass, fmtMessage, args);
+        }
+    }
+
     /**
-     * Do wrap assertion exception.
+     * The in the environment of Quarkus2.12+java16, although I tried to
+     * increase the --add-opens JVM arguments, it still failed (no private
+     * access permit), so for compatibility support fallback processing.
+     * see:https://stackoverflow.com/questions/69631653/quarkus-optaplanner-illegal-reflective-call
      * 
      * @param exceptionClass
      * @param fmtMessage
      * @param args
      */
-    private static void doWrapException(Class<? extends RuntimeException> exceptionClass, String fmtMessage, Object... args) {
+    private static void doWrapExceptionReflection(
+            Class<? extends RuntimeException> exceptionClass,
+            String fmtMessage,
+            Object... args) {
         RuntimeException th = newRuntimeExceptionInstance(exceptionClass);
-        // Init cause message
+        // Initializing cause message
         try {
             detailMessageField.set(th, ASSERT_FAILED_PREFIX.concat(doFormat(fmtMessage, args)));
         } catch (Exception ex) {
@@ -1416,7 +1442,7 @@ public abstract class Assert2 {
 
         // Remove useless stack elements
         StackTraceElement[] stackEles = th.getStackTrace();
-        List<StackTraceElement> availableStackEles = new ArrayList<>(max(stackEles.length - 4, 4));
+        List<StackTraceElement> availableStackEles = new ArrayList<>(max(stackEles.length - 5, 5));
         for (int i = 0, j = 0; i < stackEles.length; i++) {
             StackTraceElement st = stackEles[i];
             if (j == 0) {
@@ -1426,8 +1452,30 @@ public abstract class Assert2 {
                 availableStackEles.add(st);
         }
         th.setStackTrace(availableStackEles.toArray(new StackTraceElement[] {}));
-
         throw th;
+    }
+
+    private static void doWrapExceptionWithJava9PlusFallback(
+            Class<? extends RuntimeException> exceptionClass,
+            String fmtMessage,
+            Object... args) {
+        final String errmsg = doFormat(fmtMessage, args);
+        // RuntimeException th = null;
+        // try {
+        // Constructor<? extends RuntimeException> constructor =
+        // exceptionClass.getConstructor(Throwable.class);
+        // if (nonNull(constructor)) {
+        // th = constructor.newInstance(new IllegalArgumentException(errmsg));
+        // }
+        // } catch (InstantiationException | IllegalAccessException |
+        // IllegalArgumentException | InvocationTargetException
+        // | NoSuchMethodException ex) {
+        // throw new Error(
+        // "Unexpected reflection exception -
+        // ".concat(ex.getClass().getName()).concat(":
+        // ").concat(ex.getMessage()));
+        // }
+        throw new IllegalArgumentException(errmsg); // Fallback
     }
 
     /**
@@ -1441,21 +1489,30 @@ public abstract class Assert2 {
     }
 
     /**
+     * Enable reflection to automatically wrap exceptions. </br>
+     * e.g: 1.8.0_281 / 11.0.10 / 15.0.1
+     */
+    private static final boolean ENABLE_WRAP_EXCEPTION_WITH_REFLECTION = StringUtils2.isTrue(
+            getenv("ENABLE_WRAP_EXCEPTION_WITH_REFLECTION"), false) && startsWithAny(JAVA_VERSION, "1.5", "1.6", "1.7", "1.8");
+
+    /**
      * @see new IllegalArgumentException("[Assertion failed] - xxx required");
      */
-    final private static String ASSERT_FAILED_PREFIX = "[AF] - ";
-    final private static String NEW_RUNTIMEEXCEPTION_INSTANCE_METHOD = Assert2.class.getName() + "#newRuntimeExceptionInstance";
-    final private static Field detailMessageField;
-    final private static Field causeField;
+    private static String ASSERT_FAILED_PREFIX = "[AF] - ";
+    private static String NEW_RUNTIMEEXCEPTION_INSTANCE_METHOD = Assert2.class.getName() + "#newRuntimeExceptionInstance";
+    private static Field detailMessageField;
+    private static Field causeField;
 
     static {
-        try {
-            detailMessageField = Throwable.class.getDeclaredField("detailMessage");
-            causeField = Throwable.class.getDeclaredField("cause");
-            detailMessageField.setAccessible(true);
-            causeField.setAccessible(true);
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
+        if (ENABLE_WRAP_EXCEPTION_WITH_REFLECTION) {
+            try {
+                detailMessageField = Throwable.class.getDeclaredField("detailMessage");
+                causeField = Throwable.class.getDeclaredField("cause");
+                detailMessageField.setAccessible(true);
+                causeField.setAccessible(true);
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
+            }
         }
     }
 
