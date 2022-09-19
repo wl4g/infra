@@ -16,27 +16,13 @@
 package com.wl4g.infra.common.web.rest;
 
 import static com.wl4g.infra.common.lang.Assert2.hasText;
-import static com.wl4g.infra.common.lang.Assert2.state;
 import static com.wl4g.infra.common.lang.Exceptions.getRootCausesString;
-import static com.wl4g.infra.common.remoting.standard.HttpStatus.BAD_REQUEST;
-import static com.wl4g.infra.common.remoting.standard.HttpStatus.EXPECTATION_FAILED;
-import static com.wl4g.infra.common.remoting.standard.HttpStatus.FORBIDDEN;
-import static com.wl4g.infra.common.remoting.standard.HttpStatus.LOCKED;
-import static com.wl4g.infra.common.remoting.standard.HttpStatus.NOT_FOUND;
-import static com.wl4g.infra.common.remoting.standard.HttpStatus.NOT_IMPLEMENTED;
-import static com.wl4g.infra.common.remoting.standard.HttpStatus.PRECONDITION_FAILED;
-import static com.wl4g.infra.common.remoting.standard.HttpStatus.SERVICE_UNAVAILABLE;
-import static com.wl4g.infra.common.remoting.standard.HttpStatus.UNAUTHORIZED;
-import static com.wl4g.infra.common.remoting.standard.HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS;
 import static com.wl4g.infra.common.serialize.JacksonUtils.convertBean;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
-import static com.wl4g.infra.common.web.rest.RespBase.RetCode.newCode;
 import static java.lang.String.format;
+import static java.lang.System.currentTimeMillis;
 import static java.lang.System.getProperty;
-import static java.lang.reflect.Modifier.isFinal;
-import static java.lang.reflect.Modifier.isStatic;
 import static java.util.Collections.emptyMap;
-import static java.util.Collections.unmodifiableMap;
 import static java.util.Locale.US;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -45,10 +31,6 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -56,8 +38,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.annotations.Beta;
 import com.wl4g.infra.common.annotation.Stable;
 import com.wl4g.infra.common.collection.CollectionUtils2;
-import com.wl4g.infra.common.lang.FastTimeClock;
 import com.wl4g.infra.common.remoting.standard.HttpStatus;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * Generic restful response base model wrapper.
@@ -71,10 +55,10 @@ import com.wl4g.infra.common.remoting.standard.HttpStatus;
 public class RespBase<D> implements Serializable {
     private static final long serialVersionUID = 2647155468624590650L;
 
-    private RetCode code = RetCode.OK;
+    private RetCodeSpec code = RetCode.OK;
     private String status = DEFAULT_STATUS; // [Extensible]
     private String requestId = DEFAULT_REQUESTID; // [Extensible]
-    private Long timestamp = FastTimeClock.currentTimeMillis();
+    private Long timestamp = currentTimeMillis();
     private String message = EMPTY;
     @SuppressWarnings("unchecked")
     private D data = (D) DEFAULT_DATA;
@@ -83,7 +67,7 @@ public class RespBase<D> implements Serializable {
         this(null);
     }
 
-    public RespBase(RetCode retCode) {
+    public RespBase(RetCodeSpec retCode) {
         this(retCode, null);
     }
 
@@ -91,15 +75,15 @@ public class RespBase<D> implements Serializable {
         this(null, data);
     }
 
-    public RespBase(RetCode retCode, D data) {
+    public RespBase(RetCodeSpec retCode, D data) {
         this(retCode, null, data);
     }
 
-    public RespBase(RetCode retCode, String message, D data) {
+    public RespBase(RetCodeSpec retCode, String message, D data) {
         this(retCode, null, message, data);
     }
 
-    public RespBase(RetCode retCode, String status, String message, D data) {
+    public RespBase(RetCodeSpec retCode, String status, String message, D data) {
         setCode(retCode);
         setStatus(status);
         setMessage(message);
@@ -116,24 +100,24 @@ public class RespBase<D> implements Serializable {
     }
 
     /**
-     * Sets response code of {@link RetCode}.
+     * Sets response code of {@link RetCodeSpec}.
      * 
      * @param retCode
      */
-    public void setCode(RetCode retCode) {
+    public void setCode(RetCodeSpec retCode) {
         if (nonNull(retCode)) {
-            this.code = (RetCode) retCode;
+            this.code = (RetCodeSpec) retCode;
         }
     }
 
     /**
-     * Sets response code of {@link RetCode}.
+     * Sets response code of {@link RetCodeSpec}.
      * 
      * @param retCode
      * @return
      */
     @JsonIgnore
-    public RespBase<D> withCode(RetCode retCode) {
+    public RespBase<D> withCode(RetCodeSpec retCode) {
         setCode(retCode);
         return this;
     }
@@ -144,7 +128,7 @@ public class RespBase<D> implements Serializable {
      * @param retCode
      */
     public void setCode(int retCode) {
-        this.code = newCode(retCode);
+        this.code = RetCodeSpec.newSpec(retCode, null);
     }
 
     /**
@@ -452,7 +436,7 @@ public class RespBase<D> implements Serializable {
      * @param th
      * @return
      */
-    public static final RetCode getRestfulCode(Throwable th) {
+    public static final RetCodeSpec getRestfulCode(Throwable th) {
         return getRestfulCode(th, null);
     }
 
@@ -468,7 +452,7 @@ public class RespBase<D> implements Serializable {
      * @see {@link InvalidParametersException}
      * @see {@link ServiceUnavailableException}
      */
-    public static final RetCode getRestfulCode(Throwable th, RetCode defaultCode) {
+    public static final RetCodeSpec getRestfulCode(Throwable th, RetCodeSpec defaultCode) {
         if (nonNull(th) && (th instanceof RESTfulException)) {
             return ((RESTfulException) th).getCode();
         }
@@ -511,7 +495,7 @@ public class RespBase<D> implements Serializable {
      * @param retCode
      * @return
      */
-    public static final boolean eq(RespBase<?> resp, RetCode retCode) {
+    public static final boolean eq(RespBase<?> resp, RetCodeSpec retCode) {
         return !isNull(resp) && retCode.getErrcode() == resp.getCode();
     }
 
@@ -637,62 +621,91 @@ public class RespBase<D> implements Serializable {
             putAll(m);
             return this;
         }
-
     }
 
     /**
-     * HTTP response code definitions. </br>
+     * Response code specification. </br>
      * 
-     * @author wangl.sir
-     * @version v1.0 2019年1月10日
-     * @since
+     * @author James Wong
+     * @version 2022-09-19
+     * @since v3.0.0
      * @see <a href="https://www.ietf.org/rfc/rfc2616.txt">RFC1216</a>
      * @see <a href=
      *      "https://tools.ietf.org/html/rfc2324#section-2.3.2">RFC2314</a>
      */
-    public abstract static class RetCode {
+    public static interface RetCodeSpec {
+
+        /**
+         * Errors code.
+         */
+        int getErrcode();
+
+        /**
+         * Errors message.
+         */
+        String getErrmsg();
+
+        public static RetCodeSpec newSpec(int errcode, String errmsg) {
+            return new RetCodeSpec() {
+                @Override
+                public int getErrcode() {
+                    return errcode;
+                }
+
+                @Override
+                public String getErrmsg() {
+                    return errmsg;
+                }
+            };
+        }
+    }
+
+    /**
+     * Default response code definitions. </br>
+     * 
+     * @author James Wong
+     * @version 2022-09-19
+     * @since v3.0.0
+     */
+    @Getter
+    @AllArgsConstructor
+    public static enum RetCode implements RetCodeSpec {
 
         /**
          * Successful code </br>
          * {@link HttpStatus.OK}
          */
-        public static final RetCode OK = new RetCode(HttpStatus.OK.value(), "Ok") {
-        };
+        OK(HttpStatus.OK.value(), "Ok"),
 
         /**
          * Parameter error </br>
          * {@link HttpStatus.BAD_REQUEST}
          */
-        public static final RetCode BAD_PARAMS = new RetCode(BAD_REQUEST.value(), "Bad parameters") {
-        };
+        BAD_PARAMS(HttpStatus.BAD_REQUEST.value(), "Bad parameters"),
 
         /**
          * Unauthenticated </br>
          * {@link HttpStatus.UNAUTHORIZED}
          */
-        public static final RetCode UNAUTHC = new RetCode(UNAUTHORIZED.value(), "Unauthenticated") {
-        };
+        UNAUTHC(HttpStatus.UNAUTHORIZED.value(), "Unauthenticated"),
 
         /**
          * Unauthorized </br>
          * {@link HttpStatus.FORBIDDEN}
          */
-        public static final RetCode UNAUTHZ = new RetCode(FORBIDDEN.value(), "Unauthorized") {
-        };
+        UNAUTHZ(HttpStatus.FORBIDDEN.value(), "Unauthorized"),
 
         /**
          * Not found </br>
          * {@link HttpStatus.NOT_FOUND}
          */
-        public static final RetCode NOT_FOUND_ERR = new RetCode(NOT_FOUND.value(), "Not found") {
-        };
+        NOT_FOUND_ERR(HttpStatus.NOT_FOUND.value(), "Not found"),
 
         /**
          * Business constraints </br>
          * {@link HttpStatus.NOT_IMPLEMENTED}
          */
-        public static final RetCode BIZ_ERR = new RetCode(EXPECTATION_FAILED.value(), "Business restricted") {
-        };
+        BIZ_ERR(HttpStatus.EXPECTATION_FAILED.value(), "Business restricted"),
 
         /**
          * Business locked constraints </br>
@@ -700,48 +713,31 @@ public class RespBase<D> implements Serializable {
          * 
          * @see <a href="https://httpstatusdogs.com/423-locked">423-Locked</a>
          */
-        public static final RetCode LOCKD_ERR = new RetCode(LOCKED.value(), "Resources locked") {
-        };
+        LOCKD_ERR(HttpStatus.LOCKED.value(), "Resources locked"),
 
         /**
          * Precondition limited </br>
          * {@link HttpStatus.PRECONDITION_FAILED}
          */
-        public static final RetCode PRECONDITITE_LIMITED = new RetCode(PRECONDITION_FAILED.value(), "Precondition limited") {
-        };
+        PRECONDITITE_LIMITED(HttpStatus.PRECONDITION_FAILED.value(), "Precondition limited"),
 
         /**
          * Unsuppported </br>
          * {@link HttpStatus.NOT_IMPLEMENTED}
          */
-        public static final RetCode UNSUPPORTED = new RetCode(NOT_IMPLEMENTED.value(), "Unsuppported") {
-        };
+        UNSUPPORTED(HttpStatus.NOT_IMPLEMENTED.value(), "Unsuppported"),
 
         /**
          * System abnormality </br>
          * {@link HttpStatus.SERVICE_UNAVAILABLE}
          */
-        public static final RetCode SYS_ERR = new RetCode(SERVICE_UNAVAILABLE.value(),
-                "Service unavailable, please try again later") {
-        };
+        SYS_ERR(HttpStatus.SERVICE_UNAVAILABLE.value(), "Service unavailable, please try again later"),
 
         /**
          * Unavailable For Legal Reasons </br>
          * {@link HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS}
          */
-        public static final RetCode LEGAL_ERR = new RetCode(UNAVAILABLE_FOR_LEGAL_REASONS.value(),
-                "Not available for legal reasons") {
-        };
-
-        /**
-         * Name to {@link RetCode} value definitions.
-         */
-        private static final Map<String, RetCode> internalNameValues;
-
-        /**
-         * Code to {@link RetCode} value definitions.
-         */
-        private static final Map<Integer, RetCode> internalCodeValues;
+        LEGAL_ERR(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS.value(), "Not available for legal reasons");
 
         /**
          * Errors code.
@@ -753,124 +749,9 @@ public class RespBase<D> implements Serializable {
          */
         private final String errmsg;
 
-        private RetCode(int errcode, String errmsg) {
-            // hasTextOf(errmsg, "errmsg");
-            this.errcode = errcode;
-            this.errmsg = errmsg;
+        public static RetCodeSpec newCode(int errcode, String errmsg) {
+            return RetCodeSpec.newSpec(errcode, errmsg);
         }
-
-        /**
-         * Get error code.</br>
-         * If custom status code ({@link #_$$}) is used, it takes precedence.
-         * 
-         * @return
-         */
-        public final int getErrcode() {
-            return errcode;
-        }
-
-        /**
-         * Get error message.</br>
-         * If custom status error message ({@link #_$$}) is used, it takes
-         * precedence.
-         * 
-         * @return
-         */
-        public final String getErrmsg() {
-            return errmsg;
-        }
-
-        /**
-         * Case insensitive handling of JACKSON mapping enumeration.
-         * 
-         * <a href=
-         * "https://www.cnblogs.com/chyu/p/9177140.htmlhttps://www.cnblogs.com/chyu/p/9177140.html">See</a>
-         * 
-         * @param value
-         * @return
-         */
-        public static final RetCode of(String nameOrCode) {
-            RetCode retCode = safeOf(nameOrCode);
-            if (nonNull(retCode)) {
-                return retCode;
-            }
-            throw new IllegalArgumentException(format("'%s'", nameOrCode));
-        }
-
-        /**
-         * Safe convert retCode.
-         * 
-         * @param nameOrCode
-         * @return
-         */
-        public static final RetCode safeOf(Object nameOrCode) {
-            if (isNull(nameOrCode)) {
-                return null;
-            }
-            RetCode retCode = internalNameValues.get(nameOrCode);
-            if (isNull(retCode)) {
-                return internalCodeValues.get(nameOrCode);
-            }
-            return retCode;
-        }
-
-        /**
-         * New create custom status code
-         * 
-         * @param errcode
-         * @return
-         */
-        public static final RetCode newCode(int errcode) {
-            return new RetCode(errcode, null) {
-            };
-        }
-
-        /**
-         * New create custom status code
-         * 
-         * @param errcode
-         * @param errmsg
-         * @return
-         */
-        public static final RetCode newCode(int errcode, String errmsg) {
-            return new RetCode(errcode, errmsg) {
-            };
-        }
-
-        /**
-         * Register defaults instance definitions.
-         * 
-         * @return
-         */
-        static {
-            try {
-                final Map<String, RetCode> nameValueMap = new HashMap<>();
-                final Map<Integer, RetCode> codeValueMap = new HashMap<>();
-                for (Field f : RetCode.class.getDeclaredFields()) {
-                    if (isStatic(f.getModifiers()) && isFinal(f.getModifiers()) && f.getType() == RetCode.class) {
-                        AccessController.doPrivileged(new PrivilegedAction<Void>() {
-                            @Override
-                            public Void run() {
-                                f.setAccessible(true);
-                                return null;
-                            }
-                        });
-
-                        Object fObj = f.get(null);
-                        if (fObj instanceof RetCode) {
-                            RetCode retCode = (RetCode) f.get(null);
-                            state(isNull(nameValueMap.putIfAbsent(f.getName(), retCode)), "");
-                            state(isNull(codeValueMap.putIfAbsent(retCode.getErrcode(), retCode)), "");
-                        }
-                    }
-                }
-                internalNameValues = unmodifiableMap(nameValueMap);
-                internalCodeValues = unmodifiableMap(codeValueMap);
-            } catch (Exception ex) {
-                throw new IllegalStateException("", ex);
-            }
-        }
-
     }
 
     /**
@@ -888,7 +769,7 @@ public class RespBase<D> implements Serializable {
          * 
          * @see {@link com.wl4g.infra.common.web.rest.RespBase#globalErrPrefix()}
          */
-        private static String errorPrompt = getProperty("spring.infra.dopaas.component.resp-base.error-prompt", "API");
+        private static String errorPrompt = getProperty("spring.infra.common.respbase.error-prompt", "API");
 
         /**
          * Building error message with prefix.
@@ -897,7 +778,7 @@ public class RespBase<D> implements Serializable {
          * @param errmsg
          * @return
          */
-        static final String build(RetCode retCode, String errmsg) {
+        static final String build(RetCodeSpec retCode, String errmsg) {
             // Ignore display in message when response code is OK.
             if (isBlank(errmsg) || retCode == RetCode.OK) {
                 return errmsg;
@@ -916,7 +797,6 @@ public class RespBase<D> implements Serializable {
                 ErrorPromptMessageBuilder.errorPrompt = errorPrompt.replaceAll("-", "").toUpperCase(US);
             }
         }
-
     }
 
     /**

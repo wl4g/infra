@@ -31,6 +31,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.validation.FieldError;
 
 import com.wl4g.infra.common.web.rest.RespBase.RetCode;
+import com.wl4g.infra.common.web.rest.RespBase.RetCodeSpec;
 import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration.ErrorHandlerProperties;
 
 /**
@@ -59,7 +60,7 @@ public class DefaultSmartErrorHandler extends AbstractSmartErrorHandler {
          * @see {@link org.springframework.boot.autoconfigure.web.DefaultErrorAttributes#addStatus()}
          */
         if (isNull(statusCode) || statusCode == 999) {
-            RetCode retCode = getRestfulCode(th);
+            RetCodeSpec retCode = getRestfulCode(th);
             if (!isNull(retCode)) {
                 statusCode = retCode.getErrcode();
             } else if (th instanceof IllegalArgumentException) {
