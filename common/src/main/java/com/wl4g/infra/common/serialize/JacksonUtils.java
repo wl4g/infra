@@ -15,8 +15,10 @@
  */
 package com.wl4g.infra.common.serialize;
 
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.util.Objects.isNull;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,9 +30,11 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
@@ -80,7 +84,7 @@ public abstract class JacksonUtils {
      */
     public static <T> T parseJSON(@Nullable String content, @NotNull Class<T> clazz) {
         notNullOf(clazz, "clazz");
-        if (isNull(content)) {
+        if (isBlank(content)) {
             return null;
         }
         try {
@@ -175,12 +179,53 @@ public abstract class JacksonUtils {
      */
     public static <T> T parseJSON(@Nullable String content, @NotNull TypeReference<T> valueTypeRef) {
         notNullOf(valueTypeRef, "valueTypeRef");
-        if (isNull(content)) {
+        if (isBlank(content)) {
             return null;
         }
         try {
             return defaultObjectMapper.readValue(content, valueTypeRef);
         } catch (Exception e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    /**
+     * Parse {@link TreeNode} to object.
+     * 
+     * @param object
+     * @param extractPathExpr
+     * @return
+     */
+    public static <T> T parseFromNode(@Nullable TreeNode node, @NotBlank String extractPathExpr, @NotNull Class<T> clazz) {
+        hasTextOf(extractPathExpr, "extractPathExpr");
+        if (isNull(node)) {
+            return null;
+        }
+        try {
+            final TreeNode objNode = node.at(extractPathExpr);
+            if (objNode.size() > 0) {
+                return defaultObjectMapper.treeToValue(objNode, clazz);
+            }
+            return null;
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    /**
+     * Parse object to {@link JsonNode}.
+     * 
+     * @param object
+     * @param extractPathExpr
+     * @return
+     */
+    public static JsonNode parseToNode(@Nullable String content, @Nullable String extractPathExpr) {
+        if (isBlank(content)) {
+            return null;
+        }
+        try {
+            return defaultObjectMapper.readTree(content).requiredAt(extractPathExpr);
+        } catch (JsonProcessingException e) {
             throw new IllegalArgumentException(e);
         }
     }
@@ -235,24 +280,6 @@ public abstract class JacksonUtils {
         try {
             return defaultObjectMapper.readValue(content, listMapObjectTypeRef);
         } catch (Exception e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
-    /**
-     * Parse object to {@link JsonNode}.
-     * 
-     * @param object
-     * @param extractPathExpr
-     * @return
-     */
-    public static JsonNode parseJsonNode(@Nullable String content, @Nullable String extractPathExpr) {
-        if (isNull(content)) {
-            return null;
-        }
-        try {
-            return defaultObjectMapper.readTree(content).requiredAt(extractPathExpr);
-        } catch (JsonProcessingException e) {
             throw new IllegalArgumentException(e);
         }
     }

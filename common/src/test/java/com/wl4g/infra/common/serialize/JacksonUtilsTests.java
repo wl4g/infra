@@ -19,7 +19,7 @@ import static com.wl4g.infra.common.serialize.JacksonUtils.deepClone;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseArrayMapString;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseArrayString;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
-import static com.wl4g.infra.common.serialize.JacksonUtils.parseJsonNode;
+import static com.wl4g.infra.common.serialize.JacksonUtils.parseToNode;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.lang.System.out;
 import static java.util.Collections.singletonMap;
@@ -135,7 +135,7 @@ public class JacksonUtilsTests {
     @Test
     public void testParseJsonNode() {
         String json = "{\"name\":\"jack\",\"expire\":1000,\"children\":{\"name\":\"tom\",\"expire\":2000}}";
-        JsonNode jsonNode = parseJsonNode(json, "");
+        JsonNode jsonNode = parseToNode(json, "");
         System.out.println(jsonNode);
 
         String subname = jsonNode.at("/children/name").asText();
