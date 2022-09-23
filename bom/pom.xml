@@ -153,6 +153,8 @@
 		<!-- ANTLR -->
 		<antlr4.version>4.10.1</antlr4.version>
 		<antlr3.version>3.5.3</antlr3.version>
+		<!-- GraalVM (Notice: The js language support for the native-image plugin has been moved out by default since graalvm-22.2) -->
+		<graalvm.version>22.1.0</graalvm.version>
 		<!-- SPOTBUGS -->
 		<spotbugs.version>4.1.2</spotbugs.version>
 	</properties>
@@ -1044,6 +1046,35 @@
 				<artifactId>antlr</artifactId>
 				<version>${antlr3.version}</version>
 			</dependency>
+			<!-- Graal(graal.js/nashorn script engine) -->
+            <!-- see: https://github.com/graalvm/graal-js-jdk11-maven-demo/blob/master/pom.xml -->
+            <dependency>
+                <groupId>org.graalvm.sdk</groupId>
+                <artifactId>graal-sdk</artifactId>
+                <version>${graalvm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.graalvm.js</groupId>
+                <artifactId>js</artifactId>
+                <version>${graalvm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.graalvm.js</groupId>
+                <artifactId>js-scriptengine</artifactId>
+                <version>${graalvm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.graalvm.tools</groupId>
+                <artifactId>profiler</artifactId>
+                <version>${graalvm.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.graalvm.tools</groupId>
+                <artifactId>chromeinspector</artifactId>
+                <version>${graalvm.version}</version>
+                <scope>runtime</scope>
+            </dependency>
 			<!-- SPOTBUGS -->
 			<dependency>
 				<groupId>com.github.spotbugs</groupId>

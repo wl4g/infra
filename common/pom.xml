@@ -399,14 +399,6 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <executions>
                     <execution>
@@ -421,6 +413,93 @@
         </plugins>
     </build>
     <profiles>
+        <profile>
+            <id>java8</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <source>${java.version}</source>
+                            <target>${java.version}</target>
+                            <excludes>
+                                <exclude>com/wl4g/infra/common/graalvm/*.java</exclude> 
+                            </excludes>
+                        </configuration>
+                        <!-- see:https://stackoverflow.com/questions/25273160/how-to-permanently-exclude-one-test-class-in-a-maven-build -->
+                        <executions>
+                            <execution>
+                                <id>default-testCompile</id>
+                                <phase>test-compile</phase>
+                                <configuration>
+                                    <testExcludes>
+                                        <exclude>com/wl4g/infra/common/graalvm/*.java</exclude> 
+                                    </testExcludes>
+                                </configuration> 
+                                <goals>
+                                    <goal>testCompile</goal>
+                                </goals>
+                            </execution>                  
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>java11</id>
+            <activation>
+                <!-- see:https://maven.apache.org/enforcer/enforcer-rules/versionRanges.html -->
+                <jdk>[11,)</jdk>
+            </activation>
+            <dependencies>
+                <!-- GraalVM (graal.js/nashorn script engine) -->
+                <!-- see: https://github.com/graalvm/graal-js-jdk11-maven-demo/blob/master/pom.xml -->
+                <dependency>
+                    <groupId>org.graalvm.sdk</groupId>
+                    <artifactId>graal-sdk</artifactId>
+                    <optional>true</optional>
+                </dependency>
+                <dependency>
+                    <groupId>org.graalvm.js</groupId>
+                    <artifactId>js</artifactId>
+                    <optional>true</optional>
+                </dependency>
+                <dependency>
+                    <groupId>org.graalvm.js</groupId>
+                    <artifactId>js-scriptengine</artifactId>
+                    <optional>true</optional>
+                </dependency>
+                <dependency>
+                    <groupId>org.graalvm.tools</groupId>
+                    <artifactId>profiler</artifactId>
+                    <optional>true</optional>
+                    <scope>runtime</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.graalvm.tools</groupId>
+                    <artifactId>chromeinspector</artifactId>
+                    <optional>true</optional>
+                    <scope>runtime</scope>
+                </dependency>
+           </dependencies>
+           <build>
+                <finalName>${project.artifactId}-${project.version}_java11</finalName>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <source>${java.version}</source>
+                            <target>${java.version}</target>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>release</id>
             <build>
