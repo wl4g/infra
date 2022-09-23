@@ -40,56 +40,60 @@ public class EnumValidtor implements ConstraintValidator<EnumValue, Object> {
     private Class<?>[] enumClass;
     private String fieldName;
     private boolean caseSensitive;
+    private boolean hasText;
 
     @Override
     public void initialize(EnumValue constraintAnnotation) {
         this.enumClass = constraintAnnotation.enumCls();
         this.fieldName = constraintAnnotation.enumField();
         this.caseSensitive = constraintAnnotation.caseSensitive();
+        this.hasText = constraintAnnotation.hasText();
     }
 
     @Override
     public boolean isValid(Object value, ConstraintValidatorContext context) {
-        if (value != null && value.toString().length() > 0 && enumClass.length > 0) {
-            for (Class<?> cl : enumClass) {
-                if (cl.isEnum()) {
-                    try {
-                        // 匹配枚举常量名
-                        Object[] constants = cl.getEnumConstants();
-                        Method method = cl.getMethod("name");
-                        for (Object constant : constants) {
-                            String constantName = method.invoke(constant).toString();
-                            if (caseSensitive ? constantName.equals(value.toString())
-                                    : equalsIgnoreCase(constantName, value.toString())) {
-                                return true;
+        if (nonNull(value) && !isBlank(value.toString())) {
+            if (enumClass.length > 0) {
+                for (Class<?> cl : enumClass) {
+                    if (cl.isEnum()) {
+                        try {
+                            // 匹配枚举常量名
+                            Object[] constants = cl.getEnumConstants();
+                            Method method = cl.getMethod("name");
+                            for (Object constant : constants) {
+                                String constantName = method.invoke(constant).toString();
+                                if (caseSensitive ? constantName.equals(value.toString())
+                                        : equalsIgnoreCase(constantName, value.toString())) {
+                                    return true;
+                                }
                             }
-                        }
-                        // 匹配枚举常量的属性值
-                        if (!isBlank(fieldName)) {
-                            Field field = findField(cl, fieldName);
-                            if (nonNull(field)) {
-                                makeAccessible(field);
-                                for (Object constant : constants) {
-                                    Object fieldValue = getField(field, constant);
-                                    if (nonNull(fieldValue)) {
-                                        String fieldValueStr = fieldValue.toString();
-                                        if (caseSensitive ? fieldValueStr.equals(value.toString())
-                                                : equalsIgnoreCase(fieldValueStr, value.toString())) {
-                                            return true;
+                            // 匹配枚举常量的属性值
+                            if (!isBlank(fieldName)) {
+                                Field field = findField(cl, fieldName);
+                                if (nonNull(field)) {
+                                    makeAccessible(field);
+                                    for (Object constant : constants) {
+                                        Object fieldValue = getField(field, constant);
+                                        if (nonNull(fieldValue)) {
+                                            String fieldValueStr = fieldValue.toString();
+                                            if (caseSensitive ? fieldValueStr.equals(value.toString())
+                                                    : equalsIgnoreCase(fieldValueStr, value.toString())) {
+                                                return true;
+                                            }
                                         }
                                     }
                                 }
                             }
+                        } catch (Exception e) {
+                            throw new IllegalStateException(e);
                         }
-                    } catch (Exception e) {
-                        throw new IllegalStateException(e);
                     }
                 }
+            } else {
+                return true;
             }
-        } else {
-            return true;
         }
-        return false;
+        return !hasText;
     }
 
 }

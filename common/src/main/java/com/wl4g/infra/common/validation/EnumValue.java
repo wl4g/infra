@@ -45,6 +45,8 @@ public @interface EnumValue {
 
     boolean caseSensitive() default false;
 
+    boolean hasText() default true;
+
     Class<?>[] enumCls() default {};
 
     String enumField() default "";
