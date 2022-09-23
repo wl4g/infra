@@ -19,17 +19,22 @@
  */
 package com.wl4g.infra.common.lang;
 
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.TypeConverts.parseDoubleOrNull;
 import static com.wl4g.infra.common.lang.TypeConverts.parseFloatOrNull;
 import static com.wl4g.infra.common.lang.TypeConverts.parseIntOrNull;
 import static com.wl4g.infra.common.lang.TypeConverts.parseLongOrNull;
 import static java.lang.System.getProperty;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.replace;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -42,11 +47,19 @@ import javax.validation.constraints.NotNull;
  */
 public abstract class EnvironmentUtil {
 
-    /** OS environment map cache. */
+    /** Process properties map cache. */
+    public static final Properties PROPS = System.getProperties();
+
+    /** Process environment map cache. */
     public static final Map<String, String> ENV = Collections.unmodifiableMap(System.getenv());
 
-    public static String getStringProperty(@NotNull String key, @Nullable String defaultValue) {
-        return getProperty(key, defaultValue);
+    public static String getStringProperty(@NotBlank String key, @Nullable String defaultValue) {
+        hasTextOf(key, "key");
+        String value = ENV.get(replace(key, ".", "_").toUpperCase());
+        if (isNull(value)) {
+            value = PROPS.getProperty(value);
+        }
+        return isNull(value) ? defaultValue : value;
     }
 
     public static long getLongProperty(@NotNull String key, @Nullable long defaultValue) {
