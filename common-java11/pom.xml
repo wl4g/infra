@@ -82,6 +82,11 @@
         </dependency>
         <!-- Tests -->
         <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
@@ -140,6 +145,7 @@
         </plugins>
     </build>
     <profiles>
+        <!-- see:https://plump-possum-683.notion.site/java-a4ff79ddfe594f4284c6c18c4944d128 -->
         <profile>
             <id>java8</id>
             <activation>

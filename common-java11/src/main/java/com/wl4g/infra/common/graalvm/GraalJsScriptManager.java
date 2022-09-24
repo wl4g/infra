@@ -35,8 +35,6 @@ import org.graalvm.polyglot.PolyglotException;
 import org.graalvm.polyglot.Source;
 import org.graalvm.polyglot.Value;
 
-import com.wl4g.infra.common.graalvm.GraalJsScriptManager.FastContextPool.ContextWrapper;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -199,29 +197,29 @@ public class GraalJsScriptManager implements Closeable {
             }
         }
 
-        @Getter
-        @ToString
-        @AllArgsConstructor
-        static class ContextWrapper implements Closeable {
-            private String id;
-            private Context context;
-            private @Getter(value = AccessLevel.PRIVATE) final AtomicBoolean opened = new AtomicBoolean(false);
+    }
 
-            @Override
-            public void close() throws IOException {
-                // Mark closed with pool.
-                this.opened.set(false);
-            }
+    @Getter
+    @ToString
+    @AllArgsConstructor
+    public static class ContextWrapper implements Closeable {
+        private String id;
+        private Context context;
+        private @Getter(value = AccessLevel.PRIVATE) final AtomicBoolean opened = new AtomicBoolean(false);
 
-            public boolean isOpened() {
-                return this.opened.get();
-            }
-
-            public void open() {
-                this.opened.set(true);
-            }
+        @Override
+        public void close() throws IOException {
+            // Mark closed with pool.
+            this.opened.set(false);
         }
 
+        public boolean isOpened() {
+            return this.opened.get();
+        }
+
+        public void open() {
+            this.opened.set(true);
+        }
     }
 
 }

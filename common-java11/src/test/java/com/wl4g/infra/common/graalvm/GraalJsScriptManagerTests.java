@@ -26,11 +26,10 @@ import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Source;
 import org.graalvm.polyglot.Value;
 import org.junit.Test;
-import org.junit.jupiter.api.Assertions;
 
 import com.google.common.base.Charsets;
+import com.wl4g.infra.common.graalvm.GraalJsScriptManager.ContextWrapper;
 import com.wl4g.infra.common.graalvm.GraalJsScriptManager.FastContextPool;
-import com.wl4g.infra.common.graalvm.GraalJsScriptManager.FastContextPool.ContextWrapper;
 import com.wl4g.infra.common.io.FileIOUtils;
 
 /**
@@ -101,44 +100,21 @@ public class GraalJsScriptManagerTests {
     // Notice: The js language support for the native-image plugin has been
     // moved out by default since graalvm-22.2
     @Test
-    public void testESModuleImport() throws Exception {
+    public void testJavaToESModuleCall() throws Exception {
         String esmModuleScript = "export class Foo { square(x) { return x * x; } }";
 
         File localFile = new File("/tmp/test-graaljs-" + currentTimeMillis() + ".mjs");
         FileIOUtils.writeFile(localFile, esmModuleScript, Charsets.UTF_8, false);
 
         String esmScript = "import {Foo} from '" + localFile.getAbsolutePath()
-                + "'; const foo = new Foo(); console.log(foo.square(42));";
+                + "'; const foo = new Foo(); console.log(foo.square(64));";
 
         try (GraalJsScriptManager manager = new GraalJsScriptManager(() -> Context.newBuilder("js").allowIO(true).build());) {
-            manager.eval(Source.newBuilder("js", esmScript, "test.mjs").build());
-        }
-    }
-
-    // see:https://www.graalvm.org/22.0/reference-manual/js/Modules/
-    // Notice: The js language support for the native-image plugin has been
-    // moved out by default since graalvm-22.2
-    @Test
-    public void testESModuleExports() throws Exception {
-        String esmModuleScript = "export const foo = 42;";
-
-        File localFile = new File("/tmp/test-graaljs-" + currentTimeMillis() + ".mjs");
-        FileIOUtils.writeFile(localFile, esmModuleScript, Charsets.UTF_8, false);
-
-        try (GraalJsScriptManager manager = new GraalJsScriptManager(() -> Context.newBuilder("js")
-                .allowExperimentalOptions(true)
-                .allowIO(true)
-                .option("js.esm-eval-returns-exports", "true")
-                .build());) {
-
-            Source source = Source.newBuilder("js", localFile).mimeType("application/javascript+module").build();
-            Value exports = manager.eval(source);
-
-            // now the `exports` object contains the ES module exported symbols.
-            // prints `42`
-            final String result = exports.getMember("foo").toString();
+            // Source source =
+            // Source.newBuilder("js",localFile).mimeType("application/javascript+module").build();
+            Source source = Source.newBuilder("js", esmScript, "test.mjs").build();
+            Value result = manager.eval(source);
             System.out.println(result);
-            Assertions.assertEquals(result, "42");
         }
     }
 
@@ -146,7 +122,7 @@ public class GraalJsScriptManagerTests {
     // Notice: The js language support for the native-image plugin has been
     // moved out by default since graalvm-22.2
     @Test
-    public void testESModuleRequireCommonJsNPM() throws Exception {
+    public void testESModuleCommonJsNPMRequireImport() throws Exception {
         File npmModulesDir = new File("/tmp/test-graaljs-esm-require-commonjs-npm-modules/");
         FileIOUtils.forceMkdir(npmModulesDir);
 

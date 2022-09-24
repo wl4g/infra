@@ -172,6 +172,11 @@
 			</dependency>
 			<dependency>
 				<groupId>com.wl4g</groupId>
+				<artifactId>infra-common-java11</artifactId>
+				<version>${project.parent.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.wl4g</groupId>
 				<artifactId>infra-common-shade</artifactId>
 				<version>${project.parent.version}</version>
 			</dependency>
