@@ -109,7 +109,8 @@ public class GraalJsScriptManagerTests {
         String esmScript = "import {Foo} from '" + localFile.getAbsolutePath()
                 + "'; const foo = new Foo(); console.log(foo.square(64));";
 
-        try (GraalJsScriptManager manager = new GraalJsScriptManager(() -> Context.newBuilder("js").allowIO(true).build());) {
+        try (GraalJsScriptManager manager = new GraalJsScriptManager(1, 10,
+                () -> Context.newBuilder("js").allowIO(true).build());) {
             // Source source =
             // Source.newBuilder("js",localFile).mimeType("application/javascript+module").build();
             Source source = Source.newBuilder("js", esmScript, "test.mjs").build();
@@ -144,7 +145,7 @@ public class GraalJsScriptManagerTests {
         // (optional) Node.js built-in replacements as a comma separated list.
         // options.put("js.commonjs-core-modules-replacements","buffer:buffer/,path:path-browserify");
 
-        try (GraalJsScriptManager manager = new GraalJsScriptManager(
+        try (GraalJsScriptManager manager = new GraalJsScriptManager(1, 10,
                 // Create context with IO support and experimental options.
                 () -> Context.newBuilder("js").allowExperimentalOptions(true).allowIO(true).options(options).build());) {
             // Require a module

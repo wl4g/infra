@@ -28,6 +28,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import org.graalvm.polyglot.Context;
@@ -54,18 +55,18 @@ public class GraalJsScriptManager implements Closeable {
 
     private @NotNull FastContextPool contextPool;
 
-    public GraalJsScriptManager(Boolean allowIO, String... permittedLanguages) {
-        this(() -> Context.newBuilder(permittedLanguages).allowIO(allowIO).build());
+    public GraalJsScriptManager(@Min(0) int initSize, @Min(1) int maxSize, Boolean allowIO, String... permittedLanguages) {
+        this(initSize, maxSize, () -> Context.newBuilder(permittedLanguages).allowIO(allowIO).build());
     }
 
-    public GraalJsScriptManager(String... permittedLanguages) {
-        this(() -> Context.newBuilder(permittedLanguages).allowAllAccess(true).build());
+    public GraalJsScriptManager(@Min(0) int initSize, @Min(1) int maxSize, String... permittedLanguages) {
+        this(initSize, maxSize, () -> Context.newBuilder(permittedLanguages).allowAllAccess(true).build());
     }
 
-    public GraalJsScriptManager(Callable<Context> instantiator) {
+    public GraalJsScriptManager(@Min(0) int initSize, @Min(1) int maxSize, Callable<Context> instantiator) {
         try {
             log.info("Initialzing graalvm polyglot context pool ...");
-            this.contextPool = new FastContextPool(1, 10, instantiator);
+            this.contextPool = new FastContextPool(initSize, maxSize, instantiator);
             log.info("Initialzed graalvm polyglot context pool for {}", contextPool);
         } catch (Exception e) {
             throw e;
@@ -125,7 +126,7 @@ public class GraalJsScriptManager implements Closeable {
 
         private final Callable<Context> instantiator;
 
-        public FastContextPool(int initSize, int maxSize, Callable<Context> instantiator) {
+        public FastContextPool(@Min(0) int initSize, @Min(1) int maxSize, Callable<Context> instantiator) {
             isTrue(initSize > 0, "initSize >= 0");
             isTrue(maxSize >= 1, "maxSize >= 1");
             notNullOf(instantiator, "instantiator");

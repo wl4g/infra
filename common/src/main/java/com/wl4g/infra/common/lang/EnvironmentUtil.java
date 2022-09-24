@@ -27,7 +27,9 @@ import static com.wl4g.infra.common.lang.TypeConverts.parseLongOrNull;
 import static java.lang.System.getProperty;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.replace;
+import static org.apache.commons.lang3.StringUtils.startsWithIgnoreCase;
 
 import java.util.Collections;
 import java.util.Map;
@@ -35,6 +37,7 @@ import java.util.Properties;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -85,6 +88,33 @@ public abstract class EnvironmentUtil {
     public static boolean getBooleanProperty(@NotNull String key, @Nullable boolean defaultValue) {
         String value = getProperty(key);
         return nonNull(value) ? Boolean.parseBoolean(value) : defaultValue;
+    }
+
+    public static Map<String, String> getConfigProperties(@NotBlank String prefix) {
+        return getConfigProperties(ENV, PROPS, prefix);
+    }
+
+    public static Map<String, String> getConfigProperties(
+            @NotEmpty Map<String, String> env,
+            Properties props,
+            @NotBlank String prefix) {
+        hasTextOf(prefix, "prefix");
+        String underscorePrefix = replace(prefix, ".", "_").toUpperCase();
+
+        Map<String, String> props1 = props.entrySet()
+                .stream()
+                .filter(e -> startsWithIgnoreCase(String.valueOf(e.getKey()), underscorePrefix))
+                .collect(toMap(e -> String.valueOf(e.getKey()), e -> String.valueOf(e.getValue())));
+
+        Map<String, String> props2 = env.entrySet()
+                .stream()
+                .filter(e -> startsWithIgnoreCase(e.getKey(), underscorePrefix))
+                .collect(toMap(e -> e.getKey(), e -> e.getValue()));
+
+        // Merge environment override to properties.
+        props1.putAll(props2);
+
+        return props1;
     }
 
 }
