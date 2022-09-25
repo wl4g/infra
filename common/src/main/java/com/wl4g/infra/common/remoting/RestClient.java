@@ -72,7 +72,7 @@ import io.netty.handler.codec.http.HttpMethod;
  * @see ResponseErrorHandler
  */
 public class RestClient {
-    protected final Log log = LogFactory.getLog(getClass());
+    private static final Log log = LogFactory.getLog(RestClient.class);
 
     private final ClientHttpRequestFactory requestFactory;
     private final List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>(4);
