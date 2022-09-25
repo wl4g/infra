@@ -20,7 +20,6 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
@@ -31,10 +30,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Random;
 import java.util.TreeSet;
 
 import javax.annotation.Nullable;
+
+import org.apache.commons.lang3.RandomUtils;
+
 import com.wl4g.infra.common.collection.CollectionUtils2;
 import com.wl4g.infra.common.collection.multimap.LinkedCaseInsensitiveMap;
 import com.wl4g.infra.common.lang.Assert2;
@@ -683,16 +684,14 @@ public class HttpMimeType implements Comparable<HttpMimeType>, Serializable {
      * @version v1.0 2020年7月2日
      * @since
      */
-    public abstract static class MimeTypeUtils {
+    public static class MimeTypeUtils {
 
-        private static final byte[] BOUNDARY_CHARS = new byte[] { '-', '_', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'a',
+        public static final byte[] BOUNDARY_CHARS = new byte[] { '-', '_', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'a',
                 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
                 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
                 'V', 'W', 'X', 'Y', 'Z' };
 
-        private static final Random RND = new SecureRandom();
-
-        private static Charset US_ASCII = Charset.forName("US-ASCII");
+        public static Charset US_ASCII = Charset.forName("US-ASCII");
 
         /**
          * Comparator used by {@link #sortBySpecificity(List)}.
@@ -1088,9 +1087,9 @@ public class HttpMimeType implements Comparable<HttpMimeType>, Serializable {
          * mime types.
          */
         public static byte[] generateMultipartBoundary() {
-            byte[] boundary = new byte[RND.nextInt(11) + 30];
+            byte[] boundary = new byte[RandomUtils.nextInt(11, 30)];
             for (int i = 0; i < boundary.length; i++) {
-                boundary[i] = BOUNDARY_CHARS[RND.nextInt(BOUNDARY_CHARS.length)];
+                boundary[i] = BOUNDARY_CHARS[RandomUtils.nextInt(0, BOUNDARY_CHARS.length)];
             }
             return boundary;
         }

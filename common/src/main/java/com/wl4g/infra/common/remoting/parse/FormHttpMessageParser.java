@@ -343,7 +343,8 @@ public class FormHttpMessageParser implements HttpMessageParser<MultiValueMap<St
     }
 
     @Override
-    public MultiValueMap<String, String> read(@Nullable Class<? extends MultiValueMap<String, ?>> clazz,
+    public MultiValueMap<String, String> read(
+            @Nullable Class<? extends MultiValueMap<String, ?>> clazz,
             HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
 
         HttpMediaType contentType = inputMessage.getHeaders().getContentType();
@@ -391,7 +392,9 @@ public class FormHttpMessageParser implements HttpMessageParser<MultiValueMap<St
         return false;
     }
 
-    private void writeForm(MultiValueMap<String, Object> formData, @Nullable HttpMediaType contentType,
+    private void writeForm(
+            MultiValueMap<String, Object> formData,
+            @Nullable HttpMediaType contentType,
             HttpOutputMessage outputMessage) throws IOException {
 
         contentType = getFormContentType(contentType);
@@ -461,7 +464,9 @@ public class FormHttpMessageParser implements HttpMessageParser<MultiValueMap<St
         return builder.toString();
     }
 
-    private void writeMultipart(MultiValueMap<String, Object> parts, @Nullable HttpMediaType contentType,
+    private void writeMultipart(
+            MultiValueMap<String, Object> parts,
+            @Nullable HttpMediaType contentType,
             HttpOutputMessage outputMessage) throws IOException {
 
         // If the supplied content type is null, fall back to
@@ -583,7 +588,11 @@ public class FormHttpMessageParser implements HttpMessageParser<MultiValueMap<St
             StreamResource resource = (StreamResource) part;
             String filename = resource.getFilename();
             if (filename != null && multipartCharset != null) {
-                filename = MimeDelegate.encode(filename, this.multipartCharset.name());
+                try {
+                    filename = MimeUtility.encodeText(filename, multipartCharset.name(), null);
+                } catch (UnsupportedEncodingException ex) {
+                    throw new IllegalStateException(ex);
+                }
             }
             return filename;
         } else {
@@ -616,7 +625,7 @@ public class FormHttpMessageParser implements HttpMessageParser<MultiValueMap<St
      * Implementation of {@link HttpOutputMessage} used to write a MIME
      * multipart.
      */
-    private static class MultipartHttpOutputMessage implements HttpOutputMessage {
+    static class MultipartHttpOutputMessage implements HttpOutputMessage {
 
         private final OutputStream outputStream;
         private final Charset charset;
@@ -659,20 +668,6 @@ public class FormHttpMessageParser implements HttpMessageParser<MultiValueMap<St
 
         private byte[] getBytes(String name) {
             return name.getBytes(this.charset);
-        }
-    }
-
-    /**
-     * Inner class to avoid a hard dependency on the JavaMail API.
-     */
-    private static class MimeDelegate {
-
-        public static String encode(String value, String charset) {
-            try {
-                return MimeUtility.encodeText(value, charset, null);
-            } catch (UnsupportedEncodingException ex) {
-                throw new IllegalStateException(ex);
-            }
         }
     }
 

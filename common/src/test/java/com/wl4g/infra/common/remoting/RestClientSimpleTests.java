@@ -17,51 +17,63 @@ package com.wl4g.infra.common.remoting;
 
 import java.net.URI;
 
+import org.junit.Test;
+
+import com.fasterxml.jackson.databind.JsonNode;
+
+import lombok.Data;
+import lombok.experimental.SuperBuilder;
+
 public class RestClientSimpleTests {
 
-    public static void main(String[] args) {
-        getForEntityTest1();
-        getForObjectTest2();
+    @Test
+    public void testGetForEntity() {
+        try {
+            String uri = "http://api.map.baidu.com/telematics/v3/weather?location=嘉兴&output=json&ak=5slgyqGDENN7Sy7pw29IUvrZ";
+            HttpResponseEntity<String> resp = new RestClient().getForEntity(URI.create(uri), String.class);
+            System.out.println(resp.getBody());
+        } catch (Throwable e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 
-    public static void getForEntityTest1() {
-        String uri = "http://api.map.baidu.com/telematics/v3/weather?location=嘉兴&output=json&ak=5slgyqGDENN7Sy7pw29IUvrZ";
-        HttpResponseEntity<String> resp = new RestClient().getForEntity(URI.create(uri), String.class);
-        System.out.println(resp.getBody());
+    @Test
+    public void testGetForObject() {
+        try {
+            String uri = "http://api.map.baidu.com/telematics/v3/weather?location=嘉兴&output=json&ak=5slgyqGDENN7Sy7pw29IUvrZ";
+            BaiduWeatherModelResult resp = new RestClient().getForObject(URI.create(uri), BaiduWeatherModelResult.class);
+            System.out.println(resp);
+        } catch (Throwable e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 
-    public static void getForObjectTest2() {
-        String uri = "http://api.map.baidu.com/telematics/v3/weather?location=嘉兴&output=json&ak=5slgyqGDENN7Sy7pw29IUvrZ";
-        BaiduWeatherBean resp = new RestClient().getForObject(URI.create(uri), BaiduWeatherBean.class);
-        System.out.println(resp);
+    @Test
+    public void testPostForObject() {
+        try {
+            String uri = "http://httpbin.org/post";
+            JsonNode resp = new RestClient().postForObject(URI.create(uri), MyUser.builder().name("jack001").age(18).build(),
+                    JsonNode.class);
+            System.out.println(resp);
+        } catch (Throwable e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 
-    public static class BaiduWeatherBean {
-
+    @Data
+    public static class BaiduWeatherModelResult {
         private String status;
         private String message;
+    }
 
-        public String getStatus() {
-            return status;
-        }
-
-        public void setStatus(String status) {
-            this.status = status;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public void setMessage(String message) {
-            this.message = message;
-        }
-
-        @Override
-        public String toString() {
-            return "BaiduWeatherBean [status=" + status + ", message=" + message + "]";
-        }
-
+    @Data
+    @SuperBuilder
+    public static class MyUser {
+        private String name;
+        private int age;
     }
 
 }
