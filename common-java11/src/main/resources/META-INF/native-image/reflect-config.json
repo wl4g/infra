@@ -1,0 +1,246 @@
+[
+{
+  "name":"java.lang.Object"
+},
+{
+  "name":"java.lang.String"
+},
+{
+  "name":"java.lang.Float"
+},
+{
+  "name":"java.lang.Double"
+},
+{
+  "name":"java.lang.Boolean"
+},
+{
+  "name":"java.lang.Byte"
+},
+{
+  "name":"java.math.BigInteger"
+},
+{
+  "name":"java.util.List"
+},
+{
+  "name":"java.util.ArrayList"
+},
+{
+  "name":"java.util.Map"
+},
+{
+  "name":"java.util.HashMap"
+},
+{
+  "name":"com.fasterxml.jackson.databind.JsonNode",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"deepCopy","parameterTypes":[] }, 
+    {"name":"isEmpty","parameterTypes":[] }, 
+    {"name":"isValueNode","parameterTypes":[] }, 
+    {"name":"isContainerNode","parameterTypes":[] }, 
+    {"name":"isMissingNode","parameterTypes":[] }, 
+    {"name":"isArray","parameterTypes":[] }, 
+    {"name":"isObject","parameterTypes":[] }, 
+    {"name":"at","parameterTypes":["java.lang.String"] }, 
+    {"name":"required","parameterTypes":["java.lang.String"] }, 
+    {"name":"requiredAt","parameterTypes":["java.lang.String"] }, 
+    {"name":"has","parameterTypes":["java.lang.String"] }, 
+    {"name":"findValue","parameterTypes":["java.lang.String"] }, 
+    {"name":"isShort","parameterTypes":[] }, 
+    {"name":"isInt","parameterTypes":[] }, 
+    {"name":"isLong","parameterTypes":[] }, 
+    {"name":"isNumber","parameterTypes":[] }, 
+    {"name":"isDouble","parameterTypes":[] }, 
+    {"name":"isBigDecimal","parameterTypes":[] }, 
+    {"name":"isBigInteger","parameterTypes":[] }, 
+    {"name":"isNull","parameterTypes":[] }, 
+    {"name":"isBoolean","parameterTypes":[] }, 
+    {"name":"isBinary","parameterTypes":[] }, 
+    {"name":"asText","parameterTypes":[] }, 
+    {"name":"asInt","parameterTypes":[] }, 
+    {"name":"asLong","parameterTypes":[] }, 
+    {"name":"asDouble","parameterTypes":[] }, 
+    {"name":"asBoolean","parameterTypes":[] }, 
+    {"name":"toPrettyString","parameterTypes":[] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.fasterxml.jackson.databind.node.ObjectNode",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"deepCopy","parameterTypes":[] }, 
+    {"name":"isEmpty","parameterTypes":[] }, 
+    {"name":"isValueNode","parameterTypes":[] }, 
+    {"name":"isContainerNode","parameterTypes":[] }, 
+    {"name":"isMissingNode","parameterTypes":[] }, 
+    {"name":"isArray","parameterTypes":[] }, 
+    {"name":"isObject","parameterTypes":[] }, 
+    {"name":"at","parameterTypes":["java.lang.String"] }, 
+    {"name":"required","parameterTypes":["java.lang.String"] }, 
+    {"name":"requiredAt","parameterTypes":["java.lang.String"] }, 
+    {"name":"has","parameterTypes":["java.lang.String"] }, 
+    {"name":"findValue","parameterTypes":["java.lang.String"] }, 
+    {"name":"isShort","parameterTypes":[] }, 
+    {"name":"isInt","parameterTypes":[] }, 
+    {"name":"isLong","parameterTypes":[] }, 
+    {"name":"isNumber","parameterTypes":[] }, 
+    {"name":"isDouble","parameterTypes":[] }, 
+    {"name":"isBigDecimal","parameterTypes":[] }, 
+    {"name":"isBigInteger","parameterTypes":[] }, 
+    {"name":"isNull","parameterTypes":[] }, 
+    {"name":"isBoolean","parameterTypes":[] }, 
+    {"name":"isBinary","parameterTypes":[] }, 
+    {"name":"asText","parameterTypes":[] }, 
+    {"name":"asInt","parameterTypes":[] }, 
+    {"name":"asLong","parameterTypes":[] }, 
+    {"name":"asDouble","parameterTypes":[] }, 
+    {"name":"asBoolean","parameterTypes":[] }, 
+    {"name":"without","parameterTypes":["java.lang.String"] }, 
+    {"name":"remove","parameterTypes":["java.lang.String"] }, 
+    {"name":"removeAll","parameterTypes":[] }, 
+    {"name":"put","parameterTypes":["java.lang.String","java.lang.String"] }, 
+    {"name":"put","parameterTypes":["java.lang.String","java.lang.Short"] }, 
+    {"name":"put","parameterTypes":["java.lang.String","java.lang.Integer"] }, 
+    {"name":"put","parameterTypes":["java.lang.String","java.lang.Float"] }, 
+    {"name":"put","parameterTypes":["java.lang.String","java.lang.Double"] }, 
+    {"name":"put","parameterTypes":["java.lang.String","java.lang.Boolean"] }, 
+    {"name":"putArray","parameterTypes":["java.lang.String"] }, 
+    {"name":"putObject","parameterTypes":["java.lang.String"] }, 
+    {"name":"toPrettyString","parameterTypes":[] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.fasterxml.jackson.databind.node.ValueNode",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"deepCopy","parameterTypes":[] }, 
+    {"name":"isEmpty","parameterTypes":[] }, 
+    {"name":"isValueNode","parameterTypes":[] }, 
+    {"name":"isContainerNode","parameterTypes":[] }, 
+    {"name":"isMissingNode","parameterTypes":[] }, 
+    {"name":"isArray","parameterTypes":[] }, 
+    {"name":"isObject","parameterTypes":[] }, 
+    {"name":"at","parameterTypes":["java.lang.String"] }, 
+    {"name":"required","parameterTypes":["java.lang.String"] }, 
+    {"name":"requiredAt","parameterTypes":["java.lang.String"] }, 
+    {"name":"has","parameterTypes":["java.lang.String"] }, 
+    {"name":"findValue","parameterTypes":["java.lang.String"] }, 
+    {"name":"isShort","parameterTypes":[] }, 
+    {"name":"isInt","parameterTypes":[] }, 
+    {"name":"isLong","parameterTypes":[] }, 
+    {"name":"isNumber","parameterTypes":[] }, 
+    {"name":"isDouble","parameterTypes":[] }, 
+    {"name":"isBigDecimal","parameterTypes":[] }, 
+    {"name":"isBigInteger","parameterTypes":[] }, 
+    {"name":"isNull","parameterTypes":[] }, 
+    {"name":"isBoolean","parameterTypes":[] }, 
+    {"name":"isBinary","parameterTypes":[] }, 
+    {"name":"asText","parameterTypes":[] }, 
+    {"name":"asInt","parameterTypes":[] }, 
+    {"name":"asLong","parameterTypes":[] }, 
+    {"name":"asDouble","parameterTypes":[] }, 
+    {"name":"asBoolean","parameterTypes":[] }, 
+    {"name":"toPrettyString","parameterTypes":[] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"org.apache.commons.logging.LogFactory",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true
+},
+{
+  "name":"org.apache.commons.logging.impl.LogFactoryImpl",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getAttribute","parameterTypes":["java.lang.String"] }, 
+    {"name":"getAttributeNames","parameterTypes":[] }, 
+    {"name":"getInstance","parameterTypes":["java.lang.String"] }, 
+    {"name":"getInstance","parameterTypes":["java.lang.Class"] }, 
+    {"name":"release","parameterTypes":[] }, 
+    {"name":"removeAttribute","parameterTypes":["java.lang.String"] }, 
+    {"name":"setAttribute","parameterTypes":["java.lang.String","java.lang.Object"] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"org.apache.commons.logging.impl.SLF4JLogFactory",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getAttribute","parameterTypes":["java.lang.String"] }, 
+    {"name":"getAttributeNames","parameterTypes":[] }, 
+    {"name":"getInstance","parameterTypes":["java.lang.String"] }, 
+    {"name":"getInstance","parameterTypes":["java.lang.Class"] }, 
+    {"name":"release","parameterTypes":[] }, 
+    {"name":"removeAttribute","parameterTypes":["java.lang.String"] }, 
+    {"name":"setAttribute","parameterTypes":["java.lang.String","java.lang.Object"] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"org.apache.commons.logging.impl.JBossLogFactory",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getAttribute","parameterTypes":["java.lang.String"] }, 
+    {"name":"getAttributeNames","parameterTypes":[] }, 
+    {"name":"getInstance","parameterTypes":["java.lang.String"] }, 
+    {"name":"getInstance","parameterTypes":["java.lang.Class"] }, 
+    {"name":"release","parameterTypes":[] }, 
+    {"name":"removeAttribute","parameterTypes":["java.lang.String"] }, 
+    {"name":"setAttribute","parameterTypes":["java.lang.String","java.lang.Object"] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"org.graalvm.polyglot.Engine",
+  "methods":[{"name":"getImpl","parameterTypes":[] }]
+},
+{
+  "name":"org.graalvm.polyglot.management.Management"
+},
+{
+  "name":"org.graalvm.polyglot.proxy.Proxy",
+  "queryAllDeclaredMethods":true
+},
+{
+  "name":"org.graalvm.polyglot.proxy.ProxyObject",
+  "queryAllDeclaredMethods":true
+},
+{
+  "name":"org.graalvm.polyglot.proxy.ProxyObject$1",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getMember","parameterTypes":["java.lang.String"] }, 
+    {"name":"getMemberKeys","parameterTypes":[] },
+    {"name":"hasMember","parameterTypes":["java.lang.String"] }, 
+    {"name":"putMember","parameterTypes":["java.lang.String","org.graalvm.polyglot.Value"] }, 
+    {"name":"removeMember","parameterTypes":["java.lang.String"] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+}
+]
