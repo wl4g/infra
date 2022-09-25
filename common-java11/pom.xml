@@ -146,48 +146,49 @@
     </build>
     <profiles>
         <!-- see:https://plump-possum-683.notion.site/java-a4ff79ddfe594f4284c6c18c4944d128 -->
-        <profile>
-            <id>java8</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration>
-                            <source>${java.version}</source>
-                            <target>${java.version}</target>
-                            <excludes>
-                                <exclude>com/wl4g/infra/common/graalvm/*.java</exclude>
-                            </excludes>
-                        </configuration>
-                        <executions>
-                            <!-- see:https://stackoverflow.com/questions/25273160/how-to-permanently-exclude-one-test-class-in-a-maven-build -->
-                            <!-- see:https://www.baeldung.com/maven-multi-release-jars -->
-                            <execution>
-                                <id>default-testCompile</id>
-                                <phase>test-compile</phase>
-                                <goals>
-                                    <goal>testCompile</goal>
-                                </goals>
-                                <configuration>
-                                    <testExcludes>
-                                        <exclude>com/wl4g/infra/common/graalvm/*.java</exclude>
-                                    </testExcludes>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
+        <!-- <profile>-->
+        <!--     <id>java8</id>-->
+        <!--     <activation>-->
+        <!--         <activeByDefault>true</activeByDefault>-->
+        <!--     </activation>-->
+        <!--     <build>-->
+        <!--         <plugins>-->
+        <!--             <plugin>-->
+        <!--                 <groupId>org.apache.maven.plugins</groupId>-->
+        <!--                 <artifactId>maven-compiler-plugin</artifactId>-->
+        <!--                 <configuration>-->
+        <!--                     <source>${java.version}</source>-->
+        <!--                     <target>${java.version}</target>-->
+        <!--                     <excludes>-->
+        <!--                         <exclude>com/wl4g/infra/common/graalvm/*.java</exclude>-->
+        <!--                     </excludes>-->
+        <!--                 </configuration>-->
+        <!--                 <executions>-->
+                             <!-- see:https://stackoverflow.com/questions/25273160/how-to-permanently-exclude-one-test-class-in-a-maven-build -->
+                             <!-- see:https://www.baeldung.com/maven-multi-release-jars -->
+        <!--                     <execution>-->
+        <!--                         <id>default-testCompile</id>-->
+        <!--                         <phase>test-compile</phase>-->
+        <!--                         <goals>-->
+        <!--                             <goal>testCompile</goal>-->
+        <!--                         </goals>-->
+        <!--                         <configuration>-->
+        <!--                             <testExcludes>-->
+        <!--                                 <exclude>com/wl4g/infra/common/graalvm/*.java</exclude>-->
+        <!--                             </testExcludes>-->
+        <!--                         </configuration>-->
+        <!--                     </execution>-->
+        <!--                 </executions>-->
+        <!--             </plugin>-->
+        <!--         </plugins>-->
+        <!--     </build>-->
+        <!-- </profile>-->
         <profile>
             <id>java11</id>
             <activation>
                 <!-- see:https://maven.apache.org/enforcer/enforcer-rules/versionRanges.html -->
                 <jdk>[11,)</jdk>
+                <activeByDefault>true</activeByDefault>
             </activation>
             <dependencies>
                 <!-- GraalVM (graal.js/nashorn script engine) -->
@@ -232,24 +233,6 @@
                         </configuration>
                         <executions>
                             <execution>
-                                <id>compile-java8</id>
-                                <goals>
-                                    <goal>compile</goal>
-                                </goals>
-                                <configuration>
-                                    <source>1.8</source>
-                                    <target>1.8</target>
-                                    <release>8</release>
-                                    <compileSourceRoots>
-                                        <compileSourceRoot>${project.basedir}/src/main/java</compileSourceRoot>
-                                    </compileSourceRoots>
-                                    <multiReleaseOutput>true</multiReleaseOutput>
-                                    <testExcludes>
-                                        <exclude>com/wl4g/infra/common/graalvm/*.java</exclude>
-                                    </testExcludes>
-                                </configuration>
-                            </execution>
-                            <execution>
                                 <id>compile-java11</id>
                                 <phase>compile</phase>
                                 <goals>
@@ -260,7 +243,7 @@
                                     <target>11</target>
                                     <release>11</release>
                                     <compileSourceRoots>
-                                        <compileSourceRoot>${project.basedir}/src/main/java11</compileSourceRoot>
+                                        <compileSourceRoot>${project.basedir}/src/main/java</compileSourceRoot>
                                     </compileSourceRoots>
                                     <multiReleaseOutput>true</multiReleaseOutput>
                                 </configuration>
@@ -277,7 +260,7 @@
                                 </manifest>
                                 <manifestEntries>
                                     <Multi-Release>true</Multi-Release>
-                                    <Implementation-Version>${project.version}_java11</Implementation-Version>
+                                    <Implementation-Version>${project.version}</Implementation-Version>
                                 </manifestEntries>
                             </archive>
                         </configuration>
