@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ~ 2025 the original author or authors. <James Wong <jameswong1376@gmail.com>>
+ * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package com.wl4g.infra.support.cache.jedis.single;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static java.lang.String.format;
 import static java.util.Collections.singletonMap;
 
 import java.io.IOException;
@@ -391,25 +392,44 @@ public class SingleJedisClient implements JedisClient {
     }
 
     @Override
-    public List<byte[]> xreadGroup(byte[] groupname, byte[] consumer, int count, long block, boolean noAck,
+    public List<byte[]> xreadGroup(
+            byte[] groupname,
+            byte[] consumer,
+            int count,
+            long block,
+            boolean noAck,
             Map<byte[], byte[]> streams) {
         return doExecuteWithRedis(jedis -> jedis.xreadGroup(groupname, consumer, count, block, noAck, streams));
     }
 
     @Override
-    public List<byte[]> xreadGroup(byte[] groupname, byte[] consumer, XReadGroupParams xReadGroupParams,
+    public List<byte[]> xreadGroup(
+            byte[] groupname,
+            byte[] consumer,
+            XReadGroupParams xReadGroupParams,
             Entry<byte[], byte[]>... streams) {
         return doExecuteWithRedis(jedis -> jedis.xreadGroup(groupname, consumer, xReadGroupParams, streams));
     }
 
     @Override
-    public Long georadiusStore(byte[] key, double longitude, double latitude, double radius, GeoUnit unit, GeoRadiusParam param,
+    public Long georadiusStore(
+            byte[] key,
+            double longitude,
+            double latitude,
+            double radius,
+            GeoUnit unit,
+            GeoRadiusParam param,
             GeoRadiusStoreParam storeParam) {
         return doExecuteWithRedis(jedis -> jedis.georadiusStore(key, longitude, latitude, radius, unit, param, storeParam));
     }
 
     @Override
-    public Long georadiusByMemberStore(byte[] key, byte[] member, double radius, GeoUnit unit, GeoRadiusParam param,
+    public Long georadiusByMemberStore(
+            byte[] key,
+            byte[] member,
+            double radius,
+            GeoUnit unit,
+            GeoRadiusParam param,
             GeoRadiusStoreParam storeParam) {
         return doExecuteWithRedis(jedis -> jedis.georadiusByMemberStore(key, member, radius, unit, param, storeParam));
     }
@@ -1230,13 +1250,23 @@ public class SingleJedisClient implements JedisClient {
     }
 
     @Override
-    public List<GeoRadiusResponse> georadius(byte[] key, double longitude, double latitude, double radius, GeoUnit unit,
+    public List<GeoRadiusResponse> georadius(
+            byte[] key,
+            double longitude,
+            double latitude,
+            double radius,
+            GeoUnit unit,
             GeoRadiusParam param) {
         return doExecuteWithRedis(jedis -> jedis.georadius(key, longitude, latitude, radius, unit, param));
     }
 
     @Override
-    public List<GeoRadiusResponse> georadiusReadonly(byte[] key, double longitude, double latitude, double radius, GeoUnit unit,
+    public List<GeoRadiusResponse> georadiusReadonly(
+            byte[] key,
+            double longitude,
+            double latitude,
+            double radius,
+            GeoUnit unit,
             GeoRadiusParam param) {
         return doExecuteWithRedis(jedis -> jedis.georadiusReadonly(key, longitude, latitude, radius, unit, param));
     }
@@ -1252,13 +1282,21 @@ public class SingleJedisClient implements JedisClient {
     }
 
     @Override
-    public List<GeoRadiusResponse> georadiusByMember(byte[] key, byte[] member, double radius, GeoUnit unit,
+    public List<GeoRadiusResponse> georadiusByMember(
+            byte[] key,
+            byte[] member,
+            double radius,
+            GeoUnit unit,
             GeoRadiusParam param) {
         return doExecuteWithRedis(jedis -> jedis.georadiusByMember(key, member, radius, unit, param));
     }
 
     @Override
-    public List<GeoRadiusResponse> georadiusByMemberReadonly(byte[] key, byte[] member, double radius, GeoUnit unit,
+    public List<GeoRadiusResponse> georadiusByMemberReadonly(
+            byte[] key,
+            byte[] member,
+            double radius,
+            GeoUnit unit,
             GeoRadiusParam param) {
         return doExecuteWithRedis(jedis -> jedis.georadiusByMemberReadonly(key, member, radius, unit, param));
     }
@@ -1398,27 +1436,51 @@ public class SingleJedisClient implements JedisClient {
         return doExecuteWithRedis(jedis -> jedis.xpending(key, groupname, params));
     }
 
-    public List<byte[]> xclaim(byte[] key, byte[] groupname, byte[] consumername, long minIdleTime, long newIdleTime, int retries,
-            boolean force, byte[]... ids) {
+    public List<byte[]> xclaim(
+            byte[] key,
+            byte[] groupname,
+            byte[] consumername,
+            long minIdleTime,
+            long newIdleTime,
+            int retries,
+            boolean force,
+            byte[]... ids) {
         return doExecuteWithRedis(
                 jedis -> jedis.xclaim(key, groupname, consumername, minIdleTime, newIdleTime, retries, force, ids));
     }
 
     // For compatibility and adaptation
     @Override
-    public List<byte[]> xclaim$JedisCommands(byte[] key, byte[] groupname, byte[] consumername, long minIdleTime,
-            long newIdleTime, int retries, boolean force, byte[]... ids) {
+    public List<byte[]> xclaim$JedisCommands(
+            byte[] key,
+            byte[] groupname,
+            byte[] consumername,
+            long minIdleTime,
+            long newIdleTime,
+            int retries,
+            boolean force,
+            byte[]... ids) {
         return xclaim(key, groupname, consumername, minIdleTime, newIdleTime, retries, force, ids);
     }
 
     @Override
-    public List<byte[]> xclaim(byte[] key, byte[] group, byte[] consumername, long minIdleTime, XClaimParams params,
+    public List<byte[]> xclaim(
+            byte[] key,
+            byte[] group,
+            byte[] consumername,
+            long minIdleTime,
+            XClaimParams params,
             byte[]... ids) {
         return doExecuteWithRedis(jedis -> jedis.xclaim(key, group, consumername, minIdleTime, params, ids));
     }
 
     @Override
-    public List<byte[]> xclaimJustId(byte[] key, byte[] group, byte[] consumername, long minIdleTime, XClaimParams params,
+    public List<byte[]> xclaimJustId(
+            byte[] key,
+            byte[] group,
+            byte[] consumername,
+            long minIdleTime,
+            XClaimParams params,
             byte[]... ids) {
         return doExecuteWithRedis(jedis -> jedis.xclaimJustId(key, group, consumername, minIdleTime, params, ids));
     }
@@ -2445,25 +2507,44 @@ public class SingleJedisClient implements JedisClient {
     }
 
     @Override
-    public List<Entry<String, List<StreamEntry>>> xreadGroup(String groupname, String consumer, int count, long block,
-            boolean noAck, Entry<String, StreamEntryID>... streams) {
+    public List<Entry<String, List<StreamEntry>>> xreadGroup(
+            String groupname,
+            String consumer,
+            int count,
+            long block,
+            boolean noAck,
+            Entry<String, StreamEntryID>... streams) {
         return doExecuteWithRedis(jedis -> jedis.xreadGroup(groupname, consumer, count, block, noAck, streams));
     }
 
     @Override
-    public List<Entry<String, List<StreamEntry>>> xreadGroup(String groupname, String consumer, XReadGroupParams xReadGroupParams,
+    public List<Entry<String, List<StreamEntry>>> xreadGroup(
+            String groupname,
+            String consumer,
+            XReadGroupParams xReadGroupParams,
             Map<String, StreamEntryID> streams) {
         return doExecuteWithRedis(jedis -> jedis.xreadGroup(groupname, consumer, xReadGroupParams, streams));
     }
 
     @Override
-    public Long georadiusStore(String key, double longitude, double latitude, double radius, GeoUnit unit, GeoRadiusParam param,
+    public Long georadiusStore(
+            String key,
+            double longitude,
+            double latitude,
+            double radius,
+            GeoUnit unit,
+            GeoRadiusParam param,
             GeoRadiusStoreParam storeParam) {
         return doExecuteWithRedis(jedis -> jedis.georadiusStore(key, longitude, latitude, radius, unit, param, storeParam));
     }
 
     @Override
-    public Long georadiusByMemberStore(String key, String member, double radius, GeoUnit unit, GeoRadiusParam param,
+    public Long georadiusByMemberStore(
+            String key,
+            String member,
+            double radius,
+            GeoUnit unit,
+            GeoRadiusParam param,
             GeoRadiusStoreParam storeParam) {
         return doExecuteWithRedis(jedis -> jedis.georadiusByMemberStore(key, member, radius, unit, param, storeParam));
     }
@@ -3284,13 +3365,23 @@ public class SingleJedisClient implements JedisClient {
     }
 
     @Override
-    public List<GeoRadiusResponse> georadius(String key, double longitude, double latitude, double radius, GeoUnit unit,
+    public List<GeoRadiusResponse> georadius(
+            String key,
+            double longitude,
+            double latitude,
+            double radius,
+            GeoUnit unit,
             GeoRadiusParam param) {
         return doExecuteWithRedis(jedis -> jedis.georadius(key, longitude, latitude, radius, unit, param));
     }
 
     @Override
-    public List<GeoRadiusResponse> georadiusReadonly(String key, double longitude, double latitude, double radius, GeoUnit unit,
+    public List<GeoRadiusResponse> georadiusReadonly(
+            String key,
+            double longitude,
+            double latitude,
+            double radius,
+            GeoUnit unit,
             GeoRadiusParam param) {
         return doExecuteWithRedis(jedis -> jedis.georadiusReadonly(key, longitude, latitude, radius, unit, param));
     }
@@ -3306,13 +3397,21 @@ public class SingleJedisClient implements JedisClient {
     }
 
     @Override
-    public List<GeoRadiusResponse> georadiusByMember(String key, String member, double radius, GeoUnit unit,
+    public List<GeoRadiusResponse> georadiusByMember(
+            String key,
+            String member,
+            double radius,
+            GeoUnit unit,
             GeoRadiusParam param) {
         return doExecuteWithRedis(jedis -> jedis.georadiusByMember(key, member, radius, unit, param));
     }
 
     @Override
-    public List<GeoRadiusResponse> georadiusByMemberReadonly(String key, String member, double radius, GeoUnit unit,
+    public List<GeoRadiusResponse> georadiusByMemberReadonly(
+            String key,
+            String member,
+            double radius,
+            GeoUnit unit,
             GeoRadiusParam param) {
         return doExecuteWithRedis(jedis -> jedis.georadiusByMemberReadonly(key, member, radius, unit, param));
     }
@@ -3414,7 +3513,12 @@ public class SingleJedisClient implements JedisClient {
     }
 
     @Override
-    public List<StreamPendingEntry> xpending(String key, String groupname, StreamEntryID start, StreamEntryID end, int count,
+    public List<StreamPendingEntry> xpending(
+            String key,
+            String groupname,
+            StreamEntryID start,
+            StreamEntryID end,
+            int count,
             String consumername) {
         return doExecuteWithRedis(jedis -> jedis.xpending(key, groupname, start, end, count, consumername));
     }
@@ -3458,19 +3562,36 @@ public class SingleJedisClient implements JedisClient {
     }
 
     @Override
-    public List<StreamEntry> xclaim(String key, String group, String consumername, long minIdleTime, long newIdleTime,
-            int retries, boolean force, StreamEntryID... ids) {
+    public List<StreamEntry> xclaim(
+            String key,
+            String group,
+            String consumername,
+            long minIdleTime,
+            long newIdleTime,
+            int retries,
+            boolean force,
+            StreamEntryID... ids) {
         return doExecuteWithRedis(jedis -> jedis.xclaim(key, group, consumername, minIdleTime, newIdleTime, retries, force, ids));
     }
 
     @Override
-    public List<StreamEntry> xclaim(String key, String group, String consumername, long minIdleTime, XClaimParams params,
+    public List<StreamEntry> xclaim(
+            String key,
+            String group,
+            String consumername,
+            long minIdleTime,
+            XClaimParams params,
             StreamEntryID... ids) {
         return doExecuteWithRedis(jedis -> jedis.xclaim(key, group, consumername, minIdleTime, params, ids));
     }
 
     @Override
-    public List<StreamEntryID> xclaimJustId(String key, String group, String consumername, long minIdleTime, XClaimParams params,
+    public List<StreamEntryID> xclaimJustId(
+            String key,
+            String group,
+            String consumername,
+            long minIdleTime,
+            XClaimParams params,
             StreamEntryID... ids) {
         return doExecuteWithRedis(jedis -> jedis.xclaimJustId(key, group, consumername, minIdleTime, params, ids));
     }
@@ -3500,7 +3621,7 @@ public class SingleJedisClient implements JedisClient {
         try (Jedis jedis = jedisPool.getResource();) {
             return invoker.apply(jedis);
         } catch (Throwable t) {
-            throw new JedisException("Errors jedis processing.", t);
+            throw new JedisException(format("Errors jedis processing. cause by: %s", t.getMessage()), t);
         }
     }
 

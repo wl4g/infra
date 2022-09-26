@@ -38,7 +38,6 @@ import java.lang.reflect.Method;
  * @sine v1.0
  * @see https://blog.csdn.net/zoinsung_lee/article/details/82529624
  */
-@Deprecated
 public abstract class RpcContextProviderInterceptorBridges {
 
     public static int invokeFieldOrder() {
@@ -69,19 +68,18 @@ public abstract class RpcContextProviderInterceptorBridges {
         return false;
     }
 
-    public static boolean hasFeignRpcContextProcessorClass() {
-        return nonNull(rpcContextProviderProxyInterceptorClass);
+    public static boolean hasProviderFeignRpcContextClass() {
+        return nonNull(providerRpcContextFilterClass);
     }
 
-    public static final String rpcContextProviderProxyInterceptorClassName = "com.wl4g.infra.integration.feign.core.context.interceptor.RpcContextProviderProxyInterceptor";
-    private static final Class<?> rpcContextProviderProxyInterceptorClass = resolveClassNameNullable(
-            rpcContextProviderProxyInterceptorClassName);
+    public static final String providerRpcContextFilterClassName = "com.wl4g.infra.integration.feign.core.context.internal.ProviderFeignContextFilter";
+    private static final Class<?> providerRpcContextFilterClass = resolveClassNameNullable(providerRpcContextFilterClassName);
 
-    private static final Method checkSupportTypeProxyMethod = findMethodNullable(rpcContextProviderProxyInterceptorClass,
+    private static final Method checkSupportTypeProxyMethod = findMethodNullable(providerRpcContextFilterClass,
             "checkSupportTypeProxy", Object.class, Class.class);
-    private static final Method checkSupportMethodProxyMethod = findMethodNullable(rpcContextProviderProxyInterceptorClass,
+    private static final Method checkSupportMethodProxyMethod = findMethodNullable(providerRpcContextFilterClass,
             "checkSupportMethodProxy", Object.class, Method.class, Class.class, Object[].class);
 
-    private static final Field ORDER_FIELD = findFieldNullable(rpcContextProviderProxyInterceptorClass, "ORDER", int.class);
+    private static final Field ORDER_FIELD = findFieldNullable(providerRpcContextFilterClass, "ORDER", int.class);
 
 }

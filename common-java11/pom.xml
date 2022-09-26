@@ -55,7 +55,7 @@
         <version>3.0.0</version>
     </parent>
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>11</java.version>
         <maven-source-plugin.version>2.4</maven-source-plugin.version>
     </properties>
     <dependencyManagement>
@@ -128,67 +128,14 @@
                 <filtering>false</filtering>
             </resource>
         </resources>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
     </build>
     <profiles>
         <!-- see:https://plump-possum-683.notion.site/java-a4ff79ddfe594f4284c6c18c4944d128 -->
-        <!-- <profile>-->
-        <!--     <id>java8</id>-->
-        <!--     <activation>-->
-        <!--         <activeByDefault>true</activeByDefault>-->
-        <!--     </activation>-->
-        <!--     <build>-->
-        <!--         <plugins>-->
-        <!--             <plugin>-->
-        <!--                 <groupId>org.apache.maven.plugins</groupId>-->
-        <!--                 <artifactId>maven-compiler-plugin</artifactId>-->
-        <!--                 <configuration>-->
-        <!--                     <source>${java.version}</source>-->
-        <!--                     <target>${java.version}</target>-->
-        <!--                     <excludes>-->
-        <!--                         <exclude>com/wl4g/infra/common/graalvm/*.java</exclude>-->
-        <!--                     </excludes>-->
-        <!--                 </configuration>-->
-        <!--                 <executions>-->
-                             <!-- see:https://stackoverflow.com/questions/25273160/how-to-permanently-exclude-one-test-class-in-a-maven-build -->
-                             <!-- see:https://www.baeldung.com/maven-multi-release-jars -->
-        <!--                     <execution>-->
-        <!--                         <id>default-testCompile</id>-->
-        <!--                         <phase>test-compile</phase>-->
-        <!--                         <goals>-->
-        <!--                             <goal>testCompile</goal>-->
-        <!--                         </goals>-->
-        <!--                         <configuration>-->
-        <!--                             <testExcludes>-->
-        <!--                                 <exclude>com/wl4g/infra/common/graalvm/*.java</exclude>-->
-        <!--                             </testExcludes>-->
-        <!--                         </configuration>-->
-        <!--                     </execution>-->
-        <!--                 </executions>-->
-        <!--             </plugin>-->
-        <!--         </plugins>-->
-        <!--     </build>-->
-        <!-- </profile>-->
         <profile>
-            <id>java11</id>
+            <id>java11-plus</id>
             <activation>
                 <!-- see:https://maven.apache.org/enforcer/enforcer-rules/versionRanges.html -->
                 <jdk>[11,)</jdk>
-                <activeByDefault>true</activeByDefault>
             </activation>
             <dependencies>
                 <!-- GraalVM (graal.js/nashorn script engine) -->
@@ -222,7 +169,6 @@
                 </dependency>
             </dependencies>
             <build>
-                <finalName>${project.artifactId}-${project.version}_java11</finalName>
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -232,6 +178,7 @@
                             <target>${java.version}</target>
                         </configuration>
                         <executions>
+                            <!-- see:https://stackoverflow.com/questions/25273160/how-to-permanently-exclude-one-test-class-in-a-maven-build -->
                             <execution>
                                 <id>compile-java11</id>
                                 <phase>compile</phase>
@@ -259,11 +206,60 @@
                                     <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                                 </manifest>
                                 <manifestEntries>
+                                    <!-- see:https://www.baeldung.com/maven-multi-release-jars -->
                                     <Multi-Release>true</Multi-Release>
                                     <Implementation-Version>${project.version}</Implementation-Version>
                                 </manifestEntries>
                             </archive>
                         </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>java11-lower-with-skip</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <source>${java.version}</source>
+                            <target>${java.version}</target>
+                            <excludes>
+                                <exclude>com/wl4g/infra/common/*/*.java</exclude>
+                            </excludes>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>default-testCompile</id>
+                                <phase>test-compile</phase>
+                                <goals>
+                                    <goal>testCompile</goal>
+                                </goals>
+                                <configuration>
+                                    <testExcludes>
+                                        <exclude>com/wl4g/infra/common/*/*.java</exclude>
+                                    </testExcludes>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>

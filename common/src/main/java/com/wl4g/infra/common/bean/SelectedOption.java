@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ~ 2025 the original author or authors. <James Wong <jameswong1376@gmail.com>>
+ * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.context.bean.model;
+package com.wl4g.infra.common.bean;
 
 import java.io.Serializable;
 
@@ -30,22 +30,22 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class SelectionModel implements Serializable {
-	private static final long serialVersionUID = -3412929918195969714L;
+public class SelectedOption implements Serializable {
+    private static final long serialVersionUID = -3412929918195969714L;
 
-	/**
-	 * Drop down box display value
-	 */
-	private String label;
+    /**
+     * Drop down box display value
+     */
+    private String label;
 
-	/**
-	 * Drop down box background value.
-	 */
-	private String value;
+    /**
+     * Drop down box background value.
+     */
+    private String value;
 
-	@Override
-	public String toString() {
-		return label + ":" + value;
-	}
+    @Override
+    public String toString() {
+        return label + ":" + value;
+    }
 
 }

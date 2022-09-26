@@ -45,7 +45,6 @@ import javax.validation.constraints.NotNull;
  * @sine v1.0
  * @see https://blog.csdn.net/zoinsung_lee/article/details/82529624
  */
-@Deprecated
 public abstract class RpcContextHolderBridges {
 
     // BASIC(static)

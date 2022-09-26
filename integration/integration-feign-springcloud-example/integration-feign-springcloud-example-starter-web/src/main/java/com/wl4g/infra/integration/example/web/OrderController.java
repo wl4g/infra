@@ -28,8 +28,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.infra.context.page.PageHolder;
 import com.wl4g.infra.context.web.BaseController;
 import com.wl4g.infra.integration.feign.springcloud.example.bean.OrderInfo;
 import com.wl4g.infra.integration.feign.springcloud.example.service.OrderService;

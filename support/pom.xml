@@ -97,10 +97,14 @@
 		<!-- <artifactId>lettuce-core</artifactId> -->
 		<!-- </dependency> -->
 		<!-- Notification. -->
-		<dependency>
-			<groupId>javax.mail</groupId>
-			<artifactId>mail</artifactId>
-		</dependency>
+	    <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>javax.mail-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+        </dependency>
 		<!-- Aliyun. -->
 		<dependency>
 			<groupId>com.aliyun</groupId>

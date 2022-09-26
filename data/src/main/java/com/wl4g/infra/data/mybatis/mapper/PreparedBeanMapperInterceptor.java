@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ~ 2025 the original author or authors. <James Wong <jameswong1376@gmail.com>>
+ * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,11 +39,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.SqlUtil;
+import com.wl4g.infra.common.bean.BaseBean;
+import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.bridge.RpcContextHolderBridges;
 import com.wl4g.infra.common.bridge.RpcContextIamSecurityBridges;
 import com.wl4g.infra.common.log.SmartLogger;
-import com.wl4g.infra.context.bean.BaseBean;
-import com.wl4g.infra.context.page.PageHolder;
 
 /**
  * General {@link BaseBean} property functions handle interceptors in a unified
@@ -171,7 +171,7 @@ public class PreparedBeanMapperInterceptor implements Interceptor {
          */
         if (isNull(SqlUtil.getLocalPage())) { // Not paging
             // Obtain page from rpc context.
-            com.wl4g.infra.context.page.PageHolder.Page<?> page = PageHolder.Util.current(false);
+            com.wl4g.infra.common.bean.page.PageHolder.PageSpec<?> page = PageHolder.Util.current(false);
             if (nonNull(page)) {
                 log.debug("Begin current paging of: {}", page);
                 PageHelper.startPage(page.getPageNum(), page.getPageSize(), page.isCount());
@@ -255,7 +255,7 @@ public class PreparedBeanMapperInterceptor implements Interceptor {
         // Update executed paging info to rpc server context.
         if (result instanceof Page) {
             com.github.pagehelper.Page<?> helperPage = (com.github.pagehelper.Page<?>) result;
-            com.wl4g.infra.context.page.PageHolder.Page<?> currentPage = PageHolder.Util.current(false);
+            com.wl4g.infra.common.bean.page.PageHolder.PageSpec<?> currentPage = PageHolder.Util.current(false);
             if (nonNull(currentPage)) {
                 copyProperties(helperPage, currentPage);
                 // Re-bind executed page information to rpc server context,

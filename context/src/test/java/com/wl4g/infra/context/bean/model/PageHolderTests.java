@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ~ 2025 the original author or authors. <James Wong <jameswong1376@gmail.com>>
+ * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import static java.lang.System.out;
 import org.junit.Test;
 
 import com.github.pagehelper.Page;
-import com.wl4g.infra.context.page.PageHolder;
+import com.wl4g.infra.common.bean.page.PageHolder;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

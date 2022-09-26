@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ~ 2025 the original author or authors. <James Wong <jameswong1376@gmail.com>>
+ * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.context.page;
+package com.wl4g.infra.common.bean.page;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.nonNull;
-import static org.springframework.beans.BeanUtils.copyProperties;
 
 import java.io.Serializable;
 import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
+
+import org.apache.commons.beanutils.BeanUtilsBean2;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -35,33 +36,35 @@ import com.wl4g.infra.common.bridge.RpcContextHolderBridges;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiModelProperty.AccessMode;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.annotations.ApiParam;
 
 /**
  * The original intention of the integrated paging packaging model is that
  * multiple modules under microservices must be completely decoupled. Therefore,
  * we refer to part of the code of 11 instead of relying on it directly. We are
- * very grateful for {@link com.github.pagehelper.Page} work and fully abide by
- * your agreements.
+ * very grateful for {@link com.github.pageSpechelper.PageSpec} work and fully
+ * abide by your agreements.
  * 
- * @auhtor Wangl.sir <James Wong <jameswong1376@gmail.com>>
+ * @auhtor Wangl.sir James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2018年9月7日
  * @since
- * @see https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/Interceptor.md
+ * @see https://github.com/pageSpechelper/Mybatis-PageHelper/blob/master/wikis/zh/Interceptor.md
  */
-@ApiModel("Pagination information")
+@ApiModel("Pagination")
 @SuppressWarnings("unchecked")
 public class PageHolder<E> implements Serializable {
     private static final long serialVersionUID = -7002775417254397561L;
 
     /**
-     * Page of {@link Page}
+     * PageSpec of {@link PageSpec}
      */
+    @Schema(hidden = true, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
     @JsonIgnore
-    private Page<E> page;
+    private PageSpec pageSpec;
 
     /**
-     * Page record rows.</br>
+     * PageSpec record rows.</br>
      * </br>
      * 
      * <b>Note:</b> The following annotation combination configuration does not
@@ -75,11 +78,11 @@ public class PageHolder<E> implements Serializable {
      * for negative examples:
      * 
      * <pre>
-     * &#64;ApiOperation(value = "Query myuser page list")
+     * &#64;ApiOperation(value = "Query myuser pageSpec list")
      * &#64;RequestMapping(value = "/list", method = { GET })
      * public RespBase&lt;PageModel&lt;MyUserModel&gt;&gt; list(PageModel&lt;MyUserModel&gt; pm, MyUserModel param) {
      *     RespBase&lt;PageModel&lt;MyUserModel&gt;&gt; resp = RespBase.create();
-     *     resp.setData(myUserService.page(pm, param));
+     *     resp.setData(myUserService.pageSpec(pm, param));
      *     return resp;
      * }
      * </pre>
@@ -87,20 +90,21 @@ public class PageHolder<E> implements Serializable {
      * for positive examples(Solution):
      * 
      * <pre>
-     * &#64;ApiOperation(value = "Query myuser page list")
+     * &#64;ApiOperation(value = "Query myuser pageSpec list")
      * &#64;ApiImplicitParams({
-     *	&#64;ApiImplicitParam(name = "pageNum", dataType = "int32", defaultValue = "1"),
-     *	&#64;ApiImplicitParam(name = "pageSize", dataType = "int32", defaultValue = "10")
+     *	&#64;ApiImplicitParam(name = "pageSpecNum", dataType = "int32", defaultValue = "1"),
+     *	&#64;ApiImplicitParam(name = "pageSpecSize", dataType = "int32", defaultValue = "10")
      * })
      * &#64;RequestMapping(value = "/list", method = { GET })
      * public RespBase&lt;PageModel&lt;MyUserModel&gt;&gt; list({@code @ApiIgnore} PageModel&lt;MyUserModel&gt; pm, MyUserModel param) {
      * 	RespBase&lt;PageModel&lt;MyUserModel&gt;&gt; resp = RespBase.create();
-     * 	resp.setData(myUserService.page(pm, param));
+     * 	resp.setData(myUserService.pageSpec(pm, param));
      * 	return resp;
      * }
      * </pre>
      * </p>
      */
+    @Schema(hidden = false, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY)
     @ApiModelProperty(readOnly = true, accessMode = AccessMode.READ_ONLY)
     @ApiParam(readOnly = true, hidden = true)
     @JsonIgnoreProperties(allowGetters = true, allowSetters = false)
@@ -110,61 +114,71 @@ public class PageHolder<E> implements Serializable {
         this(1, 10);
     }
 
-    public PageHolder(@NotNull Page<E> page) {
-        setPage(page);
+    public PageHolder(@NotNull PageHolder<E> page) {
+        notNullOf(page, "page");
+        setPageSpec(page.getPageSpec());
     }
 
-    public PageHolder(@Nullable Integer pageNum, @Nullable Integer pageSize) {
-        setPage(new Page<>());
-        setPageNum(pageNum);
-        setPageSize(pageSize);
+    public PageHolder(@NotNull PageSpec pageSpec) {
+        setPageSpec(pageSpec);
     }
 
-    public Page<E> getPage() {
-        return page;
+    public PageHolder(@Nullable Integer pageSpecNum, @Nullable Integer pageSpecSize) {
+        setPageSpec(new PageSpec());
+        setPageNum(pageSpecNum);
+        setPageSize(pageSpecSize);
     }
 
-    public final void setPage(@NotNull Page<E> page) {
-        this.page = notNullOf(page, "page");
+    public PageSpec getPageSpec() {
+        return pageSpec;
+    }
+
+    public final void setPageSpec(@NotNull PageSpec pageSpec) {
+        this.pageSpec = notNullOf(pageSpec, "pageSpec");
+    }
+
+    public final PageHolder<E> withPageSpec(@NotNull PageSpec pageSpec) {
+        setPageSpec(pageSpec);
+        return this;
     }
 
     public Integer getPageNum() {
-        return page.getPageNum();
+        return pageSpec.getPageNum();
     }
 
-    public void setPageNum(@Nullable Integer pageNum) {
-        if (nonNull(pageNum)) {
-            page.setPageNum(pageNum);
+    public void setPageNum(@Nullable Integer pageSpecNum) {
+        if (nonNull(pageSpecNum)) {
+            pageSpec.setPageNum(pageSpecNum);
         }
     }
 
-    public PageHolder<E> withPageNum(@Nullable Integer pageNum) {
-        setPageNum(pageNum);
+    public PageHolder<E> withPageNum(@Nullable Integer pageSpecNum) {
+        setPageNum(pageSpecNum);
         return this;
     }
 
     public Integer getPageSize() {
-        return page.getPageSize();
+        return pageSpec.getPageSize();
     }
 
-    public void setPageSize(@Nullable Integer pageSize) {
-        if (nonNull(pageSize)) {
-            page.setPageSize(pageSize);
+    public void setPageSize(@Nullable Integer pageSpecSize) {
+        if (nonNull(pageSpecSize)) {
+            pageSpec.setPageSize(pageSpecSize);
         }
     }
 
-    public PageHolder<E> withPageSize(@Nullable Integer pageSize) {
-        setPageSize(pageSize);
+    public PageHolder<E> withPageSize(@Nullable Integer pageSpecSize) {
+        setPageSize(pageSpecSize);
         return this;
     }
 
     public Long getTotal() {
-        return page.getTotal();
+        return pageSpec.getTotal();
     }
 
     public void setTotal(@Nullable Long total) {
         if (nonNull(total)) {
-            page.setTotal(total);
+            pageSpec.setTotal(total);
         }
     }
 
@@ -174,16 +188,16 @@ public class PageHolder<E> implements Serializable {
     }
 
     public Integer getPages() {
-        return page.getPages();
+        return pageSpec.getPages();
     }
 
-    public void setPages(Integer pages) {
-        if (nonNull(pages)) {
-            page.setPages(pages);
+    public void setPages(Integer pageSpecs) {
+        if (nonNull(pageSpecs)) {
+            pageSpec.setPages(pageSpecs);
         }
     }
 
-    public PageHolder<E> withPages(Integer pages) {
+    public PageHolder<E> withPages(Integer pageSpecs) {
         return this;
     }
 
@@ -207,44 +221,45 @@ public class PageHolder<E> implements Serializable {
         return getClass().getSimpleName().concat("<").concat(toJSONString(this)).concat(">");
     }
 
-    // --- Current page function methods. ---
+    // --- Current pageSpec function methods. ---
 
     public PageHolder<E> useCount() {
-        getPage().setCount(true);
+        getPageSpec().setCount(true);
         return this;
     }
 
     /**
-     * Sets page in current Rpc context.
+     * Sets pageSpec in current Rpc context.
      */
     public PageHolder<E> bind() {
-        Util.bind(false, getPage());
+        Util.bind(false, getPageSpec());
         return this;
     }
 
     /**
-     * Mybatis pagination. </br>
-     * Thank you very much {@link com.github.pagehelper.Page}. We are in full
-     * compliance with your agreements.
+     * For example jdbc/mybatis/mongo-collection/... pagination specification.
+     * </br>
+     * Thank refer to very much {@link com.github.pageSpechelper.PageSpec}. We
+     * are in full compliance with your agreements.
      * 
      * @param <E>
      * @see http://git.oschina.net/free/Mybatis_PageHelper
      */
-    public static class Page<E> implements Serializable {
+    public static class PageSpec implements Serializable {
         private static final long serialVersionUID = -5149671532631896079L;
 
-        /** Page number, starting from 1 */
-        private int pageNum;
-        /** Page size. */
-        private int pageSize;
+        /** PageSpec number, starting from 1 */
+        private int pageSpecNum;
+        /** PageSpec size. */
+        private int pageSpecSize;
         /** Start row. */
         private int startRow;
         /** End row. */
         private int endRow;
         /** Total row count. */
         private long total;
-        /** Total page size. */
-        private int pages;
+        /** Total pageSpec size. */
+        private int pageSpecs;
         /** Include count query. */
         private boolean count;
         /**
@@ -263,27 +278,27 @@ public class PageHolder<E> implements Serializable {
          * When set to true, if PageSize is set to 0 (or rowbounds limit = 0),
          * paging is not performed and all results are returned.
          */
-        private Boolean pageSizeZero;
+        private Boolean pageSpecSizeZero;
 
-        public Page() {
+        public PageSpec() {
             super();
         }
 
-        public Page(int pageNum, int pageSize) {
-            this(pageNum, pageSize, true, null);
+        public PageSpec(int pageSpecNum, int pageSpecSize) {
+            this(pageSpecNum, pageSpecSize, true, null);
         }
 
-        public Page(int pageNum, int pageSize, boolean count) {
-            this(pageNum, pageSize, count, null);
+        public PageSpec(int pageSpecNum, int pageSpecSize, boolean count) {
+            this(pageSpecNum, pageSpecSize, count, null);
         }
 
-        private Page(int pageNum, int pageSize, boolean count, Boolean reasonable) {
-            if (pageNum == 1 && pageSize == Integer.MAX_VALUE) {
-                pageSizeZero = true;
-                pageSize = 0;
+        private PageSpec(int pageSpecNum, int pageSpecSize, boolean count, Boolean reasonable) {
+            if (pageSpecNum == 1 && pageSpecSize == Integer.MAX_VALUE) {
+                pageSpecSizeZero = true;
+                pageSpecSize = 0;
             }
-            this.pageNum = pageNum;
-            this.pageSize = pageSize;
+            this.pageSpecNum = pageSpecNum;
+            this.pageSpecSize = pageSpecSize;
             this.count = count;
             calculateStartAndEndRow();
             setReasonable(reasonable);
@@ -292,13 +307,14 @@ public class PageHolder<E> implements Serializable {
         /**
          * int[] rowBounds 0 : offset 1 : limit
          */
-        public Page(int[] rowBounds, boolean count) {
+        public PageSpec(int[] rowBounds, boolean count) {
             if (rowBounds[0] == 0 && rowBounds[1] == Integer.MAX_VALUE) {
-                pageSizeZero = true;
-                this.pageSize = 0;
+                pageSpecSizeZero = true;
+                this.pageSpecSize = 0;
             } else {
-                this.pageSize = rowBounds[1];
-                this.pageNum = rowBounds[1] != 0 ? (int) (Math.ceil(((double) rowBounds[0] + rowBounds[1]) / rowBounds[1])) : 0;
+                this.pageSpecSize = rowBounds[1];
+                this.pageSpecNum = rowBounds[1] != 0 ? (int) (Math.ceil(((double) rowBounds[0] + rowBounds[1]) / rowBounds[1]))
+                        : 0;
             }
             this.startRow = rowBounds[0];
             this.count = count;
@@ -306,11 +322,11 @@ public class PageHolder<E> implements Serializable {
         }
 
         public int getPages() {
-            return pages;
+            return pageSpecs;
         }
 
-        public Page<E> setPages(int pages) {
-            this.pages = pages;
+        public PageSpec setPages(int pageSpecs) {
+            this.pageSpecs = pageSpecs;
             return this;
         }
 
@@ -318,27 +334,27 @@ public class PageHolder<E> implements Serializable {
             return endRow;
         }
 
-        public Page<E> setEndRow(int endRow) {
+        public PageSpec setEndRow(int endRow) {
             this.endRow = endRow;
             return this;
         }
 
         public int getPageNum() {
-            return pageNum;
+            return pageSpecNum;
         }
 
-        public Page<E> setPageNum(int pageNum) {
+        public PageSpec setPageNum(int pageSpecNum) {
             // 分页合理化，针对不合理的页码自动处理
-            this.pageNum = ((reasonable != null && reasonable) && pageNum <= 0) ? 1 : pageNum;
+            this.pageSpecNum = ((reasonable != null && reasonable) && pageSpecNum <= 0) ? 1 : pageSpecNum;
             return this;
         }
 
         public int getPageSize() {
-            return pageSize;
+            return pageSpecSize;
         }
 
-        public Page<E> setPageSize(int pageSize) {
-            this.pageSize = pageSize;
+        public PageSpec setPageSize(int pageSpecSize) {
+            this.pageSpecSize = pageSpecSize;
             return this;
         }
 
@@ -346,7 +362,7 @@ public class PageHolder<E> implements Serializable {
             return startRow;
         }
 
-        public Page<E> setStartRow(int startRow) {
+        public PageSpec setStartRow(int startRow) {
             this.startRow = startRow;
             return this;
         }
@@ -358,17 +374,17 @@ public class PageHolder<E> implements Serializable {
         public void setTotal(long total) {
             this.total = total;
             if (total == -1) {
-                pages = 1;
+                pageSpecs = 1;
                 return;
             }
-            if (pageSize > 0) {
-                pages = (int) (total / pageSize + ((total % pageSize == 0) ? 0 : 1));
+            if (pageSpecSize > 0) {
+                pageSpecs = (int) (total / pageSpecSize + ((total % pageSpecSize == 0) ? 0 : 1));
             } else {
-                pages = 0;
+                pageSpecs = 0;
             }
             // 分页合理化，针对不合理的页码自动处理
-            if ((reasonable != null && reasonable) && pageNum > pages) {
-                pageNum = pages;
+            if ((reasonable != null && reasonable) && pageSpecNum > pageSpecs) {
+                pageSpecNum = pageSpecs;
                 calculateStartAndEndRow();
             }
         }
@@ -377,26 +393,26 @@ public class PageHolder<E> implements Serializable {
             return reasonable;
         }
 
-        public Page<E> setReasonable(Boolean reasonable) {
+        public PageSpec setReasonable(Boolean reasonable) {
             if (reasonable == null) {
                 return this;
             }
             this.reasonable = reasonable;
             // 分页合理化，针对不合理的页码自动处理
-            if (this.reasonable && this.pageNum <= 0) {
-                this.pageNum = 1;
+            if (this.reasonable && this.pageSpecNum <= 0) {
+                this.pageSpecNum = 1;
                 calculateStartAndEndRow();
             }
             return this;
         }
 
         public Boolean getPageSizeZero() {
-            return pageSizeZero;
+            return pageSpecSizeZero;
         }
 
-        public Page<E> setPageSizeZero(Boolean pageSizeZero) {
-            if (pageSizeZero != null) {
-                this.pageSizeZero = pageSizeZero;
+        public PageSpec setPageSizeZero(Boolean pageSpecSizeZero) {
+            if (pageSpecSizeZero != null) {
+                this.pageSpecSizeZero = pageSpecSizeZero;
             }
             return this;
         }
@@ -405,15 +421,15 @@ public class PageHolder<E> implements Serializable {
          * 计算起止行号
          */
         private void calculateStartAndEndRow() {
-            this.startRow = this.pageNum > 0 ? (this.pageNum - 1) * this.pageSize : 0;
-            this.endRow = this.startRow + this.pageSize * (this.pageNum > 0 ? 1 : 0);
+            this.startRow = this.pageSpecNum > 0 ? (this.pageSpecNum - 1) * this.pageSpecSize : 0;
+            this.endRow = this.startRow + this.pageSpecSize * (this.pageSpecNum > 0 ? 1 : 0);
         }
 
         public boolean isCount() {
             return this.count;
         }
 
-        public Page<E> setCount(boolean count) {
+        public PageSpec setCount(boolean count) {
             this.count = count;
             return this;
         }
@@ -422,7 +438,7 @@ public class PageHolder<E> implements Serializable {
             return orderBy;
         }
 
-        public Page<E> setOrderBy(String orderBy) {
+        public PageSpec setOrderBy(String orderBy) {
             this.orderBy = orderBy;
             return this;
         }
@@ -448,23 +464,23 @@ public class PageHolder<E> implements Serializable {
         /**
          * 设置页码
          *
-         * @param pageNum
+         * @param pageSpecNum
          * @return
          */
-        public Page<E> pageNum(int pageNum) {
+        public PageSpec pageSpecNum(int pageSpecNum) {
             // 分页合理化，针对不合理的页码自动处理
-            this.pageNum = ((reasonable != null && reasonable) && pageNum <= 0) ? 1 : pageNum;
+            this.pageSpecNum = ((reasonable != null && reasonable) && pageSpecNum <= 0) ? 1 : pageSpecNum;
             return this;
         }
 
         /**
          * 设置页面大小
          *
-         * @param pageSize
+         * @param pageSpecSize
          * @return
          */
-        public Page<E> pageSize(int pageSize) {
-            this.pageSize = pageSize;
+        public PageSpec pageSpecSize(int pageSpecSize) {
+            this.pageSpecSize = pageSpecSize;
             calculateStartAndEndRow();
             return this;
         }
@@ -475,7 +491,7 @@ public class PageHolder<E> implements Serializable {
          * @param count
          * @return
          */
-        public Page<E> count(Boolean count) {
+        public PageSpec count(Boolean count) {
             this.count = count;
             return this;
         }
@@ -486,28 +502,28 @@ public class PageHolder<E> implements Serializable {
          * @param reasonable
          * @return
          */
-        public Page<E> reasonable(Boolean reasonable) {
+        public PageSpec reasonable(Boolean reasonable) {
             setReasonable(reasonable);
             return this;
         }
 
         /**
-         * 当设置为true的时候，如果pagesize设置为0（或RowBounds的limit=0），就不执行分页，返回全部结果
+         * 当设置为true的时候，如果pageSpecsize设置为0（或RowBounds的limit=0），就不执行分页，返回全部结果
          *
-         * @param pageSizeZero
+         * @param pageSpecSizeZero
          * @return
          */
-        public Page<E> pageSizeZero(Boolean pageSizeZero) {
-            setPageSizeZero(pageSizeZero);
+        public PageSpec pageSpecSizeZero(Boolean pageSpecSizeZero) {
+            setPageSizeZero(pageSpecSizeZero);
             return this;
         }
 
         @Override
         public String toString() {
-            return "Page{" + "count=" + count + ", pageNum=" + pageNum + ", pageSize=" + pageSize + ", startRow=" + startRow
-                    + ", endRow=" + endRow + ", total=" + total + ", pages=" + pages + ", countSignal=" + countSignal
-                    + ", orderBy='" + orderBy + '\'' + ", orderByOnly=" + orderByOnly + ", reasonable=" + reasonable
-                    + ", pageSizeZero=" + pageSizeZero + '}';
+            return "PageSpec{" + "count=" + count + ", pageSpecNum=" + pageSpecNum + ", pageSpecSize=" + pageSpecSize
+                    + ", startRow=" + startRow + ", endRow=" + endRow + ", total=" + total + ", pageSpecs=" + pageSpecs
+                    + ", countSignal=" + countSignal + ", orderBy='" + orderBy + '\'' + ", orderByOnly=" + orderByOnly
+                    + ", reasonable=" + reasonable + ", pageSpecSizeZero=" + pageSpecSizeZero + '}';
         }
     }
 
@@ -517,15 +533,15 @@ public class PageHolder<E> implements Serializable {
     public static final class Util {
 
         /**
-         * Sets page in current Rpc context.
+         * Sets pageSpec in current Rpc context.
          * 
          * @param useServerContext
-         * @param page
+         * @param pageSpec
          */
-        public static void bind(boolean useServerContext, @Nullable Page<?> page) {
-            localCurrentPage.set(page);
+        public static void bind(boolean useServerContext, @Nullable PageSpec pageSpec) {
+            localCurrentPage.set(pageSpec);
             if (RpcContextHolderBridges.hasRpcContextHolderClass()) { // Distributed(cluster)?
-                RpcContextHolderBridges.invokeSet(useServerContext, CURRENT_PAGE_KEY, page);
+                RpcContextHolderBridges.invokeSet(useServerContext, CURRENT_PAGE_KEY, pageSpec);
             }
         }
 
@@ -535,13 +551,17 @@ public class PageHolder<E> implements Serializable {
          * @param useServerContext
          * @return
          */
-        public @Nullable static <T> Page<T> current(boolean useServerContext) {
-            Page<T> lCurrentPage = (Page<T>) localCurrentPage.get();
+        public @Nullable static <T> PageSpec current(boolean useServerContext) {
+            PageSpec lCurrentPage = (PageSpec) localCurrentPage.get();
             if (RpcContextHolderBridges.hasRpcContextHolderClass()) { // Distributed-mode?
-                Page<T> rCurrentPage = (Page<T>) RpcContextHolderBridges.invokeGet(useServerContext, CURRENT_PAGE_KEY,
-                        Page.class);
+                PageSpec rCurrentPage = (PageSpec) RpcContextHolderBridges.invokeGet(useServerContext, CURRENT_PAGE_KEY,
+                        PageSpec.class);
                 if (nonNull(rCurrentPage) && nonNull(lCurrentPage)) {
-                    copyProperties(rCurrentPage, lCurrentPage);
+                    try {
+                        BeanUtilsBean2.getInstance().copyProperties(rCurrentPage, lCurrentPage);
+                    } catch (Exception e) {
+                        throw new IllegalStateException(e);
+                    }
                 } else { // Fallback
                     lCurrentPage = rCurrentPage;
                 }
@@ -550,11 +570,12 @@ public class PageHolder<E> implements Serializable {
         }
 
         /**
-         * Reload current executed paging information to local current page
+         * Reload current executed paging information to local current pageSpec
          * object and release from local and origin RPC context.
          */
         public static void update() {
-            // Reload executed paging information to local current page object.
+            // Reload executed paging information to local current pageSpec
+            // object.
             current(true);
 
             // Remove object reference from local.
@@ -569,12 +590,11 @@ public class PageHolder<E> implements Serializable {
         }
 
         /**
-         * Distributed mode, current page RPC context key.
+         * Distributed mode, current pageSpec RPC context key.
          */
         private static transient final String CURRENT_PAGE_KEY = "currentPage";
-        private static transient final ThreadLocal<Page<?>> localCurrentPage = new ThreadLocal<>();
+        private static transient final ThreadLocal<PageSpec> localCurrentPage = new ThreadLocal<>();
     }
 
     private static transient final List<?> DEFAULT_RECORDS = unmodifiableList(emptyList());
-
 }

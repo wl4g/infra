@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ~ 2025 the original author or authors. <James Wong <jameswong1376@gmail.com>>
+ * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.context.bean;
+package com.wl4g.infra.common.bean;
 
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.util.Objects.isNull;
@@ -22,7 +22,9 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -71,8 +73,11 @@ public abstract class BaseBean implements Serializable {
      */
     private String organizationCode;
 
+    private @Nullable List<String> labels;
+
     private String remark;
 
+    // 即当作为请求(输入)参数时(即添加操作)隐藏，当作为响应(输出)参数时不隐藏(如查询操作)
     @Schema(hidden = false, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY)
     @ApiModelProperty(readOnly = true, accessMode = AccessMode.READ_ONLY)
     @ApiParam(readOnly = true, hidden = true)
@@ -119,6 +124,7 @@ public abstract class BaseBean implements Serializable {
      * ways that will work.
      */
     // @JsonIgnore
+    @Schema(hidden = true, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
     @ApiModelProperty(readOnly = true, hidden = true)
     @ApiParam(hidden = true, readOnly = true)
     // Because feign remote call requires readability and writability, while
@@ -126,40 +132,6 @@ public abstract class BaseBean implements Serializable {
     // problem on the swagger side.
     // @JsonIgnoreProperties(allowGetters = false, allowSetters = false)
     private Integer delFlag;
-
-    //
-    // --- Temporary fields. ---
-    //
-
-    /**
-     * Human creation date.</br>
-     * </br>
-     * Note: In order to be compatible with the different usages of the
-     * annotations of swagger 2.x and 3.x, the safest way is to add all possible
-     * ways that will work.
-     */
-    @ApiModelProperty(readOnly = true, accessMode = AccessMode.READ_ONLY)
-    @ApiParam(readOnly = true, hidden = true)
-    // Because feign remote call requires readability and writability, while
-    // swagger requires read-only, there is a conflict, so we should solve this
-    // problem on the swagger side.
-    // @JsonIgnoreProperties(allowGetters = true, allowSetters = false)
-    private transient String humanCreateDate;
-
-    /**
-     * Human update date.</br>
-     * </br>
-     * Note: In order to be compatible with the different usages of the
-     * annotations of swagger 2.x and 3.x, the safest way is to add all possible
-     * ways that will work.
-     */
-    @ApiModelProperty(readOnly = true, accessMode = AccessMode.READ_ONLY)
-    @ApiParam(readOnly = true, hidden = true)
-    // Because feign remote call requires readability and writability, while
-    // swagger requires read-only, there is a conflict, so we should solve this
-    // problem on the swagger side.
-    // @JsonIgnoreProperties(allowGetters = true, allowSetters = false)
-    private transient String humanUpdateDate;
 
     /**
      * Execute method before inserting, need to call manually
@@ -211,6 +183,11 @@ public abstract class BaseBean implements Serializable {
         return this;
     }
 
+    public BaseBean withLabels(List<String> labels) {
+        setLabels(labels);
+        return this;
+    }
+
     public BaseBean withRemark(String remark) {
         setRemark(remark);
         return this;
@@ -242,7 +219,7 @@ public abstract class BaseBean implements Serializable {
     }
 
     public BaseBean deleted() {
-        setDelFlag(DEL_FLAG_DELETE);
+        setDelFlag(DEL_FLAG_DELETED);
         return this;
     }
 
@@ -262,6 +239,7 @@ public abstract class BaseBean implements Serializable {
      * Internal utility for {@link BaseBean}
      */
     public static final class Util {
+        private static transient final ThreadLocal<BaseBean> localCurrentBean = new ThreadLocal<>();
 
         public static void bind(BaseBean bean) {
             localCurrentBean.set(bean);
@@ -291,7 +269,7 @@ public abstract class BaseBean implements Serializable {
          * Distributed mode, current inserted bean.id RPC context key.
          */
         public static transient final String CURRENT_BEANID_KEY = "currentInsertionBean";
-        private static transient final ThreadLocal<BaseBean> localCurrentBean = new ThreadLocal<>();
+
     }
 
     /**
@@ -312,7 +290,7 @@ public abstract class BaseBean implements Serializable {
     /**
      * Generic Status: deleted
      */
-    public static transient final int DEL_FLAG_DELETE = 1;
+    public static transient final int DEL_FLAG_DELETED = 1;
 
     /**
      * Unknown user ID.

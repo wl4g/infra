@@ -38,9 +38,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.infra.common.lang.period.PeriodFormatter;
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.infra.context.bean.BaseBean;
 import com.wl4g.infra.core.framework.proxy.InvocationChain;
 import com.wl4g.infra.core.framework.proxy.SmartProxyFilter;
 

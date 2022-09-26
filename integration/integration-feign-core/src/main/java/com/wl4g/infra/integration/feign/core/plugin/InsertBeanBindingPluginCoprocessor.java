@@ -28,7 +28,7 @@ import java.lang.reflect.Type;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
-import com.wl4g.infra.context.bean.BaseBean;
+import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.infra.integration.feign.core.context.internal.FeignContextCoprocessor;
 
 import feign.Response;

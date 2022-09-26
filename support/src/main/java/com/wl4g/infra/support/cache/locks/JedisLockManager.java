@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ~ 2025 the original author or authors. <James Wong <jameswong1376@gmail.com>>
+ * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,7 +99,7 @@ public class JedisLockManager {
      * copying to the slave or when the master and slave die together, there
      * will be serious consequences of locking.</font>
      * 
-     * @author Wangl.sir <James Wong <jameswong1376@gmail.com>>
+     * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
      * @version v1.0 2019年3月21日
      * @since
      * @see <a href=
