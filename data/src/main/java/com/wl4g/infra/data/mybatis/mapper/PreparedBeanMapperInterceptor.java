@@ -66,8 +66,8 @@ import com.wl4g.infra.common.log.SmartLogger;
  * @see https://cloud.tencent.com/developer/article/1170370
  */
 @Intercepts({ @Signature(type = Executor.class, method = "update", args = { MappedStatement.class, Object.class }),
-        @Signature(type = Executor.class, method = "query", args = { MappedStatement.class, Object.class, RowBounds.class,
-                ResultHandler.class }) })
+        @Signature(type = Executor.class, method = "query",
+                args = { MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class }) })
 public class PreparedBeanMapperInterceptor implements Interceptor {
 
     protected final SmartLogger log = getLogger(getClass());
@@ -171,7 +171,7 @@ public class PreparedBeanMapperInterceptor implements Interceptor {
          */
         if (isNull(SqlUtil.getLocalPage())) { // Not paging
             // Obtain page from rpc context.
-            com.wl4g.infra.common.bean.page.PageHolder.PageSpec<?> page = PageHolder.Util.current(false);
+            PageHolder.PageSpec page = PageHolder.Util.current(false);
             if (nonNull(page)) {
                 log.debug("Begin current paging of: {}", page);
                 PageHelper.startPage(page.getPageNum(), page.getPageSize(), page.isCount());
@@ -255,7 +255,7 @@ public class PreparedBeanMapperInterceptor implements Interceptor {
         // Update executed paging info to rpc server context.
         if (result instanceof Page) {
             com.github.pagehelper.Page<?> helperPage = (com.github.pagehelper.Page<?>) result;
-            com.wl4g.infra.common.bean.page.PageHolder.PageSpec<?> currentPage = PageHolder.Util.current(false);
+            PageHolder.PageSpec currentPage = PageHolder.Util.current(false);
             if (nonNull(currentPage)) {
                 copyProperties(helperPage, currentPage);
                 // Re-bind executed page information to rpc server context,

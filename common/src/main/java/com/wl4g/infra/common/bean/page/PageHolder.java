@@ -78,7 +78,7 @@ public class PageHolder<E> implements Serializable {
      * for negative examples:
      * 
      * <pre>
-     * &#64;ApiOperation(value = "Query myuser pageSpec list")
+     * &#64;ApiOperation(value = "Query myuser page list")
      * &#64;RequestMapping(value = "/list", method = { GET })
      * public RespBase&lt;PageModel&lt;MyUserModel&gt;&gt; list(PageModel&lt;MyUserModel&gt; pm, MyUserModel param) {
      *     RespBase&lt;PageModel&lt;MyUserModel&gt;&gt; resp = RespBase.create();
@@ -90,10 +90,10 @@ public class PageHolder<E> implements Serializable {
      * for positive examples(Solution):
      * 
      * <pre>
-     * &#64;ApiOperation(value = "Query myuser pageSpec list")
+     * &#64;ApiOperation(value = "Query myuser page list")
      * &#64;ApiImplicitParams({
-     *	&#64;ApiImplicitParam(name = "pageSpecNum", dataType = "int32", defaultValue = "1"),
-     *	&#64;ApiImplicitParam(name = "pageSpecSize", dataType = "int32", defaultValue = "10")
+     *	&#64;ApiImplicitParam(name = "pageNum", dataType = "int32", defaultValue = "1"),
+     *	&#64;ApiImplicitParam(name = "pageSize", dataType = "int32", defaultValue = "10")
      * })
      * &#64;RequestMapping(value = "/list", method = { GET })
      * public RespBase&lt;PageModel&lt;MyUserModel&gt;&gt; list({@code @ApiIgnore} PageModel&lt;MyUserModel&gt; pm, MyUserModel param) {
@@ -123,10 +123,10 @@ public class PageHolder<E> implements Serializable {
         setPageSpec(pageSpec);
     }
 
-    public PageHolder(@Nullable Integer pageSpecNum, @Nullable Integer pageSpecSize) {
+    public PageHolder(@Nullable Integer pageNum, @Nullable Integer pageSize) {
         setPageSpec(new PageSpec());
-        setPageNum(pageSpecNum);
-        setPageSize(pageSpecSize);
+        getPageSpec().setPageNum(pageNum);
+        getPageSpec().setPageSize(pageSize);
     }
 
     public PageSpec getPageSpec() {
@@ -146,14 +146,14 @@ public class PageHolder<E> implements Serializable {
         return pageSpec.getPageNum();
     }
 
-    public void setPageNum(@Nullable Integer pageSpecNum) {
-        if (nonNull(pageSpecNum)) {
-            pageSpec.setPageNum(pageSpecNum);
+    public void setPageNum(@Nullable Integer pageNum) {
+        if (nonNull(pageNum)) {
+            pageSpec.setPageNum(pageNum);
         }
     }
 
-    public PageHolder<E> withPageNum(@Nullable Integer pageSpecNum) {
-        setPageNum(pageSpecNum);
+    public PageHolder<E> withPageNum(@Nullable Integer pageNum) {
+        setPageNum(pageNum);
         return this;
     }
 
@@ -161,14 +161,14 @@ public class PageHolder<E> implements Serializable {
         return pageSpec.getPageSize();
     }
 
-    public void setPageSize(@Nullable Integer pageSpecSize) {
-        if (nonNull(pageSpecSize)) {
-            pageSpec.setPageSize(pageSpecSize);
+    public void setPageSize(@Nullable Integer pageSize) {
+        if (nonNull(pageSize)) {
+            pageSpec.setPageSize(pageSize);
         }
     }
 
-    public PageHolder<E> withPageSize(@Nullable Integer pageSpecSize) {
-        setPageSize(pageSpecSize);
+    public PageHolder<E> withPageSize(@Nullable Integer pageSize) {
+        setPageSize(pageSize);
         return this;
     }
 
@@ -248,10 +248,10 @@ public class PageHolder<E> implements Serializable {
     public static class PageSpec implements Serializable {
         private static final long serialVersionUID = -5149671532631896079L;
 
-        /** PageSpec number, starting from 1 */
-        private int pageSpecNum;
+        /** PageSpec number, starting from 0 */
+        private int pageNum;
         /** PageSpec size. */
-        private int pageSpecSize;
+        private int pageSize;
         /** Start row. */
         private int startRow;
         /** End row. */
@@ -278,27 +278,27 @@ public class PageHolder<E> implements Serializable {
          * When set to true, if PageSize is set to 0 (or rowbounds limit = 0),
          * paging is not performed and all results are returned.
          */
-        private Boolean pageSpecSizeZero;
+        private Boolean pageSizeZero;
 
         public PageSpec() {
             super();
         }
 
-        public PageSpec(int pageSpecNum, int pageSpecSize) {
-            this(pageSpecNum, pageSpecSize, true, null);
+        public PageSpec(int pageNum, int pageSize) {
+            this(pageNum, pageSize, true, null);
         }
 
-        public PageSpec(int pageSpecNum, int pageSpecSize, boolean count) {
-            this(pageSpecNum, pageSpecSize, count, null);
+        public PageSpec(int pageNum, int pageSize, boolean count) {
+            this(pageNum, pageSize, count, null);
         }
 
-        private PageSpec(int pageSpecNum, int pageSpecSize, boolean count, Boolean reasonable) {
-            if (pageSpecNum == 1 && pageSpecSize == Integer.MAX_VALUE) {
-                pageSpecSizeZero = true;
-                pageSpecSize = 0;
+        private PageSpec(int pageNum, int pageSize, boolean count, Boolean reasonable) {
+            if (pageNum <= 1 && pageSize == Integer.MAX_VALUE) {
+                pageSizeZero = true;
+                pageSize = 0;
             }
-            this.pageSpecNum = pageSpecNum;
-            this.pageSpecSize = pageSpecSize;
+            this.pageNum = (pageNum <= 0 ? 0 : pageNum);
+            this.pageSize = pageSize;
             this.count = count;
             calculateStartAndEndRow();
             setReasonable(reasonable);
@@ -309,12 +309,11 @@ public class PageHolder<E> implements Serializable {
          */
         public PageSpec(int[] rowBounds, boolean count) {
             if (rowBounds[0] == 0 && rowBounds[1] == Integer.MAX_VALUE) {
-                pageSpecSizeZero = true;
-                this.pageSpecSize = 0;
+                pageSizeZero = true;
+                this.pageSize = 0;
             } else {
-                this.pageSpecSize = rowBounds[1];
-                this.pageSpecNum = rowBounds[1] != 0 ? (int) (Math.ceil(((double) rowBounds[0] + rowBounds[1]) / rowBounds[1]))
-                        : 0;
+                this.pageSize = rowBounds[1];
+                this.pageNum = rowBounds[1] != 0 ? (int) (Math.ceil(((double) rowBounds[0] + rowBounds[1]) / rowBounds[1])) : 0;
             }
             this.startRow = rowBounds[0];
             this.count = count;
@@ -340,21 +339,21 @@ public class PageHolder<E> implements Serializable {
         }
 
         public int getPageNum() {
-            return pageSpecNum;
+            return pageNum;
         }
 
-        public PageSpec setPageNum(int pageSpecNum) {
+        public PageSpec setPageNum(int pageNum) {
             // 分页合理化，针对不合理的页码自动处理
-            this.pageSpecNum = ((reasonable != null && reasonable) && pageSpecNum <= 0) ? 1 : pageSpecNum;
+            this.pageNum = ((reasonable != null && reasonable) && pageNum <= 0) ? 1 : pageNum;
             return this;
         }
 
         public int getPageSize() {
-            return pageSpecSize;
+            return pageSize;
         }
 
-        public PageSpec setPageSize(int pageSpecSize) {
-            this.pageSpecSize = pageSpecSize;
+        public PageSpec setPageSize(int pageSize) {
+            this.pageSize = pageSize;
             return this;
         }
 
@@ -377,14 +376,14 @@ public class PageHolder<E> implements Serializable {
                 pageSpecs = 1;
                 return;
             }
-            if (pageSpecSize > 0) {
-                pageSpecs = (int) (total / pageSpecSize + ((total % pageSpecSize == 0) ? 0 : 1));
+            if (pageSize > 0) {
+                pageSpecs = (int) (total / pageSize + ((total % pageSize == 0) ? 0 : 1));
             } else {
                 pageSpecs = 0;
             }
             // 分页合理化，针对不合理的页码自动处理
-            if ((reasonable != null && reasonable) && pageSpecNum > pageSpecs) {
-                pageSpecNum = pageSpecs;
+            if ((reasonable != null && reasonable) && pageNum > pageSpecs) {
+                pageNum = pageSpecs;
                 calculateStartAndEndRow();
             }
         }
@@ -399,20 +398,20 @@ public class PageHolder<E> implements Serializable {
             }
             this.reasonable = reasonable;
             // 分页合理化，针对不合理的页码自动处理
-            if (this.reasonable && this.pageSpecNum <= 0) {
-                this.pageSpecNum = 1;
+            if (this.reasonable && this.pageNum <= 0) {
+                this.pageNum = 1;
                 calculateStartAndEndRow();
             }
             return this;
         }
 
         public Boolean getPageSizeZero() {
-            return pageSpecSizeZero;
+            return pageSizeZero;
         }
 
-        public PageSpec setPageSizeZero(Boolean pageSpecSizeZero) {
-            if (pageSpecSizeZero != null) {
-                this.pageSpecSizeZero = pageSpecSizeZero;
+        public PageSpec setPageSizeZero(Boolean pageSizeZero) {
+            if (pageSizeZero != null) {
+                this.pageSizeZero = pageSizeZero;
             }
             return this;
         }
@@ -421,8 +420,8 @@ public class PageHolder<E> implements Serializable {
          * 计算起止行号
          */
         private void calculateStartAndEndRow() {
-            this.startRow = this.pageSpecNum > 0 ? (this.pageSpecNum - 1) * this.pageSpecSize : 0;
-            this.endRow = this.startRow + this.pageSpecSize * (this.pageSpecNum > 0 ? 1 : 0);
+            this.startRow = this.pageNum > 0 ? (this.pageNum - 1) * this.pageSize : 0;
+            this.endRow = this.startRow + this.pageSize * (this.pageNum > 0 ? 1 : 0);
         }
 
         public boolean isCount() {
@@ -464,23 +463,23 @@ public class PageHolder<E> implements Serializable {
         /**
          * 设置页码
          *
-         * @param pageSpecNum
+         * @param pageNum
          * @return
          */
-        public PageSpec pageSpecNum(int pageSpecNum) {
+        public PageSpec pageNum(int pageNum) {
             // 分页合理化，针对不合理的页码自动处理
-            this.pageSpecNum = ((reasonable != null && reasonable) && pageSpecNum <= 0) ? 1 : pageSpecNum;
+            this.pageNum = ((reasonable != null && reasonable) && pageNum <= 0) ? 1 : pageNum;
             return this;
         }
 
         /**
          * 设置页面大小
          *
-         * @param pageSpecSize
+         * @param pageSize
          * @return
          */
-        public PageSpec pageSpecSize(int pageSpecSize) {
-            this.pageSpecSize = pageSpecSize;
+        public PageSpec pageSize(int pageSize) {
+            this.pageSize = pageSize;
             calculateStartAndEndRow();
             return this;
         }
@@ -510,20 +509,20 @@ public class PageHolder<E> implements Serializable {
         /**
          * 当设置为true的时候，如果pageSpecsize设置为0（或RowBounds的limit=0），就不执行分页，返回全部结果
          *
-         * @param pageSpecSizeZero
+         * @param pageSizeZero
          * @return
          */
-        public PageSpec pageSpecSizeZero(Boolean pageSpecSizeZero) {
-            setPageSizeZero(pageSpecSizeZero);
+        public PageSpec pageSizeZero(Boolean pageSizeZero) {
+            setPageSizeZero(pageSizeZero);
             return this;
         }
 
         @Override
         public String toString() {
-            return "PageSpec{" + "count=" + count + ", pageSpecNum=" + pageSpecNum + ", pageSpecSize=" + pageSpecSize
-                    + ", startRow=" + startRow + ", endRow=" + endRow + ", total=" + total + ", pageSpecs=" + pageSpecs
-                    + ", countSignal=" + countSignal + ", orderBy='" + orderBy + '\'' + ", orderByOnly=" + orderByOnly
-                    + ", reasonable=" + reasonable + ", pageSpecSizeZero=" + pageSpecSizeZero + '}';
+            return "PageSpec{" + "count=" + count + ", pageNum=" + pageNum + ", pageSize=" + pageSize + ", startRow=" + startRow
+                    + ", endRow=" + endRow + ", total=" + total + ", pageSpecs=" + pageSpecs + ", countSignal=" + countSignal
+                    + ", orderBy='" + orderBy + '\'' + ", orderByOnly=" + orderByOnly + ", reasonable=" + reasonable
+                    + ", pageSizeZero=" + pageSizeZero + '}';
         }
     }
 

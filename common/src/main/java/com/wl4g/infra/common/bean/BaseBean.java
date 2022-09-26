@@ -27,6 +27,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -55,8 +56,11 @@ import lombok.experimental.SuperBuilder;
 public abstract class BaseBean implements Serializable {
     private static final long serialVersionUID = 8940373806493080114L;
 
-    // Hide when used as input parameter (ie add operation), not hidden when
-    // used as return parameter (ie query operation)
+    /**
+     * When it is used as the request (input) parameter of the interface, if it
+     * is a modification operation, it needs to be displayed, but the response
+     * (output) parameter must not be displayed. </br>
+     */
     @Schema(hidden = false, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY)
     @ApiModelProperty(readOnly = true, accessMode = AccessMode.READ_ONLY)
     @ApiParam(readOnly = true, hidden = true)
@@ -66,18 +70,32 @@ public abstract class BaseBean implements Serializable {
     // @JsonIgnoreProperties(allowGetters = true, allowSetters = true)
     private Long id;
 
-    private @NotNull @Min(0) @Max(1) Integer enable;
+    /**
+     * The organization structure code, which can be used for data permissions
+     * as an organization tree, or in tenant isolation scenarios
+     */
+    private @NotBlank String orgCode;
 
     /**
-     * For data permission scopes.
+     * Whether the this object(record) is enabled.
      */
-    private String organizationCode;
+    private @NotNull @Min(DISABLED) @Max(ENABLED) Integer enable;
 
+    /**
+     * Used to mark whether the this object(record) is enabled or not
+     */
     private @Nullable List<String> labels;
 
-    private String remark;
+    /**
+     * Remark content corresponding to the this object(record).
+     */
+    private @Nullable String remark;
 
-    // 即当作为请求(输入)参数时(即添加操作)隐藏，当作为响应(输出)参数时不隐藏(如查询操作)
+    /**
+     * That is, when it is used as a request (input) parameter (e.g, add
+     * operation), it is hidden, and when it is used as a response (output)
+     * parameter, it is not hidden (such as query operation) </br>
+     */
     @Schema(hidden = false, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY)
     @ApiModelProperty(readOnly = true, accessMode = AccessMode.READ_ONLY)
     @ApiParam(readOnly = true, hidden = true)
@@ -87,6 +105,11 @@ public abstract class BaseBean implements Serializable {
     // @JsonIgnoreProperties(allowGetters = true, allowSetters = false)
     private Long createBy;
 
+    /**
+     * That is, when it is used as a request (input) parameter (e.g, add
+     * operation), it is hidden, and when it is used as a response (output)
+     * parameter, it is not hidden (such as query operation) </br>
+     */
     @Schema(hidden = false, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(readOnly = true, accessMode = AccessMode.READ_ONLY)
@@ -97,6 +120,11 @@ public abstract class BaseBean implements Serializable {
     // @JsonIgnoreProperties(allowGetters = true, allowSetters = false)
     private Date createDate;
 
+    /**
+     * That is, when it is used as a request (input) parameter (e.g, add
+     * operation), it is hidden, and when it is used as a response (output)
+     * parameter, it is not hidden (such as query operation) </br>
+     */
     @Schema(hidden = false, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY)
     @ApiModelProperty(readOnly = true, accessMode = AccessMode.READ_ONLY)
     @ApiParam(readOnly = true, hidden = true)
@@ -106,6 +134,11 @@ public abstract class BaseBean implements Serializable {
     // @JsonIgnoreProperties(allowGetters = true, allowSetters = false)
     private Long updateBy;
 
+    /**
+     * That is, when it is used as a request (input) parameter (e.g, add
+     * operation), it is hidden, and when it is used as a response (output)
+     * parameter, it is not hidden (such as query operation) </br>
+     */
     @Schema(hidden = false, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(readOnly = true, accessMode = AccessMode.READ_ONLY)
@@ -117,21 +150,52 @@ public abstract class BaseBean implements Serializable {
     private Date updateDate;
 
     /**
-     * Logistic delete status. </br>
+     * Whether it is the request (input) parameter or the response (output)
+     * parameter of the interface, it does not need to be displayed</br>
      * </br>
      * Note: In order to be compatible with the different usages of the
      * annotations of swagger 2.x and 3.x, the safest way is to add all possible
      * ways that will work.
      */
-    // @JsonIgnore
     @Schema(hidden = true, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
     @ApiModelProperty(readOnly = true, hidden = true)
     @ApiParam(hidden = true, readOnly = true)
     // Because feign remote call requires readability and writability, while
     // swagger requires read-only, there is a conflict, so we should solve this
     // problem on the swagger side.
+    // @JsonIgnore
     // @JsonIgnoreProperties(allowGetters = false, allowSetters = false)
     private Integer delFlag;
+
+    //
+    // --- Temporary fields. ---
+    //
+
+    /**
+     * Note: In order to be compatible with the different usages of the
+     * annotations of swagger 2.x and 3.x, the safest way is to add all possible
+     * ways that will work.
+     */
+    @ApiModelProperty(readOnly = true, accessMode = AccessMode.READ_ONLY)
+    @ApiParam(readOnly = true, hidden = true)
+    // Because feign remote call requires readability and writability, while
+    // swagger requires read-only, there is a conflict, so we should solve this
+    // problem on the swagger side.
+    // @JsonIgnoreProperties(allowGetters = true, allowSetters = false)
+    private transient String humanCreateDate;
+
+    /**
+     * Note: In order to be compatible with the different usages of the
+     * annotations of swagger 2.x and 3.x, the safest way is to add all possible
+     * ways that will work.
+     */
+    @ApiModelProperty(readOnly = true, accessMode = AccessMode.READ_ONLY)
+    @ApiParam(readOnly = true, hidden = true)
+    // Because feign remote call requires readability and writability, while
+    // swagger requires read-only, there is a conflict, so we should solve this
+    // problem on the swagger side.
+    // @JsonIgnoreProperties(allowGetters = true, allowSetters = false)
+    private transient String humanUpdateDate;
 
     /**
      * Execute method before inserting, need to call manually
@@ -150,12 +214,12 @@ public abstract class BaseBean implements Serializable {
     /**
      * Execute method before inserting, need to call manually
      *
-     * @param organizationCode
+     * @param orgCode
      * @return return current preparing insert generated id.
      */
-    public void preInsert(String organizationCode) {
-        if (isBlank(getOrganizationCode())) {
-            setOrganizationCode(organizationCode);
+    public void preInsert(String orgCode) {
+        if (isBlank(getOrgCode())) {
+            setOrgCode(orgCode);
         }
     }
 
@@ -169,7 +233,7 @@ public abstract class BaseBean implements Serializable {
     }
 
     public BaseBean withId(Long id) {
-        this.id = id;
+        setId(id);
         return this;
     }
 
@@ -178,8 +242,8 @@ public abstract class BaseBean implements Serializable {
         return this;
     }
 
-    public BaseBean withOrganizationCode(String organizationCode) {
-        setOrganizationCode(organizationCode);
+    public BaseBean withOrgCode(String orgCode) {
+        setOrgCode(orgCode);
         return this;
     }
 
@@ -228,7 +292,7 @@ public abstract class BaseBean implements Serializable {
         return this;
     }
 
-    // --- Function's. ---
+    // --- Functions. ---
 
     @Override
     public String toString() {
