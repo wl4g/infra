@@ -176,6 +176,7 @@ public abstract class BaseBean implements Serializable {
      * annotations of swagger 2.x and 3.x, the safest way is to add all possible
      * ways that will work.
      */
+    @Schema(hidden = false, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY)
     @ApiModelProperty(readOnly = true, accessMode = AccessMode.READ_ONLY)
     @ApiParam(readOnly = true, hidden = true)
     // Because feign remote call requires readability and writability, while
@@ -189,6 +190,7 @@ public abstract class BaseBean implements Serializable {
      * annotations of swagger 2.x and 3.x, the safest way is to add all possible
      * ways that will work.
      */
+    @Schema(hidden = false, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY)
     @ApiModelProperty(readOnly = true, accessMode = AccessMode.READ_ONLY)
     @ApiParam(readOnly = true, hidden = true)
     // Because feign remote call requires readability and writability, while
