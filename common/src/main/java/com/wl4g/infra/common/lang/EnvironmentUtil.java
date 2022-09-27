@@ -60,7 +60,7 @@ public abstract class EnvironmentUtil {
         hasTextOf(key, "key");
         String value = ENV.get(replace(key, ".", "_").toUpperCase());
         if (isNull(value)) {
-            value = PROPS.getProperty(value);
+            value = PROPS.getProperty(key);
         }
         return isNull(value) ? defaultValue : value;
     }
