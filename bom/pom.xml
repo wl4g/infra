@@ -118,7 +118,7 @@
         <!-- excel/word -->
         <easyexcel.version>2.2.6</easyexcel.version>
         <!-- task/scheduler -->
-        <quartz.version>2.2.2</quartz.version>
+        <quartz.version>2.3.2</quartz.version>
         <!-- serialization -->
         <!-- Note: Must be consistent with springboot -->
         <!-- <jackson.version>2.10.2</jackson.version> -->
