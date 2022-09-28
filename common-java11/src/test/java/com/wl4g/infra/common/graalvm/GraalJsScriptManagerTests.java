@@ -15,12 +15,15 @@
  */
 package com.wl4g.infra.common.graalvm;
 
+import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.concurrent.CountDownLatch;
 
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Source;
@@ -29,7 +32,7 @@ import org.junit.Test;
 
 import com.google.common.base.Charsets;
 import com.wl4g.infra.common.graalvm.GraalJsScriptManager.ContextWrapper;
-import com.wl4g.infra.common.graalvm.GraalJsScriptManager.FastContextPool;
+import com.wl4g.infra.common.graalvm.GraalJsScriptManager.SimpleFastContextPool;
 import com.wl4g.infra.common.io.FileIOUtils;
 
 /**
@@ -43,55 +46,103 @@ public class GraalJsScriptManagerTests {
 
     @Test
     public void testTakeNoOverflow() throws Exception {
-        try (FastContextPool pool = new FastContextPool(1, 10, () -> {
-            return Context.create();
-        });) {
+        try (SimpleFastContextPool pool = new SimpleFastContextPool(1, 10, () -> Context.create());) {
             try {
                 for (int i = 0; i < 10; i++) {
                     ContextWrapper context = pool.take();
                     System.out.println("The " + i + " take context: " + context);
                 }
                 System.out.println("Assertion success");
-            } catch (NoSuchElementException e) {
+            } catch (IllegalStateException e) {
                 e.printStackTrace();
                 throw new IllegalStateException("Assertion failed", e);
             }
         }
     }
 
-    @Test
+    @Test(expected = IllegalStateException.class)
     public void testTakeOverflow() throws Exception {
-        try (FastContextPool pool = new FastContextPool(1, 10, () -> {
-            return Context.create();
-        });) {
+        try (SimpleFastContextPool pool = new SimpleFastContextPool(1, 10, () -> Context.create());) {
             try {
                 for (int i = 0; i < 11; i++) {
                     ContextWrapper context = pool.take();
                     System.out.println("The " + i + " take context: " + context);
                 }
-                throw new IllegalStateException("Assertion failed");
-            } catch (NoSuchElementException e) {
+            } catch (IllegalStateException e) {
                 // e.printStackTrace();
                 System.out.println("Assertion success");
+                throw e;
             }
         }
     }
 
     @Test
     public void testTakeNoOverflowWithRelease() throws Exception {
-        try (FastContextPool pool = new FastContextPool(1, 10, () -> {
-            return Context.create();
-        });) {
+        try (SimpleFastContextPool pool = new SimpleFastContextPool(1, 10, () -> Context.create());) {
             try {
-                for (int i = 0; i < 11; i++) {
+                for (int i = 0; i < 20; i++) {
                     try (ContextWrapper context = pool.take();) {
                         System.out.println("The " + i + " take context: " + context);
                     }
                 }
                 System.out.println("Assertion success");
-            } catch (NoSuchElementException e) {
-                e.printStackTrace();
-                throw new IllegalStateException("Assertion failed", e);
+            } catch (IllegalStateException e) {
+                System.out.println(format("Assertion failed - %s", e.getMessage()));
+                throw e;
+            }
+        }
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testMultiThreadExecutionWithOverflow() throws Exception {
+        System.setProperty("polyglot.engine.WarnInterpreterOnly", "false"); // disabled-warning
+
+        int threadCount = 100;
+        int poolMaxSize = 20;
+
+        String script = format("function process(name) { console.log('[  js] - The name is:', name); return 'Hello ' + name; }");
+        File localFile = new File("/tmp/test-graaljs-" + currentTimeMillis() + ".js");
+        FileIOUtils.writeFile(localFile, script, Charsets.UTF_8, false);
+
+        List<Exception> exceptions = new ArrayList<>();
+        CountDownLatch latch = new CountDownLatch(threadCount);
+
+        try (SimpleFastContextPool pool = new SimpleFastContextPool(1, poolMaxSize,
+                () -> Context.newBuilder("js").allowIO(true).build());) {
+            for (int i = 0; i < threadCount; i++) {
+                new Thread(() -> {
+                    long begin = currentTimeMillis();
+
+                    try (ContextWrapper context = pool.take();) {
+                        context.leave();
+                        System.out.println(format("[java] [%s] - running ...", Thread.currentThread().getName()));
+
+                        context.eval(Source.newBuilder("js", localFile).build());
+                        Value bindings = context.getBindings("js");
+                        Value processFunction = bindings.getMember("process");
+
+                        String helloName = format("jack from %s", Thread.currentThread().getName());
+                        Value result = processFunction.execute(helloName);
+
+                        System.out.println(format("[java] [%s] - finished, cost(execute): %sms, result: %s",
+                                Thread.currentThread().getName(), (currentTimeMillis() - begin), result));
+
+                    } catch (Exception e) {
+                        System.err.println(format("[java] [%s] - %s", Thread.currentThread().getName(), e));
+                        exceptions.add(e);
+                    } finally {
+                        latch.countDown();
+                    }
+                }, "test-thread-" + i).start();
+                Thread.sleep(10L);
+            }
+            latch.await();
+
+            if (exceptions.isEmpty()) {
+                System.out.println("Assertion success");
+            } else {
+                throw new IllegalStateException(format("Assertion failed - %s", exceptions.get(0).getMessage()),
+                        exceptions.get(0));
             }
         }
     }
@@ -114,7 +165,7 @@ public class GraalJsScriptManagerTests {
             // Source source =
             // Source.newBuilder("js",localFile).mimeType("application/javascript+module").build();
             Source source = Source.newBuilder("js", esmScript, "test.mjs").build();
-            Value result = manager.eval(source);
+            Value result = manager.getContext().eval(source);
             System.out.println(result);
         }
     }
@@ -149,7 +200,7 @@ public class GraalJsScriptManagerTests {
                 // Create context with IO support and experimental options.
                 () -> Context.newBuilder("js").allowExperimentalOptions(true).allowIO(true).options(options).build());) {
             // Require a module
-            Value module = manager.eval("js", "require('Foo');");
+            Value module = manager.getContext().eval("js", "require('Foo');");
             System.out.println(module);
         }
     }
