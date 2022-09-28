@@ -110,7 +110,7 @@
         <!-- web compontens -->
         <user-agent.version>1.2.4</user-agent.version>
         <feign.version>10.12</feign.version>
-        <httpclient.version>4.5.5</httpclient.version>
+        <httpclient.version>4.5.13</httpclient.version>
         <httpcore.version>4.4.9</httpcore.version>
         <okhttp.version>4.10.0</okhttp.version>
         <!-- compression -->
