@@ -49,13 +49,13 @@ import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
 
 /**
- * {@link MinioAdminTools}
+ * {@link MinioAdminTool}
  * 
  * @author James Wong
  * @version 2022-09-16
  * @since v3.0.0
  */
-public final class MinioAdminTools {
+public final class MinioAdminTool {
 
     public static final String DEFAULT_ENDPOINT = "http://localhost:9000";
     public static final String DEFAULT_REGION = "us-east-1";
@@ -114,13 +114,13 @@ public final class MinioAdminTools {
         System.out.println("           region: " + region);
         System.out.println("   adminAccessKey: " + adminAccessKey);
         System.out.println("   adminSecretKey: " + adminSecretKey);
-        System.out.println(" tenantAccessKey: " + tenantAccessKey);
-        System.out.println(" tenantSecretKey: " + tenantSecretKey);
-        System.out.println("    tenantBucket: " + tenantBucket);
-        System.out.println("tenantPolicyName: " + tenantPolicyName);
-        System.out.println("tenantPolicyJson: " + tenantPolicyJson);
+        System.out.println("  tenantAccessKey: " + tenantAccessKey);
+        System.out.println("  tenantSecretKey: " + tenantSecretKey);
+        System.out.println("     tenantBucket: " + tenantBucket);
+        System.out.println(" tenantPolicyName: " + tenantPolicyName);
+        System.out.println(" tenantPolicyJson: " + tenantPolicyJson);
         System.out.println("---------------------------------------");
-        System.out.println("\nCall to MinIO Server ...\n");
+        System.out.println("\nRequest to MinIO Server ...\n");
 
         createTenantPolicy(endpoint, region, adminAccessKey, adminSecretKey, tenantPolicyName, tenantPolicyJson);
         createTenantUser(endpoint, region, adminAccessKey, adminSecretKey, tenantAccessKey, tenantSecretKey, tenantPolicyName);
