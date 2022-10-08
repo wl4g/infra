@@ -152,19 +152,26 @@ public class GraalJsScriptManagerTests {
     // moved out by default since graalvm-22.2
     @Test
     public void testJavaToESModuleCall() throws Exception {
-        String esmModuleScript = "export class Foo { square(x) { return x * x; } }";
+        String esmScript1 = "export class Foo {"
+                + "square(x) { "
+                + "  console.log('versionJS:', Graal.versionJS);"
+                + "  console.log('versionGraalVM:', Graal.versionGraalVM);"
+                + "  console.log('isGraalRuntime():', Graal.isGraalRuntime());"
+                + "  return x * x; }"
+                + "}";
 
-        File localFile = new File("/tmp/test-graaljs-" + currentTimeMillis() + ".mjs");
-        FileIOUtils.writeFile(localFile, esmModuleScript, Charsets.UTF_8, false);
+        File esmScript1File = new File(
+                "/tmp/test-graaljs-" + currentTimeMillis() + ".mjs"/* ".js" */);
+        FileIOUtils.writeFile(esmScript1File, esmScript1, Charsets.UTF_8, false);
 
-        String esmScript = "import {Foo} from '" + localFile.getAbsolutePath()
+        String esmScript2 = "import {Foo} from '" + esmScript1File.getAbsolutePath()
                 + "'; const foo = new Foo(); console.log(foo.square(64));";
 
         try (GraalJsScriptManager manager = new GraalJsScriptManager(1, 10,
                 () -> Context.newBuilder("js").allowIO(true).build());) {
             // Source source =
-            // Source.newBuilder("js",localFile).mimeType("application/javascript+module").build();
-            Source source = Source.newBuilder("js", esmScript, "test.mjs").build();
+            // Source.newBuilder("js",esmScript1File).mimeType("application/javascript+module").build();
+            Source source = Source.newBuilder("js", esmScript2, "test.mjs").build();
             Value result = manager.getContext().eval(source);
             System.out.println(result);
         }
@@ -182,9 +189,9 @@ public class GraalJsScriptManagerTests {
         File localGlobalFile = new File("/tmp/test-graaljs-globals-" + currentTimeMillis() + ".js");
         FileIOUtils.writeFile(localGlobalFile, globalScript, Charsets.UTF_8, false);
 
-        String esmModuleScript = "export class Foo { square(x) { return x * x; } }";
-        File localFile = new File("/tmp/test-graaljs-" + currentTimeMillis() + ".mjs");
-        FileIOUtils.writeFile(localFile, esmModuleScript, Charsets.UTF_8, false);
+        String esmScript1 = "export class Foo { square(x) { return x * x; } }";
+        File esmScript1File = new File("/tmp/test-graaljs-" + currentTimeMillis() + ".mjs");
+        FileIOUtils.writeFile(esmScript1File, esmScript1, Charsets.UTF_8, false);
 
         Map<String, String> options = new HashMap<>();
         // Enable CommonJS experimental support.
@@ -192,7 +199,7 @@ public class GraalJsScriptManagerTests {
         // (optional) folder where the NPM modules to be loaded are located.
         options.put("js.commonjs-require-cwd", npmModulesDir.getAbsolutePath());
         // (optional) initialization script to pre-define globals.
-        options.put("js.commonjs-global-properties", localFile.getAbsolutePath());
+        options.put("js.commonjs-global-properties", esmScript1File.getAbsolutePath());
         // (optional) Node.js built-in replacements as a comma separated list.
         // options.put("js.commonjs-core-modules-replacements","buffer:buffer/,path:path-browserify");
 

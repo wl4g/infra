@@ -54,11 +54,35 @@ public class GraalJsJava2JsTests {
     }
 
     @Test
-    public void testLoadAndRunJS() {
-        Context c = Context.create("js");
+    public void testRunSimpleJS() {
+        Context c = Context.newBuilder("js").allowIO(true).build();
         try {
             File calculatorJS = new File(getClass().getClassLoader().getResource("graalvm/js/test-calculator.js").getFile());
-            c.eval(Source.newBuilder("js", calculatorJS).build());
+            c.eval(Source.newBuilder("js", calculatorJS)
+                    /* .mimeType("application/javascript+module") */.build());
+
+            Value fibonacciFunction = c.getBindings("js").getMember("fibonacci");
+            Integer fibonacciResult = fibonacciFunction.execute(12).asInt();
+
+            System.out.println("Calculation Result for Fibonacci (12) " + fibonacciResult);
+            Value sqrtFunction = c.getBindings("js").getMember("squareRoot");
+
+            Double sqrtResult = sqrtFunction.execute(42).asDouble();
+            System.out.println("Calculation Result for Square Root (42) " + sqrtResult);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    // Failure:TODO
+    @Test
+    public void testRunJquery() {
+        Context c = Context.newBuilder("js").allowIO(true).build();
+        try {
+            File jquery = new File(getClass().getClassLoader().getResource("graalvm/js/jquery-3.6.1.min.js").getFile());
+            c.eval(Source.newBuilder("js", jquery)
+                    /* .mimeType("application/javascript+module") */.build());
 
             Value fibonacciFunction = c.getBindings("js").getMember("fibonacci");
             Integer fibonacciResult = fibonacciFunction.execute(12).asInt();

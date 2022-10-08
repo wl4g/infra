@@ -24,7 +24,6 @@ import static com.wl4g.infra.common.lang.TypeConverts.parseDoubleOrNull;
 import static com.wl4g.infra.common.lang.TypeConverts.parseFloatOrNull;
 import static com.wl4g.infra.common.lang.TypeConverts.parseIntOrNull;
 import static com.wl4g.infra.common.lang.TypeConverts.parseLongOrNull;
-import static java.lang.System.getProperty;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toMap;
@@ -66,27 +65,27 @@ public abstract class EnvironmentUtil {
     }
 
     public static long getLongProperty(@NotNull String key, @Nullable long defaultValue) {
-        Long value = parseLongOrNull(getProperty(key));
+        Long value = parseLongOrNull(getStringProperty(key, null));
         return nonNull(value) ? value : defaultValue;
     }
 
     public static int getIntProperty(@NotNull String key, @Nullable int defaultValue) {
-        Integer value = parseIntOrNull(getProperty(key));
+        Integer value = parseIntOrNull(getStringProperty(key, null));
         return nonNull(value) ? value : defaultValue;
     }
 
     public static float getFloatProperty(@NotNull String key, @Nullable float defaultValue) {
-        Float value = parseFloatOrNull(getProperty(key));
+        Float value = parseFloatOrNull(getStringProperty(key, null));
         return nonNull(value) ? value : defaultValue;
     }
 
     public static double getDoubleProperty(@NotNull String key, @Nullable double defaultValue) {
-        Double value = parseDoubleOrNull(getProperty(key));
+        Double value = parseDoubleOrNull(getStringProperty(key, null));
         return nonNull(value) ? value : defaultValue;
     }
 
     public static boolean getBooleanProperty(@NotNull String key, @Nullable boolean defaultValue) {
-        String value = getProperty(key);
+        String value = getStringProperty(key, null);
         return nonNull(value) ? Boolean.parseBoolean(value) : defaultValue;
     }
 
@@ -111,7 +110,7 @@ public abstract class EnvironmentUtil {
                 .filter(e -> startsWithIgnoreCase(e.getKey(), underscorePrefix))
                 .collect(toMap(e -> e.getKey(), e -> e.getValue()));
 
-        // Merge environment override to properties.
+        // Merge environment(prioritized) override to properties.
         props1.putAll(props2);
 
         return props1;
