@@ -44,7 +44,7 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * {@link GraalJsScriptManager}
+ * {@link GraalPolyglotManager}
  * 
  * @author James Wong
  * @version 2022-09-23
@@ -52,19 +52,19 @@ import lombok.extern.slf4j.Slf4j;
  * @see https://www.graalvm.org/22.0/reference-manual/js/Modules/
  */
 @Slf4j
-public class GraalJsScriptManager implements Closeable {
+public class GraalPolyglotManager implements Closeable {
 
     private @NotNull SimpleFastContextPool contextPool;
 
-    public GraalJsScriptManager(@Min(0) int initSize, @Min(1) int maxSize, Boolean allowIO, String... permittedLanguages) {
+    public GraalPolyglotManager(@Min(0) int initSize, @Min(1) int maxSize, Boolean allowIO, String... permittedLanguages) {
         this(initSize, maxSize, () -> Context.newBuilder(permittedLanguages).allowIO(allowIO).build());
     }
 
-    public GraalJsScriptManager(@Min(0) int initSize, @Min(1) int maxSize, String... permittedLanguages) {
+    public GraalPolyglotManager(@Min(0) int initSize, @Min(1) int maxSize, String... permittedLanguages) {
         this(initSize, maxSize, () -> Context.newBuilder(permittedLanguages).allowAllAccess(true).build());
     }
 
-    public GraalJsScriptManager(@Min(0) int initSize, @Min(1) int maxSize, Callable<Context> instantiator) {
+    public GraalPolyglotManager(@Min(0) int initSize, @Min(1) int maxSize, Callable<Context> instantiator) {
         try {
             log.info("Initialzing graalvm polyglot context pool ...");
             this.contextPool = new SimpleFastContextPool(initSize, maxSize, instantiator);

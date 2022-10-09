@@ -19,14 +19,14 @@ import lombok.Data;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link GraalJsJava2JsTests}
+ * {@link GraalJava2JSTests}
  * 
  * @author James Wong
  * @version 2022-09-24
  * @since v3.0.0
  * @see https://github.com/AMIS-Services/jfall2019-graalvm/blob/master/polyglot/java2js/nl/amis/java2js/CallbackFromJS2J.java
  */
-public class GraalJs2JavaTests {
+public class GraalJS2JavaTests {
 
     @Test
     public void testJsCallJava() {

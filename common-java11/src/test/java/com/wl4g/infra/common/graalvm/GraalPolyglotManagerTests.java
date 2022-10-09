@@ -31,18 +31,18 @@ import org.graalvm.polyglot.Value;
 import org.junit.Test;
 
 import com.google.common.base.Charsets;
-import com.wl4g.infra.common.graalvm.GraalJsScriptManager.ContextWrapper;
-import com.wl4g.infra.common.graalvm.GraalJsScriptManager.SimpleFastContextPool;
+import com.wl4g.infra.common.graalvm.GraalPolyglotManager.ContextWrapper;
+import com.wl4g.infra.common.graalvm.GraalPolyglotManager.SimpleFastContextPool;
 import com.wl4g.infra.common.io.FileIOUtils;
 
 /**
- * {@link GraalJsScriptManagerTests}
+ * {@link GraalPolyglotManagerTests}
  * 
  * @author James Wong
  * @version 2022-09-23
  * @since v3.0.0
  */
-public class GraalJsScriptManagerTests {
+public class GraalPolyglotManagerTests {
 
     @Test
     public void testTakeNoOverflow() throws Exception {
@@ -151,14 +151,10 @@ public class GraalJsScriptManagerTests {
     // Notice: The js language support for the native-image plugin has been
     // moved out by default since graalvm-22.2
     @Test
-    public void testJavaToESModuleCall() throws Exception {
-        String esmScript1 = "export class Foo {"
-                + "square(x) { "
-                + "  console.log('versionJS:', Graal.versionJS);"
+    public void testJava2ESMScript() throws Exception {
+        String esmScript1 = "export class Foo {" + "square(x) { " + "  console.log('versionJS:', Graal.versionJS);"
                 + "  console.log('versionGraalVM:', Graal.versionGraalVM);"
-                + "  console.log('isGraalRuntime():', Graal.isGraalRuntime());"
-                + "  return x * x; }"
-                + "}";
+                + "  console.log('isGraalRuntime():', Graal.isGraalRuntime());" + "  return x * x; }" + "}";
 
         File esmScript1File = new File(
                 "/tmp/test-graaljs-" + currentTimeMillis() + ".mjs"/* ".js" */);
@@ -167,12 +163,13 @@ public class GraalJsScriptManagerTests {
         String esmScript2 = "import {Foo} from '" + esmScript1File.getAbsolutePath()
                 + "'; const foo = new Foo(); console.log(foo.square(64));";
 
-        try (GraalJsScriptManager manager = new GraalJsScriptManager(1, 10,
-                () -> Context.newBuilder("js").allowIO(true).build());) {
-            // Source source =
+        try (GraalPolyglotManager manager = new GraalPolyglotManager(1, 10, () -> Context.newBuilder("js").allowIO(true).build());
+                ContextWrapper context = manager.getContext();) {
             // Source.newBuilder("js",esmScript1File).mimeType("application/javascript+module").build();
-            Source source = Source.newBuilder("js", esmScript2, "test.mjs").build();
-            Value result = manager.getContext().eval(source);
+            Value result = context.eval(Source.newBuilder("js", esmScript2, "test.mjs").build());
+
+            // Value bindings = context.getBindings("js");
+            // Value mainFunction = bindings.getMember("mainFunction");
             System.out.println(result);
         }
     }
@@ -203,7 +200,7 @@ public class GraalJsScriptManagerTests {
         // (optional) Node.js built-in replacements as a comma separated list.
         // options.put("js.commonjs-core-modules-replacements","buffer:buffer/,path:path-browserify");
 
-        try (GraalJsScriptManager manager = new GraalJsScriptManager(1, 10,
+        try (GraalPolyglotManager manager = new GraalPolyglotManager(1, 10,
                 // Create context with IO support and experimental options.
                 () -> Context.newBuilder("js").allowExperimentalOptions(true).allowIO(true).options(options).build());) {
             // Require a module

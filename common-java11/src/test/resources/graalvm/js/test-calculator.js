@@ -22,7 +22,7 @@ function squareRoot(num) {
 
     // ReferenceError: URL is not defined
     try {
-        console.log("Testing for URL              => ", new URL("https://www.google.com/a/b/c").origin);
+        console.log("Testing for URL          => ", new URL("https://www.google.com/a/b/c").origin);
     } catch (e) { console.error(e); }
 
     return Math.sqrt(num);
