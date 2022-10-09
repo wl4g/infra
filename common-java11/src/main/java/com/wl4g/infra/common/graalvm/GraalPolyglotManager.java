@@ -33,7 +33,6 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import org.graalvm.polyglot.Context;
-import org.graalvm.polyglot.PolyglotException;
 import org.graalvm.polyglot.Source;
 import org.graalvm.polyglot.Value;
 
@@ -243,19 +242,19 @@ public class GraalPolyglotManager implements Closeable {
             }
         }
 
-        public Value eval(Source source) throws IOException {
+        public Value eval(Source source) {
             return getContext().eval(source);
         }
 
-        public Value eval(String languageId, CharSequence source) throws IOException {
+        public Value eval(String languageId, CharSequence source) {
             return getContext().eval(languageId, source);
         }
 
-        public Value parse(Source source) throws PolyglotException, IOException {
+        public Value parse(Source source) {
             return getContext().parse(source);
         }
 
-        public Value parse(String languageId, CharSequence source) throws IOException {
+        public Value parse(String languageId, CharSequence source) {
             return getContext().parse(languageId, source);
         }
 
