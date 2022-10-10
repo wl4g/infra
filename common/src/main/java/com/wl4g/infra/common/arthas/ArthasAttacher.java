@@ -82,7 +82,7 @@ public class ArthasAttacher {
     static String generateDefaultAgentId(@NotBlank String appName) {
         String hostname = SystemUtils2.LOCAL_PROCESS_ID;
         try {
-            hostname += "@".concat(InetAddress.getLocalHost().getHostName());
+            hostname += "-".concat(InetAddress.getLocalHost().getHostName());
         } catch (UnknownHostException e) {
             // Ignore
         }
