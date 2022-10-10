@@ -23,19 +23,18 @@ import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 /**
- * {@link EnumValidtor}
+ * {@link EnumValidator}
  * 
  * @author James Wong
  * @version 2022-09-16
  * @since v3.0.0
  */
-public class EnumValidtor implements ConstraintValidator<EnumValue, Object> {
+public class EnumValidator implements ConstraintValidator<EnumValue, Object> {
 
     private Class<?>[] enumClass;
     private String fieldName;
@@ -50,6 +49,7 @@ public class EnumValidtor implements ConstraintValidator<EnumValue, Object> {
         this.hasText = constraintAnnotation.hasText();
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public boolean isValid(Object value, ConstraintValidatorContext context) {
         if (nonNull(value) && !isBlank(value.toString())) {
@@ -58,10 +58,9 @@ public class EnumValidtor implements ConstraintValidator<EnumValue, Object> {
                     if (cl.isEnum()) {
                         try {
                             // 匹配枚举常量名
-                            Object[] constants = cl.getEnumConstants();
-                            Method method = cl.getMethod("name");
-                            for (Object constant : constants) {
-                                String constantName = method.invoke(constant).toString();
+                            Enum[] constants = (Enum[]) cl.getEnumConstants();
+                            for (Enum constant : constants) {
+                                String constantName = constant.name();
                                 if (caseSensitive ? constantName.equals(value.toString())
                                         : equalsIgnoreCase(constantName, value.toString())) {
                                     return true;

@@ -33,7 +33,7 @@ import javax.validation.Payload;
  */
 @Target({ ElementType.FIELD, ElementType.METHOD, ElementType.ANNOTATION_TYPE })
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = { EnumValidtor.class })
+@Constraint(validatedBy = { EnumValidator.class })
 @Documented
 public @interface EnumValue {
 
