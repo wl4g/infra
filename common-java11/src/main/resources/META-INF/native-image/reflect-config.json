@@ -215,6 +215,33 @@
   ]
 },
 {
+  "name":"io.minio.GetObjectArgs",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }
+  ]
+},
+{
+  "name":"io.minio.PutObjectArgs",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }
+  ]
+},
+{
+  "name":"io.minio.StatObjectArgs",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }
+  ]
+},
+{
   "name":"org.graalvm.polyglot.Engine",
   "methods":[{"name":"getImpl","parameterTypes":[] }]
 },
