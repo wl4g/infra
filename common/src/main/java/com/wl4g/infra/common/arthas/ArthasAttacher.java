@@ -17,19 +17,22 @@ package com.wl4g.infra.common.arthas;
 
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.EnvironmentUtil.getStringProperty;
-import static com.wl4g.infra.common.lang.FastTimeClock.currentTimeMillis;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.invokeMethod;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.SystemUtils.USER_HOME;
 
 import java.lang.reflect.Method;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotBlank;
 
 import com.wl4g.infra.common.lang.ClassUtils2;
+import com.wl4g.infra.common.lang.SystemUtils2;
 import com.wl4g.infra.common.reflect.ReflectionUtils2;
 
 import lombok.extern.slf4j.Slf4j;
@@ -56,7 +59,7 @@ public class ArthasAttacher {
             appName = getStringProperty("arthas.appName", (isBlank(appName) ? "defaultApp" : appName));
             Map<String, String> config = new HashMap<>();
             config.put("arthas.appName", appName);
-            config.put("arthas.agentId", getStringProperty("arthas.agentId", appName + "-" + currentTimeMillis()));
+            config.put("arthas.agentId", getStringProperty("arthas.agentId", generateDefaultAgentId(appName)));
             config.put("arthas.ip", getStringProperty("arthas.ip", "0.0.0.0"));
             config.put("arthas.telnetPort", getStringProperty("arthas.telnetPort", "3658"));
             config.put("arthas.httpPort", getStringProperty("arthas.httpPort", "8563"));
@@ -74,6 +77,16 @@ public class ArthasAttacher {
 
     static String getDefaultArthasOutputPath() {
         return USER_HOME.concat("/").concat(".arthas-output/");
+    }
+
+    static String generateDefaultAgentId(@NotBlank String appName) {
+        String hostname = SystemUtils2.LOCAL_PROCESS_ID;
+        try {
+            hostname += "@".concat(InetAddress.getLocalHost().getHostName());
+        } catch (UnknownHostException e) {
+            // Ignore
+        }
+        return appName.concat("-").concat(hostname);
     }
 
     public static final String ARTHAS_AGENT_CLASS = "com.taobao.arthas.agent.attach.ArthasAgent";
