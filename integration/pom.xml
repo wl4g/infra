@@ -59,9 +59,9 @@
 		<module>integration-feign-common</module>
 		<module>integration-feign-core</module>
 		<module>integration-feign-istio</module>
-		<module>integration-feign-istio-example</module>
+		<!-- <module>integration-feign-istio-example</module> -->
 		<module>integration-feign-springcloud</module>
-		<module>integration-feign-springcloud-example</module>
+		<!-- <module>integration-feign-springcloud-example</module> -->
 		<!-- <module>integration-feign-dubbo</module> -->
 		<!-- <module>integration-feign-dubbo-example</module> -->
 		<module>integration-eureka</module>
