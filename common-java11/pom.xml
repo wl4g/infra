@@ -132,7 +132,7 @@
     <profiles>
         <!-- see:https://plump-possum-683.notion.site/java-a4ff79ddfe594f4284c6c18c4944d128 -->
         <profile>
-            <id>java11-plus</id>
+            <id>compile-on-java11-plus</id>
             <activation>
                 <!-- see:https://maven.apache.org/enforcer/enforcer-rules/versionRanges.html -->
                 <jdk>[11,)</jdk>

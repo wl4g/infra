@@ -37,8 +37,6 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
-import org.junit.jupiter.api.Test;
-
 import com.wl4g.infra.common.minio.S3Policy.EffectType;
 import com.wl4g.infra.common.minio.S3Policy.Statement;
 
@@ -78,7 +76,7 @@ public class MinioIdentityProviderTests {
      * @see https://github.com/minio/minio/blob/8.4.3/docs/sts/web-identity.md
      * @see https://github.com/minio/minio/blob/master/docs/sts/keycloak.md
      */
-    @Test
+    // @Test
     public void testGetSTSWithWebIdentity() {
         String resource = format("arn:aws:s3:::%s/%s/%s", TENANT_BUCKET, USER_PREFIX, USER_OBJECT_NAME);
 
