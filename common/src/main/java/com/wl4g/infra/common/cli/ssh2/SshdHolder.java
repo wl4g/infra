@@ -15,8 +15,10 @@
  */
 package com.wl4g.infra.common.cli.ssh2;
 
-import static com.wl4g.infra.common.lang.Assert2.hasText;
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.util.Collections.singleton;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -59,26 +61,22 @@ public class SshdHolder extends SSH2Holders<ChannelExec, ScpClient> {
 
     // --- Transfer files. ---
 
-    /**
-     * Transfer get file from remote host.(user sftp)
-     *
-     * @param host
-     * @param user
-     * @param pemPrivateKey
-     * @param localFile
-     * @param remoteFilePath
-     * @throws Exception
-     */
     @Override
-    public void scpGetFile(String host, String user, char[] pemPrivateKey, String password, File localFile, String remoteFilePath)
-            throws Exception {
-        notNull(localFile, "Transfer localFile must not be null.");
-        hasText(remoteFilePath, "Transfer remoteDir can't empty.");
-        log.debug("SSH2 transfer file from {} to {}@{}:{}", localFile.getAbsolutePath(), user, host, remoteFilePath);
+    public void scpGetFile(
+            String host,
+            int port,
+            String user,
+            char[] pemPrivateKey,
+            String password,
+            File localFile,
+            String remoteFilePath) throws Exception {
+        notNullOf(localFile, "localFile");
+        hasTextOf(remoteFilePath, "remoteFilePath");
 
+        log.debug("SSH2 transfer file from {} to {}@{}:{}", localFile.getAbsolutePath(), user, host, remoteFilePath);
         try {
             // Transfer get file.
-            doScpTransfer(host, user, pemPrivateKey, password, scp -> {
+            doScpTransfer(host, port, user, pemPrivateKey, password, scp -> {
                 scp.download(remoteFilePath, localFile.getAbsolutePath());
             });
 
@@ -86,65 +84,50 @@ public class SshdHolder extends SSH2Holders<ChannelExec, ScpClient> {
         } catch (IOException e) {
             throw e;
         }
-
     }
 
-    /**
-     * Transfer put file to remote host directory.
-     *
-     * @param host
-     * @param user
-     * @param pemPrivateKey
-     * @param localFile
-     * @param remoteDir
-     * @throws Exception
-     */
     @Override
-    public void scpPutFile(String host, String user, char[] pemPrivateKey, String password, File localFile, String remoteDir)
-            throws Exception {
-        notNull(localFile, "Transfer localFile must not be null.");
-        hasText(remoteDir, "Transfer remoteDir can't empty.");
-        log.debug("SSH2 transfer file from {} to {}@{}:{}", localFile.getAbsolutePath(), user, host, remoteDir);
+    public void scpPutFile(
+            String host,
+            int port,
+            String user,
+            char[] pemPrivateKey,
+            String password,
+            File localFile,
+            String remoteDir) throws Exception {
+        notNullOf(localFile, "localFile");
+        hasTextOf(remoteDir, "remoteDir");
 
+        log.debug("SSH2 transfer file from {} to {}@{}:{}", localFile.getAbsolutePath(), user, host, remoteDir);
         try {
             // Transfer send file.
-            doScpTransfer(host, user, pemPrivateKey, password, scp -> {
+            doScpTransfer(host, port, user, pemPrivateKey, password, scp -> {
                 scp.upload(localFile.getAbsolutePath(), remoteDir);
             });
-
             log.debug("SCP put transfered: '{}' to '{}@{}:{}'", localFile.getAbsolutePath(), user, host, remoteDir);
         } catch (IOException e) {
             throw e;
         }
-
     }
 
-    /**
-     * Perform file transfer with remote host, including scp.put/upload or
-     * scp.get/download.
-     *
-     * @param host
-     * @param user
-     * @param pemPrivateKey
-     * @param processor
-     * @throws IOException
-     */
     @Override
     protected void doScpTransfer(
             String host,
+            int port,
             String user,
             char[] pemPrivateKey,
             String password,
             CallbackFunction<ScpClient> processor) throws Exception {
-        hasText(host, "Transfer host can't empty.");
-        hasText(user, "Transfer user can't empty.");
-        notNull(processor, "Transfer processor can't null.");
+        hasTextOf(host, "host");
+        isTrueOf(port >= 1, "port>=1");
+        hasTextOf(user, "user");
+        notNullOf(processor, "processor");
 
         // Fallback uses the local current user private key by default.
         if (isNull(pemPrivateKey)) {
             pemPrivateKey = getDefaultLocalUserPrivateKey();
         }
-        notNull(pemPrivateKey, "Transfer pemPrivateKey can't null.");
+        notNullOf(pemPrivateKey, "pemPrivateKey");
 
         SshClient client = null;
         ClientSession session = null;
@@ -152,7 +135,7 @@ public class SshdHolder extends SSH2Holders<ChannelExec, ScpClient> {
         try {
             client = SshClient.setUpDefaultClient();
             client.start();
-            session = authWithPrivateKey(client, host, null, user, pemPrivateKey, password);
+            session = authWithPrivateKey(client, host, port, user, pemPrivateKey, password);
             scpClient = DefaultScpClientCreator.INSTANCE.createScpClient(session);
             processor.process(scpClient);
         } catch (Exception e) {
@@ -163,7 +146,7 @@ public class SshdHolder extends SSH2Holders<ChannelExec, ScpClient> {
                     session.close();
                 }
             } catch (Exception e) {
-                log.error("", e);
+                log.error("Closing session failure", e);
             }
             try {
                 if (nonNull(client)) {
@@ -171,7 +154,7 @@ public class SshdHolder extends SSH2Holders<ChannelExec, ScpClient> {
                     client.close();
                 }
             } catch (Exception e) {
-                log.error("", e);
+                log.error("Closing client failure", e);
             }
         }
     }
@@ -180,12 +163,13 @@ public class SshdHolder extends SSH2Holders<ChannelExec, ScpClient> {
 
     public Ssh2ExecResult execWaitForResponse(
             String host,
+            int port,
             String user,
             char[] pemPrivateKey,
             String password,
             String command,
             long timeoutMs) throws Exception {
-        return execWaitForComplete(host, user, pemPrivateKey, password, command, session -> {
+        return execWaitForComplete(host, port, user, pemPrivateKey, password, command, session -> {
             String msg = null, errmsg = null;
             if (nonNull(session.getOut())) {
                 // msg = readFullyToString(session.getOut());
@@ -201,13 +185,14 @@ public class SshdHolder extends SSH2Holders<ChannelExec, ScpClient> {
     @Override
     public <T> T execWaitForComplete(
             String host,
+            int port,
             String user,
             char[] pemPrivateKey,
             String password,
             String command,
             ProcessFunction<ChannelExec, T> processor,
             long timeoutMs) throws Exception {
-        return doExecCommand(host, user, pemPrivateKey, password, command, channelExec -> {
+        return doExecCommand(host, port, user, pemPrivateKey, password, command, channelExec -> {
             // Wait for completed by condition.
             channelExec.waitFor(singleton(ClientChannelEvent.CLOSED), timeoutMs);
             return processor.process(channelExec);
@@ -217,14 +202,16 @@ public class SshdHolder extends SSH2Holders<ChannelExec, ScpClient> {
     @Override
     public <T> T doExecCommand(
             String host,
+            int port,
             String user,
             char[] pemPrivateKey,
             String password,
             String command,
             ProcessFunction<ChannelExec, T> processor) throws Exception {
-        hasText(host, "SSH2 command host can't empty.");
-        hasText(user, "SSH2 command user can't empty.");
-        notNull(processor, "SSH2 command processor can't null.");
+        hasTextOf(host, "host");
+        isTrueOf(port >= 1, "port>=1");
+        hasTextOf(user, "user");
+        notNullOf(processor, "processor");
 
         // Fallback uses the local current user private key by default.
         if (isNull(pemPrivateKey)) {
@@ -255,7 +242,7 @@ public class SshdHolder extends SSH2Holders<ChannelExec, ScpClient> {
                 try {
                     out.close();
                 } catch (Exception e) {
-                    log.error("", e);
+                    log.error("Closing sshd output stream failure", e);
                 }
             }
             try {
@@ -263,14 +250,14 @@ public class SshdHolder extends SSH2Holders<ChannelExec, ScpClient> {
                     chSession.close();
                 }
             } catch (Exception e) {
-                log.error("", e);
+                log.error("Closing sshd channel failure", e);
             }
             try {
                 if (nonNull(session)) {
                     session.close();
                 }
             } catch (Exception e) {
-                log.error("", e);
+                log.error("Closing sshd session failure", e);
             }
             try {
                 if (nonNull(client)) {
@@ -278,7 +265,7 @@ public class SshdHolder extends SSH2Holders<ChannelExec, ScpClient> {
                     client.close();
                 }
             } catch (Exception e) {
-                log.error("", e);
+                log.error("Closing sshd client failure", e);
             }
         }
     }

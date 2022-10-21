@@ -36,19 +36,36 @@ public class JschHolder extends SSH2Holders<Void, Void> {
     // --- Transfer files. ---
 
     @Override
-    public void scpGetFile(String host, String user, char[] pemPrivateKey, String password, File localFile, String remoteFilePath)
-            throws Exception {
+    public void scpGetFile(
+            String host,
+            int port,
+            String user,
+            char[] pemPrivateKey,
+            String password,
+            File localFile,
+            String remoteFilePath) throws Exception {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void scpPutFile(String host, String user, char[] pemPrivateKey, String password, File localFile, String remoteDir)
-            throws Exception {
+    public void scpPutFile(
+            String host,
+            int port,
+            String user,
+            char[] pemPrivateKey,
+            String password,
+            File localFile,
+            String remoteDir) throws Exception {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    protected void doScpTransfer(String host, String user, char[] pemPrivateKey, String password,
+    protected void doScpTransfer(
+            String host,
+            int port,
+            String user,
+            char[] pemPrivateKey,
+            String password,
             CallbackFunction<Void> processor) throws Exception {
         throw new UnsupportedOperationException();
     }
@@ -56,19 +73,38 @@ public class JschHolder extends SSH2Holders<Void, Void> {
     // --- Execution commands. ---
 
     @Override
-    public Ssh2ExecResult execWaitForResponse(String host, String user, char[] pemPrivateKey, String password, String command,
+    public Ssh2ExecResult execWaitForResponse(
+            String host,
+            int port,
+            String user,
+            char[] pemPrivateKey,
+            String password,
+            String command,
             long timeoutMs) throws Exception {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public <T> T execWaitForComplete(String host, String user, char[] pemPrivateKey, String password, String command,
-            ProcessFunction<Void, T> processor, long timeoutMs) throws Exception {
+    public <T> T execWaitForComplete(
+            String host,
+            int port,
+            String user,
+            char[] pemPrivateKey,
+            String password,
+            String command,
+            ProcessFunction<Void, T> processor,
+            long timeoutMs) throws Exception {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public <T> T doExecCommand(String host, String user, char[] pemPrivateKey, String password, String command,
+    public <T> T doExecCommand(
+            String host,
+            int port,
+            String user,
+            char[] pemPrivateKey,
+            String password,
+            String command,
             ProcessFunction<Void, T> processor) throws Exception {
         throw new UnsupportedOperationException();
     }

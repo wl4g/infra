@@ -60,8 +60,8 @@ public class SshdHolderTests {
 
     public static void execCatCommandTest1() throws Exception {
         String cmd = "cat /tmp/test_vim_file.txt";
-        Ssh2ExecResult resp = SSH2Holders.getInstance(SshdHolder.class).execWaitForResponse("127.0.0.1", "wanglsir",
-                PRIVATE_KEY.toCharArray(), null, cmd, 3_000);
+        Ssh2ExecResult resp = SSH2Holders.getInstance(SshdHolder.class)
+                .execWaitForResponse("127.0.0.1", "wanglsir", PRIVATE_KEY.toCharArray(), null, cmd, 3_000);
         out.println("stdout=" + resp.getMessage());
         out.println("stderr=" + resp.getErrmsg());
         out.println("exitCode=" + resp.getExitCode());
@@ -70,10 +70,9 @@ public class SshdHolderTests {
 
     public static void execVimCommandTest2() throws Exception {
         String cmd = "vim /tmp/test_vim_file.txt";
-        SSH2Holders.getInstance(SshdHolder.class).doExecCommand("127.0.0.1", "wanglsir", PRIVATE_KEY.toCharArray(), null, cmd,
-                chSession -> {
+        SSH2Holders.getInstance(SshdHolder.class)
+                .doExecCommand("127.0.0.1", "wanglsir", PRIVATE_KEY.toCharArray(), null, cmd, chSession -> {
                     chSession.waitFor(singleton(ClientChannelEvent.CLOSED), 3_000);
-
                     String msg = null, errmsg = null;
                     if (nonNull(chSession.getOut())) {
                         msg = chSession.getOut().toString();
@@ -85,15 +84,15 @@ public class SshdHolderTests {
                     }
                     return null;
                 });
-
     }
 
     public static void putTransferTest2() throws Exception {
         long begin = currentTimeMillis();
         // Test upload file
         String loaclFile = "/Users/vjay/Downloads/elasticsearch-7.6.0-linux-x86_64.tar";
-        SSH2Holders.getInstance(SshdHolder.class).scpPutFile("10.0.0.160", "root", PRIVATE_KEY.toCharArray(), null,
-                new File(loaclFile), "$HOME/testssh/elasticsearch-7.6.0-linux-x86_64.tar");
+        SSH2Holders.getInstance(SshdHolder.class)
+                .scpPutFile("10.0.0.160", "root", PRIVATE_KEY.toCharArray(), null, new File(loaclFile),
+                        "$HOME/testssh/elasticsearch-7.6.0-linux-x86_64.tar");
         long end = currentTimeMillis();
         out.println("cost:" + (end - begin));// 80801ms 150<cpu<200
     }

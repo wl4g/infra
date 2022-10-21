@@ -15,10 +15,26 @@
  */
 package com.wl4g.infra.common.cli.ssh2;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.isEmptyArray;
+import static com.wl4g.infra.common.io.ByteStreamUtils.readFullyToString;
+import static com.wl4g.infra.common.lang.Assert2.hasText;
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
+import static com.wl4g.infra.common.lang.Assert2.notNull;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
+import java.io.File;
+import java.io.IOException;
+
+import javax.validation.constraints.NotNull;
+
 import com.google.common.annotations.Beta;
+import com.wl4g.infra.common.cli.ssh2.SshjHolder.CommandSessionWrapper;
 import com.wl4g.infra.common.function.CallbackFunction;
 import com.wl4g.infra.common.function.ProcessFunction;
-import com.wl4g.infra.common.log.SmartLogger;
 
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.connection.channel.direct.Session;
@@ -28,19 +44,6 @@ import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
 import net.schmizz.sshj.xfer.FileSystemFile;
 import net.schmizz.sshj.xfer.scp.SCPFileTransfer;
 import net.schmizz.sshj.xfer.scp.ScpCommandLine;
-
-import java.io.File;
-import java.io.IOException;
-
-import static com.wl4g.infra.common.cli.ssh2.SshjHolder.CommandSessionWrapper;
-import static com.wl4g.infra.common.collection.CollectionUtils2.isEmptyArray;
-import static com.wl4g.infra.common.io.ByteStreamUtils.readFullyToString;
-import static com.wl4g.infra.common.lang.Assert2.hasText;
-import static com.wl4g.infra.common.lang.Assert2.notNull;
-import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
-import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
  * SSHJ based SSH2 tools.
@@ -52,30 +55,24 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 @Beta
 public class SshjHolder extends SSH2Holders<CommandSessionWrapper, SCPFileTransfer> {
 
-    private static final SmartLogger log = getLogger(SshjHolder.class);
-
     // --- Transfer files. ---
 
-    /**
-     * Transfer get file from remote host.(user sftp)
-     * 
-     * @param host
-     * @param user
-     * @param pemPrivateKey
-     * @param localFile
-     * @param remoteFilePath
-     * @throws Exception
-     */
     @Override
-    public void scpGetFile(String host, String user, char[] pemPrivateKey, String password, File localFile, String remoteFilePath)
-            throws Exception {
+    public void scpGetFile(
+            String host,
+            int port,
+            String user,
+            char[] pemPrivateKey,
+            String password,
+            File localFile,
+            String remoteFilePath) throws Exception {
         notNull(localFile, "Transfer localFile must not be null.");
         hasText(remoteFilePath, "Transfer remoteDir can't empty.");
-        log.debug("SSH2 transfer file from {} to {}@{}:{}", localFile.getAbsolutePath(), user, host, remoteFilePath);
 
+        log.debug("SSH2 transfer file from {} to {}@{}:{}", localFile.getAbsolutePath(), user, host, remoteFilePath);
         try {
             // Transfer get file.
-            doScpTransfer(host, user, pemPrivateKey, password, scp -> {
+            doScpTransfer(host, port, user, pemPrivateKey, password, scp -> {
                 scp.download(remoteFilePath, new FileSystemFile(localFile));
             });
 
@@ -83,29 +80,24 @@ public class SshjHolder extends SSH2Holders<CommandSessionWrapper, SCPFileTransf
         } catch (IOException e) {
             throw e;
         }
-
     }
 
-    /**
-     * Transfer put file to remote host directory.
-     * 
-     * @param host
-     * @param user
-     * @param pemPrivateKey
-     * @param localFile
-     * @param remoteDir
-     * @throws Exception
-     */
     @Override
-    public void scpPutFile(String host, String user, char[] pemPrivateKey, String password, File localFile, String remoteDir)
-            throws Exception {
-        notNull(localFile, "Transfer localFile must not be null.");
-        hasText(remoteDir, "Transfer remoteDir can't empty.");
-        log.debug("SSH2 transfer file from {} to {}@{}:{}", localFile.getAbsolutePath(), user, host, remoteDir);
+    public void scpPutFile(
+            String host,
+            int port,
+            String user,
+            char[] pemPrivateKey,
+            String password,
+            File localFile,
+            String remoteDir) throws Exception {
+        notNullOf(localFile, "localFile");
+        hasTextOf(remoteDir, "remoteDir");
 
+        log.debug("SSH2 transfer file from {} to {}@{}:{}", localFile.getAbsolutePath(), user, host, remoteDir);
         try {
             // Transfer send file.
-            doScpTransfer(host, user, pemPrivateKey, password, scp -> {
+            doScpTransfer(host, port, user, pemPrivateKey, password, scp -> {
                 // scp.upload(new FileSystemFile(localFile), remoteDir);
                 scp.newSCPUploadClient().copy(new FileSystemFile(localFile), remoteDir, ScpCommandLine.EscapeMode.NoEscape);
             });
@@ -114,7 +106,6 @@ public class SshjHolder extends SSH2Holders<CommandSessionWrapper, SCPFileTransf
         } catch (IOException e) {
             throw e;
         }
-
     }
 
     /**
@@ -128,11 +119,17 @@ public class SshjHolder extends SSH2Holders<CommandSessionWrapper, SCPFileTransf
      * @throws IOException
      */
     @Override
-    protected void doScpTransfer(String host, String user, char[] pemPrivateKey, String password,
+    protected void doScpTransfer(
+            String host,
+            int port,
+            String user,
+            char[] pemPrivateKey,
+            String password,
             CallbackFunction<SCPFileTransfer> processor) throws Exception {
-        hasText(host, "Transfer host can't empty.");
-        hasText(user, "Transfer user can't empty.");
-        notNull(processor, "Transfer processor can't null.");
+        hasTextOf(host, "host");
+        isTrueOf(port >= 1, "port>=1");
+        hasTextOf(user, "user");
+        notNullOf(processor, "processor");
 
         // Fallback uses the local current user private key by default.
         if (isNull(pemPrivateKey)) {
@@ -141,15 +138,14 @@ public class SshjHolder extends SSH2Holders<CommandSessionWrapper, SCPFileTransf
         notNull(pemPrivateKey, "Transfer pemPrivateKey can't null.");
 
         SSHClient ssh = null;
-        SCPFileTransfer scpFileTransfer = null;
         try {
             ssh = new SSHClient();
             ssh.addHostKeyVerifier(new PromiscuousVerifier());
-            ssh.connect(host);
+            ssh.connect(host, port);
             KeyProvider keyProvider = ssh.loadKeys(new String(pemPrivateKey), null, null);
             ssh.authPublickey(user, keyProvider);
 
-            scpFileTransfer = ssh.newSCPFileTransfer();
+            SCPFileTransfer scpFileTransfer = ssh.newSCPFileTransfer();
 
             // Transfer file(put/get).
             processor.process(scpFileTransfer);
@@ -162,16 +158,22 @@ public class SshjHolder extends SSH2Holders<CommandSessionWrapper, SCPFileTransf
                     ssh.close();
                 }
             } catch (Exception e) {
-                log.error("", e);
+                log.error("Failed to closing ssh client.", e);
             }
         }
     }
 
     // --- Execution commands. ---
 
-    public Ssh2ExecResult execWaitForResponse(String host, String user, char[] pemPrivateKey, String password, String command,
+    public Ssh2ExecResult execWaitForResponse(
+            String host,
+            int port,
+            String user,
+            char[] pemPrivateKey,
+            String password,
+            String command,
             long timeoutMs) throws Exception {
-        return execWaitForComplete(host, user, pemPrivateKey, password, command, s -> {
+        return execWaitForComplete(host, port, user, pemPrivateKey, password, command, s -> {
             Session.Command cmd = s.getCommand();
             String message = null, errmsg = null;
             if (nonNull(cmd.getInputStream())) {
@@ -186,9 +188,16 @@ public class SshjHolder extends SSH2Holders<CommandSessionWrapper, SCPFileTransf
     }
 
     @Override
-    public <T> T execWaitForComplete(String host, String user, char[] pemPrivateKey, String password, String command,
-            ProcessFunction<CommandSessionWrapper, T> processor, long timeoutMs) throws Exception {
-        return doExecCommand(host, user, pemPrivateKey, password, command, s -> {
+    public <T> T execWaitForComplete(
+            String host,
+            int port,
+            String user,
+            char[] pemPrivateKey,
+            String password,
+            String command,
+            @NotNull ProcessFunction<CommandSessionWrapper, T> processor,
+            long timeoutMs) throws Exception {
+        return doExecCommand(host, port, user, pemPrivateKey, password, command, s -> {
             // Wait for completed by condition.
             s.getCommand().join(timeoutMs, MILLISECONDS);
             return processor.process(s);
@@ -196,17 +205,24 @@ public class SshjHolder extends SSH2Holders<CommandSessionWrapper, SCPFileTransf
     }
 
     @Override
-    public <T> T doExecCommand(String host, String user, char[] pemPrivateKey, String password, String command,
+    public <T> T doExecCommand(
+            String host,
+            int port,
+            String user,
+            char[] pemPrivateKey,
+            String password,
+            String command,
             ProcessFunction<CommandSessionWrapper, T> processor) throws Exception {
-        hasText(host, "SSH2 command host can't empty.");
-        hasText(user, "SSH2 command user can't empty.");
-        notNull(processor, "SSH2 command processor can't null.");
+        hasTextOf(host, "host");
+        isTrueOf(port >= 1, "port>=1");
+        hasTextOf(user, "user");
+        notNullOf(processor, "processor");
 
         // Fallback uses the local current user private key by default.
         if (isNull(pemPrivateKey)) {
             pemPrivateKey = getDefaultLocalUserPrivateKey();
         }
-        notNull(pemPrivateKey, "Transfer pemPrivateKey can't null.");
+        notNullOf(pemPrivateKey, "pemPrivateKey");
 
         SSHClient ssh = null;
         Session session = null;
@@ -224,8 +240,10 @@ public class SshjHolder extends SSH2Holders<CommandSessionWrapper, SCPFileTransf
             }
             session = ssh.startSession();
 
-            // TODO
-            command = "source /etc/profile\nsource /etc/bashrc\n" + command;
+            // Note: temporarily load according to the priority of user
+            // environment > global environment, ignoring errors caused by linux
+            // OS differences (such as ubuntu without /etc/bashrc file).
+            command = ". /etc/profile; . /etc/bashrc; . /etc/bash.bashrc; . ~/.profile; . ~/.bashrc; " + command;
             cmd = session.exec(command);
 
             return processor.process(new CommandSessionWrapper(session, cmd));
@@ -237,7 +255,7 @@ public class SshjHolder extends SSH2Holders<CommandSessionWrapper, SCPFileTransf
                     session.close();
                 }
             } catch (Exception e) {
-                log.error("", e);
+                log.error("Closing sshj session failure", e);
             }
             try {
                 if (nonNull(ssh)) {
@@ -245,7 +263,7 @@ public class SshjHolder extends SSH2Holders<CommandSessionWrapper, SCPFileTransf
                     ssh.close();
                 }
             } catch (Exception e) {
-                log.error("", e);
+                log.error("Closing sshj client failure", e);
             }
         }
     }

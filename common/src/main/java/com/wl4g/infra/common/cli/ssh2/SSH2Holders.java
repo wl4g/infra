@@ -15,10 +15,12 @@
  */
 package com.wl4g.infra.common.cli.ssh2;
 
-import com.wl4g.infra.common.function.CallbackFunction;
-import com.wl4g.infra.common.function.ProcessFunction;
-import com.wl4g.infra.common.log.SmartLogger;
-import com.wl4g.infra.common.reflect.ObjectInstantiators;
+import static com.wl4g.infra.common.lang.Assert2.isTrue;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
+import static java.util.Objects.isNull;
+import static org.apache.commons.lang3.StringUtils.join;
+import static org.apache.commons.lang3.SystemUtils.USER_HOME;
 
 import java.io.CharArrayWriter;
 import java.io.File;
@@ -27,12 +29,14 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.wl4g.infra.common.lang.Assert2.isTrue;
-import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
-import static java.util.Objects.isNull;
-import static org.apache.commons.lang3.StringUtils.join;
-import static org.apache.commons.lang3.SystemUtils.USER_HOME;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
+import com.wl4g.infra.common.function.CallbackFunction;
+import com.wl4g.infra.common.function.ProcessFunction;
+import com.wl4g.infra.common.log.SmartLogger;
+import com.wl4g.infra.common.reflect.ObjectInstantiators;
 
 /**
  * {@link SSH2Holders}, generic SSH2 client wrapper tool. </br>
@@ -44,7 +48,11 @@ import static org.apache.commons.lang3.SystemUtils.USER_HOME;
  */
 public abstract class SSH2Holders<S, F> {
 
-    private static final SmartLogger log = getLogger(SSH2Holders.class);
+    protected SmartLogger log = getLogger(getClass());
+
+    //
+    // --- Instantiation function. ---
+    //
 
     /**
      * Gets default {@link SSH2Holders} instance by provider class.
@@ -79,10 +87,12 @@ public abstract class SSH2Holders<S, F> {
         return t;
     }
 
-    // --- Transfer files. ---
+    //
+    // --- Transfer function. ---
+    //
 
     /**
-     * Transfer get file from remote host.(user sftp)
+     * Transfer get file from remote host. (SFTP)
      * 
      * @param host
      * @param user
@@ -91,7 +101,34 @@ public abstract class SSH2Holders<S, F> {
      * @param remoteFilePath
      * @throws Exception
      */
-    public abstract void scpGetFile(String host, String user, char[] pemPrivateKey, String password, File localFile,
+    public void scpGetFile(
+            @NotBlank String host,
+            @NotBlank String user,
+            char[] pemPrivateKey,
+            String password,
+            File localFile,
+            String remoteFilePath) throws Exception {
+        scpGetFile(host, 22, user, pemPrivateKey, password, localFile, remoteFilePath);
+    }
+
+    /**
+     * Transfer get file from remote host. (SFTP)
+     * 
+     * @param host
+     * @param port
+     * @param user
+     * @param pemPrivateKey
+     * @param localFile
+     * @param remoteFilePath
+     * @throws Exception
+     */
+    public abstract void scpGetFile(
+            @NotBlank String host,
+            @Min(1) int port,
+            @NotBlank String user,
+            char[] pemPrivateKey,
+            String password,
+            File localFile,
             String remoteFilePath) throws Exception;
 
     /**
@@ -104,7 +141,34 @@ public abstract class SSH2Holders<S, F> {
      * @param remoteDir
      * @throws Exception
      */
-    public abstract void scpPutFile(String host, String user, char[] pemPrivateKey, String password, File localFile,
+    public void scpPutFile(
+            @NotBlank String host,
+            @NotBlank String user,
+            char[] pemPrivateKey,
+            String password,
+            File localFile,
+            String remoteDir) throws Exception {
+        scpPutFile(host, 22, user, pemPrivateKey, password, localFile, remoteDir);
+    }
+
+    /**
+     * Transfer put file to remote host directory.
+     * 
+     * @param host
+     * @param port
+     * @param user
+     * @param pemPrivateKey
+     * @param localFile
+     * @param remoteDir
+     * @throws Exception
+     */
+    public abstract void scpPutFile(
+            @NotBlank String host,
+            @Min(1) int port,
+            @NotBlank String user,
+            char[] pemPrivateKey,
+            String password,
+            File localFile,
             String remoteDir) throws Exception;
 
     /**
@@ -112,15 +176,23 @@ public abstract class SSH2Holders<S, F> {
      * scp.get/download.
      * 
      * @param host
+     * @param port
      * @param user
      * @param pemPrivateKey
      * @param processor
      * @throws IOException
      */
-    protected abstract void doScpTransfer(String host, String user, char[] pemPrivateKey, String password,
-            CallbackFunction<F> processor) throws Exception;
+    protected abstract void doScpTransfer(
+            @NotBlank String host,
+            @Min(1) int port,
+            @NotBlank String user,
+            char[] pemPrivateKey,
+            String password,
+            @NotNull CallbackFunction<F> processor) throws Exception;
 
-    // --- Execution commands. ---
+    //
+    // --- Execution function. ---
+    //
 
     /**
      * Execution commands with SSH2.
@@ -133,8 +205,36 @@ public abstract class SSH2Holders<S, F> {
      * @return
      * @throws IOException
      */
-    public abstract Ssh2ExecResult execWaitForResponse(String host, String user, char[] pemPrivateKey, String password,
-            String command, long timeoutMs) throws Exception;
+    public Ssh2ExecResult execWaitForResponse(
+            @NotBlank String host,
+            @NotBlank String user,
+            char[] pemPrivateKey,
+            String password,
+            @NotBlank String command,
+            @Min(1) long timeoutMs) throws Exception {
+        return execWaitForResponse(host, 22, user, pemPrivateKey, password, command, timeoutMs);
+    }
+
+    /**
+     * Execution commands with SSH2.
+     * 
+     * @param host
+     * @param port
+     * @param user
+     * @param pemPrivateKey
+     * @param command
+     * @param timeoutMs
+     * @return
+     * @throws IOException
+     */
+    public abstract Ssh2ExecResult execWaitForResponse(
+            @NotBlank String host,
+            @Min(1) int port,
+            @NotBlank String user,
+            char[] pemPrivateKey,
+            String password,
+            @NotBlank String command,
+            @Min(1) long timeoutMs) throws Exception;
 
     /**
      * Execution commands wait for complete with SSH2
@@ -148,8 +248,39 @@ public abstract class SSH2Holders<S, F> {
      * @return
      * @throws IOException
      */
-    public abstract <T> T execWaitForComplete(String host, String user, char[] pemPrivateKey, String password, String command,
-            ProcessFunction<S, T> processor, long timeoutMs) throws Exception;
+    public <T> T execWaitForComplete(
+            @NotBlank String host,
+            @NotBlank String user,
+            char[] pemPrivateKey,
+            String password,
+            String command,
+            @NotNull ProcessFunction<S, T> processor,
+            long timeoutMs) throws Exception {
+        return execWaitForComplete(host, 22, user, pemPrivateKey, password, command, processor, timeoutMs);
+    }
+
+    /**
+     * Execution commands wait for complete with SSH2
+     * 
+     * @param host
+     * @param port
+     * @param user
+     * @param pemPrivateKey
+     * @param command
+     * @param processor
+     * @param timeoutMs
+     * @return
+     * @throws IOException
+     */
+    public abstract <T> T execWaitForComplete(
+            @NotBlank String host,
+            @Min(1) int port,
+            @NotBlank String user,
+            char[] pemPrivateKey,
+            String password,
+            String command,
+            @NotNull ProcessFunction<S, T> processor,
+            long timeoutMs) throws Exception;
 
     /**
      * Execution commands with SSH2
@@ -162,8 +293,36 @@ public abstract class SSH2Holders<S, F> {
      * @return
      * @throws IOException
      */
-    public abstract <T> T doExecCommand(String host, String user, char[] pemPrivateKey, String password, String command,
-            ProcessFunction<S, T> processor) throws Exception;
+    public <T> T doExecCommand(
+            @NotBlank String host,
+            @NotBlank String user,
+            char[] pemPrivateKey,
+            String password,
+            @NotBlank String command,
+            @NotNull ProcessFunction<S, T> processor) throws Exception {
+        return doExecCommand(host, 22, user, pemPrivateKey, password, command, processor);
+    }
+
+    /**
+     * Execution commands with SSH2
+     * 
+     * @param host
+     * @param port
+     * @param user
+     * @param pemPrivateKey
+     * @param command
+     * @param processor
+     * @return
+     * @throws IOException
+     */
+    public abstract <T> T doExecCommand(
+            @NotBlank String host,
+            @Min(1) int port,
+            @NotBlank String user,
+            char[] pemPrivateKey,
+            String password,
+            @NotBlank String command,
+            @NotNull ProcessFunction<S, T> processor) throws Exception;
 
     /**
      * Get local current user ssh authentication private key of default.
@@ -189,7 +348,9 @@ public abstract class SSH2Holders<S, F> {
         }
     }
 
-    // --- Tool function's. ---
+    //
+    // --- Tools function. ---
+    //
 
     /**
      * Generate keypair of SSH2 based on RSA/DSA/ECDSA.
