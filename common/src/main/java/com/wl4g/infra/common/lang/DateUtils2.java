@@ -178,10 +178,10 @@ public abstract class DateUtils2 extends DateUtils {
     /**
      * 得到日期字符串 默认格式（yyyy-MM-dd） pattern可以为："yyyy-MM-dd" "HH:mm:ss" "E"
      */
-    public static String formatDate(Date date, Object... pattern) {
+    public static String formatDate(Date date, String... pattern) {
         notNull(date, "null Date");
         if (pattern != null && pattern.length > 0) {
-            return DateFormatUtils.format(date, pattern[0].toString());
+            return DateFormatUtils.format(date, pattern[0]);
         }
         return DateFormatUtils.format(date, "yyyy-MM-dd");
     }
