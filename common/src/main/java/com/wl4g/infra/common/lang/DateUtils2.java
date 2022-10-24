@@ -16,6 +16,7 @@
 package com.wl4g.infra.common.lang;
 
 import static com.wl4g.infra.common.lang.Assert2.notNull;
+import static java.lang.String.format;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -310,6 +311,46 @@ public abstract class DateUtils2 extends DateUtils {
         long beforeTime = before.getTime();
         long afterTime = after.getTime();
         return (afterTime - beforeTime) / (1000 * 60 * 60 * 24);
+    }
+
+    /**
+     * 获取两个日期之间的近似的时间刻度数 (如: 年/月/日/时/分/秒等) </br>
+     * 注: 只是近似的时间刻度数的原因是: 如当 pattern=MM 时则仅按照固定 30 天每月来计算(忽略大小月及闰月的情况等).
+     * 
+     * @param before
+     * @param after
+     * @return
+     */
+    public static double getDistanceOf(Date before, Date after, String pattern) {
+        long beforeTime = before.getTime();
+        long afterTime = after.getTime();
+        switch (pattern) {
+        case "yy":
+        case "y":
+        case "YY":
+        case "Y":
+            return (afterTime - beforeTime) / (1000 * 60 * 60 * 24 * 30 * 12);
+        case "MM":
+        case "M":
+            return (afterTime - beforeTime) / (1000 * 60 * 60 * 24 * 30);
+        case "dd":
+        case "d":
+        case "DD":
+        case "D":
+            return (afterTime - beforeTime) / (1000 * 60 * 60 * 24);
+        case "HH":
+        case "H":
+        case "hh":
+        case "h":
+            return (afterTime - beforeTime) / (1000 * 60 * 60);
+        case "mm":
+        case "m":
+            return (afterTime - beforeTime) / (1000 * 60);
+        case "ss":
+        case "s":
+            return (afterTime - beforeTime) / (1000);
+        }
+        throw new IllegalArgumentException(format("Not supported date pattern '%s'", pattern));
     }
 
 }
