@@ -180,7 +180,7 @@ public class BootstrappingConfigApplicationListener implements GenericApplicatio
             SpringApplication application,
             List<IBootstrappingConfigurer> configurers) throws Exception {
         Properties mergedProps = new Properties();
-        // defaultProperties.put("spring.main.allow-bean-definition-overriding","true");
+        // mergedProps.put("spring.main.allow-bean-definition-overriding","true");
 
         // Gets default properties in chains.
         Properties addDefaultProps = new Properties();
@@ -228,8 +228,9 @@ public class BootstrappingConfigApplicationListener implements GenericApplicatio
             configure.additionalProfiles(currentAdditionalProfiles);
         }
         if (!isEmpty(currentAdditionalProfiles)) {
-            String[] additionalProfiles = currentAdditionalProfiles.stream().map(p -> defaultTrim2EmptyClear.apply(p)).toArray(
-                    String[]::new);
+            String[] additionalProfiles = currentAdditionalProfiles.stream()
+                    .map(p -> defaultTrim2EmptyClear.apply(p))
+                    .toArray(String[]::new);
             if (isDebug) {
                 log.debug("Preset SpringApplication#setAdditionalProfiles: {}", asList(additionalProfiles));
             }
