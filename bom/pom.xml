@@ -305,10 +305,11 @@
                 <artifactId>javax.inject</artifactId>
                 <version>${javax-inject.version}</version>
             </dependency>
+            <!-- Deprecated -->
             <dependency>
                 <groupId>javax.mail</groupId>
                 <artifactId>mail</artifactId>
-                <version>${javax-mail.version}</version>
+                <version>1.4.7</version>
             </dependency>
             <dependency>
                 <groupId>javax.mail</groupId>
