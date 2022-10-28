@@ -76,7 +76,7 @@ public class ArthasAttacher {
     }
 
     static String getDefaultArthasOutputPath() {
-        return USER_HOME.concat("/").concat(".arthas-output/");
+        return USER_HOME.concat("/.arthas-output/");
     }
 
     static String generateDefaultAgentId(@NotBlank String appName) {

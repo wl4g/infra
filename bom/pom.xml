@@ -89,7 +89,7 @@
         <commons-lang3.version>3.5</commons-lang3.version>
         <commons-math3.version>3.6.1</commons-math3.version>
         <commons-beanutils.version>1.9.3</commons-beanutils.version>
-        <commons-dbutils.version>1.7</commons-dbutils.version>
+        <commons-dbutils.version>1.8</commons-dbutils.version>
         <commons-pool2.version>2.11.1</commons-pool2.version>
         <commons-codec.version>1.10</commons-codec.version>
         <commons-cli.version>1.4</commons-cli.version>
