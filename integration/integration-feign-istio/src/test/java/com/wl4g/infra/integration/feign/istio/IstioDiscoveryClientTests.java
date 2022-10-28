@@ -60,7 +60,7 @@ import io.fabric8.kubernetes.client.ConfigBuilder;
 /**
  * {@link IstioDiscoveryClientTests}
  * 
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version 2022-03-01 v1.0.0
  * @since v1.0.0
  */

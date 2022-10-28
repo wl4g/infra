@@ -21,7 +21,7 @@ import com.wl4g.infra.support.notification.GenericNotifyMessage;
 /**
  * {@link DingtalkMessageNotifier}
  * 
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version 2020年1月9日 v1.0.0
  * @see
  */

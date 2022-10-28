@@ -44,7 +44,7 @@ import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 /**
  * {@link SpelExpressions}
  * 
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version 2020-09-15
  * @sine v1.0.0
  * @see

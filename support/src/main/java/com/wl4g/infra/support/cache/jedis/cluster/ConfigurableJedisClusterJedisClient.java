@@ -84,7 +84,7 @@ import redis.clients.jedis.util.SafeEncoder;
 /**
  * {@link ConfigurableJedisClusterJedisClient}
  * 
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version 2020年3月28日 v1.0.0
  * @see
  */

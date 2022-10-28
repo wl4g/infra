@@ -33,7 +33,7 @@ import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
 /**
  * {@link SshjHolderTests}
  * 
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @author vjay
  * @version 2020年5月23日 v1.0.0
  * @see

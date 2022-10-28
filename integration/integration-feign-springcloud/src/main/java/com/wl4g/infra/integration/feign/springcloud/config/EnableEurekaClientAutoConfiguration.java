@@ -26,7 +26,7 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
  * Just for downward compatibility, In the new version of spring cloud, it will
  * automatically enable configuration.
  * 
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version v1.0 2021-01-11
  * @sine v1.0
  * @see https://blog.csdn.net/boling_cavalry/article/details/82668480

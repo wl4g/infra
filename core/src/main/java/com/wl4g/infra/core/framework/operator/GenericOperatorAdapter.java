@@ -49,7 +49,7 @@ import com.wl4g.infra.common.log.SmartLogger;
 /**
  * Composite generic operator adapter.
  * 
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version v1.0 2019年11月1日
  * @since
  */

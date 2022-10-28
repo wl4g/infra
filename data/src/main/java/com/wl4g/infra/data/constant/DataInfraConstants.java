@@ -24,7 +24,7 @@ import com.wl4g.infra.core.constant.CoreInfraConstants;
 /**
  * {@link DataInfraConstants}
  * 
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version v1.0 2021-01-20
  * @sine v1.0
  * @see

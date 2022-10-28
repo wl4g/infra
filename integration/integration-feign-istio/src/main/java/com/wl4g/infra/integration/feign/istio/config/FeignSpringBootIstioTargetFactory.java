@@ -35,7 +35,7 @@ import feign.Target;
 /**
  * {@link FeignSpringBootIstioTargetFactory}
  * 
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version 2022-03-10 v1.0.0
  * @since v1.0.0
  */

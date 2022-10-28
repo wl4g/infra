@@ -38,7 +38,7 @@ import com.wl4g.infra.common.web.rest.RespBase.DataMap;
 /**
  * {@link GenericNotifyMessage}
  * 
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version 2020年3月14日 v1.0.0
  * @see
  */

@@ -30,7 +30,7 @@ import lombok.ToString;
 /**
  * {@link ApacheCommonsBeanUtils2}
  * 
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version 2022-04-28 v3.0.0
  * @since v3.0.0
  */

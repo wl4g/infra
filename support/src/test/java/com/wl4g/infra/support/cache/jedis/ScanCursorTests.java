@@ -29,7 +29,7 @@ import com.wl4g.infra.support.cache.jedis.ScanCursor.ClusterScanParams;
 /**
  * {@link ScanCursorTests}
  * 
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version 2021-06-12 v1.0.0
  * @see v1.0.0
  */

@@ -59,7 +59,7 @@ import com.wl4g.infra.common.matching.AntPathMatcher;
  * └── file.txt
  * </pre>
  * 
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version 2020-09-28
  * @sine v1.0.0
  * @see

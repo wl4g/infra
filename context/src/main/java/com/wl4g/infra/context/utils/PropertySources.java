@@ -59,7 +59,7 @@ public abstract class PropertySources {
     /**
      * {@link ConfigType}
      * 
-     * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+     * @author James Wong &lt;jameswong1376@gmail.com&gt;
      * @sine v1.0
      * @see
      */
@@ -94,7 +94,7 @@ public abstract class PropertySources {
     /**
      * {@link ResolveHandler}
      * 
-     * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+     * @author James Wong &lt;jameswong1376@gmail.com&gt;
      * @sine v1.0
      * @see
      */
@@ -105,7 +105,7 @@ public abstract class PropertySources {
     /**
      * {@link YamlResolveHandler}
      * 
-     * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+     * @author James Wong &lt;jameswong1376@gmail.com&gt;
      * @sine v1.0
      * @see
      */
@@ -131,7 +131,7 @@ public abstract class PropertySources {
     /**
      * {@link PropertiesResolveHandler}
      * 
-     * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+     * @author James Wong &lt;jameswong1376@gmail.com&gt;
      * @sine v1.0
      * @see
      */

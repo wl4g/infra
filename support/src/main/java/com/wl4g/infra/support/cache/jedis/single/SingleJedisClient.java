@@ -83,7 +83,7 @@ import redis.clients.jedis.util.Slowlog;
 /**
  * Single mode Jedis client implemention.
  * 
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version 2020年7月18日 v1.0.0
  * @see
  */

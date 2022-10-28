@@ -22,7 +22,7 @@ import com.wl4g.infra.common.log.SmartLogger;
 /**
  * Simple API version comparator with ASCII.
  * 
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version v1.0 2020-11-30
  * @sine v1.0
  * @see https://www.cnblogs.com/yucongblog/p/5600312.html

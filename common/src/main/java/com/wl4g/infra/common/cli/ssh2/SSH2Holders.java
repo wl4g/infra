@@ -42,7 +42,7 @@ import com.wl4g.infra.common.reflect.ObjectInstantiators;
  * {@link SSH2Holders}, generic SSH2 client wrapper tool. </br>
  * Including the implementation of ethz/ssj/ssd.
  * 
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version 2020年1月9日 v1.0.0
  * @see
  */
@@ -377,7 +377,7 @@ public abstract class SSH2Holders<S, F> {
     /**
      * {@link Ssh2ExecResult}
      * 
-     * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+     * @author James Wong &lt;jameswong1376@gmail.com&gt;
      * @version 2020年1月9日 v1.0.0
      * @see
      */
@@ -424,7 +424,7 @@ public abstract class SSH2Holders<S, F> {
     /**
      * {@link Ssh2KeyPair}
      * 
-     * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+     * @author James Wong &lt;jameswong1376@gmail.com&gt;
      * @version 2020年2月4日 v1.0.0
      * @see
      */
@@ -456,7 +456,7 @@ public abstract class SSH2Holders<S, F> {
     /**
      * {@link AlgorithmType}
      * 
-     * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+     * @author James Wong &lt;jameswong1376@gmail.com&gt;
      * @version 2020年2月4日 v1.0.0
      * @see
      */

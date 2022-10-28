@@ -29,7 +29,7 @@ import javax.validation.constraints.NotNull;
 /**
  * {@link FileLocks}
  * 
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @author vjay
  * @date 2020-03-24
  * @sine v1.0.0

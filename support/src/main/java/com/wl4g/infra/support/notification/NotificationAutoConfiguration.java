@@ -53,9 +53,9 @@ import com.wl4g.infra.support.notification.wechat.WechatNotifyProperties;
 /**
  * Notification message service auto configuration
  * 
- * @author wangl.sir
- * @version v1.0 2019年8月28日
- * @since
+ * @author James Wong
+ * @version 2019-09-28
+ * @since v2.0.0
  */
 public class NotificationAutoConfiguration {
 

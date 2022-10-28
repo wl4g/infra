@@ -36,7 +36,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
  * does not support return values of incompatible types, if you need to return
  * values of incompatible types, Please use {@link ResponseBodyAdvice}.
  * 
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version v1.0 2020-12-29
  * @sine v1.0
  * @see

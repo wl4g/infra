@@ -20,7 +20,7 @@ import org.springframework.cglib.proxy.InvocationHandler;
 /**
  * Generic proxy invocation handler. (Compatible with JDK proxy and CGLIB proxy)
  * 
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version v1.0 2020-11-25
  * @sine v1.0
  * @see

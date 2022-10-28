@@ -32,7 +32,7 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 /**
  * {@link DispatcherSmartProxyInvocation}
  * 
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @author liqiu
  * @version v1.0 2019-11-20
  * @sine v1.0

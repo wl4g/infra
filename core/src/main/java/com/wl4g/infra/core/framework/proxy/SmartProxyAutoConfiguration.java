@@ -64,7 +64,7 @@ import com.wl4g.infra.common.log.SmartLogger;
  * various types of beans, such as: Simple Object, {@link FactoryBean} and
  * {@link org.mybatis.spring.mapper.MapperFactoryBean} etc.
  * 
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version v1.0 2020-11-23
  * @sine v1.0
  * @see

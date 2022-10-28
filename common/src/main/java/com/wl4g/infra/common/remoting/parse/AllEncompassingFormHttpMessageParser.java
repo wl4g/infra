@@ -22,7 +22,7 @@ import com.wl4g.infra.common.lang.ClassUtils2;
  * Extension of {@link FormHttpMessageParser}, adding support for JSON-based
  * parts.
  * 
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version 2020年7月01日 v1.0.0
  * @see
  */

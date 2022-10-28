@@ -36,7 +36,7 @@ import feign.Response;
 /**
  * {@link InsertBeanBindingPluginCoprocessor}
  * 
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version v1.0 2021-05-20
  * @sine v1.0
  * @see

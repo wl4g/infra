@@ -18,7 +18,7 @@ package com.wl4g.infra.metrics.health.timed;
 /**
  * {@link TimedStat}
  * 
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version 2020-07-12
  * @since v3.0.0
  */

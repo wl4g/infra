@@ -32,7 +32,7 @@ import nl.bitwalker.useragentutils.UserAgent;
 /**
  * User Agent recognition tools.
  * 
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version 2018-12-26
  * @sine v1.0.0
  * @see

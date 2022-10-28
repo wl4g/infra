@@ -25,7 +25,7 @@ import com.wl4g.infra.common.crypto.asymmetric.spec.KeyPairSpec;
  * 
  * @param <C>
  * @param <K>
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version 2019年08月29日 v1.0.0
  * @see
  */

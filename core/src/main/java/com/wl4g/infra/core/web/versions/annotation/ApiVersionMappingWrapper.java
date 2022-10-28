@@ -29,7 +29,7 @@ import org.springframework.core.env.Environment;
 /**
  * {@link ApiVersionMapping} annotation metadata wrapper.
  * 
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version v1.0 2020-12-03
  * @sine v1.0
  * @see

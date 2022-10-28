@@ -37,7 +37,7 @@ import lombok.CustomLog;
 /**
  * {@link InetUtils}
  * 
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version 2022-07-12
  * @since {@link org.springframework.cloud.commons.util.InetUtils}
  */

@@ -42,7 +42,7 @@ import static java.util.Collections.emptySet;
  * {@link org.springframework.context.annotation.Configuration
  * <code>@Configuration</code>} classes.</br>
  * 
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version v1.0 2020-11-20
  * @sine v1.0
  * @see Implementation simulated of refer to

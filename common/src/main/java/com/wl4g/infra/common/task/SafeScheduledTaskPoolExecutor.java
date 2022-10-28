@@ -332,7 +332,7 @@ public class SafeScheduledTaskPoolExecutor extends ScheduledThreadPoolExecutor {
      * 
      * @see {@link ScheduledThreadPoolExecutor.ScheduledFutureTask}
      * @param <V>
-     * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+     * @author James Wong &lt;jameswong1376@gmail.com&gt;
      * @version 2020年1月20日 v1.0.0
      * @see
      */
@@ -528,7 +528,7 @@ public class SafeScheduledTaskPoolExecutor extends ScheduledThreadPoolExecutor {
     /**
      * {@link RandomScheduleRunnable}
      * 
-     * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+     * @author James Wong &lt;jameswong1376@gmail.com&gt;
      * @version 2020年1月20日 v1.0.0
      * @see
      */

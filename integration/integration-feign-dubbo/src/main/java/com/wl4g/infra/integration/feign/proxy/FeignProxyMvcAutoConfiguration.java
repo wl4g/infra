@@ -68,7 +68,7 @@ import com.wl4g.infra.integration.feign.proxy.FeignProxyController;
 /**
  * Feign proxy rest configurer of servlet mvc.
  * 
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version v1.0 2019-11-20
  * @sine v1.0
  * @see Thannks refer: https://gitee.com/leecho/spring-cloud-feign-proxy
@@ -226,7 +226,7 @@ public class FeignProxyMvcAutoConfiguration implements InitializingBean {
 	 * For related source code analysis, please refer to:
 	 * {@link AbstractHandlerMethodMapping#isHandler()}
 	 * 
-	 * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+	 * @author James Wong &lt;jameswong1376@gmail.com&gt;
 	 * @version v1.0 2020-11-26
 	 * @sine v1.0
 	 * @see {@link org.springframework.web.servlet.DispatcherServlet#getHandler()}

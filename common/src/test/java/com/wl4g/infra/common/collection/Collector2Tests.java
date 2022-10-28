@@ -24,7 +24,7 @@ import org.junit.Test;
 /**
  * {@link Collector2Tests}
  * 
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version 2022-01-07 v1.0.0
  * @since v1.0.0
  */

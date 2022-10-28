@@ -22,7 +22,7 @@ import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
 /**
  * {@link EurekaServer}
  * 
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version v1.0 2020-11-20
  * @sine v1.0
  * @see

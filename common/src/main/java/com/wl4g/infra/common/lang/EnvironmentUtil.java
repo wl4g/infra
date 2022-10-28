@@ -42,7 +42,7 @@ import javax.validation.constraints.NotNull;
 /**
  * {@link EnvironmentUtil}
  * 
- * @author James Wong &lt;983708408@qq.com, wanglsir@gmail.com&gt;
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version v1.0 2021-01-05
  * @sine v1.0
  * @see
