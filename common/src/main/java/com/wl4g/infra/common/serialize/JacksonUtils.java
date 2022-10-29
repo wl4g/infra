@@ -18,6 +18,7 @@ package com.wl4g.infra.common.serialize;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.File;
@@ -386,6 +387,24 @@ public abstract class JacksonUtils {
 
         // Custom bean(obj field after recursion)
         return (T) parseJSON(toJSONString(obj), obj.getClass());
+    }
+
+    public static <T> T mergeWithOverride(@Nullable T obj, @Nullable T overrideObj) {
+        if (isNull(obj) && nonNull(overrideObj)) {
+            return overrideObj;
+        }
+        if (isNull(overrideObj) && nonNull(obj)) {
+            return obj;
+        }
+        if (isNull(obj) && isNull(overrideObj)) {
+            return null;
+        }
+        try {
+            ObjectReader reader = defaultObjectMapper.readerForUpdating(obj);
+            return reader.readValue(toJSONString(overrideObj));
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     /**

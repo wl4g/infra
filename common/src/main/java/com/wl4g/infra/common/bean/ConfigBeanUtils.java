@@ -44,70 +44,72 @@ import com.wl4g.infra.common.reflect.ReflectionUtils2.FieldFilter;
 public abstract class ConfigBeanUtils {
 
     /**
-     * The copies default configuration object properties deep to the target
+     * The copies default configuration object properties deep to the destObj
      * configuration object, overriding as needed.
      * 
-     * @param initTargetConfig
-     * @param targetConfig
-     * @param defaultConfig
+     * @param initObj
+     * @param destObj
+     * @param defaultObj
      * @return
      * @throws IllegalArgumentException
      * @throws IllegalAccessException
      */
     public static @NotNull <I extends D, T extends D, D> T configureWithDefault(
-            @NotNull I initTargetConfig,
-            @NotNull T targetConfig,
-            @NotNull D defaultConfig) throws IllegalArgumentException, IllegalAccessException {
-        notNullOf(initTargetConfig, "initTargetConfig");
-        notNullOf(targetConfig, "targetConfig");
-        notNullOf(defaultConfig, "defaultConfig");
+            @NotNull I initObj,
+            @NotNull T destObj,
+            @NotNull D defaultObj) throws IllegalArgumentException, IllegalAccessException {
+        notNullOf(initObj, "initObj");
+        notNullOf(destObj, "destObj");
+        notNullOf(defaultObj, "defaultObj");
 
-        if (initTargetConfig.getClass() != targetConfig.getClass()) {
+        if (initObj.getClass() != destObj.getClass()) {
             throw new IllegalArgumentException(format(
-                    "The target configuration object must be of the exact same type as the initial configuration object. %s != %s",
-                    targetConfig.getClass(), initTargetConfig.getClass()));
+                    "The destObj configuration object must be of the exact same type as the initial configuration object. %s != %s",
+                    destObj.getClass(), initObj.getClass()));
         }
 
-        deepCopyFieldStateWithInit(initTargetConfig, targetConfig, defaultConfig, BeanUtils2.DEFAULT_FIELD_FILTER,
+        deepCopyFieldStateWithInit(initObj, destObj, defaultObj, BeanUtils2.DEFAULT_FIELD_FILTER,
                 (
-                        @Nullable Object initTarget,
-                        @NotNull Object target,
+                        @Nullable Object init,
+                        @NotNull Object dest,
                         @NotNull Field tf,
                         @NotNull Field sf,
-                        @Nullable Object sourcePropertyValue) -> {
+                        @Nullable Object defaultPropertyValue) -> {
 
-                    if (nonNull(sourcePropertyValue)) {
-                        Object initTargetPropertyValue = tf.get(initTarget);
-                        Object targetPropertyValue = tf.get(target);
+                    if (nonNull(defaultPropertyValue)) {
+                        Object initObjPropertyValue = tf.get(init);
+                        Object destObjPropertyValue = tf.get(dest);
                         boolean flag = false;
-                        if (isNull(initTargetPropertyValue)) {
-                            if (isNull(targetPropertyValue)) {
+                        if (isNull(initObjPropertyValue)) {
+                            if (isNull(destObjPropertyValue)) {
                                 flag = true;
                             }
-                        } else if (!initTargetPropertyValue.equals(sourcePropertyValue)
-                                && initTargetPropertyValue.equals(targetPropertyValue)) {
-                            flag = true;
+                        } else {
+                            if ((isNull(destObjPropertyValue) || destObjPropertyValue.equals(initObjPropertyValue))
+                                    && !defaultPropertyValue.equals(initObjPropertyValue)) {
+                                flag = true;
+                            }
                         }
                         if (flag) {
                             tf.setAccessible(true);
-                            tf.set(target, sourcePropertyValue);
+                            tf.set(dest, defaultPropertyValue);
                         }
                     }
                 });
 
-        return targetConfig;
+        return destObj;
     }
 
     /**
-     * Calls the given callback on all fields of the target class, recursively
+     * Calls the given callback on all fields of the destObj class, recursively
      * running the class hierarchy up to copy all declared fields.</br>
      * It will contain all the fields defined by all parent or superclasses. At
-     * the same time, the target and the source object must be compatible.
+     * the same time, the destObj and the source object must be compatible.
      * 
-     * @param target
-     *            The target object to copy to
-     * @param src
-     *            Source object
+     * @param destObj
+     *            The destObj object to copy to
+     * @param defaultObj
+     *            Default/Source object
      * @param ff
      *            Field filter
      * @param fp
@@ -116,42 +118,42 @@ public abstract class ConfigBeanUtils {
      * @throws IllegalAccessException
      */
     private static void deepCopyFieldStateWithInit(
-            @Nullable Object initTarget,
-            @NotNull Object target,
-            @NotNull Object src,
+            @Nullable Object initObj,
+            @NotNull Object destObj,
+            @NotNull Object defaultObj,
             @NotNull FieldFilter ff,
             @NotNull FieldProcessor2 fp) throws IllegalArgumentException, IllegalAccessException {
 
-        if (!(target != null && src != null && ff != null && fp != null)) {
+        if (!(destObj != null && defaultObj != null && ff != null && fp != null)) {
             throw new IllegalArgumentException("Target and source FieldFilter and FieldProcessor2 must not be null");
         }
 
-        // Check if the target is compatible with the source object
-        Class<?> targetClass = target.getClass(), sourceClass = src.getClass();
-        if (!isCompatibleType(target.getClass(), src.getClass())) {
+        // Check if the destObj is compatible with the source object
+        Class<?> destObjClass = destObj.getClass(), sourceClass = defaultObj.getClass();
+        if (!isCompatibleType(destObj.getClass(), defaultObj.getClass())) {
             throw new IllegalArgumentException(
-                    format("Incompatible the objects, target class: %s, source class: %s", targetClass, sourceClass));
+                    format("Incompatible the objects, destObj class: %s, source class: %s", destObjClass, sourceClass));
         }
 
-        Class<?> targetCls = target.getClass(); // [MARK0]
+        Class<?> destObjCls = destObj.getClass(); // [MARK0]
         do {
-            doDeepCopyFieldsWithInit(targetCls, initTarget, target, src, ff, fp);
-        } while ((targetCls = targetCls.getSuperclass()) != Object.class);
+            doDeepCopyFieldsWithInit(destObjCls, initObj, destObj, defaultObj, ff, fp);
+        } while ((destObjCls = destObjCls.getSuperclass()) != Object.class);
     }
 
     /**
-     * Calls the given callback on all fields of the target class, recursively
+     * Calls the given callback on all fields of the destObj class, recursively
      * running the class hierarchy up to copy all declared fields.</br>
      * Note: that it does not contain fields defined by the parent or super
-     * class. At the same time, the target and the source object must be
+     * class. At the same time, the destObj and the source object must be
      * compatible.</br>
      * Note: Attribute fields of parent and superclass are not included
      * 
      * @param currentTargetClass
      *            The level of the class currently copied to (upward recursion)
-     * @param target
-     *            The target object to copy to
-     * @param src
+     * @param destObj
+     *            The destObj object to copy to
+     * @param defaultObj
      *            Source object
      * @param ff
      *            Field filter
@@ -162,29 +164,32 @@ public abstract class ConfigBeanUtils {
      */
     private static void doDeepCopyFieldsWithInit(
             Class<?> currentTargetClass,
-            @Nullable Object initTarget,
-            @NotNull Object target,
-            @NotNull Object src,
+            @Nullable Object initObj,
+            @NotNull Object destObj,
+            @NotNull Object defaultObj,
             @NotNull FieldFilter ff,
             @NotNull FieldProcessor2 fp) throws IllegalArgumentException, IllegalAccessException {
 
         if (isNull(currentTargetClass) || isNull(ff) || isNull(fp)) {
             throw new IllegalArgumentException(
-                    "Hierarchy current target class or source FieldFilter and FieldProcessor2 can't null");
+                    "Hierarchy current destObj class or source FieldFilter and FieldProcessor2 can't null");
         }
         // Skip the current level copy.
-        if (isNull(src) || isNull(target)) {
+        if (isNull(defaultObj) || isNull(destObj)) {
             return;
         }
         // Check is only required when the initial object is not empty.
-        if (nonNull(initTarget) && initTarget.getClass() != target.getClass()) {
+        // @formatter:off
+      //  if (nonNull(initObj) && initObj.getClass() != destObj.getClass()) {
+        // @formatter:on
+        if (nonNull(initObj) && !destObj.getClass().isAssignableFrom(initObj.getClass())) {
             throw new IllegalArgumentException(
-                    format("The initial target object must be of the exact same type as the target object. %s != %s",
-                            initTarget.getClass(), target.getClass()));
+                    format("The initial destObj object must be of the exact same type as the destObj object. %s != %s",
+                            initObj.getClass(), destObj.getClass()));
         }
 
         // Recursive traversal matching and processing
-        Class<?> sourceClass = src.getClass();
+        Class<?> sourceClass = defaultObj.getClass();
         for (Field tf : currentTargetClass.getDeclaredFields()) {
             // Must be filtered over.
             // [BUGFIX]: for example when recursively getting
@@ -197,33 +202,33 @@ public abstract class ConfigBeanUtils {
             }
 
             makeAccessible(tf);
-            Object initTargetPropertyValue = nonNull(initTarget) ? tf.get(initTarget) : null;
-            Object targetPropertyValue = tf.get(target); // See:[MARK0]
-            Object sourcePropertyValue = null;
+            Object initObjPropertyValue = nonNull(initObj) ? tf.get(initObj) : null;
+            Object destObjPropertyValue = tf.get(destObj); // See:[MARK0]
+            Object defaultPropertyValue = null;
             Field sf = findField(sourceClass, tf.getName());
             if (nonNull(sf)) {
                 makeAccessible(sf);
-                sourcePropertyValue = sf.get(src);
+                defaultPropertyValue = sf.get(defaultObj);
             }
 
             // Base type or collection type or enum?
             if (isSimpleType(tf.getType()) || isSimpleCollectionType(tf.getType()) || tf.getType().isEnum()) {
                 // [MARK2] Filter matching property
                 if (nonNull(fp) && ff.matches(tf)) {
-                    fp.doProcess(initTarget, target, tf, sf, sourcePropertyValue);
+                    fp.doProcess(initObj, destObj, tf, sf, defaultPropertyValue);
                 }
             } else {
-                doDeepCopyFieldsWithInit(tf.getType(), initTargetPropertyValue, targetPropertyValue, sourcePropertyValue, ff, fp);
+                doDeepCopyFieldsWithInit(tf.getType(), initObjPropertyValue, destObjPropertyValue, defaultPropertyValue, ff, fp);
             }
         }
     }
 
     public static interface FieldProcessor2 {
         void doProcess(
-                @Nullable Object initTarget,
-                @NotNull Object target,
+                @Nullable Object initObj,
+                @NotNull Object destObj,
                 @NotNull Field tf,
                 @NotNull Field sf,
-                @Nullable Object sourcePropertyValue) throws IllegalArgumentException, IllegalAccessException;
+                @Nullable Object defaultPropertyValue) throws IllegalArgumentException, IllegalAccessException;
     }
 }

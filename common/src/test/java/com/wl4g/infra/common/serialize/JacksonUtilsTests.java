@@ -144,6 +144,21 @@ public class JacksonUtilsTests {
     }
 
     //
+    // ----- Merge object. -----
+    //
+
+    @Test
+    public void testMergeWithOverride() {
+        TestCar car = TestCar.builder().type("T1").model("X1").power("petroleum").build();
+        TestCar overrideCar = TestCar.builder().type("T1-d").model(null).power("petroleum-d").build();
+        TestCar mergeCar = JacksonUtils.mergeWithOverride(car, overrideCar);
+        System.out.println(toJSONString(mergeCar));
+        assert mergeCar.getType().equals("T1-d");
+        assert mergeCar.getModel() == null;
+        assert mergeCar.getPower().equals("petroleum-d");
+    }
+
+    //
     // ----- Sub-type parse. -----
     //
 

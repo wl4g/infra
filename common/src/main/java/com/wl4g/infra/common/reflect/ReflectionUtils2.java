@@ -15,14 +15,19 @@
  */
 package com.wl4g.infra.common.reflect;
 
+import static com.wl4g.infra.common.lang.Assert2.isTrue;
+import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
+import static com.wl4g.infra.common.lang.Assert2.notNull;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.infra.common.reflect.TypeUtils2.isSimpleCollectionType;
+import static com.wl4g.infra.common.reflect.TypeUtils2.isSimpleType;
 import static java.lang.reflect.Modifier.isAbstract;
-import static java.lang.reflect.Modifier.isPublic;
 import static java.lang.reflect.Modifier.isFinal;
 import static java.lang.reflect.Modifier.isNative;
+import static java.lang.reflect.Modifier.isPublic;
 import static java.lang.reflect.Modifier.isStatic;
 import static java.lang.reflect.Modifier.isSynchronized;
 import static java.lang.reflect.Modifier.isTransient;
-import static java.lang.reflect.Modifier.isVolatile;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.startsWith;
@@ -41,16 +46,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.validation.constraints.NotNull;
-
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.wl4g.infra.common.collection.ConcurrentReferenceHashMap;
-
-import static com.wl4g.infra.common.lang.Assert2.*;
-import static com.wl4g.infra.common.reflect.TypeUtils2.isSimpleCollectionType;
-import static com.wl4g.infra.common.reflect.TypeUtils2.isSimpleType;
 
 /**
  * Enhanced utility class for working with the reflection API and handling
@@ -88,8 +88,7 @@ public abstract class ReflectionUtils2 {
      * @return
      */
     public static boolean isGenericModifier(int modifer) {
-        return !(isFinal(modifer) || isStatic(modifer) || isTransient(modifer) || isNative(modifer) || isVolatile(modifer)
-                || isSynchronized(modifer));
+        return !(isFinal(modifer) || isStatic(modifer) || isTransient(modifer) || isNative(modifer) || isSynchronized(modifer));
     }
 
     /**

@@ -45,19 +45,23 @@ public class ConfigBeanUtilsTests {
         defaultConfig.setName("jack"); // by covered of target
         defaultConfig.setType("Canary"); // by default
         defaultConfig.setMaxTries(20); // by covered of target
-        defaultConfig.getChilren().setPath("/hello"); // by covered of default
+        ChildrenConfig children = defaultConfig.getChildren();
+        children.setPath("/hello"); // by covered of default
+        children.setDebug(true); // by covered of default
 
         targetConfig = ConfigBeanUtils.configureWithDefault(new SubConfig(), targetConfig, defaultConfig);
 
         assert targetConfig.getSubName().equals("mary");
+
         assert targetConfig.getName().equals("tom");
-        assert targetConfig.getAlgorithm() == AlgorithmType.R;// Default value
-                                                              // overwrites
-                                                              // initial value
+        // Default value overwrites initial value
+        assert targetConfig.getAlgorithm() == AlgorithmType.R;
         assert targetConfig.getMaxTries() == 30;
         assert targetConfig.getType().equals("Canary");
-        assert targetConfig.getChilren().getTimeoutMs() == 6000;
-        assert targetConfig.getChilren().getPath() == "/hello";
+
+        assert targetConfig.getChildren().getTimeoutMs() == 6000;
+        assert targetConfig.getChildren().getPath() == "/hello";
+        assert targetConfig.getChildren().isDebug();
     }
 
     @Getter
@@ -76,13 +80,13 @@ public class ConfigBeanUtilsTests {
         private int maxTries = 10;
         private List<String> collection = new ArrayList<>();
         private AlgorithmType algorithm = AlgorithmType.WR;
-        private ChilrenConfig chilren = new ChilrenConfig();
+        private ChildrenConfig children = new ChildrenConfig();
     }
 
     @Getter
     @Setter
     @ToString
-    static class ChilrenConfig {
+    static class ChildrenConfig {
         private boolean debug = false;
         private long timeoutMs = 6000;
         private String path = "/healthz";
