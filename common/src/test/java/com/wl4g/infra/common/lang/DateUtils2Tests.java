@@ -24,6 +24,8 @@ import java.util.Date;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 
+import com.ibm.icu.util.Calendar;
+
 /**
  * {@link DateUtils2Tests}
  * 
@@ -52,6 +54,11 @@ public class DateUtils2Tests {
         final double distanceOfMinue = DateUtils2.getDistanceOf(before, after, "mm");
         System.out.println(distanceOfMinue);
         Assertions.assertEquals(distanceOfMinue, 1461);
+    }
+
+    @Test
+    public void testGetDateOf() {
+        System.out.println(DateUtils2.getDateOf(Calendar.DAY_OF_MONTH, -1, "yyyy-MM-dd"));
     }
 
 }

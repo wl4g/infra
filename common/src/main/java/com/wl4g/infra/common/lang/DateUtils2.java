@@ -15,6 +15,7 @@
  */
 package com.wl4g.infra.common.lang;
 
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static java.lang.String.format;
 
@@ -110,10 +111,6 @@ public abstract class DateUtils2 extends DateUtils {
         return sf.format(new Date());
     }
 
-    public static String ymdhmsToymd(String date) {
-        return date.substring(0, 10);
-    }
-
     /**
      * Seconds before getting the current time
      * 
@@ -174,6 +171,21 @@ public abstract class DateUtils2 extends DateUtils {
      */
     public static String getDate(String pattern) {
         return DateFormatUtils.format(new Date(), pattern);
+    }
+
+    /**
+     * Gets date of calendar field.
+     * 
+     * @param calendarField
+     * @param amount
+     * @param pattern
+     * @return
+     */
+    public static String getDateOf(int calendarField, int amount, String pattern) {
+        hasTextOf(pattern, "pattern");
+        Calendar c = Calendar.getInstance();
+        c.add(calendarField, amount);
+        return formatDate(c.getTime(), pattern);
     }
 
     /**
