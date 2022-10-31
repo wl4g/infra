@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.support.cache.jedis.util;
+package com.wl4g.infra.common.cache.jedis.util;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.util.Collections.singletonList;
@@ -33,8 +32,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
-import com.wl4g.infra.common.log.SmartLogger;
-import com.wl4g.infra.core.exception.framework.ParameterCanonicalException;
+import lombok.CustomLog;
 
 /**
  * Redis key specifications utils(formatter etc).
@@ -43,8 +41,8 @@ import com.wl4g.infra.core.exception.framework.ParameterCanonicalException;
  * @version v1.0 2020年4月10日
  * @since
  */
+@CustomLog
 public abstract class RedisSpecUtil {
-    private static final SmartLogger log = getLogger(RedisSpecUtil.class);
 
     /**
      * Check is result is successful.
@@ -72,7 +70,7 @@ public abstract class RedisSpecUtil {
      * @param keys
      * @throws ParameterNormativeException
      */
-    public static void safeCheckKeys(@NotNull final List<?> keys) throws ParameterCanonicalException {
+    public static void safeCheckKeys(@NotNull final List<?> keys) throws NoCanonicalParamaterException {
         notNullOf(keys, "jedis operation key");
         for (Object key : keys) {
             char[] _key = null;
@@ -99,7 +97,7 @@ public abstract class RedisSpecUtil {
                         log.warn(warning);
                         return;
                     } else {
-                        throw new ParameterCanonicalException(warning);
+                        throw new NoCanonicalParamaterException(warning);
                     }
                 }
             }

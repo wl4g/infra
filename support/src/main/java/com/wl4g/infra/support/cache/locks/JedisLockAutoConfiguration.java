@@ -23,8 +23,8 @@ import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 
+import com.wl4g.infra.common.cache.jedis.JedisService;
 import com.wl4g.infra.support.cache.jedis.JedisClientAutoConfiguration;
-import com.wl4g.infra.support.cache.jedis.JedisService;
 
 /**
  * {@link JedisLockAutoConfiguration}

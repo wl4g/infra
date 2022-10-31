@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.support.cache.jedis;
+package com.wl4g.infra.common.cache.jedis;
 
 import static com.wl4g.infra.common.lang.Assert2.hasText;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
@@ -29,7 +29,6 @@ import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.endsWithIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.split;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
-import static org.springframework.util.CollectionUtils.isEmpty;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -41,12 +40,12 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.ResolvableType;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.Charsets;
+import com.wl4g.infra.common.collection.CollectionUtils2;
+import com.wl4g.infra.common.log.SmartLogger;
+import com.wl4g.infra.common.log.SmartLoggerFactory;
+import com.wl4g.infra.common.reflect.ResolvableType;
 import com.wl4g.infra.common.serialize.ProtostuffUtils;
 
 import redis.clients.jedis.Jedis;
@@ -74,7 +73,7 @@ public class ScanCursor<E> implements Iterator<E> {
     public final static String ROLE_MASTER = "role:master";
     public final static ClusterScanParams NONE_PARAMS = new ClusterScanParams();
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
+    private final SmartLogger log = SmartLoggerFactory.getLogger(getClass());
     private final ClusterScanParams params;
     private final Class<?> valueType;
     private final Deserializer deserializer;
@@ -581,7 +580,7 @@ public class ScanCursor<E> implements Iterator<E> {
          */
         public ScanIterable(CursorSpec cursor, List<K> keys) {
             this.cursor = cursor;
-            this.keys = (isEmpty(keys) ? emptyList() : new ArrayList<K>(keys));
+            this.keys = (CollectionUtils2.isEmpty(keys) ? emptyList() : new ArrayList<K>(keys));
             this.iter = this.keys.iterator();
         }
 

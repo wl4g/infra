@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.support.cache.jedis;
+package com.wl4g.infra.common.cache.jedis;
 
 import static com.google.common.base.Charsets.UTF_8;
+import static java.lang.System.out;
 import static java.util.Arrays.asList;
 
 import java.util.UUID;
@@ -25,7 +26,7 @@ import org.junit.Test;
 
 import com.google.common.hash.Funnel;
 import com.wl4g.infra.common.bloom.BloomGenerator;
-import com.wl4g.infra.support.cache.jedis.JedisClientAutoConfiguration.JedisProperties;
+import com.wl4g.infra.common.cache.jedis.JedisClientBuilder.JedisConfig;
 
 /**
  * {@link JedisServiceTests}
@@ -40,13 +41,14 @@ public class JedisServiceTests {
 
     @BeforeClass
     public static void init() throws Exception {
-        JedisProperties config = new JedisProperties();
-        config.setPasswd("zzx!@#$%");
-        config.setNodes(asList("127.0.0.1:6379", "127.0.0.1:6380", "127.0.0.1:6381", "127.0.0.1:7379", "127.0.0.1:7380",
-                "127.0.0.1:7381"));
-        JedisClientFactoryBean factory = new JedisClientFactoryBean(config);
-        factory.afterPropertiesSet();
-        jedisService = new JedisService(factory.getObject());
+        JedisConfig config = new JedisConfig();
+        config.setNodes(asList(new String[] { "127.0.0.1:6379", "127.0.0.1:6380", "127.0.0.1:6381", "127.0.0.1:7379",
+                "127.0.0.1:7380", "127.0.0.1:7381" }));
+        config.setPasswd("123456");
+
+        out.println("Instantiating composite operators adapter with cluster ...");
+        JedisClient client = new JedisClientBuilder(config).build();
+        jedisService = new JedisService(client);
     }
 
     @Test
@@ -75,7 +77,8 @@ public class JedisServiceTests {
 
     @Test
     public void testBloomfilterFailOutOfExpectedInsertions() throws Exception {
-        BloomGenerator<String> bfConfig = new BloomGenerator<>((Funnel<String>) (from, into) -> into.putString(from, UTF_8), 100, 0.01);
+        BloomGenerator<String> bfConfig = new BloomGenerator<>((Funnel<String>) (from, into) -> into.putString(from, UTF_8), 100,
+                0.01);
 
         // In order to ensure that the test environment is fast, a unique key is
         // generated here.

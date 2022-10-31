@@ -33,8 +33,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.wl4g.infra.common.cache.jedis.JedisClient;
 import com.wl4g.infra.integration.feign.core.context.RpcContextHolder.ReferenceRepository;
-import com.wl4g.infra.support.cache.jedis.JedisClient;
 import com.wl4g.infra.support.cache.jedis.JedisClientFactoryBean;
 
 /**
@@ -52,7 +52,7 @@ import com.wl4g.infra.support.cache.jedis.JedisClientFactoryBean;
 public class JedisReferenceRepositoryAutoConfiguration {
 
     @Bean
-    // @ConditionalOnBean(JedisClientFactoryBean.class) // invalid??
+    // @ConditionalOnBean(JedisClientBuilder.class) // invalid??
     public ReferenceRepository jedisReferenceRepository(@Autowired(required = false) JedisClient jedisClient) {
         return isNull(jedisClient) ? null : new JedisReferenceRepository(jedisClient);
     }

@@ -17,7 +17,7 @@ package com.wl4g.infra.support.cli;
 
 import static com.wl4g.infra.common.lang.Exceptions.getRootCausesString;
 import static com.wl4g.infra.common.lang.ThreadUtils2.sleepRandom;
-import static com.wl4g.infra.support.cache.jedis.util.RedisSpecUtil.safeFormat;
+import static com.wl4g.infra.common.cache.jedis.util.RedisSpecUtil.safeFormat;
 import static com.wl4g.infra.support.cli.destroy.DestroySignalMessage.DestroyState.DESTROY_FAIL;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -32,7 +32,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.util.Assert;
 
 import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor;
-import com.wl4g.infra.support.cache.jedis.JedisService;
+import com.wl4g.infra.common.cache.jedis.JedisService;
 import com.wl4g.infra.support.cache.locks.JedisLockManager;
 import com.wl4g.infra.support.cli.destroy.DestroySignal;
 import com.wl4g.infra.support.cli.destroy.DestroySignalMessage;

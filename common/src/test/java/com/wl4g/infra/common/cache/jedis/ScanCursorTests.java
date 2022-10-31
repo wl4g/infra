@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.support.cache.jedis;
+package com.wl4g.infra.common.cache.jedis;
 
+import static java.lang.System.out;
 import static java.util.Arrays.asList;
 
 import java.util.ArrayList;
@@ -23,8 +24,8 @@ import java.util.List;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.wl4g.infra.support.cache.jedis.JedisClientAutoConfiguration.JedisProperties;
-import com.wl4g.infra.support.cache.jedis.ScanCursor.ClusterScanParams;
+import com.wl4g.infra.common.cache.jedis.JedisClientBuilder.JedisConfig;
+import com.wl4g.infra.common.cache.jedis.ScanCursor.ClusterScanParams;
 
 /**
  * {@link ScanCursorTests}
@@ -39,13 +40,13 @@ public class ScanCursorTests {
 
     @BeforeClass
     public static void initJedisClient() throws Exception {
-        JedisProperties config = new JedisProperties();
-        config.setPasswd("zzx!@#$%");
-        config.setNodes(asList("127.0.0.1:6379", "127.0.0.1:6380", "127.0.0.1:6381", "127.0.0.1:7379", "127.0.0.1:7380",
-                "127.0.0.1:7381"));
-        JedisClientFactoryBean factory = new JedisClientFactoryBean(config);
-        factory.afterPropertiesSet();
-        jedisClient = factory.getObject();
+        JedisConfig config = new JedisConfig();
+        config.setNodes(asList(new String[] { "127.0.0.1:6379", "127.0.0.1:6380", "127.0.0.1:6381", "127.0.0.1:7379",
+                "127.0.0.1:7380", "127.0.0.1:7381" }));
+        config.setPasswd("123456");
+
+        out.println("Instantiating composite operators adapter with cluster ...");
+        jedisClient = new JedisClientBuilder(config).build();
     }
 
     @Test
@@ -56,7 +57,7 @@ public class ScanCursorTests {
         System.out.println("Succcessful assertion of next total limit(" + total + ") case!");
     }
 
-    private List<String> doScanWithCursor(int total) throws Exception {
+     private List<String> doScanWithCursor(int total) throws Exception {
         jedisClient.set("foo1{abc}", "bar1");
         jedisClient.set("foo2{abc}", "bar2");
         jedisClient.set("foo3{abc}", "bar3");

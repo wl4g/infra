@@ -13,12 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.context.exception.framework;
+package com.wl4g.infra.common.cache.jedis.util;
 
-import com.wl4g.infra.common.web.rest.ServiceUnavailableException;
-import com.wl4g.infra.context.exception.ComponentsException;
-
-public class ParameterCanonicalException extends ComponentsException implements ServiceUnavailableException {
+public class NoCanonicalParamaterException extends RuntimeException {
     static final long serialVersionUID = -7034833390711766939L;
 
     /**
@@ -26,7 +23,7 @@ public class ParameterCanonicalException extends ComponentsException implements 
      * message. The cause is not initialized, and may subsequently be
      * initialized by a call to {@link #initCause}.
      */
-    public ParameterCanonicalException() {
+    public NoCanonicalParamaterException() {
         super();
     }
 
@@ -39,7 +36,7 @@ public class ParameterCanonicalException extends ComponentsException implements 
      *            the detail message. The detail message is saved for later
      *            retrieval by the {@link #getMessage()} method.
      */
-    public ParameterCanonicalException(String message) {
+    public NoCanonicalParamaterException(String message) {
         super(message);
     }
 
@@ -60,7 +57,7 @@ public class ParameterCanonicalException extends ComponentsException implements 
      *            unknown.)
      * @since 1.4
      */
-    public ParameterCanonicalException(String message, Throwable cause) {
+    public NoCanonicalParamaterException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -78,7 +75,7 @@ public class ParameterCanonicalException extends ComponentsException implements 
      *            unknown.)
      * @since 1.4
      */
-    public ParameterCanonicalException(Throwable cause) {
+    public NoCanonicalParamaterException(Throwable cause) {
         super(cause);
     }
 

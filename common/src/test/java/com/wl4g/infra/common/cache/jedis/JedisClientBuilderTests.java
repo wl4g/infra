@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.support.cache.jedis;
+package com.wl4g.infra.common.cache.jedis;
 
 import static java.lang.System.out;
 import static java.util.Arrays.asList;
@@ -21,20 +21,20 @@ import static java.util.Collections.singletonList;
 
 import org.junit.Test;
 
-import com.wl4g.infra.support.cache.jedis.JedisClientAutoConfiguration.JedisProperties;
-import com.wl4g.infra.support.cache.jedis.util.RedisSpecUtil;
+import com.wl4g.infra.common.cache.jedis.JedisClientBuilder.JedisConfig;
+import com.wl4g.infra.common.cache.jedis.util.RedisSpecUtil;
 
 /**
- * {@link JedisClientFactoryTests}
+ * {@link JedisClientBuilderTests}
  * 
  * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version 2020年7月18日 v1.0.0
  * @see
  */
-public class JedisClientFactoryTests {
+public class JedisClientBuilderTests {
 
     @Test
-    public void checkKeyFormatTest1() {
+    public void testCheckKeyFormat() {
         System.out.println("-----11-----");
         RedisSpecUtil.safeCheckKeys(asList("safecloud_support_appinfo_admin"));
 
@@ -53,14 +53,13 @@ public class JedisClientFactoryTests {
     }
 
     @Test
-    public void createWithJedisSingleTest2() throws Exception {
-        JedisProperties config = new JedisProperties();
+    public void testCreateWithJedisSingle() throws Exception {
+        JedisConfig config = new JedisConfig();
         config.setNodes(singletonList("127.0.0.1:6379"));
+        config.setPasswd("123456");
 
         out.println("Instantiating composite operators adapter with single ...");
-        JedisClientFactoryBean factory = new JedisClientFactoryBean(config);
-        factory.afterPropertiesSet();
-        JedisClient client = factory.getObject();
+        JedisClient client = new JedisClientBuilder(config).build();
 
         out.printf("\nadapter.set() result: %s", client.set("foo", "bar"));
         out.printf("\nadapter.get() result: %s", client.get("foo"));
@@ -68,20 +67,17 @@ public class JedisClientFactoryTests {
     }
 
     @Test
-    public void createWithJedisClusterTest3() throws Exception {
-        JedisProperties config = new JedisProperties();
+    public void testCreateWithJedisCluster() throws Exception {
+        JedisConfig config = new JedisConfig();
         config.setNodes(asList(new String[] { "127.0.0.1:6379", "127.0.0.1:6380", "127.0.0.1:6381", "127.0.0.1:7379",
                 "127.0.0.1:7380", "127.0.0.1:7381" }));
         config.setPasswd("123456");
 
         out.println("Instantiating composite operators adapter with cluster ...");
-        JedisClientFactoryBean factory = new JedisClientFactoryBean(config);
-        factory.afterPropertiesSet();
-        JedisClient client = factory.getObject();
+        JedisClient client = new JedisClientBuilder(config).build();
 
         out.printf("\nadapter.set() result: %s", client.set("foo", "bar"));
         out.printf("\nadapter.get() result: %s", client.get("foo"));
-
     }
 
 }

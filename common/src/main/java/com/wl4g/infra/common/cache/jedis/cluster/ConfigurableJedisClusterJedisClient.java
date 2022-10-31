@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.support.cache.jedis.cluster;
+package com.wl4g.infra.common.cache.jedis.cluster;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
@@ -32,10 +32,10 @@ import java.util.Set;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
 import com.wl4g.infra.common.log.SmartLogger;
-import com.wl4g.infra.core.exception.framework.ParameterCanonicalException;
-import com.wl4g.infra.support.cache.jedis.JedisClient;
-import com.wl4g.infra.support.cache.jedis.cluster.ConfigurableJedisClusterCommand.ConfigurableJedisClusterConntionHandler;
-import com.wl4g.infra.support.cache.jedis.util.RedisSpecUtil;
+import com.wl4g.infra.common.cache.jedis.JedisClient;
+import com.wl4g.infra.common.cache.jedis.util.NoCanonicalParamaterException;
+import com.wl4g.infra.common.cache.jedis.cluster.ConfigurableJedisClusterCommand.ConfigurableJedisClusterConntionHandler;
+import com.wl4g.infra.common.cache.jedis.util.RedisSpecUtil;
 
 import redis.clients.jedis.BinaryJedisCluster;
 import redis.clients.jedis.BinaryJedisPubSub;
@@ -1440,7 +1440,11 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public Set<Tuple> zrangeByScoreWithScores(final String key, final double min, final double max, final int offset,
+    public Set<Tuple> zrangeByScoreWithScores(
+            final String key,
+            final double min,
+            final double max,
+            final int offset,
             final int count) {
         checkArguments(key);
         return new ConfigurableJedisClusterCommand<Set<Tuple>>(connectionHandler, maxAttempts, maxTotalRetriesDuration) {
@@ -1485,7 +1489,11 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public Set<Tuple> zrangeByScoreWithScores(final String key, final String min, final String max, final int offset,
+    public Set<Tuple> zrangeByScoreWithScores(
+            final String key,
+            final String min,
+            final String max,
+            final int offset,
             final int count) {
         checkArguments(key);
         return new ConfigurableJedisClusterCommand<Set<Tuple>>(connectionHandler, maxAttempts, maxTotalRetriesDuration) {
@@ -1497,7 +1505,11 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public Set<Tuple> zrevrangeByScoreWithScores(final String key, final double max, final double min, final int offset,
+    public Set<Tuple> zrevrangeByScoreWithScores(
+            final String key,
+            final double max,
+            final double min,
+            final int offset,
             final int count) {
         checkArguments(key);
         return new ConfigurableJedisClusterCommand<Set<Tuple>>(connectionHandler, maxAttempts, maxTotalRetriesDuration) {
@@ -1509,7 +1521,11 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public Set<Tuple> zrevrangeByScoreWithScores(final String key, final String max, final String min, final int offset,
+    public Set<Tuple> zrevrangeByScoreWithScores(
+            final String key,
+            final String max,
+            final String min,
+            final int offset,
             final int count) {
         checkArguments(key);
         return new ConfigurableJedisClusterCommand<Set<Tuple>>(connectionHandler, maxAttempts, maxTotalRetriesDuration) {
@@ -2513,7 +2529,11 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public List<GeoRadiusResponse> georadius(final String key, final double longitude, final double latitude, final double radius,
+    public List<GeoRadiusResponse> georadius(
+            final String key,
+            final double longitude,
+            final double latitude,
+            final double radius,
             final GeoUnit unit) {
         checkArguments(key);
         return new ConfigurableJedisClusterCommand<List<GeoRadiusResponse>>(connectionHandler, maxAttempts,
@@ -2526,8 +2546,12 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public List<GeoRadiusResponse> georadiusReadonly(final String key, final double longitude, final double latitude,
-            final double radius, final GeoUnit unit) {
+    public List<GeoRadiusResponse> georadiusReadonly(
+            final String key,
+            final double longitude,
+            final double latitude,
+            final double radius,
+            final GeoUnit unit) {
         checkArguments(key);
         return new ConfigurableJedisClusterCommand<List<GeoRadiusResponse>>(connectionHandler, maxAttempts,
                 maxTotalRetriesDuration) {
@@ -2539,8 +2563,13 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public List<GeoRadiusResponse> georadius(final String key, final double longitude, final double latitude, final double radius,
-            final GeoUnit unit, final GeoRadiusParam param) {
+    public List<GeoRadiusResponse> georadius(
+            final String key,
+            final double longitude,
+            final double latitude,
+            final double radius,
+            final GeoUnit unit,
+            final GeoRadiusParam param) {
         checkArguments(key);
         return new ConfigurableJedisClusterCommand<List<GeoRadiusResponse>>(connectionHandler, maxAttempts,
                 maxTotalRetriesDuration) {
@@ -2552,8 +2581,14 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public Long georadiusStore(final String key, final double longitude, final double latitude, final double radius,
-            final GeoUnit unit, final GeoRadiusParam param, final GeoRadiusStoreParam storeParam) {
+    public Long georadiusStore(
+            final String key,
+            final double longitude,
+            final double latitude,
+            final double radius,
+            final GeoUnit unit,
+            final GeoRadiusParam param,
+            final GeoRadiusStoreParam storeParam) {
         String[] keys = storeParam.getStringKeys(key);
         checkArguments(key);
         return new ConfigurableJedisClusterCommand<Long>(connectionHandler, maxAttempts, maxTotalRetriesDuration) {
@@ -2565,8 +2600,13 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public List<GeoRadiusResponse> georadiusReadonly(final String key, final double longitude, final double latitude,
-            final double radius, final GeoUnit unit, final GeoRadiusParam param) {
+    public List<GeoRadiusResponse> georadiusReadonly(
+            final String key,
+            final double longitude,
+            final double latitude,
+            final double radius,
+            final GeoUnit unit,
+            final GeoRadiusParam param) {
         checkArguments(key);
         return new ConfigurableJedisClusterCommand<List<GeoRadiusResponse>>(connectionHandler, maxAttempts,
                 maxTotalRetriesDuration) {
@@ -2578,7 +2618,10 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public List<GeoRadiusResponse> georadiusByMember(final String key, final String member, final double radius,
+    public List<GeoRadiusResponse> georadiusByMember(
+            final String key,
+            final String member,
+            final double radius,
             final GeoUnit unit) {
         checkArguments(key);
         return new ConfigurableJedisClusterCommand<List<GeoRadiusResponse>>(connectionHandler, maxAttempts,
@@ -2591,7 +2634,10 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public List<GeoRadiusResponse> georadiusByMemberReadonly(final String key, final String member, final double radius,
+    public List<GeoRadiusResponse> georadiusByMemberReadonly(
+            final String key,
+            final String member,
+            final double radius,
             final GeoUnit unit) {
         checkArguments(key);
         return new ConfigurableJedisClusterCommand<List<GeoRadiusResponse>>(connectionHandler, maxAttempts,
@@ -2604,8 +2650,12 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public List<GeoRadiusResponse> georadiusByMember(final String key, final String member, final double radius,
-            final GeoUnit unit, final GeoRadiusParam param) {
+    public List<GeoRadiusResponse> georadiusByMember(
+            final String key,
+            final String member,
+            final double radius,
+            final GeoUnit unit,
+            final GeoRadiusParam param) {
         checkArguments(key);
         return new ConfigurableJedisClusterCommand<List<GeoRadiusResponse>>(connectionHandler, maxAttempts,
                 maxTotalRetriesDuration) {
@@ -2617,8 +2667,13 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public Long georadiusByMemberStore(final String key, final String member, final double radius, final GeoUnit unit,
-            final GeoRadiusParam param, final GeoRadiusStoreParam storeParam) {
+    public Long georadiusByMemberStore(
+            final String key,
+            final String member,
+            final double radius,
+            final GeoUnit unit,
+            final GeoRadiusParam param,
+            final GeoRadiusStoreParam storeParam) {
         String[] keys = storeParam.getStringKeys(key);
         checkArguments(key);
         return new ConfigurableJedisClusterCommand<Long>(connectionHandler, maxAttempts, maxTotalRetriesDuration) {
@@ -2630,8 +2685,12 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public List<GeoRadiusResponse> georadiusByMemberReadonly(final String key, final String member, final double radius,
-            final GeoUnit unit, final GeoRadiusParam param) {
+    public List<GeoRadiusResponse> georadiusByMemberReadonly(
+            final String key,
+            final String member,
+            final double radius,
+            final GeoUnit unit,
+            final GeoRadiusParam param) {
         checkArguments(key);
         return new ConfigurableJedisClusterCommand<List<GeoRadiusResponse>>(connectionHandler, maxAttempts,
                 maxTotalRetriesDuration) {
@@ -2709,7 +2768,11 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public StreamEntryID xadd(final String key, final StreamEntryID id, final Map<String, String> hash, final long maxLen,
+    public StreamEntryID xadd(
+            final String key,
+            final StreamEntryID id,
+            final Map<String, String> hash,
+            final long maxLen,
             final boolean approximateLength) {
         checkArguments(key);
         return new ConfigurableJedisClusterCommand<StreamEntryID>(connectionHandler, maxAttempts, maxTotalRetriesDuration) {
@@ -2787,7 +2850,9 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public List<Entry<String, List<StreamEntry>>> xread(final int count, final long block,
+    public List<Entry<String, List<StreamEntry>>> xread(
+            final int count,
+            final long block,
             final Entry<String, StreamEntryID>... streams) {
         String[] keys = new String[streams.length];
         for (int i = 0; i < streams.length; ++i) {
@@ -2869,8 +2934,13 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public List<Entry<String, List<StreamEntry>>> xreadGroup(final String groupname, final String consumer, final int count,
-            final long block, final boolean noAck, final Entry<String, StreamEntryID>... streams) {
+    public List<Entry<String, List<StreamEntry>>> xreadGroup(
+            final String groupname,
+            final String consumer,
+            final int count,
+            final long block,
+            final boolean noAck,
+            final Entry<String, StreamEntryID>... streams) {
 
         String[] keys = new String[streams.length];
         for (int i = 0; i < streams.length; ++i) {
@@ -2886,8 +2956,11 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public List<Entry<String, List<StreamEntry>>> xreadGroup(final String groupname, final String consumer,
-            final XReadGroupParams xReadGroupParams, final Map<String, StreamEntryID> streams) {
+    public List<Entry<String, List<StreamEntry>>> xreadGroup(
+            final String groupname,
+            final String consumer,
+            final XReadGroupParams xReadGroupParams,
+            final Map<String, StreamEntryID> streams) {
         return new ConfigurableJedisClusterCommand<List<Entry<String, List<StreamEntry>>>>(connectionHandler, maxAttempts,
                 maxTotalRetriesDuration) {
             @Override
@@ -2910,8 +2983,13 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public List<StreamPendingEntry> xpending(final String key, final String groupname, final StreamEntryID start,
-            final StreamEntryID end, final int count, final String consumername) {
+    public List<StreamPendingEntry> xpending(
+            final String key,
+            final String groupname,
+            final StreamEntryID start,
+            final StreamEntryID end,
+            final int count,
+            final String consumername) {
         checkArguments(key);
         return new ConfigurableJedisClusterCommand<List<StreamPendingEntry>>(connectionHandler, maxAttempts,
                 maxTotalRetriesDuration) {
@@ -2968,8 +3046,15 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public List<StreamEntry> xclaim(final String key, final String group, final String consumername, final long minIdleTime,
-            final long newIdleTime, final int retries, final boolean force, final StreamEntryID... ids) {
+    public List<StreamEntry> xclaim(
+            final String key,
+            final String group,
+            final String consumername,
+            final long minIdleTime,
+            final long newIdleTime,
+            final int retries,
+            final boolean force,
+            final StreamEntryID... ids) {
         checkArguments(key);
         return new ConfigurableJedisClusterCommand<List<StreamEntry>>(connectionHandler, maxAttempts, maxTotalRetriesDuration) {
             @Override
@@ -2980,7 +3065,12 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public List<StreamEntry> xclaim(String key, String group, String consumername, long minIdleTime, XClaimParams params,
+    public List<StreamEntry> xclaim(
+            String key,
+            String group,
+            String consumername,
+            long minIdleTime,
+            XClaimParams params,
             StreamEntryID... ids) {
         checkArguments(key);
         return new ConfigurableJedisClusterCommand<List<StreamEntry>>(connectionHandler, maxAttempts, maxTotalRetriesDuration) {
@@ -2992,7 +3082,12 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public List<StreamEntryID> xclaimJustId(String key, String group, String consumername, long minIdleTime, XClaimParams params,
+    public List<StreamEntryID> xclaimJustId(
+            String key,
+            String group,
+            String consumername,
+            long minIdleTime,
+            XClaimParams params,
             StreamEntryID... ids) {
         checkArguments(key);
         return new ConfigurableJedisClusterCommand<List<StreamEntryID>>(connectionHandler, maxAttempts, maxTotalRetriesDuration) {
@@ -4348,7 +4443,11 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public Set<Tuple> zrangeByScoreWithScores(final byte[] key, final double min, final double max, final int offset,
+    public Set<Tuple> zrangeByScoreWithScores(
+            final byte[] key,
+            final double min,
+            final double max,
+            final int offset,
             final int count) {
         checkBinaryArguments(key);
         return new ConfigurableJedisClusterCommand<Set<Tuple>>(connectionHandler, maxAttempts, maxTotalRetriesDuration) {
@@ -4393,7 +4492,11 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public Set<Tuple> zrangeByScoreWithScores(final byte[] key, final byte[] min, final byte[] max, final int offset,
+    public Set<Tuple> zrangeByScoreWithScores(
+            final byte[] key,
+            final byte[] min,
+            final byte[] max,
+            final int offset,
             final int count) {
         checkBinaryArguments(key);
         return new ConfigurableJedisClusterCommand<Set<Tuple>>(connectionHandler, maxAttempts, maxTotalRetriesDuration) {
@@ -4405,7 +4508,11 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public Set<Tuple> zrevrangeByScoreWithScores(final byte[] key, final double max, final double min, final int offset,
+    public Set<Tuple> zrevrangeByScoreWithScores(
+            final byte[] key,
+            final double max,
+            final double min,
+            final int offset,
             final int count) {
         checkBinaryArguments(key);
         return new ConfigurableJedisClusterCommand<Set<Tuple>>(connectionHandler, maxAttempts, maxTotalRetriesDuration) {
@@ -4417,7 +4524,11 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public Set<Tuple> zrevrangeByScoreWithScores(final byte[] key, final byte[] max, final byte[] min, final int offset,
+    public Set<Tuple> zrevrangeByScoreWithScores(
+            final byte[] key,
+            final byte[] max,
+            final byte[] min,
+            final int offset,
             final int count) {
         checkBinaryArguments(key);
         return new ConfigurableJedisClusterCommand<Set<Tuple>>(connectionHandler, maxAttempts, maxTotalRetriesDuration) {
@@ -4812,7 +4923,11 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public byte[] blmove(final byte[] srcKey, final byte[] dstKey, final ListDirection from, final ListDirection to,
+    public byte[] blmove(
+            final byte[] srcKey,
+            final byte[] dstKey,
+            final ListDirection from,
+            final ListDirection to,
             final double timeout) {
         checkBinaryArguments(srcKey);
         checkBinaryArguments(dstKey);
@@ -5321,7 +5436,11 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public List<GeoRadiusResponse> georadius(final byte[] key, final double longitude, final double latitude, final double radius,
+    public List<GeoRadiusResponse> georadius(
+            final byte[] key,
+            final double longitude,
+            final double latitude,
+            final double radius,
             final GeoUnit unit) {
         checkBinaryArguments(key);
         return new ConfigurableJedisClusterCommand<List<GeoRadiusResponse>>(connectionHandler, maxAttempts,
@@ -5334,8 +5453,12 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public List<GeoRadiusResponse> georadiusReadonly(final byte[] key, final double longitude, final double latitude,
-            final double radius, final GeoUnit unit) {
+    public List<GeoRadiusResponse> georadiusReadonly(
+            final byte[] key,
+            final double longitude,
+            final double latitude,
+            final double radius,
+            final GeoUnit unit) {
         checkBinaryArguments(key);
         return new ConfigurableJedisClusterCommand<List<GeoRadiusResponse>>(connectionHandler, maxAttempts,
                 maxTotalRetriesDuration) {
@@ -5347,8 +5470,13 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public List<GeoRadiusResponse> georadius(final byte[] key, final double longitude, final double latitude, final double radius,
-            final GeoUnit unit, final GeoRadiusParam param) {
+    public List<GeoRadiusResponse> georadius(
+            final byte[] key,
+            final double longitude,
+            final double latitude,
+            final double radius,
+            final GeoUnit unit,
+            final GeoRadiusParam param) {
         checkBinaryArguments(key);
         return new ConfigurableJedisClusterCommand<List<GeoRadiusResponse>>(connectionHandler, maxAttempts,
                 maxTotalRetriesDuration) {
@@ -5360,8 +5488,14 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public Long georadiusStore(final byte[] key, final double longitude, final double latitude, final double radius,
-            final GeoUnit unit, final GeoRadiusParam param, final GeoRadiusStoreParam storeParam) {
+    public Long georadiusStore(
+            final byte[] key,
+            final double longitude,
+            final double latitude,
+            final double radius,
+            final GeoUnit unit,
+            final GeoRadiusParam param,
+            final GeoRadiusStoreParam storeParam) {
         byte[][] keys = storeParam.getByteKeys(key);
         checkBinaryArguments(key);
         return new ConfigurableJedisClusterCommand<Long>(connectionHandler, maxAttempts, maxTotalRetriesDuration) {
@@ -5373,8 +5507,13 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public List<GeoRadiusResponse> georadiusReadonly(final byte[] key, final double longitude, final double latitude,
-            final double radius, final GeoUnit unit, final GeoRadiusParam param) {
+    public List<GeoRadiusResponse> georadiusReadonly(
+            final byte[] key,
+            final double longitude,
+            final double latitude,
+            final double radius,
+            final GeoUnit unit,
+            final GeoRadiusParam param) {
         checkBinaryArguments(key);
         return new ConfigurableJedisClusterCommand<List<GeoRadiusResponse>>(connectionHandler, maxAttempts,
                 maxTotalRetriesDuration) {
@@ -5386,7 +5525,10 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public List<GeoRadiusResponse> georadiusByMember(final byte[] key, final byte[] member, final double radius,
+    public List<GeoRadiusResponse> georadiusByMember(
+            final byte[] key,
+            final byte[] member,
+            final double radius,
             final GeoUnit unit) {
         checkBinaryArguments(key);
         return new ConfigurableJedisClusterCommand<List<GeoRadiusResponse>>(connectionHandler, maxAttempts,
@@ -5399,7 +5541,10 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public List<GeoRadiusResponse> georadiusByMemberReadonly(final byte[] key, final byte[] member, final double radius,
+    public List<GeoRadiusResponse> georadiusByMemberReadonly(
+            final byte[] key,
+            final byte[] member,
+            final double radius,
             final GeoUnit unit) {
         checkBinaryArguments(key);
         return new ConfigurableJedisClusterCommand<List<GeoRadiusResponse>>(connectionHandler, maxAttempts,
@@ -5412,8 +5557,12 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public List<GeoRadiusResponse> georadiusByMember(final byte[] key, final byte[] member, final double radius,
-            final GeoUnit unit, final GeoRadiusParam param) {
+    public List<GeoRadiusResponse> georadiusByMember(
+            final byte[] key,
+            final byte[] member,
+            final double radius,
+            final GeoUnit unit,
+            final GeoRadiusParam param) {
         checkBinaryArguments(key);
         return new ConfigurableJedisClusterCommand<List<GeoRadiusResponse>>(connectionHandler, maxAttempts,
                 maxTotalRetriesDuration) {
@@ -5425,8 +5574,13 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public Long georadiusByMemberStore(final byte[] key, final byte[] member, final double radius, final GeoUnit unit,
-            final GeoRadiusParam param, final GeoRadiusStoreParam storeParam) {
+    public Long georadiusByMemberStore(
+            final byte[] key,
+            final byte[] member,
+            final double radius,
+            final GeoUnit unit,
+            final GeoRadiusParam param,
+            final GeoRadiusStoreParam storeParam) {
         byte[][] keys = storeParam.getByteKeys(key);
         checkBinaryArguments(key);
         return new ConfigurableJedisClusterCommand<Long>(connectionHandler, maxAttempts, maxTotalRetriesDuration) {
@@ -5438,8 +5592,12 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public List<GeoRadiusResponse> georadiusByMemberReadonly(final byte[] key, final byte[] member, final double radius,
-            final GeoUnit unit, final GeoRadiusParam param) {
+    public List<GeoRadiusResponse> georadiusByMemberReadonly(
+            final byte[] key,
+            final byte[] member,
+            final double radius,
+            final GeoUnit unit,
+            final GeoRadiusParam param) {
         checkBinaryArguments(key);
         return new ConfigurableJedisClusterCommand<List<GeoRadiusResponse>>(connectionHandler, maxAttempts,
                 maxTotalRetriesDuration) {
@@ -5612,7 +5770,11 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public byte[] xadd(final byte[] key, final byte[] id, final Map<byte[], byte[]> hash, final long maxLen,
+    public byte[] xadd(
+            final byte[] key,
+            final byte[] id,
+            final Map<byte[], byte[]> hash,
+            final long maxLen,
             final boolean approximateLength) {
         checkBinaryArguments(key);
         return new ConfigurableJedisClusterCommand<byte[]>(connectionHandler, maxAttempts, maxTotalRetriesDuration) {
@@ -5777,8 +5939,13 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public List<byte[]> xreadGroup(final byte[] groupname, final byte[] consumer, final int count, final long block,
-            final boolean noAck, final Map<byte[], byte[]> streams) {
+    public List<byte[]> xreadGroup(
+            final byte[] groupname,
+            final byte[] consumer,
+            final int count,
+            final long block,
+            final boolean noAck,
+            final Map<byte[], byte[]> streams) {
         byte[][] keys = streams.keySet().toArray(new byte[streams.size()][]);
         return new ConfigurableJedisClusterCommand<List<byte[]>>(connectionHandler, maxAttempts, maxTotalRetriesDuration) {
             @Override
@@ -5789,7 +5956,10 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public List<byte[]> xreadGroup(final byte[] groupname, final byte[] consumer, final XReadGroupParams xReadGroupParams,
+    public List<byte[]> xreadGroup(
+            final byte[] groupname,
+            final byte[] consumer,
+            final XReadGroupParams xReadGroupParams,
             final Entry<byte[], byte[]>... streams) {
         return new ConfigurableJedisClusterCommand<List<byte[]>>(connectionHandler, maxAttempts, maxTotalRetriesDuration) {
             @Override
@@ -5833,7 +6003,12 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public List<Object> xpending(final byte[] key, final byte[] groupname, final byte[] start, final byte[] end, final int count,
+    public List<Object> xpending(
+            final byte[] key,
+            final byte[] groupname,
+            final byte[] start,
+            final byte[] end,
+            final int count,
             final byte[] consumername) {
         checkBinaryArguments(key);
         return new ConfigurableJedisClusterCommand<List<Object>>(connectionHandler, maxAttempts, maxTotalRetriesDuration) {
@@ -5867,8 +6042,15 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public List<byte[]> xclaim(final byte[] key, final byte[] groupname, final byte[] consumername, final long minIdleTime,
-            final long newIdleTime, final int retries, final boolean force, final byte[][] ids) {
+    public List<byte[]> xclaim(
+            final byte[] key,
+            final byte[] groupname,
+            final byte[] consumername,
+            final long minIdleTime,
+            final long newIdleTime,
+            final int retries,
+            final boolean force,
+            final byte[][] ids) {
         checkBinaryArguments(key);
         return new ConfigurableJedisClusterCommand<List<byte[]>>(connectionHandler, maxAttempts, maxTotalRetriesDuration) {
             @Override
@@ -5879,7 +6061,12 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public List<byte[]> xclaim(byte[] key, byte[] group, byte[] consumername, long minIdleTime, XClaimParams params,
+    public List<byte[]> xclaim(
+            byte[] key,
+            byte[] group,
+            byte[] consumername,
+            long minIdleTime,
+            XClaimParams params,
             byte[]... ids) {
         checkBinaryArguments(key);
         return new ConfigurableJedisClusterCommand<List<byte[]>>(connectionHandler, maxAttempts, maxTotalRetriesDuration) {
@@ -5891,7 +6078,12 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
     }
 
     @Override
-    public List<byte[]> xclaimJustId(byte[] key, byte[] group, byte[] consumername, long minIdleTime, XClaimParams params,
+    public List<byte[]> xclaimJustId(
+            byte[] key,
+            byte[] group,
+            byte[] consumername,
+            long minIdleTime,
+            XClaimParams params,
             byte[]... ids) {
         checkBinaryArguments(key);
         return new ConfigurableJedisClusterCommand<List<byte[]>>(connectionHandler, maxAttempts, maxTotalRetriesDuration) {
@@ -5951,9 +6143,9 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
      * Check input argument names specification.
      * 
      * @param keys
-     * @throws ParameterCanonicalException
+     * @throws NoCanonicalParamaterException
      */
-    protected void checkBinaryArguments(final byte[]... keys) throws ParameterCanonicalException {
+    protected void checkBinaryArguments(final byte[]... keys) throws NoCanonicalParamaterException {
         if (safeMode) {
             RedisSpecUtil.safeCheckKeys(asList(keys));
         }
@@ -5963,9 +6155,9 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
      * Check input argument names specification.
      * 
      * @param keys
-     * @throws ParameterCanonicalException
+     * @throws NoCanonicalParamaterException
      */
-    protected void checkBinaryArguments(final List<byte[]> keys) throws ParameterCanonicalException {
+    protected void checkBinaryArguments(final List<byte[]> keys) throws NoCanonicalParamaterException {
         if (safeMode) {
             RedisSpecUtil.safeCheckKeys(asList(keys));
         }
@@ -5975,9 +6167,9 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
      * Check input argument names specification.
      * 
      * @param keys
-     * @throws ParameterCanonicalException
+     * @throws NoCanonicalParamaterException
      */
-    protected void checkArguments(final List<String> keys) throws ParameterCanonicalException {
+    protected void checkArguments(final List<String> keys) throws NoCanonicalParamaterException {
         checkArguments(keys.toArray(new String[0]));
     }
 
@@ -5985,9 +6177,9 @@ public class ConfigurableJedisClusterJedisClient extends JedisCluster implements
      * Check input argument names specification.
      * 
      * @param keys
-     * @throws ParameterCanonicalException
+     * @throws NoCanonicalParamaterException
      */
-    protected void checkArguments(final String... keys) throws ParameterCanonicalException {
+    protected void checkArguments(final String... keys) throws NoCanonicalParamaterException {
         if (safeMode) {
             RedisSpecUtil.safeCheckKeys(asList(keys));
         }

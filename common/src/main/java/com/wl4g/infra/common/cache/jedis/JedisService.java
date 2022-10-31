@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.support.cache.jedis;
+package com.wl4g.infra.common.cache.jedis;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
@@ -24,7 +24,6 @@ import static com.wl4g.infra.common.serialize.ProtostuffUtils.serialize;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
-import static org.springframework.util.CollectionUtils.isEmpty;
 
 import java.util.List;
 import java.util.Map;
@@ -38,11 +37,12 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.wl4g.infra.common.bloom.BloomGenerator;
+import com.wl4g.infra.common.cache.jedis.ScanCursor.ClusterScanParams;
+import com.wl4g.infra.common.collection.CollectionUtils2;
 import com.wl4g.infra.common.lang.StringUtils2;
 import com.wl4g.infra.common.log.SmartLogger;
 import com.wl4g.infra.common.serialize.JdkSerializeUtils;
 import com.wl4g.infra.common.serialize.ProtostuffUtils;
-import com.wl4g.infra.support.cache.jedis.ScanCursor.ClusterScanParams;
 
 /**
  * JEDIS adapter service template.
@@ -293,7 +293,7 @@ public class JedisService {
     public <T> Long setObjectList(final String key, final List<T> values, final int cacheSeconds) {
         return doExecuteWithRedis(adapter -> {
             Long result = 0L;
-            if (!isEmpty(values)) {
+            if (!CollectionUtils2.isEmpty(values)) {
                 List<String> members = safeList(values).stream().map(v -> toJSONString(v)).collect(toList());
                 result = adapter.rpush(key, members.toArray(new String[] {}));
             }

@@ -15,18 +15,7 @@
  */
 package com.wl4g.infra.support.cache.jedis;
 
-import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
-import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static com.wl4g.infra.support.constant.SupportInfraConstant.CONF_PREFIX_INFRA_SUPPORT_JEDIS;
-import static redis.clients.jedis.HostAndPort.parseString;
-
-import java.io.Serializable;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -35,18 +24,18 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
-import com.wl4g.infra.common.log.SmartLogger;
+import com.wl4g.infra.common.cache.jedis.JedisClient;
+import com.wl4g.infra.common.cache.jedis.JedisClientBuilder;
+import com.wl4g.infra.common.cache.jedis.JedisClientBuilder.JedisConfig;
+import com.wl4g.infra.common.cache.jedis.JedisService;
 
-import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
-import redis.clients.jedis.exceptions.JedisException;
 
 /**
  * Jedis auto configuration, Support automatic adaptation to current
  * environment, use jedis singleton, jedis cluster, and then create
- * {@link JedisClientFactoryBean} and {@link JedisClient}
+ * {@link JedisClientBuilder} and {@link JedisClient}
  * 
  * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2018年9月16日
@@ -54,7 +43,6 @@ import redis.clients.jedis.exceptions.JedisException;
  */
 @ConditionalOnProperty(name = CONF_PREFIX_INFRA_SUPPORT_JEDIS + ".enabled", matchIfMissing = true)
 public class JedisClientAutoConfiguration {
-    protected final SmartLogger log = getLogger(getClass());
 
     // Optional
     @Bean
@@ -87,129 +75,8 @@ public class JedisClientAutoConfiguration {
      * @version v1.0 2018年9月16日
      * @since
      */
-    public static class JedisProperties implements Serializable {
-        private final static long serialVersionUID = 1906168160146495488L;
-
-        protected SmartLogger log = getLogger(getClass());
-
-        private List<String> nodes = new ArrayList<>();
-        private String passwd;
-        private String clientName;
-        private int connTimeout = 10_000;
-        private int soTimeout = 10_000;
-        private int maxAttempts = 20;
-        private int database = 0;
-
-        private JedisPoolConfig poolConfig = new JedisPoolConfig();
-        private boolean safeMode = true;
-
-        public JedisProperties() {
-            // Default settings.
-            /*
-             * [Note:] importants, The default value is - 1, that is, there is
-             * no time-out for acquiring resources, which will lead to deadlock.
-             */
-            this.poolConfig.setMaxWait(Duration.ofMillis(10000));
-            this.poolConfig.setMinIdle(10);
-            this.poolConfig.setMaxIdle(100);
-            this.poolConfig.setMaxTotal(60000);
-        }
-
-        public List<String> getNodes() {
-            return nodes;
-        }
-
-        public void setNodes(List<String> nodes) {
-            this.nodes = nodes;
-        }
-
-        public String getPasswd() {
-            return passwd;
-        }
-
-        public void setPasswd(String passwd) {
-            this.passwd = passwd;
-        }
-
-        public String getClientName() {
-            return clientName;
-        }
-
-        public void setClientName(String clientName) {
-            this.clientName = clientName;
-        }
-
-        public int getConnTimeout() {
-            return connTimeout;
-        }
-
-        public void setConnTimeout(int connTimeout) {
-            this.connTimeout = connTimeout;
-        }
-
-        public int getSoTimeout() {
-            return soTimeout;
-        }
-
-        public void setSoTimeout(int soTimeout) {
-            this.soTimeout = soTimeout;
-        }
-
-        public int getMaxAttempts() {
-            return maxAttempts;
-        }
-
-        public void setMaxAttempts(int maxAttempts) {
-            this.maxAttempts = maxAttempts;
-        }
-
-        public int getDatabase() {
-            return database;
-        }
-
-        public void setDatabase(int database) {
-            this.database = database;
-        }
-
-        public JedisPoolConfig getPoolConfig() {
-            return poolConfig;
-        }
-
-        public void setPoolConfig(JedisPoolConfig poolConfig) {
-            this.poolConfig = poolConfig;
-        }
-
-        public boolean isSafeMode() {
-            return safeMode;
-        }
-
-        public void setSafeMode(boolean safeMode) {
-            this.safeMode = safeMode;
-        }
-
-        public final Set<HostAndPort> parseHostAndPort() throws Exception {
-            try {
-                Set<HostAndPort> haps = new HashSet<HostAndPort>();
-                for (String node : getNodes()) {
-                    boolean matched = defaultNodePattern.matcher(node).matches();
-                    if (!matched) {
-                        throw new IllegalArgumentException("illegal ip or port");
-                    }
-                    haps.add(parseString(node));
-                }
-                return haps;
-            } catch (Exception e) {
-                throw new JedisException("Resolve of redis cluster configuration failure.", e);
-            }
-        }
-
-        @Override
-        public String toString() {
-            return getClass().getSimpleName().concat(" - ").concat(toJSONString(this));
-        }
-
-        private final static Pattern defaultNodePattern = Pattern.compile("^.+[:]\\d{1,9}\\s*$");
-
+    public static class JedisProperties extends JedisConfig {
+        private final static long serialVersionUID = 1902261160146495488L;
     }
 
     /**
