@@ -17,7 +17,6 @@ package com.wl4g.infra.common.cache.jedis;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static com.wl4g.infra.common.serialize.ProtostuffUtils.serialize;
@@ -40,9 +39,10 @@ import com.wl4g.infra.common.bloom.BloomGenerator;
 import com.wl4g.infra.common.cache.jedis.ScanCursor.ClusterScanParams;
 import com.wl4g.infra.common.collection.CollectionUtils2;
 import com.wl4g.infra.common.lang.StringUtils2;
-import com.wl4g.infra.common.log.SmartLogger;
 import com.wl4g.infra.common.serialize.JdkSerializeUtils;
 import com.wl4g.infra.common.serialize.ProtostuffUtils;
+
+import lombok.CustomLog;
 
 /**
  * JEDIS adapter service template.
@@ -51,8 +51,8 @@ import com.wl4g.infra.common.serialize.ProtostuffUtils;
  * @version v1.0 2018年9月16日
  * @since
  */
+@CustomLog
 public class JedisService {
-    protected final SmartLogger log = getLogger(getClass());
 
     /**
      * {@link JedisClient}

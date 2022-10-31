@@ -82,7 +82,7 @@ public class JedisClientBuilder {
     }
 
     public JedisClientBuilder(@NotNull JedisConfig config) {
-        this.config = notNullOf(config, "jedisProperties");
+        this.config = notNullOf(config, "jedisConfig");
         this.jedisCluster = null;
         this.jedisPool = null;
     }
