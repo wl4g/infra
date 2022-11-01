@@ -20,6 +20,7 @@ import static java.util.Arrays.asList;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -89,9 +90,9 @@ public class HashScanCursorTests {
         HashScanParams params = new HashScanParams(total, "foo*");
         HashScanCursor<String> cursor = new HashScanCursor<String>(jedisClient, "mykey1".getBytes(), String.class, params).open();
         while (cursor.hasNext()) {
-            String value = cursor.next();
-            System.out.println("hscan value: " + value);
-            result.add(value);
+            Entry<String, String> entry = cursor.next();
+            System.out.println(entry.getKey() + " ==> " + entry.getValue());
+            result.add(entry.getValue());
         }
         return result;
     }

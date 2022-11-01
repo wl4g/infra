@@ -65,7 +65,7 @@ import redis.clients.jedis.util.SafeEncoder;
  * @since
  * @param <E>
  */
-public class HashScanCursor<E> implements Iterator<E> {
+public class HashScanCursor<E> implements Iterator<Entry<String, E>> {
     protected final static String REPLICATION = "Replication";
     protected final static String ROLE_MASTER = "role:master";
     protected final static HashScanParams NONE_PARAMS = new HashScanParams();
@@ -202,8 +202,8 @@ public class HashScanCursor<E> implements Iterator<E> {
      * 
      * @see HashScanCursor#next()
      */
-    public synchronized List<E> toValues() throws IOException {
-        List<E> list = new ArrayList<>(64);
+    public synchronized List<Entry<String, E>> toValues() throws IOException {
+        List<Entry<String, E>> list = new ArrayList<>(64);
         while (hasNext()) {
             list.add(next());
         }
@@ -219,11 +219,27 @@ public class HashScanCursor<E> implements Iterator<E> {
      */
     @SuppressWarnings("unchecked")
     @Override
-    public synchronized E next() {
+    public synchronized Entry<String, E> next() {
         if (!hasNext()) {
             throw new NoSuchElementException("No more elements available for cursor " + cursor + ".");
         }
-        return (E) deserializer.deserialize(iter.iterator().next().getValue(), valueType);
+        final Entry<byte[], byte[]> entry = iter.iterator().next();
+        return new Entry<String, E>() {
+            @Override
+            public String getKey() {
+                return new String(entry.getKey(), UTF_8);
+            }
+
+            @Override
+            public E getValue() {
+                return (E) deserializer.deserialize(entry.getValue(), valueType);
+            }
+
+            @Override
+            public E setValue(E value) {
+                throw new UnsupportedOperationException();
+            }
+        };
     }
 
     @Override
