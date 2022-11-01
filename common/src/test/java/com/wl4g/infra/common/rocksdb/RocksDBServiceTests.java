@@ -68,19 +68,46 @@ public class RocksDBServiceTests {
             System.out.println(keys);
         }
 
-        // iterator
-        System.out.println("----------- testing for iterator ... -----------");
-        int count = 0;
-        Iterator<Entry<String, byte[]>> it = rocksDBService.iterator("f1");
-        while (it.hasNext()) {
-            Entry<String, byte[]> entry = it.next();
+        // iterator1
+        System.out.println("----------- testing for iterator1 ... -----------");
+        int count1 = 0;
+        Iterator<Entry<String, byte[]>> it1 = rocksDBService.iterator("f1");
+        while (it1.hasNext()) {
+            Entry<String, byte[]> entry = it1.next();
             System.out.println(entry.getKey() + "  =>  " + new String(entry.getValue(), UTF_8));
-            if (count == 0) {
+            if (count1 == 0) {
                 Assertions.assertEquals(entry.getKey(), "key1");
-            } else if (count == 1) {
+            } else if (count1 == 1) {
                 Assertions.assertEquals(entry.getKey(), "key2");
+            } else if (count1 == 2) {
+                Assertions.assertEquals(entry.getKey(), "key3");
+            } else if (count1 == 3) {
+                Assertions.assertEquals(entry.getKey(), "key4");
             }
-            ++count;
+            ++count1;
+        }
+
+        // iterator1
+        System.out.println("----------- testing for iterator2 ... -----------");
+        int count2 = 0;
+        Iterator<Entry<String, String>> it2 = rocksDBService.iterator("f1", String.class, value -> new String(value, UTF_8));
+        while (it2.hasNext()) {
+            Entry<String, String> entry = it2.next();
+            System.out.println(entry.getKey() + "  =>  " + entry.getValue());
+            if (count2 == 0) {
+                Assertions.assertEquals(entry.getKey(), "key1");
+                Assertions.assertEquals(entry.getValue(), "value1");
+            } else if (count2 == 1) {
+                Assertions.assertEquals(entry.getKey(), "key2");
+                Assertions.assertEquals(entry.getValue(), "value2");
+            } else if (count2 == 2) {
+                Assertions.assertEquals(entry.getKey(), "key3");
+                Assertions.assertEquals(entry.getValue(), "value3");
+            } else if (count2 == 3) {
+                Assertions.assertEquals(entry.getKey(), "key4");
+                Assertions.assertEquals(entry.getValue(), "value4");
+            }
+            ++count2;
         }
 
     }

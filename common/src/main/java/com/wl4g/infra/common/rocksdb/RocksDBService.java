@@ -16,6 +16,7 @@
 package com.wl4g.infra.common.rocksdb;
 
 import static com.google.common.base.Charsets.UTF_8;
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -33,9 +34,11 @@ import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.io.FileUtils;
@@ -79,6 +82,11 @@ public class RocksDBService implements Closeable {
         initRocksDB(config);
     }
 
+    public Iterator<Entry<String, byte[]>> iterator(@NotBlank String familyName) throws RocksDBException {
+        hasTextOf(familyName, "familyName");
+        return iterator(familyName, byte[].class, value -> value);
+    }
+
     /**
      * Gets rocksDB iterator by family name.
      * 
@@ -86,32 +94,39 @@ public class RocksDBService implements Closeable {
      * @return
      * @throws RocksDBException
      */
-    public Iterator<Entry<String, byte[]>> iterator(String familyName) throws RocksDBException {
+    public <T> Iterator<Entry<String, T>> iterator(
+            @NotBlank String familyName,
+            @NotNull Class<T> valueClass,
+            @NotNull Function<byte[], T> deserialize) throws RocksDBException {
+        hasTextOf(familyName, "familyName");
+        notNullOf(valueClass, "valueClass");
+        notNullOf(deserialize, "deserialize");
+
         final ColumnFamilyHandle family = getOrCreateFamily(familyName);
         final RocksIterator it = rocksDB.newIterator(family);
         it.seekToFirst();
-        return new Iterator<Entry<String, byte[]>>() {
-            private Entry<String, byte[]> next;
-            private Entry<String, byte[]> previous;
+        return new Iterator<Entry<String, T>>() {
+            private Entry<String, T> next;
+            private Entry<String, T> previous;
 
             @Override
             public boolean hasNext() {
                 while (isNull(next) && it.isValid()) {
                     final String currentKey = new String(it.key(), UTF_8);
-                    final byte[] currentValue = it.value();
-                    Entry<String, byte[]> current = new Entry<String, byte[]>() {
+                    final T currentValue = deserialize.apply(it.value());
+                    Entry<String, T> current = new Entry<String, T>() {
                         @Override
                         public String getKey() {
                             return currentKey;
                         }
 
                         @Override
-                        public byte[] getValue() {
+                        public T getValue() {
                             return currentValue;
                         }
 
                         @Override
-                        public byte[] setValue(byte[] value) {
+                        public T setValue(T value) {
                             throw new UnsupportedOperationException();
                         }
                     };
@@ -126,11 +141,11 @@ public class RocksDBService implements Closeable {
             }
 
             @Override
-            public Entry<String, byte[]> next() {
+            public Entry<String, T> next() {
                 if (!hasNext()) {
                     throw new NoSuchElementException("Failed to access rocksDB.");
                 }
-                Entry<String, byte[]> tmp = next;
+                Entry<String, T> tmp = next;
                 next = null;
                 return tmp;
             }
