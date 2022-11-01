@@ -337,6 +337,14 @@
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
+        <!-- RocksDB -->
+        <!-- see:https://github1s.com/apache/flink/blob/release-1.15.1/flink-state-backends/flink-statebackend-rocksdb/pom.xml#L60-L61 -->
+        <dependency>
+            <groupId>org.rocksdb</groupId>
+            <artifactId>rocksdbjni</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
         <!-- ANTLR -->
         <dependency>
             <groupId>org.antlr</groupId>

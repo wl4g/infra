@@ -150,6 +150,8 @@
         <fabric8-kubernetes-client.version>5.12.1</fabric8-kubernetes-client.version>
         <!-- OSS -->
         <minio.version>8.4.3</minio.version>
+        <!-- RocksDB -->
+        <rocksdb.version>6.20.3</rocksdb.version>
         <!-- ANTLR -->
         <antlr4.version>4.10.1</antlr4.version>
         <antlr3.version>3.5.3</antlr3.version>
@@ -1038,6 +1040,13 @@
                 <groupId>io.minio</groupId>
                 <artifactId>minio</artifactId>
                 <version>${minio.version}</version>
+            </dependency>
+            <!-- RocksDB -->
+            <!-- see:https://github1s.com/apache/flink/blob/release-1.15.1/flink-state-backends/flink-statebackend-rocksdb/pom.xml#L60-L61 -->
+            <dependency>
+                <groupId>org.rocksdb</groupId>
+                <artifactId>rocksdbjni</artifactId>
+                <version>${rocksdb.version}</version>
             </dependency>
             <!-- ANTLR -->
             <dependency>
