@@ -17,7 +17,9 @@ package com.wl4g.infra.common.rocksdb;
 
 import static com.google.common.base.Charsets.UTF_8;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -41,16 +43,22 @@ public class RocksDBServiceTests {
     }
 
     @Test
-    public void testPutAndGetAndGetKeys() throws Exception {
+    public void testPut_Get_GetKeys_Iterator() throws Exception {
+        // put
+        System.out.println("-----------testing for put ... -----------");
         rocksDBService.put("f1", "key1", "value1".getBytes());
         rocksDBService.put("f1", "key2", "value2".getBytes());
         rocksDBService.put("f1", "key3", "value3".getBytes());
         rocksDBService.put("f1", "key4", "value4".getBytes());
 
+        // get
+        System.out.println("-----------testing for get ... -----------");
         String value1 = new String(rocksDBService.get("f1", "key1"), UTF_8);
         System.out.println(value1);
         Assertions.assertEquals(value1, "value1");
 
+        // getKeys
+        System.out.println("-----------testing for getKeys ... -----------");
         String lastKey = null;
         List<String> keys = null;
         while (!(keys = rocksDBService.getKeys("f1", lastKey, 2)).isEmpty()) {
@@ -58,6 +66,21 @@ public class RocksDBServiceTests {
                 lastKey = keys.get(keys.size() - 1);
             }
             System.out.println(keys);
+        }
+
+        // iterator
+        System.out.println("----------- testing for iterator ... -----------");
+        int count = 0;
+        Iterator<Entry<String, byte[]>> it = rocksDBService.iterator("f1");
+        while (it.hasNext()) {
+            Entry<String, byte[]> entry = it.next();
+            System.out.println(entry.getKey() + "  =>  " + new String(entry.getValue(), UTF_8));
+            if (count == 0) {
+                Assertions.assertEquals(entry.getKey(), "key1");
+            } else if (count == 1) {
+                Assertions.assertEquals(entry.getKey(), "key2");
+            }
+            ++count;
         }
 
     }

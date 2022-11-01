@@ -17,6 +17,7 @@ package com.wl4g.infra.common.rocksdb;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 
@@ -25,8 +26,12 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -48,6 +53,7 @@ import org.rocksdb.WriteOptions;
 import com.wl4g.infra.common.collection.CollectionUtils2;
 import com.wl4g.infra.common.lang.StringUtils2;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -59,6 +65,7 @@ import lombok.extern.slf4j.Slf4j;
  * @see https://github1s.com/apache/flink/blob/release-1.15.1/flink-state-backends/flink-statebackend-rocksdb/src/main/java/org/apache/flink/contrib/streaming/state/EmbeddedRocksDBStateBackend.java#L890-L891
  */
 @Slf4j
+@Getter
 public class RocksDBService implements Closeable {
 
     // A collection of column families (that is, equivalent to a database table)
@@ -70,6 +77,64 @@ public class RocksDBService implements Closeable {
 
     public RocksDBService(@NotNull RocksDBConfig config) {
         initRocksDB(config);
+    }
+
+    /**
+     * Gets rocksDB iterator by family name.
+     * 
+     * @param familyName
+     * @return
+     * @throws RocksDBException
+     */
+    public Iterator<Entry<String, byte[]>> iterator(String familyName) throws RocksDBException {
+        final ColumnFamilyHandle family = getOrCreateFamily(familyName);
+        final RocksIterator it = rocksDB.newIterator(family);
+        it.seekToFirst();
+        return new Iterator<Entry<String, byte[]>>() {
+            private Entry<String, byte[]> next;
+            private Entry<String, byte[]> previous;
+
+            @Override
+            public boolean hasNext() {
+                while (isNull(next) && it.isValid()) {
+                    final String currentKey = new String(it.key(), UTF_8);
+                    final byte[] currentValue = it.value();
+                    Entry<String, byte[]> current = new Entry<String, byte[]>() {
+                        @Override
+                        public String getKey() {
+                            return currentKey;
+                        }
+
+                        @Override
+                        public byte[] getValue() {
+                            return currentValue;
+                        }
+
+                        @Override
+                        public byte[] setValue(byte[] value) {
+                            throw new UnsupportedOperationException();
+                        }
+                    };
+                    String previousKey = isNull(previous) ? null : previous.getKey();
+                    if (!Objects.equals(previousKey, current.getKey())) {
+                        previous = current;
+                        next = current;
+                    }
+                    it.next();
+                }
+                return nonNull(next);
+            }
+
+            @Override
+            public Entry<String, byte[]> next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException("Failed to access rocksDB.");
+                }
+                Entry<String, byte[]> tmp = next;
+                next = null;
+                return tmp;
+            }
+        };
     }
 
     /**
@@ -97,17 +162,17 @@ public class RocksDBService implements Closeable {
     public List<String> getKeys(String familyName, String lastKey, int batchSize) throws RocksDBException {
         List<String> list = new ArrayList<>(batchSize);
         ColumnFamilyHandle family = getOrCreateFamily(familyName);
-        try (RocksIterator rocksIterator = rocksDB.newIterator(family)) {
+        try (RocksIterator it = rocksDB.newIterator(family)) {
             if (lastKey != null) {
-                rocksIterator.seek(lastKey.getBytes(StandardCharsets.UTF_8));
-                rocksIterator.next();
+                it.seek(lastKey.getBytes(StandardCharsets.UTF_8));
+                it.next();
             } else {
-                rocksIterator.seekToFirst();
+                it.seekToFirst();
             }
             // 一批次最多 batchSize 个 key
-            while (rocksIterator.isValid() && list.size() < batchSize) {
-                list.add(new String(rocksIterator.key(), StandardCharsets.UTF_8));
-                rocksIterator.next();
+            while (it.isValid() && list.size() < batchSize) {
+                list.add(new String(it.key(), StandardCharsets.UTF_8));
+                it.next();
             }
         }
         return list;
@@ -167,9 +232,9 @@ public class RocksDBService implements Closeable {
     public List<String> getAllKeys(String familyName) throws RocksDBException {
         List<String> list = new ArrayList<>();
         ColumnFamilyHandle family = getOrCreateFamily(familyName); // 获取列族Handle
-        try (RocksIterator rocksIterator = rocksDB.newIterator(family)) {
-            for (rocksIterator.seekToFirst(); rocksIterator.isValid(); rocksIterator.next()) {
-                list.add(new String(rocksIterator.key(), StandardCharsets.UTF_8));
+        try (RocksIterator it = rocksDB.newIterator(family)) {
+            for (it.seekToFirst(); it.isValid(); it.next()) {
+                list.add(new String(it.key(), StandardCharsets.UTF_8));
             }
         }
         return list;
@@ -185,9 +250,9 @@ public class RocksDBService implements Closeable {
     public Map<String, byte[]> getAll(String familyName) throws RocksDBException {
         Map<String, byte[]> result = new HashMap<>();
         ColumnFamilyHandle family = getOrCreateFamily(familyName); // 获取列族Handle
-        try (RocksIterator rocksIterator = rocksDB.newIterator(family)) {
-            for (rocksIterator.seekToFirst(); rocksIterator.isValid(); rocksIterator.next()) {
-                result.put(new String(rocksIterator.key(), UTF_8), rocksIterator.value());
+        try (RocksIterator it = rocksDB.newIterator(family)) {
+            for (it.seekToFirst(); it.isValid(); it.next()) {
+                result.put(new String(it.key(), UTF_8), it.value());
             }
         }
         return result;
@@ -203,8 +268,8 @@ public class RocksDBService implements Closeable {
     public int getCount(String familyName) throws RocksDBException {
         int count = 0;
         ColumnFamilyHandle family = getOrCreateFamily(familyName); // 获取列族Handle
-        try (RocksIterator rocksIterator = rocksDB.newIterator(family)) {
-            for (rocksIterator.seekToFirst(); rocksIterator.isValid(); rocksIterator.next()) {
+        try (RocksIterator it = rocksDB.newIterator(family)) {
+            for (it.seekToFirst(); it.isValid(); it.next()) {
                 count++;
             }
         }
