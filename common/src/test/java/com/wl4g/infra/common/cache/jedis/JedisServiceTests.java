@@ -19,14 +19,18 @@ import static com.google.common.base.Charsets.UTF_8;
 import static java.lang.System.out;
 import static java.util.Arrays.asList;
 
+import java.util.Map.Entry;
 import java.util.UUID;
 
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.hash.Funnel;
 import com.wl4g.infra.common.bloom.BloomGenerator;
 import com.wl4g.infra.common.cache.jedis.JedisClientBuilder.JedisConfig;
+
+import redis.clients.jedis.ScanParams;
+import redis.clients.jedis.ScanResult;
 
 /**
  * {@link JedisServiceTests}
@@ -37,14 +41,14 @@ import com.wl4g.infra.common.cache.jedis.JedisClientBuilder.JedisConfig;
  */
 public class JedisServiceTests {
 
-    private static JedisService jedisService;
+    JedisService jedisService;
 
-    @BeforeClass
-    public static void init() throws Exception {
+    @Before
+    public void setup() throws Exception {
         JedisConfig config = new JedisConfig();
         config.setNodes(asList(new String[] { "127.0.0.1:6379", "127.0.0.1:6380", "127.0.0.1:6381", "127.0.0.1:7379",
                 "127.0.0.1:7380", "127.0.0.1:7381" }));
-        config.setPasswd("123456");
+        config.setPasswd("zzx!@#$%");
 
         out.println("Instantiating composite operators adapter with cluster ...");
         JedisClient client = new JedisClientBuilder(config).build();
@@ -97,6 +101,21 @@ public class JedisServiceTests {
         boolean result2 = jedisService.bloomExist(bfConfig, key, "id_123");
         System.out.println(result2);
         assert !result2;
+    }
+
+    @Test
+    public void testHashScan() throws Exception {
+        jedisService.getJedisClient().hset("mykey1", "foo1{abc}", "bar1");
+        jedisService.getJedisClient().hset("mykey1", "foo2{abc}", "bar2");
+        jedisService.getJedisClient().hset("mykey1", "foo3{abc}", "bar3");
+
+        System.out.println("Starting hash scaning tests...");
+        ScanParams params = new ScanParams().count(100).match("foo*");
+        ScanResult<Entry<byte[], byte[]>> result = jedisService.getJedisClient()
+                .hscan("mykey1".getBytes(), "0".getBytes(), params);
+        for (Entry<byte[], byte[]> entry : result.getResult()) {
+            System.out.println(new String(entry.getKey()) + " ==> " + new String(entry.getValue()));
+        }
     }
 
 }

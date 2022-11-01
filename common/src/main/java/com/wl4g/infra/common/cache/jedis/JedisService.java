@@ -36,7 +36,10 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.wl4g.infra.common.bloom.BloomGenerator;
-import com.wl4g.infra.common.cache.jedis.ScanCursor.ClusterScanParams;
+import com.wl4g.infra.common.cache.jedis.cursor.HashScanCursor;
+import com.wl4g.infra.common.cache.jedis.cursor.HashScanCursor.HashScanParams;
+import com.wl4g.infra.common.cache.jedis.cursor.ScanCursor;
+import com.wl4g.infra.common.cache.jedis.cursor.ScanCursor.ClusterScanParams;
 import com.wl4g.infra.common.collection.CollectionUtils2;
 import com.wl4g.infra.common.lang.StringUtils2;
 import com.wl4g.infra.common.serialize.JdkSerializeUtils;
@@ -109,6 +112,13 @@ public class JedisService {
         byte[] match = trimToEmpty(pattern).getBytes(Charsets.UTF_8);
         ClusterScanParams params = new ClusterScanParams(batch, match);
         return new ScanCursor<T>(getJedisClient(), valueType, params) {
+        }.open();
+    }
+
+    public <T> HashScanCursor<T> hscan(final String hashKey, final String pattern, final int batch, final Class<T> valueType) {
+        byte[] match = trimToEmpty(pattern).getBytes(Charsets.UTF_8);
+        HashScanParams params = new HashScanParams(batch, match);
+        return new HashScanCursor<T>(getJedisClient(), hashKey.getBytes(Charsets.UTF_8), valueType, params) {
         }.open();
     }
 

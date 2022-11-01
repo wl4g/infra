@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.common.cache.jedis;
+package com.wl4g.infra.common.cache.jedis.cursor;
 
+import static com.google.common.base.Charsets.UTF_8;
 import static com.wl4g.infra.common.lang.Assert2.hasText;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.isTrue;
@@ -42,6 +43,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.Charsets;
+import com.wl4g.infra.common.cache.jedis.JedisClient;
 import com.wl4g.infra.common.collection.CollectionUtils2;
 import com.wl4g.infra.common.log.SmartLogger;
 import com.wl4g.infra.common.log.SmartLoggerFactory;
@@ -194,7 +196,7 @@ public class ScanCursor<E> implements Iterator<E> {
      * @return
      */
     public List<String> toStringkeys() {
-        return iter.getKeys().stream().map(e -> new String(e)).collect(toList());
+        return iter.getKeys().stream().map(e -> new String(e, UTF_8)).collect(toList());
     }
 
     /**
