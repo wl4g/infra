@@ -67,6 +67,14 @@ public class RocksDBMapStore implements MapStore, Closeable {
         this.rocksDBService = new RocksDBService(config);
     }
 
+    public RocksDBMapStore(@NotNull RocksDBService rocksDBService, Class<? extends Serializable> valueClass,
+            String defaultFamilyName) {
+        this.config = null;
+        this.rocksDBService = notNullOf(rocksDBService, "rocksDBService");
+        this.valueClass = notNullOf(valueClass, "valueClass");
+        this.defaultFamilyName = notNullOf(defaultFamilyName, "defaultFamilyName");
+    }
+
     @Override
     public Object getOriginalStore() {
         return rocksDBService;
