@@ -13,21 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.common.cache.jedis;
+package com.wl4g.infra.common.jedis;
 
 import static com.google.common.base.Charsets.UTF_8;
-import static java.lang.System.out;
-import static java.util.Arrays.asList;
 
 import java.util.Map.Entry;
 import java.util.UUID;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.hash.Funnel;
 import com.wl4g.infra.common.bloom.BloomGenerator;
-import com.wl4g.infra.common.cache.jedis.JedisClientBuilder.JedisConfig;
 
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
@@ -39,21 +35,7 @@ import redis.clients.jedis.ScanResult;
  * @version 2022-04-04 v3.0.0
  * @since v3.0.0
  */
-public class JedisServiceTests {
-
-    JedisService jedisService;
-
-    @Before
-    public void setup() throws Exception {
-        JedisConfig config = new JedisConfig();
-        config.setNodes(asList(new String[] { "127.0.0.1:6379", "127.0.0.1:6380", "127.0.0.1:6381", "127.0.0.1:7379",
-                "127.0.0.1:7380", "127.0.0.1:7381" }));
-        config.setPasswd("zzx!@#$%");
-
-        out.println("Instantiating composite operators adapter with cluster ...");
-        JedisClient client = new JedisClientBuilder(config).build();
-        jedisService = new JedisService(client);
-    }
+public class JedisServiceTests extends BaseJedisServiceTests {
 
     @Test
     public void testBloomfilterValid() throws Exception {

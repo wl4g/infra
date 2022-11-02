@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.common.cache.jedis;
+package com.wl4g.infra.common.jedis;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.notEmpty;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
-import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -37,12 +35,16 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
-import com.wl4g.infra.common.cache.jedis.cluster.ConfigurableJedisClusterJedisClient;
-import com.wl4g.infra.common.cache.jedis.cluster.JedisClusterJedisClient;
-import com.wl4g.infra.common.cache.jedis.single.SingleJedisClient;
-import com.wl4g.infra.common.log.SmartLogger;
+import com.wl4g.infra.common.jedis.cluster.ConfigurableJedisClusterJedisClient;
+import com.wl4g.infra.common.jedis.cluster.JedisClusterJedisClient;
+import com.wl4g.infra.common.jedis.single.SingleJedisClient;
 
+import lombok.Builder.Default;
 import lombok.CustomLog;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPool;
@@ -158,104 +160,47 @@ public class JedisClientBuilder {
         }
     }
 
+    @Getter
+    @Setter
+    @ToString
+    @SuperBuilder
     public static class JedisConfig implements Serializable {
         private final static long serialVersionUID = 1906168160146495488L;
+        private final static Pattern defaultNodePattern = Pattern.compile("^.+[:]\\d{1,9}\\s*$");
+        private final static int DEFAULT_CONN_TIMEOUT = 10_000;
+        private final static int DEFAULT_SO_TIMEOUT = 10_000;
+        private final static int DEFAULT_MAX_ATTEMPTS = 20;
+        private final static int DEFAULT_DATABASE = 0;
+        private final static boolean DEFAULT_SAFE_MOE = true;
 
-        protected SmartLogger log = getLogger(getClass());
-
-        private List<String> nodes = new ArrayList<>();
+        private @Default List<String> nodes = new ArrayList<>();
         private String passwd;
         private String clientName;
-        private int connTimeout = 10_000;
-        private int soTimeout = 10_000;
-        private int maxAttempts = 20;
-        private int database = 0;
-
-        private JedisPoolConfig poolConfig = new JedisPoolConfig();
-        private boolean safeMode = true;
+        private @Default int connTimeout = DEFAULT_CONN_TIMEOUT;
+        private @Default int soTimeout = DEFAULT_SO_TIMEOUT;
+        private @Default int maxAttempts = DEFAULT_MAX_ATTEMPTS;
+        private @Default int database = DEFAULT_DATABASE;
+        private @Default boolean safeMode = DEFAULT_SAFE_MOE;
+        private @Default JedisPoolConfig poolConfig = new JedisPoolConfig();
 
         public JedisConfig() {
-            // Default settings.
+            this.nodes = new ArrayList<>();
+            this.passwd = null;
+            this.clientName = null;
+            this.connTimeout = DEFAULT_CONN_TIMEOUT;
+            this.soTimeout = DEFAULT_SO_TIMEOUT;
+            this.maxAttempts = DEFAULT_MAX_ATTEMPTS;
+            this.database = DEFAULT_DATABASE;
+            this.safeMode = DEFAULT_SAFE_MOE;
             /*
-             * [Note:] importants, The default value is - 1, that is, there is
+             * Notice: importants, The default value is - 1, that is, there is
              * no time-out for acquiring resources, which will lead to deadlock.
              */
+            this.poolConfig = new JedisPoolConfig();
             this.poolConfig.setMaxWait(Duration.ofMillis(10000));
             this.poolConfig.setMinIdle(10);
             this.poolConfig.setMaxIdle(100);
             this.poolConfig.setMaxTotal(60000);
-        }
-
-        public List<String> getNodes() {
-            return nodes;
-        }
-
-        public void setNodes(List<String> nodes) {
-            this.nodes = nodes;
-        }
-
-        public String getPasswd() {
-            return passwd;
-        }
-
-        public void setPasswd(String passwd) {
-            this.passwd = passwd;
-        }
-
-        public String getClientName() {
-            return clientName;
-        }
-
-        public void setClientName(String clientName) {
-            this.clientName = clientName;
-        }
-
-        public int getConnTimeout() {
-            return connTimeout;
-        }
-
-        public void setConnTimeout(int connTimeout) {
-            this.connTimeout = connTimeout;
-        }
-
-        public int getSoTimeout() {
-            return soTimeout;
-        }
-
-        public void setSoTimeout(int soTimeout) {
-            this.soTimeout = soTimeout;
-        }
-
-        public int getMaxAttempts() {
-            return maxAttempts;
-        }
-
-        public void setMaxAttempts(int maxAttempts) {
-            this.maxAttempts = maxAttempts;
-        }
-
-        public int getDatabase() {
-            return database;
-        }
-
-        public void setDatabase(int database) {
-            this.database = database;
-        }
-
-        public JedisPoolConfig getPoolConfig() {
-            return poolConfig;
-        }
-
-        public void setPoolConfig(JedisPoolConfig poolConfig) {
-            this.poolConfig = poolConfig;
-        }
-
-        public boolean isSafeMode() {
-            return safeMode;
-        }
-
-        public void setSafeMode(boolean safeMode) {
-            this.safeMode = safeMode;
         }
 
         public final Set<HostAndPort> parseHostAndPort() throws Exception {
@@ -273,13 +218,6 @@ public class JedisClientBuilder {
                 throw new JedisException("Resolve of redis cluster configuration failure.", e);
             }
         }
-
-        @Override
-        public String toString() {
-            return getClass().getSimpleName().concat(" - ").concat(toJSONString(this));
-        }
-
-        private final static Pattern defaultNodePattern = Pattern.compile("^.+[:]\\d{1,9}\\s*$");
 
     }
 

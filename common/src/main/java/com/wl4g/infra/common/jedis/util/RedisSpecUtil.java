@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.common.cache.jedis.util;
+package com.wl4g.infra.common.jedis.util;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.lang.String.format;

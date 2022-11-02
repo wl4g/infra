@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.common.cache.jedis;
+package com.wl4g.infra.common.jedis;
 
 import static java.lang.System.out;
 import static java.util.Arrays.asList;
@@ -21,8 +21,8 @@ import static java.util.Collections.singletonList;
 
 import org.junit.Test;
 
-import com.wl4g.infra.common.cache.jedis.JedisClientBuilder.JedisConfig;
-import com.wl4g.infra.common.cache.jedis.util.RedisSpecUtil;
+import com.wl4g.infra.common.jedis.JedisClientBuilder.JedisConfig;
+import com.wl4g.infra.common.jedis.util.RedisSpecUtil;
 
 /**
  * {@link JedisClientBuilderTests}

@@ -27,7 +27,7 @@ import org.springframework.context.annotation.Bean;
 import com.wl4g.infra.common.cache.jedis.JedisClient;
 import com.wl4g.infra.common.cache.jedis.JedisClientBuilder;
 import com.wl4g.infra.common.cache.jedis.JedisClientBuilder.JedisConfig;
-import com.wl4g.infra.common.cache.jedis.JedisService;
+import com.wl4g.infra.common.jedis.JedisService;
 
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPool;

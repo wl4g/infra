@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.common.cache.jedis.cluster;
+package com.wl4g.infra.common.jedis.cluster;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
@@ -32,10 +32,10 @@ import java.util.Set;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
 import com.wl4g.infra.common.log.SmartLogger;
-import com.wl4g.infra.common.cache.jedis.JedisClient;
-import com.wl4g.infra.common.cache.jedis.util.NoCanonicalParamaterException;
-import com.wl4g.infra.common.cache.jedis.cluster.ConfigurableJedisClusterCommand.ConfigurableJedisClusterConntionHandler;
-import com.wl4g.infra.common.cache.jedis.util.RedisSpecUtil;
+import com.wl4g.infra.common.jedis.JedisClient;
+import com.wl4g.infra.common.jedis.util.NoCanonicalParamaterException;
+import com.wl4g.infra.common.jedis.util.RedisSpecUtil;
+import com.wl4g.infra.common.jedis.cluster.ConfigurableJedisClusterCommand.ConfigurableJedisClusterConntionHandler;
 
 import redis.clients.jedis.BinaryJedisCluster;
 import redis.clients.jedis.BinaryJedisPubSub;

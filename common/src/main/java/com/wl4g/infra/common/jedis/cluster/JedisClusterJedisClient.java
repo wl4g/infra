@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.common.cache.jedis.cluster;
+package com.wl4g.infra.common.jedis.cluster;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 
@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import com.wl4g.infra.common.cache.jedis.JedisClient;
+import com.wl4g.infra.common.jedis.JedisClient;
 
 import redis.clients.jedis.BinaryJedisPubSub;
 import redis.clients.jedis.BitOP;

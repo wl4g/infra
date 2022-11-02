@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.common.cache.jedis.single;
+package com.wl4g.infra.common.jedis.single;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.lang.String.format;
@@ -26,7 +26,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Function;
 
-import com.wl4g.infra.common.cache.jedis.JedisClient;
+import com.wl4g.infra.common.jedis.JedisClient;
 
 import redis.clients.jedis.AccessControlLogEntry;
 import redis.clients.jedis.AccessControlUser;

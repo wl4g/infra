@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.common.cache.jedis.cursor;
+package com.wl4g.infra.common.jedis.cursor;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static com.wl4g.infra.common.lang.Assert2.hasText;
@@ -43,7 +43,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.Charsets;
-import com.wl4g.infra.common.cache.jedis.JedisClient;
+import com.wl4g.infra.common.jedis.JedisClient;
 import com.wl4g.infra.common.collection.CollectionUtils2;
 import com.wl4g.infra.common.log.SmartLogger;
 import com.wl4g.infra.common.log.SmartLoggerFactory;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.common.cache.jedis.cluster;
+package com.wl4g.infra.common.jedis.cluster;
 
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static java.lang.String.format;
@@ -113,8 +113,12 @@ abstract class ConfigurableJedisClusterCommand<T> extends JedisClusterCommand<T>
             } catch (JedisException ex) {
                 // Found current jedis node
                 JedisPool jedisPool = cache.getSlotPool(slot);
-                Optional<String> opt = cache.getNodes().entrySet().stream().filter(e -> e.getValue() == jedisPool)
-                        .map(e -> e.getKey()).findFirst();
+                Optional<String> opt = cache.getNodes()
+                        .entrySet()
+                        .stream()
+                        .filter(e -> e.getValue() == jedisPool)
+                        .map(e -> e.getKey())
+                        .findFirst();
                 log.trace("Failed to getsConnectionFromSlot. slot: {}, redis.node.host: {}", slot, opt);
 
                 // Print details errors.

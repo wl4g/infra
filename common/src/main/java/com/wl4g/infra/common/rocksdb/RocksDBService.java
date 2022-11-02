@@ -84,22 +84,20 @@ public class RocksDBService implements Closeable {
 
     public Iterator<Entry<String, byte[]>> iterator(@NotBlank String familyName) throws RocksDBException {
         hasTextOf(familyName, "familyName");
-        return iterator(familyName, byte[].class, value -> value);
+        return iterator(familyName, value -> value);
     }
 
     /**
      * Gets rocksDB iterator by family name.
      * 
      * @param familyName
+     * @param deserialize
      * @return
      * @throws RocksDBException
      */
-    public <T> Iterator<Entry<String, T>> iterator(
-            @NotBlank String familyName,
-            @NotNull Class<T> valueClass,
-            @NotNull Function<byte[], T> deserialize) throws RocksDBException {
+    public <T> Iterator<Entry<String, T>> iterator(@NotBlank String familyName, @NotNull Function<byte[], T> deserialize)
+            throws RocksDBException {
         hasTextOf(familyName, "familyName");
-        notNullOf(valueClass, "valueClass");
         notNullOf(deserialize, "deserialize");
 
         final ColumnFamilyHandle family = getOrCreateFamily(familyName);

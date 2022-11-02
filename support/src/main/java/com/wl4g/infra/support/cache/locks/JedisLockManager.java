@@ -33,7 +33,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 
 import com.google.common.annotations.Beta;
-import com.wl4g.infra.common.cache.jedis.JedisService;
+import com.wl4g.infra.common.jedis.JedisService;
 import com.wl4g.infra.common.log.SmartLogger;
 
 import redis.clients.jedis.params.SetParams;

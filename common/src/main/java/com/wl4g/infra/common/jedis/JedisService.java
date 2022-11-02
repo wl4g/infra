@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.common.cache.jedis;
+package com.wl4g.infra.common.jedis;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
@@ -36,11 +36,11 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.wl4g.infra.common.bloom.BloomGenerator;
-import com.wl4g.infra.common.cache.jedis.cursor.HashScanCursor;
-import com.wl4g.infra.common.cache.jedis.cursor.HashScanCursor.HashScanParams;
-import com.wl4g.infra.common.cache.jedis.cursor.ScanCursor;
-import com.wl4g.infra.common.cache.jedis.cursor.ScanCursor.ClusterScanParams;
 import com.wl4g.infra.common.collection.CollectionUtils2;
+import com.wl4g.infra.common.jedis.cursor.HashScanCursor;
+import com.wl4g.infra.common.jedis.cursor.ScanCursor;
+import com.wl4g.infra.common.jedis.cursor.HashScanCursor.HashScanParams;
+import com.wl4g.infra.common.jedis.cursor.ScanCursor.ClusterScanParams;
 import com.wl4g.infra.common.lang.StringUtils2;
 import com.wl4g.infra.common.serialize.JdkSerializeUtils;
 import com.wl4g.infra.common.serialize.ProtostuffUtils;

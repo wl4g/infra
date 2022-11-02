@@ -90,7 +90,7 @@ public class RocksDBServiceTests {
         // iterator1
         System.out.println("----------- testing for iterator2 ... -----------");
         int count2 = 0;
-        Iterator<Entry<String, String>> it2 = rocksDBService.iterator("f1", String.class, value -> new String(value, UTF_8));
+        Iterator<Entry<String, String>> it2 = rocksDBService.iterator("f1", value -> new String(value, UTF_8));
         while (it2.hasNext()) {
             Entry<String, String> entry = it2.next();
             System.out.println(entry.getKey() + "  =>  " + entry.getValue());
