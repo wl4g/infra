@@ -32,6 +32,7 @@ import java.util.Map.Entry;
 
 import javax.validation.constraints.NotNull;
 
+import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.Options;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
@@ -141,7 +142,8 @@ public class RocksDBMapStore implements MapStore, Closeable {
     public Long size() {
         log.debug("counting size ...");
         try {
-            return rocksDBService.getRocksDB().getLongProperty("rocksdb.estimate-num-keys");
+            final ColumnFamilyHandle family = rocksDBService.getFamilyMap().get(defaultFamilyName);
+            return rocksDBService.getRocksDB().getLongProperty(family, "rocksdb.estimate-num-keys");
         } catch (RocksDBException e) {
             log.error("Error counting total, cause: '{}', message: '{}'", e.getCause(), e.getMessage());
         }

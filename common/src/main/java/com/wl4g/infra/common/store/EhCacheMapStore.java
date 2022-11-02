@@ -25,17 +25,18 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.stream.StreamSupport;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import org.ehcache.Cache;
-import org.ehcache.CacheManager;
 import org.ehcache.PersistentCacheManager;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
 import org.ehcache.config.units.EntryUnit;
 import org.ehcache.config.units.MemoryUnit;
+import org.ehcache.core.Ehcache;
+import org.ehcache.core.EhcacheManager;
 import org.ehcache.impl.config.persistence.CacheManagerPersistenceConfiguration;
 
 import com.wl4g.infra.common.store.MapStoreConfig.EhCacheStoreConfig;
@@ -54,15 +55,15 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 public class EhCacheMapStore implements MapStore, Closeable {
     protected final EhCacheStoreConfig config;
-    protected final CacheManager cacheManager;
-    protected final Cache<String, Serializable> originalCache;
+    protected final EhcacheManager cacheManager;
+    protected final Ehcache<String, Serializable> originalCache;
 
     public EhCacheMapStore(@NotNull EhCacheStoreConfig config, @NotBlank String name) {
         this.config = notNullOf(config, "config");
         hasTextOf(name, "name");
-        this.cacheManager = buildCacheManager(config, name);
-        this.originalCache = cacheManager.getCache(EhCacheMapStore.class.getSimpleName().concat("-").concat(name), String.class,
-                Serializable.class);
+        this.cacheManager = (EhcacheManager) buildCacheManager(config, name);
+        this.originalCache = (Ehcache<String, Serializable>) cacheManager
+                .getCache(EhCacheMapStore.class.getSimpleName().concat("-").concat(name), String.class, Serializable.class);
     }
 
     @Override
@@ -148,7 +149,8 @@ public class EhCacheMapStore implements MapStore, Closeable {
 
     @Override
     public Long size() {
-        return -1L;
+        // TODO using EHCACHE statistics for count.
+        return StreamSupport.stream(originalCache.spliterator(), true).count();
     }
 
     @Override

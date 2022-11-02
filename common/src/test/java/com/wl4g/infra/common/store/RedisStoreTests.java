@@ -15,7 +15,11 @@
  */
 package com.wl4g.infra.common.store;
 
+import java.util.Iterator;
+import java.util.Map.Entry;
+
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 
 import com.wl4g.infra.common.jedis.BaseJedisServiceTests;
 
@@ -38,16 +42,43 @@ public class RedisStoreTests extends BaseJedisServiceTests {
 
             MyUser user01 = (MyUser) store.get("jack01");
             System.out.println(user01);
+            Assertions.assertEquals(user01.getName(), "jack001");
+
             MyUser user02 = (MyUser) store.get("jack02");
             System.out.println(user02);
+            Assertions.assertEquals(user02.getName(), "jack002");
+
             MyUser user03 = (MyUser) store.get("jack03");
             System.out.println(user03);
+            Assertions.assertEquals(user03.getName(), "jack003");
+
             MyUser user04 = (MyUser) store.get("jack04");
             System.out.println(user04);
+            Assertions.assertEquals(user04.getName(), "jack004");
 
             store.remove("jack04");
             user04 = (MyUser) store.get("jack04");
             System.out.println(user04);
+            Assertions.assertNull(user04);
+
+            int count = 0;
+            final Iterator<Entry<String, MyUser>> it = store.iterator();
+            while (it.hasNext()) {
+                Entry<String, MyUser> entry = it.next();
+                System.out.println(entry.getKey() + " ==> " + entry.getValue());
+                if (count == 0) {
+                    Assertions.assertEquals(entry.getValue().getName(), "jack001");
+                } else if (count == 1) {
+                    Assertions.assertEquals(entry.getValue().getName(), "jack002");
+                } else if (count == 2) {
+                    Assertions.assertEquals(entry.getValue().getName(), "jack003");
+                }
+                ++count;
+            }
+
+            final Long size = store.size();
+            System.out.println(size);
+            Assertions.assertEquals(size, 3);
         }
     }
 

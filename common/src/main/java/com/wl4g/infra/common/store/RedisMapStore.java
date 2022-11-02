@@ -18,6 +18,7 @@ package com.wl4g.infra.common.store;
 import static com.google.common.base.Charsets.UTF_8;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
+import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.util.Objects.nonNull;
 
 import java.io.Closeable;
@@ -49,19 +50,19 @@ import lombok.Getter;
 @Getter
 public class RedisMapStore implements MapStore, Closeable {
     protected final RedisStoreConfig config;
-    protected final String prefix;
+    protected final String hashKey;
     protected final JedisService jedisService;
     protected final Class<?> valueClass;
 
-    public RedisMapStore(@NotNull RedisStoreConfig config, Class<?> valueClass, @NotBlank String prefix) {
-        this(new JedisService(new JedisClientBuilder(config).build()), valueClass, prefix);
+    public RedisMapStore(@NotNull RedisStoreConfig config, Class<?> valueClass, @NotBlank String hashKey) {
+        this(new JedisService(new JedisClientBuilder(config).build()), valueClass, hashKey);
     }
 
-    public RedisMapStore(@NotNull JedisService jedisService, Class<?> valueClass, @NotBlank String prefix) {
+    public RedisMapStore(@NotNull JedisService jedisService, Class<?> valueClass, @NotBlank String hashKey) {
         this.config = null;
         this.jedisService = notNullOf(jedisService, "jedisService");
         this.valueClass = notNullOf(valueClass, "valueClass");
-        this.prefix = notNullOf(prefix, "config");
+        this.hashKey = notNullOf(hashKey, "hashKey");
     }
 
     @Override
@@ -72,7 +73,7 @@ public class RedisMapStore implements MapStore, Closeable {
     @Override
     public <T extends Serializable> Iterator<Entry<String, T>> iterator() {
         HashScanParams params = new HashScanParams(Integer.MAX_VALUE, "*");
-        return new HashScanCursor<T>(jedisService.getJedisClient(), new CursorSpec(), prefix.getBytes(), valueClass,
+        return new HashScanCursor<T>(jedisService.getJedisClient(), new CursorSpec(), hashKey.getBytes(), valueClass,
                 new HashDeserializer() {
                     @Override
                     protected Object deserialize(byte[] data, Class<?> clazz) {
@@ -84,30 +85,29 @@ public class RedisMapStore implements MapStore, Closeable {
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Serializable> T get(String key) {
-        return (T) jedisService.getObjectAsJson(key, valueClass);
+        return (T) parseJSON(jedisService.getJedisClient().hget(hashKey, key), valueClass);
     }
 
     @Override
     public <T extends Serializable> Boolean put(String key, T value) {
-        jedisService.setObjectAsJson(key, value, Integer.MAX_VALUE);
+        jedisService.getJedisClient().hset(hashKey, key, toJSONString(value));
         return true;
     }
 
     @Override
     public Long remove(String key) {
-        return jedisService.del(key);
+        return jedisService.getJedisClient().hdel(hashKey, key);
     }
 
     @Override
     public Boolean removeAll() {
-        // TODO
-        return false;
+        final Long result = jedisService.del(hashKey);
+        return nonNull(result) && result > 0;
     }
 
     @Override
     public Long size() {
-        // TODO
-        return 0L;
+        return jedisService.getJedisClient().hlen(hashKey);
     }
 
     @Override

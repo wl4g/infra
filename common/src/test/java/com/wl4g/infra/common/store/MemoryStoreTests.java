@@ -15,7 +15,13 @@
  */
 package com.wl4g.infra.common.store;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map.Entry;
+
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 
 import com.wl4g.infra.common.store.MapStoreConfig.MemoryStoreConfig;
 
@@ -38,16 +44,39 @@ public class MemoryStoreTests {
 
             MyUser user01 = (MyUser) store.get("jack01");
             System.out.println(user01);
+            Assertions.assertEquals(user01.getName(), "jack001");
+
             MyUser user02 = (MyUser) store.get("jack02");
             System.out.println(user02);
+            Assertions.assertEquals(user02.getName(), "jack002");
+
             MyUser user03 = (MyUser) store.get("jack03");
             System.out.println(user03);
+            Assertions.assertEquals(user03.getName(), "jack003");
+
             MyUser user04 = (MyUser) store.get("jack04");
             System.out.println(user04);
+            Assertions.assertEquals(user04.getName(), "jack004");
 
             store.remove("jack04");
             user04 = (MyUser) store.get("jack04");
             System.out.println(user04);
+            Assertions.assertNull(user04);
+
+            List<MyUser> list = new ArrayList<>();
+            final Iterator<Entry<String, MyUser>> it = store.iterator();
+            while (it.hasNext()) {
+                Entry<String, MyUser> entry = it.next();
+                System.out.println(entry.getKey() + " ==> " + entry.getValue());
+                list.add(entry.getValue());
+            }
+            Assertions.assertTrue(list.stream().anyMatch(e -> e.getName().equals("jack001")));
+            Assertions.assertTrue(list.stream().anyMatch(e -> e.getName().equals("jack002")));
+            Assertions.assertTrue(list.stream().anyMatch(e -> e.getName().equals("jack003")));
+
+            final Long size = store.size();
+            System.out.println(size);
+            Assertions.assertEquals(size, 3);
         }
     }
 
