@@ -68,7 +68,7 @@ public class RocksDBMapStore implements MapStore, Closeable {
     }
 
     @Override
-    public Object getOriginalCache() {
+    public Object getOriginalStore() {
         return rocksDBService;
     }
 

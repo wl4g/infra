@@ -30,7 +30,7 @@ import java.util.concurrent.Callable;
  */
 public interface MapStore {
 
-    Object getOriginalCache();
+    Object getOriginalStore();
 
     /**
      * Returns an iterator over elements of entry data.

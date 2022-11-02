@@ -60,7 +60,7 @@ public class MemoryMapStore implements MapStore, Closeable {
     }
 
     @Override
-    public Object getOriginalCache() {
+    public Object getOriginalStore() {
         return memoryCache;
     }
 
