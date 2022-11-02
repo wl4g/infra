@@ -21,8 +21,8 @@ import javax.validation.constraints.NotNull;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
-import com.wl4g.infra.common.cache.jedis.JedisClient;
-import com.wl4g.infra.common.cache.jedis.JedisClientBuilder;
+import com.wl4g.infra.common.jedis.JedisClient;
+import com.wl4g.infra.common.jedis.JedisClientBuilder;
 import com.wl4g.infra.support.cache.jedis.JedisClientAutoConfiguration.JedisProperties;
 
 import lombok.CustomLog;

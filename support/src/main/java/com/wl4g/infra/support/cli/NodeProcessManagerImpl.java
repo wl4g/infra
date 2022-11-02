@@ -17,7 +17,7 @@ package com.wl4g.infra.support.cli;
 
 import static com.wl4g.infra.common.lang.Exceptions.getRootCausesString;
 import static com.wl4g.infra.common.lang.ThreadUtils2.sleepRandom;
-import static com.wl4g.infra.common.cache.jedis.util.RedisSpecUtil.safeFormat;
+import static com.wl4g.infra.common.jedis.util.RedisSpecUtil.safeFormat;
 import static com.wl4g.infra.support.cli.destroy.DestroySignalMessage.DestroyState.DESTROY_FAIL;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;

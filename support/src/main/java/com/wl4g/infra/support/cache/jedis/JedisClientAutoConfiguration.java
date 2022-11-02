@@ -24,9 +24,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
-import com.wl4g.infra.common.cache.jedis.JedisClient;
-import com.wl4g.infra.common.cache.jedis.JedisClientBuilder;
-import com.wl4g.infra.common.cache.jedis.JedisClientBuilder.JedisConfig;
+import com.wl4g.infra.common.jedis.JedisClient;
+import com.wl4g.infra.common.jedis.JedisClientBuilder;
+import com.wl4g.infra.common.jedis.JedisClientBuilder.JedisConfig;
 import com.wl4g.infra.common.jedis.JedisService;
 
 import redis.clients.jedis.JedisCluster;
