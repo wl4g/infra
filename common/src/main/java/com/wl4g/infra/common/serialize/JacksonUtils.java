@@ -66,10 +66,24 @@ public abstract class JacksonUtils {
      * @return
      */
     public static String toJSONString(@Nullable Object object) {
+        return toJSONString(object, false);
+    }
+
+    /**
+     * Object to JSON strings.
+     * 
+     * @param object
+     * @param isPretty
+     * @return
+     */
+    public static String toJSONString(@Nullable Object object, boolean isPretty) {
         if (isNull(object)) {
             return null;
         }
         try {
+            if (isPretty) {
+                return defaultObjectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
+            }
             return defaultObjectMapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException(e);
