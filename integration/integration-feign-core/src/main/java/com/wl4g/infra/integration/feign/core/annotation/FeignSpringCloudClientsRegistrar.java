@@ -225,6 +225,11 @@ class FeignSpringCloudClientsRegistrar implements ImportBeanDefinitionRegistrar,
                         public Set<MethodMetadata> getAnnotatedMethods(String annotationName) {
                             return metadata.getAnnotatedMethods(annotationName);
                         }
+
+                        @Override
+                        public Set<MethodMetadata> getDeclaredMethods() {
+                            return metadata.getDeclaredMethods();
+                        }
                     }, registry });
 
         } catch (Exception e) {

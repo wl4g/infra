@@ -36,6 +36,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.web.WebProperties.Resources;
 import org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler;
+import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.reactive.error.ErrorAttributes;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpCookie;
@@ -90,7 +91,7 @@ public class ReactiveSmartErrorController extends AbstractErrorWebExceptionHandl
     }
 
     @Override
-    protected Map<String, Object> getErrorAttributes(ServerRequest request, boolean includeStackTrace) {
+    protected Map<String, Object> getErrorAttributes(ServerRequest request, ErrorAttributeOptions options) {
         boolean _stacktrace = isStackTrace(request);
         Map<String, Object> model = super.getErrorAttributes(request, obtainErrorAttributeOptions(_stacktrace));
         if (_stacktrace) {
@@ -112,7 +113,7 @@ public class ReactiveSmartErrorController extends AbstractErrorWebExceptionHandl
      */
     @SuppressWarnings("unchecked")
     private Mono<ServerResponse> handleRendering(final ServerRequest request) {
-        Map<String, Object> model = getErrorAttributes(request, false);
+        Map<String, Object> model = getErrorAttributes(request, ErrorAttributeOptions.defaults());
 
         return (Mono<ServerResponse>) errorHandler.rendering(new WebRequestExtractor() {
             @Override

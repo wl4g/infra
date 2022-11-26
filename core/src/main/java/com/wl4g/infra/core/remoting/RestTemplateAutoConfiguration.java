@@ -15,14 +15,16 @@
  */
 package com.wl4g.infra.core.remoting;
 
-import java.io.File;
+import static java.util.Collections.singletonList;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.MINUTES;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSession;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -32,16 +34,19 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplicat
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.http.client.Netty4ClientHttpRequestFactory;
+import org.springframework.http.client.OkHttp3ClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 import com.wl4g.infra.core.constant.CoreInfraConstants;
 
-import io.netty.handler.ssl.ClientAuth;
-import io.netty.handler.ssl.SslContext;
-import io.netty.handler.ssl.SslContextBuilder;
-import io.netty.handler.ssl.SslProvider;
-import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import okhttp3.CipherSuite;
+import okhttp3.ConnectionPool;
+import okhttp3.ConnectionSpec;
+import okhttp3.OkHttpClient;
+import okhttp3.TlsVersion;
 
 /**
  * {@link RestTemplateAutoConfiguration}
@@ -51,33 +56,54 @@ import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
  * @sine v1.0
  * @see
  */
-@SuppressWarnings("deprecation")
-@ConditionalOnClass(RestTemplate.class)
+@ConditionalOnClass({ RestTemplate.class })
 @ConditionalOnWebApplication(type = Type.SERVLET)
 public class RestTemplateAutoConfiguration {
 
     @Bean
     @ConfigurationProperties(prefix = CoreInfraConstants.CONF_PREFIX_INFRA_CORE_HTTP_REMOTE)
-    public ClientHttpProperties remoteProperties() {
+    public ClientHttpProperties clientHttpProperties() {
         return new ClientHttpProperties();
     }
 
-    @Bean
+    @Bean(DEFAULT_REST_TEMPLATE)
     @ConditionalOnMissingBean
     public RestTemplate restTemplate(ClientHttpRequestFactory factory) {
         return new RestTemplate(factory);
     }
 
-    @Bean
+    @Bean(DEFAULT_REST_FACTORY)
     @ConditionalOnMissingBean
-    public ClientHttpRequestFactory netty4ClientHttpRequestFactory(
-            ClientHttpProperties config/* , SslContext sslContext */) {
-        Netty4ClientHttpRequestFactory factory = new Netty4ClientHttpRequestFactory();
-        factory.setReadTimeout(config.getReadTimeout());
-        factory.setConnectTimeout(config.getConnectTimeout());
-        factory.setMaxResponseSize(config.getMaxResponseSize());
-        // factory.setSslContext(sslContext);
-        return factory;
+    @ConditionalOnClass({ OkHttpClient.class })
+    public ClientHttpRequestFactory okhttp3ClientHttpRequestFactory(ClientHttpProperties config) {
+        // https://square.github.io/okhttp/features/https/
+        ConnectionPool pool = new ConnectionPool(config.getMaxIdleConnections(), config.getKeepAliveDuration(), MINUTES);
+
+        ConnectionSpec spec = new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
+                .tlsVersions(TlsVersion.TLS_1_1, TlsVersion.TLS_1_2, TlsVersion.TLS_1_3)
+                .cipherSuites(CipherSuite.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+                        CipherSuite.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256, CipherSuite.TLS_DHE_RSA_WITH_AES_128_GCM_SHA256)
+                .build();
+
+        // TODO
+        // see:com.wl4g.iam.gateway.server.SecureSslServerCustomizer.SecureX509TrustManager
+        //
+        // X509TrustManager trustManager = trustManagerForCertificates(null);
+        // SSLContext sslContext = SSLContext.getInstance("TLS");
+        // sslContext.init(null, new TrustManager[] { trustManager }, null);
+        // SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
+
+        OkHttpClient okhttpClient = new OkHttpClient().newBuilder()
+                .connectionPool(pool)
+                .connectionSpecs(singletonList(spec))
+                .connectTimeout(config.getConnectTimeout(), MILLISECONDS)
+                .readTimeout(config.getReadTimeout(), MILLISECONDS)
+                .writeTimeout(config.getWriteTimeout(), MILLISECONDS)
+                // TODO
+                // .sslSocketFactory(sslSocketFactory, trustManager)
+                .build();
+
+        return new OkHttp3ClientHttpRequestFactory(okhttpClient);
     }
 
     /**
@@ -90,16 +116,19 @@ public class RestTemplateAutoConfiguration {
      */
     // @Bean
     // @ConditionalOnMissingBean
-    public SslContext sslContext(ClientHttpProperties config) throws SSLException {
-        SslProperties ssl = config.getSslProperties();
-        List<String> ciphers = ssl.getCiphers() == null ? SslProperties.DEFAULT_CIPHERS : ssl.getCiphers();
-        return SslContextBuilder.forServer(new File(ssl.getKeyCertChainFile()), new File(ssl.getKeyFile()))
-                .sslProvider(SslProvider.OPENSSL)
-                .ciphers(ciphers)
-                .clientAuth(ClientAuth.REQUIRE)
-                .trustManager(InsecureTrustManagerFactory.INSTANCE)
-                .build();
-    }
+    // public SslContext sslContext(ClientHttpProperties config) throws
+    // SSLException {
+    // SslProperties ssl = config.getSslProperties();
+    // List<String> ciphers = ssl.getCiphers() == null ?
+    // SslProperties.DEFAULT_CIPHERS : ssl.getCiphers();
+    // return SslContextBuilder.forServer(new File(ssl.getKeyCertChainFile()),
+    // new File(ssl.getKeyFile()))
+    // .sslProvider(SslProvider.OPENSSL)
+    // .ciphers(ciphers)
+    // .clientAuth(ClientAuth.REQUIRE)
+    // .trustManager(InsecureTrustManagerFactory.INSTANCE)
+    // .build();
+    // }
 
     /**
      * Verifies a SSL peer host name based on an explicit whitelist of allowed
@@ -137,7 +166,6 @@ public class RestTemplateAutoConfiguration {
 
         /** {@inheritDoc} */
         public boolean verify(final String hostname, final SSLSession session) {
-
             for (final String allowedHost : this.allowedHosts) {
                 if (hostname.equalsIgnoreCase(allowedHost)) {
                     return true;
@@ -145,7 +173,6 @@ public class RestTemplateAutoConfiguration {
             }
             return false;
         }
-
     }
 
     /**
@@ -204,45 +231,29 @@ public class RestTemplateAutoConfiguration {
      * @date 2018年11月20日
      * @since
      */
+    @Getter
+    @Setter
+    @ToString
     public static class ClientHttpProperties {
 
-        private int readTimeout = 60_000;
-        private int connectTimeout = 10_000;
-        private int maxResponseSize = 1024 * 1024 * 10;
+        /** Max Idle time of connections */
+        private int maxIdleConnections = 200;
+
+        /** The keep alive default is 5 minutes. */
+        private long keepAliveDuration = 5;
+
+        /** The connect timeout default is 10 seconds. */
+        private long connectTimeout = DEFAULT_CONNECT_TIMEOUT;
+
+        /** The read timeout default is 10 seconds. */
+        private long readTimeout = DEFAULT_READ_TIMEOUT;
+
+        /** The write timeout default is 10 seconds. */
+        private long writeTimeout = DEFAULT_WRITE_TIMEOUT;
+
+        // private int maxResponseSize = 1024 * 1024 * 10;
+
         private SslProperties sslProperties = new SslProperties();
-
-        public Integer getReadTimeout() {
-            return readTimeout;
-        }
-
-        public void setReadTimeout(int readTimeout) {
-            this.readTimeout = readTimeout;
-        }
-
-        public int getConnectTimeout() {
-            return connectTimeout;
-        }
-
-        public void setConnectTimeout(int connectTimeout) {
-            this.connectTimeout = connectTimeout;
-        }
-
-        public int getMaxResponseSize() {
-            return maxResponseSize;
-        }
-
-        public void setMaxResponseSize(int maxResponseSize) {
-            this.maxResponseSize = maxResponseSize;
-        }
-
-        public SslProperties getSslProperties() {
-            return sslProperties;
-        }
-
-        public void setSslProperties(SslProperties sslProperties) {
-            this.sslProperties = sslProperties;
-        }
-
     }
 
     /**
@@ -262,6 +273,7 @@ public class RestTemplateAutoConfiguration {
 
         private String keyCertChainFile;
         private String keyFile;
+
         /**
          * Clearly specify OpenSSL, because jdk8 may have performance problems,
          * See: https://www.cnblogs.com/wade-luffy/p/6019743.html#_label1
@@ -294,5 +306,12 @@ public class RestTemplateAutoConfiguration {
             this.ciphers = ciphers;
         }
     }
+
+    public static final long DEFAULT_CONNECT_TIMEOUT = 3 * 1000L;
+    public static final long DEFAULT_READ_TIMEOUT = 6 * 1000L;
+    public static final long DEFAULT_WRITE_TIMEOUT = 6 * 1000L;
+
+    public static final String DEFAULT_REST_TEMPLATE = "infraDefaultRestTeamplte";
+    public static final String DEFAULT_REST_FACTORY = "infraDefaultOkhttp3Factory";
 
 }
