@@ -267,5 +267,59 @@
     {"name":"putMember","parameterTypes":["java.lang.String","org.graalvm.polyglot.Value"] }, 
     {"name":"removeMember","parameterTypes":["java.lang.String"] }
   ]
+},
+{
+  "name":"[Lcom.wl4g.infra.common.collection.ConcurrentReferenceHashMap$Reference;"
+},
+{
+  "name":"[Lcom.wl4g.infra.common.collection.ConcurrentReferenceHashMap$Segment;"
+},
+{
+  "name":"com.wl4g.infra.common.metrics.PrometheusMeterFacade",
+  "queriedMethods":[
+    {"name":"applyDefaultTags","parameterTypes":["java.lang.String[]"] }, 
+    {"name":"counter","parameterTypes":["java.lang.String","java.lang.String","java.lang.String[]"] }, 
+    {"name":"createLocalInstanceSpec","parameterTypes":[] }, 
+    {"name":"gauge","parameterTypes":["java.lang.String","java.lang.String","double","java.lang.String[]"] }, 
+    {"name":"gauge","parameterTypes":["java.lang.String","java.lang.String","java.util.function.Supplier","java.lang.String[]"] }, 
+    {"name":"getCounter","parameterTypes":["java.lang.String","java.lang.String","java.lang.String[]"] }, 
+    {"name":"getGauge","parameterTypes":["java.lang.String","java.lang.String","java.lang.String[]"] }, 
+    {"name":"getInet","parameterTypes":[] }, 
+    {"name":"getLocalSpec","parameterTypes":[] }, 
+    {"name":"getMeterRegistry","parameterTypes":[] }, 
+    {"name":"getPort","parameterTypes":[] }, 
+    {"name":"getSampleRegistry","parameterTypes":[] }, 
+    {"name":"getServiceId","parameterTypes":[] }, 
+    {"name":"getSummary","parameterTypes":["java.lang.String","java.lang.String","java.lang.String[]"] }, 
+    {"name":"isSecure","parameterTypes":[] }, 
+    {"name":"summary","parameterTypes":["io.micrometer.core.instrument.Meter$Id","io.micrometer.core.instrument.distribution.DistributionStatisticConfig","double"] }, 
+    {"name":"summary","parameterTypes":["java.lang.String","java.lang.String","double","double[]","java.lang.String[]"] }, 
+    {"name":"summarySlos","parameterTypes":["java.lang.String","java.lang.String","double","double[]","java.lang.String[]"] }, 
+    {"name":"timer","parameterTypes":["java.lang.String","java.lang.String","double[]","java.lang.String[]"] }
+  ]
+},
+{
+  "name":"com.wl4g.infra.common.remoting.Netty4ClientHttpRequest$RequestExecuteHandler",
+  "queriedMethods":[{"name":"exceptionCaught","parameterTypes":["io.netty.channel.ChannelHandlerContext","java.lang.Throwable"] }]
+},
+{
+  "name":"com.wl4g.infra.common.remoting.Netty4ClientHttpRequestFactory$HttpChannelInitializer"
+},
+{
+  "name":"com.wl4g.infra.common.web.rest.RespBase",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"getCode","parameterTypes":[] }, 
+    {"name":"getData","parameterTypes":[] }, 
+    {"name":"getMessage","parameterTypes":[] }, 
+    {"name":"getRequestId","parameterTypes":[] }, 
+    {"name":"getStatus","parameterTypes":[] }, 
+    {"name":"getTimestamp","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.infra.common.web.rest.RespBase$RetCodeSpec"
 }
 ]

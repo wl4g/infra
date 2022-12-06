@@ -69,7 +69,7 @@ import com.wl4g.infra.common.collection.ConcurrentReferenceHashMap;
  */
 public abstract class ReflectionUtils2 {
 
-    // --- Extended reflection's. ---
+    // --- Extended handling
 
     /**
      * Assert whether the two types are compatible
@@ -208,6 +208,29 @@ public abstract class ReflectionUtils2 {
     //
     // --- org.springframework.util.ReflectionUtils. ---
     //
+
+    // Constructor handling
+
+    /**
+     * Obtain an accessible constructor for the given class and parameters.
+     * 
+     * @param clazz
+     *            the clazz to check
+     * @param parameterTypes
+     *            the parameter types of the desired constructor
+     * @return the constructor reference
+     * @throws NoSuchMethodException
+     *             if no such constructor exists
+     * @since 5.0
+     */
+    public static <T> Constructor<T> accessibleConstructor(Class<T> clazz, Class<?>... parameterTypes)
+            throws NoSuchMethodException {
+        Constructor<T> ctor = clazz.getDeclaredConstructor(parameterTypes);
+        makeAccessible(ctor);
+        return ctor;
+    }
+
+    // Field handling
 
     /**
      * Attempt to find a {@link Field field} on the supplied {@link Class} with
@@ -410,6 +433,8 @@ public abstract class ReflectionUtils2 {
                     "Unexpected reflection exception - " + ex.getClass().getName() + ": " + ex.getMessage());
         }
     }
+
+    // Method handling
 
     /**
      * Attempt to find a {@link Method} on the supplied class with the supplied
