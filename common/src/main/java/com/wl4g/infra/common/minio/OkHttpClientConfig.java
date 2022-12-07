@@ -15,11 +15,12 @@
  */
 package com.wl4g.infra.common.minio;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
 
 import lombok.Builder.Default;
 import lombok.Getter;
@@ -43,21 +44,21 @@ import okhttp3.Protocol;
 @ToString
 @NoArgsConstructor
 public class OkHttpClientConfig {
-    // private int maxIdleConnections = 1024;
-    // private int idleConnectionCount = 10;
-    // private Duration keepAliveDuration = Duration.ofMillis(15);
     private @Default Duration connectTimeout = Duration.ofSeconds(10);
     private @Default Duration writeTimeout = Duration.ofMinutes(5);
     private @Default Duration readTimeout = Duration.ofMinutes(5);
     private Proxy proxy;
+    // private int maxIdleConnections = 1024;
+    // private int idleConnectionCount = 10;
+    // private Duration keepAliveDuration = Duration.ofMillis(15);
 
     public OkHttpClient newOkHttpClient() {
         return new OkHttpClient().newBuilder()
-                .connectTimeout(connectTimeout.toMillis(), TimeUnit.MILLISECONDS)
-                .writeTimeout(writeTimeout.toMillis(), TimeUnit.MILLISECONDS)
-                .readTimeout(readTimeout.toMillis(), TimeUnit.MILLISECONDS)
-                .protocols(Arrays.asList(Protocol.HTTP_1_1))
+                .connectTimeout(connectTimeout.toMillis(), MILLISECONDS)
+                .writeTimeout(writeTimeout.toMillis(), MILLISECONDS)
+                .readTimeout(readTimeout.toMillis(), MILLISECONDS)
                 .proxy(proxy)
+                .protocols(Arrays.asList(Protocol.HTTP_1_1, Protocol.HTTP_2, Protocol.QUIC))
                 .build();
     }
 
