@@ -177,7 +177,8 @@
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-yaml</artifactId>
-            <!-- <scope>provided</scope> -->
+            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <!-- fix:Java 8 date/time type `java.time.Duration` not supported by default -->
         <dependency>

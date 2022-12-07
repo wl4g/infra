@@ -26,7 +26,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 /**
- * {@link YamlJacksonUtils}
+ * Notice: The bottom layer of JACKSON also uses snakeyaml, which only provides
+ * a unified abstraction of json/xml/yaml, but the json format itself does not
+ * support yaml tags.
  * 
  * @author James Wong
  * @version 2022-12-07

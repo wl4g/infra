@@ -23,7 +23,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * {@link YamlJacksonUtilsTests}
+ * {@link YamlMapUtilsTests}
  * 
  * @author James Wong
  * @version 2022-12-07
@@ -31,6 +31,9 @@ import lombok.NoArgsConstructor;
  */
 public class YamlJacksonUtilsTests {
 
+    // The bottom layer of JACKSON also uses snakeyaml, which only provides a
+    // unified abstraction of json/xml/yaml, but the json format itself does not
+    // support yaml tags.
     @Test
     public void testParseYamlToObject() {
         // @formatter:off
