@@ -87,6 +87,7 @@
         <guava-retrying.version>2.0.0</guava-retrying.version>
         <commons-logging.version>1.2</commons-logging.version>
         <commons-lang3.version>3.5</commons-lang3.version>
+        <commons-collection4.version>4.4</commons-collection4.version>
         <commons-math3.version>3.6.1</commons-math3.version>
         <commons-beanutils.version>1.9.3</commons-beanutils.version>
         <commons-dbutils.version>1.8</commons-dbutils.version>
@@ -404,6 +405,11 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>${commons-lang3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>${commons-collection4.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
