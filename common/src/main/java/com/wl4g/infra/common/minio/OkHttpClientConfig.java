@@ -21,6 +21,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.time.Duration;
+import java.util.List;
 
 import lombok.Builder.Default;
 import lombok.Getter;
@@ -48,6 +49,7 @@ public class OkHttpClientConfig {
     private @Default Duration writeTimeout = Duration.ofMinutes(5);
     private @Default Duration readTimeout = Duration.ofMinutes(5);
     private @Default Proxy proxy = Proxy.NO_PROXY;
+    private @Default List<Protocol> protocols = asList(Protocol.HTTP_1_1, Protocol.HTTP_2, Protocol.QUIC);
     // private int maxIdleConnections = 1024;
     // private int idleConnectionCount = 10;
     // private Duration keepAliveDuration = Duration.ofMillis(15);
@@ -58,7 +60,7 @@ public class OkHttpClientConfig {
                 .writeTimeout(writeTimeout.toMillis(), MILLISECONDS)
                 .readTimeout(readTimeout.toMillis(), MILLISECONDS)
                 .proxy(proxy)
-                .protocols(asList(Protocol.HTTP_1_1, Protocol.HTTP_2, Protocol.QUIC))
+                .protocols(protocols)
                 .build();
     }
 
