@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.wl4g.infra.common.yaml;
+package com.wl4g.infra.common.yaml.map;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -36,7 +36,7 @@ import javax.annotation.Nullable;
  * Specialization of {@link Properties} that sorts properties alphanumerically
  * based on their keys.
  *
- * @since Based on modifiy of {@link org.springframework.core.SortedProperties}
+ * @since Based on modifiy of {@link com.wl4g.infra.common.yaml.map.springframework.core.SortedProperties}
  */
 @SuppressWarnings("serial")
 class SortedProperties extends Properties {

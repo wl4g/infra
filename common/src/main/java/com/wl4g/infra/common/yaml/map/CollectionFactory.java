@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.wl4g.infra.common.yaml;
+package com.wl4g.infra.common.yaml.map;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -47,7 +47,7 @@ import com.wl4g.infra.common.reflect.ReflectionUtils2;
  * Factory for collections that is aware of common Java and Spring collection
  * types.
  * 
- * @since Based on modifiy of {@link org.springframework.core.CollectionFactory}
+ * @since Based on modifiy of {@link com.wl4g.infra.common.yaml.map.springframework.core.CollectionFactory}
  */
 final class CollectionFactory {
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.wl4g.infra.common.yaml;
+package com.wl4g.infra.common.yaml.map;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
@@ -39,12 +39,13 @@ import com.wl4g.infra.common.resource.ByteArrayStreamResource;
 import com.wl4g.infra.common.resource.StreamResource;
 
 /**
- * {@link YamlMapUtils}
+ * It is deprecated, please use instead: {@link com.wl4g.infra.common.yaml.YamlUtils}
  * 
  * @author James Wong
  * @version 2022-12-07
  * @since v3.0.0
  */
+@Deprecated
 public abstract class YamlMapUtils {
 
     public static <T> T parse(final @NotNull List<StreamResource> resources) {
@@ -76,13 +77,10 @@ public abstract class YamlMapUtils {
         for (int i = 0, size = parts.length; i < size; i++) {
             final String part = parts[i];
             if (root instanceof Map) {
-                final Object value = ((Map) root).get(part);
-                if (value instanceof Map) {
-                    root = value;
-                } else if (i < (size - 1)) {
-                    throw new IllegalArgumentException(
-                            format("Invalid root path '%s', exceeding the depth of map nested objects.", rootPath));
-                }
+                root = ((Map) root).get(part);
+            } else if (i < size) { // i <= (size-1)
+                throw new IllegalArgumentException(
+                        format("Invalid root path '%s', exceeding the depth of map nested objects.", rootPath));
             }
         }
 

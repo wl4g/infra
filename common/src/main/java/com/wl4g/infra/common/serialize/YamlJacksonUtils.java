@@ -36,6 +36,19 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
  */
 public abstract class YamlJacksonUtils {
 
+    /**
+     * Parse yaml string content to object without root path. </br>
+     * </br>
+     * <font color=red>Notice: The bottom layer of JACKSON also uses snakeyaml,
+     * which only provides a unified abstraction of json/xml/yaml, but the json
+     * format itself does not support yaml tags. </font>
+     * 
+     * @param <T>
+     * @param clazz
+     * @param yaml
+     * @param rootPath
+     * @return
+     */
     public static <T> T parseObject(@NotNull final Class<T> clazz, @NotBlank final String yaml, @NotBlank final String rootPath) {
         notNullOf(clazz, "clazz");
         hasTextOf(yaml, "yaml");

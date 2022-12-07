@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.wl4g.infra.common.yaml;
+package com.wl4g.infra.common.yaml.map;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -45,7 +45,7 @@ import lombok.Setter;
  * Base class for YAML factories.
  *
  * @since Based on modifiy of
- *        {@link org.springframework.beans.factory.config.YamlProcessor}
+ *        {@link com.wl4g.infra.common.yaml.map.springframework.beans.factory.config.YamlProcessor}
  */
 @Setter
 class YamlProcessor {
