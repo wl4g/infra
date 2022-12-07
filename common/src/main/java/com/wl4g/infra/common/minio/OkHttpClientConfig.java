@@ -15,12 +15,12 @@
  */
 package com.wl4g.infra.common.minio;
 
+import static java.util.Arrays.asList;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.time.Duration;
-import java.util.Arrays;
 
 import lombok.Builder.Default;
 import lombok.Getter;
@@ -47,7 +47,7 @@ public class OkHttpClientConfig {
     private @Default Duration connectTimeout = Duration.ofSeconds(10);
     private @Default Duration writeTimeout = Duration.ofMinutes(5);
     private @Default Duration readTimeout = Duration.ofMinutes(5);
-    private Proxy proxy;
+    private @Default Proxy proxy = Proxy.NO_PROXY;
     // private int maxIdleConnections = 1024;
     // private int idleConnectionCount = 10;
     // private Duration keepAliveDuration = Duration.ofMillis(15);
@@ -58,7 +58,7 @@ public class OkHttpClientConfig {
                 .writeTimeout(writeTimeout.toMillis(), MILLISECONDS)
                 .readTimeout(readTimeout.toMillis(), MILLISECONDS)
                 .proxy(proxy)
-                .protocols(Arrays.asList(Protocol.HTTP_1_1, Protocol.HTTP_2, Protocol.QUIC))
+                .protocols(asList(Protocol.HTTP_1_1, Protocol.HTTP_2, Protocol.QUIC))
                 .build();
     }
 
