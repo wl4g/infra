@@ -74,7 +74,7 @@
         <javassist.version>3.20.0-GA</javassist.version>
         <!-- jdbc -->
         <druid.version>1.0.26</druid.version>
-        <pagehelper.version>4.1.6</pagehelper.version>
+        <pagehelper.version>5.3.1</pagehelper.version>
         <mybatis-springboot.version>2.2.2</mybatis-springboot.version>
         <!-- logging. -->
         <slf4j-api.version>1.7.25</slf4j-api.version>
