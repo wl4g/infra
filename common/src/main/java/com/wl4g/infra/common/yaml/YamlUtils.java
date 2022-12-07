@@ -34,6 +34,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.composer.Composer;
 import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.env.EnvScalarConstructor;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.NodeTuple;
@@ -42,6 +43,8 @@ import org.yaml.snakeyaml.parser.Parser;
 import org.yaml.snakeyaml.parser.ParserImpl;
 import org.yaml.snakeyaml.reader.StreamReader;
 import org.yaml.snakeyaml.resolver.Resolver;
+import static org.yaml.snakeyaml.env.EnvScalarConstructor.ENV_FORMAT;
+import static org.yaml.snakeyaml.env.EnvScalarConstructor.ENV_TAG;
 
 /**
  * {@link YamlUtils}
@@ -50,6 +53,7 @@ import org.yaml.snakeyaml.resolver.Resolver;
  * @version 2022-12-07
  * @since v1.0.0
  * @see https://github1s.com/snakeyaml/snakeyaml/blob/HEAD/src/test/java/org/yaml/snakeyaml/partialconstruct/FragmentComposerTest.java
+ * @see https://github1s.com/snakeyaml/snakeyaml/blob/HEAD/src/test/java/org/yaml/snakeyaml/env/EnvLombokTest.java
  */
 public abstract class YamlUtils {
 
@@ -62,7 +66,7 @@ public abstract class YamlUtils {
             @Nullable Constructor constructor,
             @Nullable String rootPath,
             @NotNull Class<T> clazz) {
-        return parse(yaml, constructor, null, null, clazz);
+        return parse(yaml, constructor, null, rootPath, clazz);
     }
 
     public static <T> T parse(
@@ -87,8 +91,13 @@ public abstract class YamlUtils {
         if (isNull(constructor)) {
             constructor = new Constructor(options);
         }
-        StreamReader reader = new StreamReader(yaml);
-        Composer composer = new FragmentComposer(new ParserImpl(reader), new Resolver(), options, rootPath);
+        final StreamReader reader = new StreamReader(yaml);
+        final Resolver resolver = new Resolver();
+        if (constructor instanceof EnvScalarConstructor) {
+            // see:https://github1s.com/snakeyaml/snakeyaml/blob/HEAD/src/test/java/org/yaml/snakeyaml/env/EnvLombokTest.java#L30
+            resolver.addImplicitResolver(ENV_TAG, ENV_FORMAT, "$");
+        }
+        final Composer composer = new FragmentComposer(new ParserImpl(reader), resolver, options, rootPath);
         constructor.setComposer(composer);
         return (T) constructor.getSingleData(clazz);
     }

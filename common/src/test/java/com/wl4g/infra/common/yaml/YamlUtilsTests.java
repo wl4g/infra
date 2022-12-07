@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.env.EnvScalarConstructor;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -40,9 +41,9 @@ import lombok.ToString;
  */
 public class YamlUtilsTests {
 
-    String yamlText;
-    LoaderOptions options;
-    Constructor constructor;
+    String yamlText; // required
+    Constructor constructor; // required
+    LoaderOptions options; // optional
 
     @Before
     public void setup() throws Exception {
@@ -50,6 +51,7 @@ public class YamlUtilsTests {
          this.yamlText = "myservice:\n"
                 //+ "  config: !config\n"
                 + "  config:\n"
+                + "    javaHome: ${JAVA_HOME:-/usr/local/jdk-11.0.10/}\n"
                 //+ "    owner: !owner\n"
                 + "    owner:\n"
                 + "      firstName: jack\n"
@@ -73,13 +75,12 @@ public class YamlUtilsTests {
                 + "          foo2: bar2\n";
         // @formatter:on
 
-        // The optional:
-        // options = new LoaderOptions();
-        // options.setAllowDuplicateKeys(false);
-        // options.setMaxAliasesForCollections(Integer.MAX_VALUE);
-        // options.setAllowRecursiveKeys(true);
+        options = new LoaderOptions();
+        options.setAllowDuplicateKeys(false);
+        options.setMaxAliasesForCollections(Integer.MAX_VALUE);
+        options.setAllowRecursiveKeys(true);
 
-        constructor = new Constructor(options);
+        constructor = new EnvScalarConstructor();
         // @formatter:off
         //constructor.addTypeDescription(new TypeDescription(TestConfig.class, "!config"));
         //constructor.addTypeDescription(new TypeDescription(TestOnwer.class, "!owner"));
@@ -114,6 +115,7 @@ public class YamlUtilsTests {
     @ToString(callSuper = true)
     @NoArgsConstructor
     public static class TestConfig {
+        private String javaHome;
         private TestOnwer owner;
         private List<TestCar> cars;
     }
