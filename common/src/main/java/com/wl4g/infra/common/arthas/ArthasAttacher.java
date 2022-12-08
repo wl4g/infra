@@ -17,9 +17,11 @@ package com.wl4g.infra.common.arthas;
 
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.ClassUtils2.resolveClassNameNullable;
+import static com.wl4g.infra.common.lang.DateUtils2.getDate;
 import static com.wl4g.infra.common.lang.EnvironmentUtil.getStringProperty;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.invokeMethod;
 import static java.lang.String.format;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.SystemUtils.USER_HOME;
@@ -41,8 +43,6 @@ import org.apache.commons.lang3.SystemUtils;
 import com.wl4g.infra.common.lang.SystemUtils2;
 import com.wl4g.infra.common.reflect.ReflectionUtils2;
 
-import lombok.extern.slf4j.Slf4j;
-
 /**
  * {@link ArthasAttacher}
  * 
@@ -51,49 +51,63 @@ import lombok.extern.slf4j.Slf4j;
  * @since v3.0.0
  * @see https://arthas.aliyun.com/doc/spring-boot-starter.html#非-spring-boot-应用使用方式
  */
-@Slf4j
 public class ArthasAttacher {
 
     public static void attachIfNecessary(@Nullable String appName) {
-        if (tryAttachLock()) {
-            Class<?> arthasAgentClass = resolveClassNameNullable(ARTHAS_AGENT_CLASS);
-            if (nonNull(arthasAgentClass)) {
-                Method attachMethod = ReflectionUtils2.findMethodNullable(arthasAgentClass, "attach", Map.class);
-                notNull(attachMethod, "Failed to load arthas agent, no such method '%s.attach(Map)'", ARTHAS_AGENT_CLASS);
-                attachMethod.setAccessible(true);
+        attachIfNecessary(appName, null);
+    }
 
-                // Load ARTHAS properties.
-                appName = getStringProperty("arthas.appName", (isBlank(appName) ? "defaultApp" : appName));
-                Map<String, String> config = new HashMap<>();
-                config.put("arthas.appName", appName);
-                config.put("arthas.agentId", getStringProperty("arthas.agentId", generateDefaultAgentId(appName)));
-                config.put("arthas.ip", getStringProperty("arthas.ip", "0.0.0.0"));
-                config.put("arthas.telnetPort", getStringProperty("arthas.telnetPort", "3658"));
-                config.put("arthas.httpPort", getStringProperty("arthas.httpPort", "8563"));
-                config.put("arthas.tunnelServer", getStringProperty("arthas.tunnelServer", "ws://127.0.0.1:7777/ws"));
-                config.put("arthas.sessionTimeout", getStringProperty("arthas.sessionTimeout", "1800")); // seconds
-                config.put("arthas.disabledCommands", getStringProperty("arthas.disabledCommands", null)); // e.g:stop,dump
-                config.put("arthas.outputPath", getStringProperty("arthas.outputPath", getDefaultArthasOutputPath()));
+    public static void attachIfNecessary(@Nullable String appName, @Nullable Class<? extends ClassLoader> condition) {
+        synchronized (ArthasAttacher.class) {
+            if (tryAttachLock(condition)) {
+                Class<?> arthasAgentClass = resolveClassNameNullable(ARTHAS_AGENT_CLASS);
+                if (nonNull(arthasAgentClass)) {
+                    Method attachMethod = ReflectionUtils2.findMethodNullable(arthasAgentClass, "attach", Map.class);
+                    notNull(attachMethod, "Failed to load arthas agent, no such method '%s.attach(Map)'", ARTHAS_AGENT_CLASS);
+                    attachMethod.setAccessible(true);
 
-                log.info("Arthas agent attaching of config: {}", config);
-                invokeMethod(attachMethod, null, config);
-            } else {
-                log.warn("Cannot to start arthas agent, becuase class not found '{}'", ARTHAS_AGENT_CLASS);
+                    // Load ARTHAS properties.
+                    appName = getStringProperty("arthas.appName", (isBlank(appName) ? "defaultApp" : appName));
+                    Map<String, String> config = new HashMap<>();
+                    config.put("arthas.appName", appName);
+                    config.put("arthas.agentId", getStringProperty("arthas.agentId", generateDefaultAgentId(appName)));
+                    config.put("arthas.ip", getStringProperty("arthas.ip", "0.0.0.0"));
+                    config.put("arthas.telnetPort", getStringProperty("arthas.telnetPort", "3658"));
+                    config.put("arthas.httpPort", getStringProperty("arthas.httpPort", "8563"));
+                    config.put("arthas.tunnelServer", getStringProperty("arthas.tunnelServer", "ws://127.0.0.1:7777/ws"));
+                    config.put("arthas.sessionTimeout", getStringProperty("arthas.sessionTimeout", "1800")); // seconds
+                    config.put("arthas.disabledCommands", getStringProperty("arthas.disabledCommands", null)); // e.g:stop,dump
+                    config.put("arthas.outputPath", getStringProperty("arthas.outputPath", getDefaultArthasOutputPath()));
+
+                    logInfo("Arthas agent attaching of config: %s", config);
+                    invokeMethod(attachMethod, null, config);
+                } else {
+                    logWarn("Cannot to start arthas agent, becuase class not found '%s'", ARTHAS_AGENT_CLASS);
+                }
             }
         }
     }
 
-    static boolean tryAttachLock() {
-        final File file = new File(SystemUtils.getJavaIoTmpDir(), SystemUtils2.LOCAL_PROCESS_ID.concat(".jvmattach.lock"));
-        if (!file.exists()) {
-            try {
-                FileUtils.touch(file);
-            } catch (IOException e) {
-                throw new IllegalStateException(format("Failed to create attach lock for : %s", file), e);
+    static boolean tryAttachLock(@Nullable Class<? extends ClassLoader> condition) {
+        boolean lock = false;
+        final File file = new File(SystemUtils.getJavaIoTmpDir(),
+                SystemUtils2.LOCAL_PROCESS_ID.concat(".tmp.").concat(ArthasAttacher.class.getSimpleName()).concat(".lock"));
+
+        final Class<? extends ClassLoader> currentCls = Thread.currentThread().getContextClassLoader().getClass();
+        if (isNull(condition) || (nonNull(condition) && condition.isAssignableFrom(currentCls))) {
+            if (!file.exists()) {
+                try {
+                    FileUtils.touch(file);
+                    lock = true;
+                } catch (IOException e) {
+                    throw new IllegalStateException(
+                            format("Failed to create attach lock : %s of classLoader: %s", file, currentCls), e);
+                }
             }
-            return true;
         }
-        return false;
+
+        logInfo("Try attach locks for : %s, %s with : %s", lock, file, currentCls);
+        return lock;
     }
 
     static String getDefaultArthasOutputPath() {
@@ -108,6 +122,14 @@ public class ArthasAttacher {
             // Ignore
         }
         return appName.concat("-").concat(hostname);
+    }
+
+    static void logInfo(String format, Object... args) {
+        System.out.println("[".concat(getDate("yyyy-MM-dd HH:mm:ss")).concat("] ").concat(format(format, args)));
+    }
+
+    static void logWarn(String format, Object... args) {
+        System.err.println("[".concat(getDate("yyyy-MM-dd HH:mm:ss")).concat("] ").concat(format(format, args)));
     }
 
     public static final String ARTHAS_AGENT_CLASS = "com.taobao.arthas.agent.attach.ArthasAgent";
