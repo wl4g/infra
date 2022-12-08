@@ -16,12 +16,16 @@
 package com.wl4g.infra.common.arthas;
 
 import static com.wl4g.infra.common.lang.Assert2.notNull;
+import static com.wl4g.infra.common.lang.ClassUtils2.resolveClassNameNullable;
 import static com.wl4g.infra.common.lang.EnvironmentUtil.getStringProperty;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.invokeMethod;
+import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.SystemUtils.USER_HOME;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -31,7 +35,9 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 
-import com.wl4g.infra.common.lang.ClassUtils2;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SystemUtils;
+
 import com.wl4g.infra.common.lang.SystemUtils2;
 import com.wl4g.infra.common.reflect.ReflectionUtils2;
 
@@ -49,30 +55,45 @@ import lombok.extern.slf4j.Slf4j;
 public class ArthasAttacher {
 
     public static void attachIfNecessary(@Nullable String appName) {
-        Class<?> arthasAgentClass = ClassUtils2.resolveClassNameNullable(ARTHAS_AGENT_CLASS);
-        if (nonNull(arthasAgentClass)) {
-            Method attachMethod = ReflectionUtils2.findMethodNullable(arthasAgentClass, "attach", Map.class);
-            notNull(attachMethod, "Failed to load arthas agent, no such method '%s.attach(Map)'", ARTHAS_AGENT_CLASS);
-            attachMethod.setAccessible(true);
+        if (tryAttachLock()) {
+            Class<?> arthasAgentClass = resolveClassNameNullable(ARTHAS_AGENT_CLASS);
+            if (nonNull(arthasAgentClass)) {
+                Method attachMethod = ReflectionUtils2.findMethodNullable(arthasAgentClass, "attach", Map.class);
+                notNull(attachMethod, "Failed to load arthas agent, no such method '%s.attach(Map)'", ARTHAS_AGENT_CLASS);
+                attachMethod.setAccessible(true);
 
-            // Load ARTHAS properties.
-            appName = getStringProperty("arthas.appName", (isBlank(appName) ? "defaultApp" : appName));
-            Map<String, String> config = new HashMap<>();
-            config.put("arthas.appName", appName);
-            config.put("arthas.agentId", getStringProperty("arthas.agentId", generateDefaultAgentId(appName)));
-            config.put("arthas.ip", getStringProperty("arthas.ip", "0.0.0.0"));
-            config.put("arthas.telnetPort", getStringProperty("arthas.telnetPort", "3658"));
-            config.put("arthas.httpPort", getStringProperty("arthas.httpPort", "8563"));
-            config.put("arthas.tunnelServer", getStringProperty("arthas.tunnelServer", "ws://127.0.0.1:7777/ws"));
-            config.put("arthas.sessionTimeout", getStringProperty("arthas.sessionTimeout", "1800")); // seconds
-            config.put("arthas.disabledCommands", getStringProperty("arthas.disabledCommands", null)); // e.g:stop,dump
-            config.put("arthas.outputPath", getStringProperty("arthas.outputPath", getDefaultArthasOutputPath()));
+                // Load ARTHAS properties.
+                appName = getStringProperty("arthas.appName", (isBlank(appName) ? "defaultApp" : appName));
+                Map<String, String> config = new HashMap<>();
+                config.put("arthas.appName", appName);
+                config.put("arthas.agentId", getStringProperty("arthas.agentId", generateDefaultAgentId(appName)));
+                config.put("arthas.ip", getStringProperty("arthas.ip", "0.0.0.0"));
+                config.put("arthas.telnetPort", getStringProperty("arthas.telnetPort", "3658"));
+                config.put("arthas.httpPort", getStringProperty("arthas.httpPort", "8563"));
+                config.put("arthas.tunnelServer", getStringProperty("arthas.tunnelServer", "ws://127.0.0.1:7777/ws"));
+                config.put("arthas.sessionTimeout", getStringProperty("arthas.sessionTimeout", "1800")); // seconds
+                config.put("arthas.disabledCommands", getStringProperty("arthas.disabledCommands", null)); // e.g:stop,dump
+                config.put("arthas.outputPath", getStringProperty("arthas.outputPath", getDefaultArthasOutputPath()));
 
-            log.info("Arthas agent attaching of config: {}", config);
-            invokeMethod(attachMethod, null, config);
-        } else {
-            log.warn("Cannot to start arthas agent, becuase class not found '{}'", ARTHAS_AGENT_CLASS);
+                log.info("Arthas agent attaching of config: {}", config);
+                invokeMethod(attachMethod, null, config);
+            } else {
+                log.warn("Cannot to start arthas agent, becuase class not found '{}'", ARTHAS_AGENT_CLASS);
+            }
         }
+    }
+
+    static boolean tryAttachLock() {
+        final File file = new File(SystemUtils.getJavaIoTmpDir(), SystemUtils2.LOCAL_PROCESS_ID.concat(".jvmattach.lock"));
+        if (!file.exists()) {
+            try {
+                FileUtils.touch(file);
+            } catch (IOException e) {
+                throw new IllegalStateException(format("Failed to create attach lock for : %s", file), e);
+            }
+            return true;
+        }
+        return false;
     }
 
     static String getDefaultArthasOutputPath() {
