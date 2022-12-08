@@ -312,14 +312,48 @@
   "queryAllDeclaredConstructors":true,
   "methods":[
     {"name":"getCode","parameterTypes":[] }, 
-    {"name":"getData","parameterTypes":[] }, 
-    {"name":"getMessage","parameterTypes":[] }, 
-    {"name":"getRequestId","parameterTypes":[] }, 
+    {"name":"setCode","parameterTypes":["int"] }, 
+    {"name":"withCode","parameterTypes":["int"] }, 
     {"name":"getStatus","parameterTypes":[] }, 
-    {"name":"getTimestamp","parameterTypes":[] }
+    {"name":"setStatus","parameterTypes":["java.lang.String"] }, 
+    {"name":"getData","parameterTypes":[] }, 
+    {"name":"setData","parameterTypes":["java.lang.Object"] }, 
+    {"name":"getMessage","parameterTypes":[] }, 
+    {"name":"setMessage","parameterTypes":["java.lang.String"] }, 
+    {"name":"getRequestId","parameterTypes":[] }, 
+    {"name":"setRequestId","parameterTypes":["java.lang.String"] }, 
+    {"name":"getTimestamp","parameterTypes":[] }, 
+    {"name":"setTimestamp","parameterTypes":["java.lang.Long"] }
   ]
 },
 {
   "name":"com.wl4g.infra.common.web.rest.RespBase$RetCodeSpec"
+}, 
+{
+  "name":"com.wl4g.infra.common.jedis.JedisClientBuilder$JedisConfig",
+  "allDeclaredFields":true,
+  "queryAllPublicMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setConnTimeout","parameterTypes":["int"] }, 
+    {"name":"setDatabase","parameterTypes":["int"] }, 
+    {"name":"setMaxAttempts","parameterTypes":["int"] }, 
+    {"name":"setNodes","parameterTypes":["java.util.List"] }, 
+    {"name":"setPasswd","parameterTypes":["java.lang.String"] }, 
+    {"name":"setSoTimeout","parameterTypes":["int"] }
+  ]
+}, 
+{
+  "name":"com.wl4g.infra.common.minio.OkHttpClientConfig",
+  "allDeclaredFields":true,
+  "queryAllPublicMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setConnectTimeout","parameterTypes":["java.time.Duration"] }, 
+    {"name":"setReadTimeout","parameterTypes":["java.time.Duration"] }, 
+    {"name":"setWriteTimeout","parameterTypes":["java.time.Duration"] }, 
+    {"name":"setProtocols","parameterTypes":["java.util.List"] }, 
+    {"name":"setProxy","parameterTypes":["java.net.Proxy"] }
+  ]
 }
 ]

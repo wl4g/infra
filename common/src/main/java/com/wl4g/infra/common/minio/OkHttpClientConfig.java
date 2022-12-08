@@ -18,7 +18,6 @@ package com.wl4g.infra.common.minio;
 import static java.util.Arrays.asList;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
-import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.time.Duration;
 import java.util.List;
@@ -64,5 +63,4 @@ public class OkHttpClientConfig {
                 .build();
     }
 
-    public static final Proxy DEFAULT_PROXY = new Proxy(java.net.Proxy.Type.SOCKS, new InetSocketAddress("localhost", 8889));
 }
