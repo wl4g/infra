@@ -19,7 +19,7 @@
  */
 package com.wl4g.infra.support.constant;
 
-import com.wl4g.infra.core.constant.CoreInfraConstants;
+import com.wl4g.infra.context.constant.ContextInfraConstants;
 
 /**
  * {@link SupportInfraConstant}
@@ -29,7 +29,7 @@ import com.wl4g.infra.core.constant.CoreInfraConstants;
  * @sine v1.0
  * @see
  */
-public abstract class SupportInfraConstant extends CoreInfraConstants {
+public abstract class SupportInfraConstant extends ContextInfraConstants {
 
     public static final String CONF_PREFIX_INFRA_SUPPORT = CONF_PREFIX_INFRA + ".support";
 

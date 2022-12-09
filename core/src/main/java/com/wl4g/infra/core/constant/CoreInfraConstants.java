@@ -19,7 +19,7 @@
  */
 package com.wl4g.infra.core.constant;
 
-import com.wl4g.infra.common.lang.EnvironmentUtil;
+import com.wl4g.infra.context.constant.ContextInfraConstants;
 
 /**
  * {@link CoreInfraConstants}
@@ -29,11 +29,9 @@ import com.wl4g.infra.common.lang.EnvironmentUtil;
  * @sine v1.0
  * @see
  */
-public abstract class CoreInfraConstants extends EnvironmentUtil {
+public abstract class CoreInfraConstants extends ContextInfraConstants {
 
     // Configuration key.
-
-    public static final String CONF_PREFIX_INFRA = "spring.infra";
 
     public static final String CONF_PREFIX_INFRA_CORE = CONF_PREFIX_INFRA + ".core";
 
