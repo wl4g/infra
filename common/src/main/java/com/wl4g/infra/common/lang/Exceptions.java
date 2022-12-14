@@ -140,7 +140,7 @@ public abstract class Exceptions extends ExceptionUtils {
         String causes = getRootCauseMessage(th);
         String errmsg = isEmpty(causes) ? getMessage(th) : causes;
         if (extract) {
-            int index = errmsg.indexOf(DEFAULT_CAUSE_EX_SEPARATE_SUFFIX);
+            int index = errmsg.lastIndexOf(DEFAULT_CAUSE_EX_SEPARATE_SUFFIX);
             if (index > 0) {
                 errmsg = errmsg.substring(index + DEFAULT_CAUSE_EX_SEPARATE_SUFFIX_LENGTH);
             }
