@@ -217,7 +217,6 @@ public class EthzHolder extends SSH2Holders<Session, SCPClient> {
         if (isNull(pemPrivateKey)) {
             pemPrivateKey = getDefaultLocalUserPrivateKey();
         }
-        notNullOf(pemPrivateKey, "pemPrivateKey");
 
         Connection conn = null;
         Session session = null;

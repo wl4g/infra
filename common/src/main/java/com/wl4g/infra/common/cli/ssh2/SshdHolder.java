@@ -17,7 +17,6 @@ package com.wl4g.infra.common.cli.ssh2;
 
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
-import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.util.Collections.singleton;
 import static java.util.Objects.isNull;
@@ -217,7 +216,6 @@ public class SshdHolder extends SSH2Holders<ChannelExec, ScpClient> {
         if (isNull(pemPrivateKey)) {
             pemPrivateKey = getDefaultLocalUserPrivateKey();
         }
-        notNull(pemPrivateKey, "Transfer pemPrivateKey can't null.");
 
         ClientSession session = null;
         ChannelExec chSession = null;
@@ -294,6 +292,7 @@ public class SshdHolder extends SSH2Holders<ChannelExec, ScpClient> {
                 session.addPublicKeyIdentity(next);// for password-less
             }
         } else {
+            notNullOf(password, "password");
             session.addPasswordIdentity(password); // for password-based
         }
         // authentication

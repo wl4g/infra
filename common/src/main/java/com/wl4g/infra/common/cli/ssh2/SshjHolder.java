@@ -222,7 +222,6 @@ public class SshjHolder extends SSH2Holders<CommandSessionWrapper, SCPFileTransf
         if (isNull(pemPrivateKey)) {
             pemPrivateKey = getDefaultLocalUserPrivateKey();
         }
-        notNullOf(pemPrivateKey, "pemPrivateKey");
 
         SSHClient ssh = null;
         Session session = null;
@@ -236,6 +235,7 @@ public class SshjHolder extends SSH2Holders<CommandSessionWrapper, SCPFileTransf
                 KeyProvider keyProvider = ssh.loadKeys(new String(pemPrivateKey), null, null);
                 ssh.authPublickey(user, keyProvider);
             } else {
+                notNullOf(password, "password");
                 ssh.authPassword(user, password);
             }
             session = ssh.startSession();
