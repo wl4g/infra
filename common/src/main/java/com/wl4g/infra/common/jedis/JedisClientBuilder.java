@@ -122,7 +122,7 @@ public class JedisClientBuilder {
                     "Cannot to automatically instantiate the %s. One of %s, %s and %s, expected at least 1 bean which qualifies as autowire candidate",
                     JedisClient.class.getSimpleName(), JedisPool.class.getSimpleName(), JedisCluster.class.getSimpleName(),
                     JedisConfig.class.getSimpleName());
-            initWithConfig(config);
+            init(config);
         }
         return jedisClient;
     }
@@ -133,16 +133,16 @@ public class JedisClientBuilder {
      * @param config
      * @throws Exception
      */
-    private void initWithConfig(JedisConfig config) {
+    void init(JedisConfig config) {
         Set<HostAndPort> nodes = null;
         try {
             nodes = config.parseHostAndPort();
         } catch (Exception e) {
-            throw new IllegalStateException(e);
+            throw new IllegalStateException(format("Unable parse to redis nodes: %s", nodes), e);
         }
         notEmpty(nodes, "Redis nodes configuration is requires, must contain at least 1 node");
 
-        log.info("Connecting to redis nodes... - {}", config.toString());
+        log.info("Connecting to redis nodes of : {}", config.toString());
         try {
             // Nodes size configuration is cluster?
             if (safeList(config.getNodes()).size() > 1) { // Cluster(Multi-nodes).
@@ -156,7 +156,7 @@ public class JedisClientBuilder {
             }
             log.info("Instantiated jedis client via configuration. {}", jedisClient);
         } catch (Exception e) {
-            throw new IllegalStateException(format("Cannot connect to redis nodes: %s", nodes), e);
+            throw new IllegalStateException(format("Cannot connect to redis nodes : %s, reason: %s", nodes, e.getMessage()), e);
         }
     }
 
