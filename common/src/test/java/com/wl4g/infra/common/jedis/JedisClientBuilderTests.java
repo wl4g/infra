@@ -56,7 +56,7 @@ public class JedisClientBuilderTests {
     public void testCreateWithJedisSingle() throws Exception {
         JedisConfig config = new JedisConfig();
         config.setNodes(singletonList("127.0.0.1:6379"));
-        config.setPasswd("123456");
+        config.setPassword("123456");
 
         out.println("Instantiating composite operators adapter with single ...");
         JedisClient client = new JedisClientBuilder(config).build();
@@ -71,7 +71,7 @@ public class JedisClientBuilderTests {
         JedisConfig config = new JedisConfig();
         config.setNodes(asList(new String[] { "127.0.0.1:6379", "127.0.0.1:6380", "127.0.0.1:6381", "127.0.0.1:7379",
                 "127.0.0.1:7380", "127.0.0.1:7381" }));
-        config.setPasswd("123456");
+        config.setPassword("123456");
 
         out.println("Instantiating composite operators adapter with cluster ...");
         JedisClient client = new JedisClientBuilder(config).build();

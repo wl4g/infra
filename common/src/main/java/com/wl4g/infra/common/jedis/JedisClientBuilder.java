@@ -147,11 +147,11 @@ public class JedisClientBuilder {
             // Nodes size configuration is cluster?
             if (safeList(config.getNodes()).size() > 1) { // Cluster(Multi-nodes).
                 jedisClient = new ConfigurableJedisClusterJedisClient(nodes, config.getConnTimeout(), config.getSoTimeout(),
-                        config.getMaxAttempts(), config.getPasswd(), config.getPoolConfig(), config.isSafeMode());
+                        config.getMaxAttempts(), config.getPassword(), config.getPoolConfig(), config.isSafeMode());
             } else { // Single
                 HostAndPort hap = nodes.iterator().next();
                 JedisPool pool = new JedisPool(config.getPoolConfig(), hap.getHost(), hap.getPort(), config.getConnTimeout(),
-                        config.getSoTimeout(), config.getPasswd(), 0, config.getClientName(), false, null, null, null);
+                        config.getSoTimeout(), config.getPassword(), 0, config.getClientName(), false, null, null, null);
                 jedisClient = new SingleJedisClient(pool, config.isSafeMode());
             }
             log.info("Instantiated jedis client via configuration. {}", jedisClient);
@@ -174,8 +174,9 @@ public class JedisClientBuilder {
         private final static boolean DEFAULT_SAFE_MOE = true;
 
         private @Default List<String> nodes = new ArrayList<>();
-        private String passwd;
-        private String clientName;
+        private @Nullable String username; // redis6.x
+        private @Nullable String password;
+        private @Nullable String clientName;
         private @Default int connTimeout = DEFAULT_CONN_TIMEOUT;
         private @Default int soTimeout = DEFAULT_SO_TIMEOUT;
         private @Default int maxAttempts = DEFAULT_MAX_ATTEMPTS;
@@ -185,7 +186,8 @@ public class JedisClientBuilder {
 
         public JedisConfig() {
             this.nodes = new ArrayList<>();
-            this.passwd = null;
+            this.username = null;
+            this.password = null;
             this.clientName = null;
             this.connTimeout = DEFAULT_CONN_TIMEOUT;
             this.soTimeout = DEFAULT_SO_TIMEOUT;
@@ -193,8 +195,8 @@ public class JedisClientBuilder {
             this.database = DEFAULT_DATABASE;
             this.safeMode = DEFAULT_SAFE_MOE;
             /*
-             * Notice: importants, The default value is - 1, that is, there is
-             * no time-out for acquiring resources, which will lead to deadlock.
+             * Notice: importants, The default value is -1, that is, there is no
+             * time-out for acquiring resources, which will lead to deadlock.
              */
             this.poolConfig = new JedisPoolConfig();
             this.poolConfig.setMaxWait(Duration.ofMillis(10000));

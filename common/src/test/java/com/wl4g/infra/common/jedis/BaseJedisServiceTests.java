@@ -39,7 +39,7 @@ public abstract class BaseJedisServiceTests {
         jedisConfig = new JedisConfig();
         jedisConfig.setNodes(asList(new String[] { "127.0.0.1:6379", "127.0.0.1:6380", "127.0.0.1:6381", "127.0.0.1:7379",
                 "127.0.0.1:7380", "127.0.0.1:7381" }));
-        jedisConfig.setPasswd(System.getenv().getOrDefault("REDIS_PASSWORD", "zzx!@#$%"));
+        jedisConfig.setPassword(System.getenv().getOrDefault("REDIS_PASSWORD", "zzx!@#$%"));
 
         out.println("Instantiating composite operators adapter with cluster ...");
         this.jedisService = new JedisService(new JedisClientBuilder(jedisConfig).build());
