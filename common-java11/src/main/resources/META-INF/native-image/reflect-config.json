@@ -335,11 +335,18 @@
   "queryAllPublicMethods":true,
   "methods":[
     {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getConnTimeout","parameterTypes":[] }, 
     {"name":"setConnTimeout","parameterTypes":["int"] }, 
+    {"name":"getDatabase","parameterTypes":[] }, 
     {"name":"setDatabase","parameterTypes":["int"] }, 
+    {"name":"getMaxAttempts","parameterTypes":[] }, 
     {"name":"setMaxAttempts","parameterTypes":["int"] }, 
+    {"name":"getNodes","parameterTypes":[] }, 
     {"name":"setNodes","parameterTypes":["java.util.List"] }, 
-    {"name":"setPasswd","parameterTypes":["java.lang.String"] }, 
+    {"name":"getUsername","parameterTypes":[] }, 
+    {"name":"setUsername","parameterTypes":["java.lang.String"] }, 
+    {"name":"getPassword","parameterTypes":[] }, 
+    {"name":"setPassword","parameterTypes":["java.lang.String"] }, 
     {"name":"setSoTimeout","parameterTypes":["int"] }
   ]
 }, 
