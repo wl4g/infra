@@ -362,5 +362,33 @@
     {"name":"setProtocols","parameterTypes":["java.util.List"] }, 
     {"name":"setProxy","parameterTypes":["java.net.Proxy"] }
   ]
+},
+{
+  "name":"com.wl4g.infra.common.bean.BaseBean",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getId","parameterTypes":[] }, 
+    {"name":"setId","parameterTypes":["java.lang.Long"] }, 
+    {"name":"getOrgCode","parameterTypes":[] }, 
+    {"name":"setOrgCode","parameterTypes":["java.lang.String"] }, 
+    {"name":"getEnable","parameterTypes":[] }, 
+    {"name":"setEnable","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"getLabels","parameterTypes":[] }, 
+    {"name":"setLabels","parameterTypes":["java.util.List"] }, 
+    {"name":"getRemark","parameterTypes":[] }, 
+    {"name":"setRemark","parameterTypes":["java.lang.String"] }, 
+    {"name":"getUpdateDate","parameterTypes":[] }, 
+    {"name":"setUpdateDate","parameterTypes":["java.util.Date"] }, 
+    {"name":"getUpdateBy","parameterTypes":[] }, 
+    {"name":"setUpdateBy","parameterTypes":["java.lang.Long"] }, 
+    {"name":"getCreateDate","parameterTypes":[] }, 
+    {"name":"setCreateDate","parameterTypes":["java.util.Date"] }, 
+    {"name":"getCreateBy","parameterTypes":[] }, 
+    {"name":"setCreateBy","parameterTypes":["java.lang.Long"] }, 
+    {"name":"getDelFlag","parameterTypes":[] }, 
+    {"name":"setDelFlag","parameterTypes":["java.lang.Integer"] }
+  ]
 }
 ]
