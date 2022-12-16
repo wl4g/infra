@@ -219,6 +219,42 @@
   ]
 },
 {
+  "name":"org.apache.commons.pool2.impl.EvictionConfig",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":["java.time.Duration","java.time.Duration","int"] }, 
+    {"name":"<init>","parameterTypes":["long","long","int"] }, 
+    {"name":"getIdleEvictDuration","parameterTypes":[""] }, 
+    {"name":"getIdleEvictTime","parameterTypes":[""] }, 
+    {"name":"getIdleEvictTimeDuration","parameterTypes":[""] }, 
+    {"name":"getIdleSoftEvictDuration","parameterTypes":[""] }, 
+    {"name":"getIdleSoftEvictTime","parameterTypes":[""] }, 
+    {"name":"getIdleSoftEvictTimeDuration","parameterTypes":[""] }, 
+    {"name":"getMinIdle","parameterTypes":[""] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"org.apache.commons.pool2.impl.EvictionPolicy",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true
+},
+{
+  "name":"org.apache.commons.pool2.impl.DefaultEvictionPolicy",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"evict","parameterTypes":["org.apache.commons.pool2.impl.EvictionConfig","org.apache.commons.pool2.PooledObject","int"] }
+  ]
+},
+{
+  "name":"org.apache.commons.pool2.PooledObject",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true
+},
+{
   "name":"io.minio.GetObjectArgs",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
