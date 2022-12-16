@@ -27,10 +27,25 @@
   "name":"java.util.ArrayList"
 },
 {
+  "name":"java.util.LinkedList"
+},
+{
   "name":"java.util.Map"
 },
 {
   "name":"java.util.HashMap"
+},
+{
+  "name":"java.util.LinkedHashMap"
+},
+{
+  "name":"java.concurrent.ConcurrentHashMap"
+},
+{
+  "name":"java.util.Date"
+},
+{
+  "name":"java.util.Calendar"
 },
 {
   "name":"com.fasterxml.jackson.databind.JsonNode",
@@ -323,7 +338,8 @@
   "methods":[
     {"name":"compareAndSet","parameterTypes":["int","int"] }, 
     {"name":"getState","parameterTypes":[] }, 
-    {"name":"setState","parameterTypes":["int"] } 
+    {"name":"setState","parameterTypes":["int"] }, 
+    {"name":"unsafeAllocated","parameterTypes":[] }
   ]
 },
 {
