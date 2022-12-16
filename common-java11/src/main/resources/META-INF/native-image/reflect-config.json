@@ -132,7 +132,8 @@
     {"name":"put","parameterTypes":["java.lang.String", "java.lang.String"] },
     {"name":"put","parameterTypes":["java.lang.String", "boolean"] },
     {"name":"put","parameterTypes":["java.lang.String", "java.lang.Boolean"] },
-    {"name":"put","parameterTypes":["java.lang.String", "byte[]"]}
+    {"name":"put","parameterTypes":["java.lang.String", "byte[]"]}, 
+    {"name":"toString","parameterTypes":[] }
   ]
 },
 {
@@ -156,7 +157,8 @@
     {"name":"findParent","parameterTypes":["java.lang.String"] },
     {"name":"findValues","parameterTypes":["java.lang.String","java.util.List"] },
     {"name":"findValuesAsText","parameterTypes":["java.lang.String","java.util.List"] },
-    {"name":"findParents","parameterTypes":["java.lang.String","java.util.List"] }
+    {"name":"findParents","parameterTypes":["java.lang.String","java.util.List"] }, 
+    {"name":"toString","parameterTypes":[] }
   ]
 },
 {
@@ -178,7 +180,8 @@
     {"name":"getInstance","parameterTypes":["java.lang.Class"] }, 
     {"name":"release","parameterTypes":[] }, 
     {"name":"removeAttribute","parameterTypes":["java.lang.String"] }, 
-    {"name":"setAttribute","parameterTypes":["java.lang.String","java.lang.Object"] }
+    {"name":"setAttribute","parameterTypes":["java.lang.String","java.lang.Object"] }, 
+    {"name":"toString","parameterTypes":[] }
   ]
 },
 {
@@ -211,7 +214,8 @@
     {"name":"getInstance","parameterTypes":["java.lang.Class"] }, 
     {"name":"release","parameterTypes":[] }, 
     {"name":"removeAttribute","parameterTypes":["java.lang.String"] }, 
-    {"name":"setAttribute","parameterTypes":["java.lang.String","java.lang.Object"] }
+    {"name":"setAttribute","parameterTypes":["java.lang.String","java.lang.Object"] }, 
+    {"name":"toString","parameterTypes":[] }
   ]
 },
 {
@@ -220,7 +224,8 @@
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
   "methods":[
-    {"name":"<init>","parameterTypes":[] }
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"toString","parameterTypes":[] }
   ]
 },
 {
@@ -229,7 +234,8 @@
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
   "methods":[
-    {"name":"<init>","parameterTypes":[] }
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"toString","parameterTypes":[] }
   ]
 },
 {
@@ -295,7 +301,8 @@
     {"name":"summary","parameterTypes":["io.micrometer.core.instrument.Meter$Id","io.micrometer.core.instrument.distribution.DistributionStatisticConfig","double"] }, 
     {"name":"summary","parameterTypes":["java.lang.String","java.lang.String","double","double[]","java.lang.String[]"] }, 
     {"name":"summarySlos","parameterTypes":["java.lang.String","java.lang.String","double","double[]","java.lang.String[]"] }, 
-    {"name":"timer","parameterTypes":["java.lang.String","java.lang.String","double[]","java.lang.String[]"] }
+    {"name":"timer","parameterTypes":["java.lang.String","java.lang.String","double[]","java.lang.String[]"] }, 
+    {"name":"toString","parameterTypes":[] }
   ]
 },
 {
@@ -323,7 +330,8 @@
     {"name":"getRequestId","parameterTypes":[] }, 
     {"name":"setRequestId","parameterTypes":["java.lang.String"] }, 
     {"name":"getTimestamp","parameterTypes":[] }, 
-    {"name":"setTimestamp","parameterTypes":["java.lang.Long"] }
+    {"name":"setTimestamp","parameterTypes":["java.lang.Long"] }, 
+    {"name":"toString","parameterTypes":[] }
   ]
 },
 {
@@ -347,7 +355,9 @@
     {"name":"setUsername","parameterTypes":["java.lang.String"] }, 
     {"name":"getPassword","parameterTypes":[] }, 
     {"name":"setPassword","parameterTypes":["java.lang.String"] }, 
-    {"name":"setSoTimeout","parameterTypes":["int"] }
+    {"name":"getSoTimeout","parameterTypes":[] }, 
+    {"name":"setSoTimeout","parameterTypes":["int"] }, 
+    {"name":"toString","parameterTypes":[] }
   ]
 }, 
 {
@@ -387,8 +397,13 @@
     {"name":"setCreateDate","parameterTypes":["java.util.Date"] }, 
     {"name":"getCreateBy","parameterTypes":[] }, 
     {"name":"setCreateBy","parameterTypes":["java.lang.Long"] }, 
+    {"name":"getHumanUpdateDate","parameterTypes":[] }, 
+    {"name":"setHumanUpdateDate","parameterTypes":["java.lang.String"] }, 
+    {"name":"getHumanCreateDate","parameterTypes":[] }, 
+    {"name":"setHumanCreateDate","parameterTypes":["java.lang.String"] }, 
     {"name":"getDelFlag","parameterTypes":[] }, 
-    {"name":"setDelFlag","parameterTypes":["java.lang.Integer"] }
+    {"name":"setDelFlag","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"toString","parameterTypes":[] }
   ]
 }
 ]
