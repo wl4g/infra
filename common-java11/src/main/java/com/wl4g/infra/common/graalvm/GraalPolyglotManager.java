@@ -223,6 +223,7 @@ public class GraalPolyglotManager implements Closeable {
             // Mark closed with pool.
             this.opened.set(false);
             try {
+                // see:https://github.com/oracle/graaljs/blob/master/graal-js/src/com.oracle.truffle.js.test.threading/src/com/oracle/truffle/js/test/threading/ConcurrentAccess.java#L202
                 getContext().leave();
             } catch (IllegalStateException e) {
                 // Ignore
@@ -236,6 +237,7 @@ public class GraalPolyglotManager implements Closeable {
         public void open() {
             this.opened.set(true);
             try {
+                // see:https://github.com/oracle/graaljs/blob/master/graal-js/src/com.oracle.truffle.js.test.threading/src/com/oracle/truffle/js/test/threading/ConcurrentAccess.java#L198
                 getContext().enter();
             } catch (IllegalStateException e) {
                 // Ignore
