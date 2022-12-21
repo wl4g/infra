@@ -350,7 +350,7 @@
   ]
 },
 {
-  "name":"[Lcom.zaxxer.hikari.util.ConcurrentBag$IConcurrentBagEntry",
+  "name":"[Lcom.zaxxer.hikari.util.ConcurrentBag$IConcurrentBagEntry;",
   "allDeclaredMethods": true,
   "allDeclaredFields": true,
   "allDeclaredConstructors": true,
@@ -445,10 +445,10 @@
   ]
 },
 {
-  "name":"[Lcom.wl4g.infra.common.collection.ConcurrentReferenceHashMap$Reference"
+  "name":"[Lcom.wl4g.infra.common.collection.ConcurrentReferenceHashMap$Reference;"
 },
 {
-  "name":"[Lcom.wl4g.infra.common.collection.ConcurrentReferenceHashMap$Segment"
+  "name":"[Lcom.wl4g.infra.common.collection.ConcurrentReferenceHashMap$Segment;"
 },
 {
   "name":"com.wl4g.infra.common.metrics.PrometheusMeterFacade",
