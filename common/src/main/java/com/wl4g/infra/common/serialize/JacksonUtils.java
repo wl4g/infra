@@ -300,6 +300,24 @@ public abstract class JacksonUtils {
     }
 
     /**
+     * Parse map parameterized object from JSON strings.
+     * 
+     * @param content
+     * @param valueTypeRef
+     * @return
+     */
+    public static Map<String, Object> parseMapObject(@Nullable String content) {
+        if (isNull(content)) {
+            return null;
+        }
+        try {
+            return defaultObjectMapper.readValue(content, mapObjectTypeRef);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    /**
      * Convert value to target type.</br>
      * 
      * @see com.fasterxml.jackson.databind.ObjectMapper#convertValue(Object,
@@ -441,6 +459,8 @@ public abstract class JacksonUtils {
     private static final TypeReference<List<Map<String, String>>> listMapStringTypeRef = new TypeReference<List<Map<String, String>>>() {
     };
     private static final TypeReference<List<Map<String, Object>>> listMapObjectTypeRef = new TypeReference<List<Map<String, Object>>>() {
+    };
+    private static final TypeReference<Map<String, Object>> mapObjectTypeRef = new TypeReference<Map<String, Object>>() {
     };
 
     static {
