@@ -48,6 +48,14 @@
   "name":"java.util.Calendar"
 },
 {
+  "name":"sun.misc.Unsafe",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "fields" : [
+    { "name" : "theUnsafe" }
+  ]
+},
+{
   "name":"com.fasterxml.jackson.databind.JsonNode",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
@@ -338,14 +346,28 @@
   "methods":[
     {"name":"compareAndSet","parameterTypes":["int","int"] }, 
     {"name":"getState","parameterTypes":[] }, 
-    {"name":"setState","parameterTypes":["int"] }, 
-    {"name":"unsafeAllocated","parameterTypes":[] }
+    {"name":"setState","parameterTypes":["int"] }
   ]
+},
+{
+  "name":"[Lcom.zaxxer.hikari.util.ConcurrentBag$IConcurrentBagEntry",
+  "allDeclaredMethods": true,
+  "allDeclaredFields": true,
+  "allDeclaredConstructors": true,
+  "allPublicMethods": true,
+  "allPublicFields": true,
+  "allPublicConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "queryAllPublicMethods": true,
+  "queryAllPublicConstructors": true,
+  "unsafeAllocated": true
 },
 {
   "name":"com.zaxxer.hikari.pool.PoolEntry",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
   "methods":[
     {"name":"recycle","parameterTypes":["long"] }, 
     {"name":"setFutureEol","parameterTypes":["java.util.concurrent.ScheduledFuture"] }, 
@@ -423,10 +445,10 @@
   ]
 },
 {
-  "name":"[Lcom.wl4g.infra.common.collection.ConcurrentReferenceHashMap$Reference;"
+  "name":"[Lcom.wl4g.infra.common.collection.ConcurrentReferenceHashMap$Reference"
 },
 {
-  "name":"[Lcom.wl4g.infra.common.collection.ConcurrentReferenceHashMap$Segment;"
+  "name":"[Lcom.wl4g.infra.common.collection.ConcurrentReferenceHashMap$Segment"
 },
 {
   "name":"com.wl4g.infra.common.metrics.PrometheusMeterFacade",
