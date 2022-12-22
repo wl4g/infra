@@ -22,7 +22,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.concurrent.TimeUnit;
 
-import com.wl4g.infra.common.cli.ssh2.SshjHolder.CommandSessionWrapper;
+import com.wl4g.infra.common.cli.ssh.SshjHelper.CommandSessionWrapper;
 import com.wl4g.infra.support.cli.command.DestroableCommand;
 
 import net.schmizz.sshj.connection.ConnectionException;

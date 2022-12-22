@@ -56,6 +56,43 @@
   ]
 },
 {
+  "name":"java.security.KeyPairGenerator",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true, 
+  "methods":[
+    {"name":"<init>","parameterTypes":["java.lang.String"] }, 
+    {"name":"getInstance","parameterTypes":["java.lang.String"] },
+    {"name":"getInstance","parameterTypes":["sun.security.jca.GetInstance.Instance","java.lang.String"] },
+    {"name":"getInstance","parameterTypes":["java.lang.String","java.lang.String"] },
+    {"name":"getInstance","parameterTypes":["java.lang.String","java.security.Provider"] }
+  ]
+},
+{
+  "name":"java.security.KeyFactory",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true, 
+  "methods":[
+    {"name":"<init>","parameterTypes":["java.lang.String"] }, 
+    {"name":"getInstance","parameterTypes":["java.lang.String"] },
+    {"name":"getInstance","parameterTypes":["java.lang.String","java.lang.String"] },
+    {"name":"getInstance","parameterTypes":["java.lang.String","java.security.Provider"] }
+  ]
+},
+{
+  "name":"java.security.Signature",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true, 
+  "methods":[
+    {"name":"<init>","parameterTypes":["java.lang.String"] }, 
+    {"name":"getInstance","parameterTypes":["java.lang.String"] },
+    {"name":"getInstance","parameterTypes":["java.lang.String","java.lang.String"] },
+    {"name":"getInstance","parameterTypes":["java.lang.String","java.security.Provider"] }
+  ]
+},
+{
   "name":"com.fasterxml.jackson.databind.JsonNode",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
@@ -240,6 +277,41 @@
     {"name":"setAttribute","parameterTypes":["java.lang.String","java.lang.Object"] }, 
     {"name":"toString","parameterTypes":[] }
   ]
+},
+{
+  "name":"org.apache.sshd.common.io.nio2.Nio2ServiceFactoryFactory",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }
+  ]
+},
+{
+  "name":"org.bouncycastle.jcajce.provider.keystore.BC",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }
+  ]
+},
+{
+  "name":"org.bouncycastle.jcajce.provider.keystore.BC$Mappings",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] },
+    {"name":"configure","parameterTypes":["org.bouncycastle.jcajce.provider.config.ConfigurableProvider"] }
+  ]
+},
+{
+  "name":"org.bouncycastle.jcajce.provider.asymmetric.rsa.KeyFactorySpi",
+  "allPublicConstructors" : true,
+  "allPublicMethods" : true
+},
+{
+  "name":"org.bouncycastle.jcajce.provider.asymmetric.RSA$Mappings",
+  "allPublicConstructors" : true,
+  "allPublicMethods" : true
 },
 {
   "name":"org.apache.commons.pool2.impl.EvictionConfig",

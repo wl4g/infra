@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.common.cli.ssh2;
+package com.wl4g.infra.common.cli.ssh;
 
 import static com.wl4g.infra.common.lang.Assert2.isTrue;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
-import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.SystemUtils.USER_HOME;
 
@@ -26,8 +24,6 @@ import java.io.CharArrayWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
@@ -35,57 +31,19 @@ import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.function.CallbackFunction;
 import com.wl4g.infra.common.function.ProcessFunction;
-import com.wl4g.infra.common.log.SmartLogger;
-import com.wl4g.infra.common.reflect.ObjectInstantiators;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
- * {@link SSH2Holders}, generic SSH2 client wrapper tool. </br>
+ * {@link SshHelperBase}, generic SSH2 client wrapper tool. </br>
  * Including the implementation of ethz/ssj/ssd.
  * 
  * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version 2020年1月9日 v1.0.0
  * @see
  */
-public abstract class SSH2Holders<S, F> {
-
-    protected SmartLogger log = getLogger(getClass());
-
-    //
-    // --- Instantiation function. ---
-    //
-
-    /**
-     * Gets default {@link SSH2Holders} instance by provider class.
-     * 
-     * @param <T>
-     * @return
-     */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    public final static <T extends SSH2Holders> T getDefault() {
-        // @see:dopass-infras-common/pom.xml#<groupId>com.hierynomus</groupId>
-        return (T) getInstance(SshjHolder.class);
-    }
-
-    /**
-     * Gets {@link SSH2Holders} instance by provider class.
-     * 
-     * @param <T>
-     * @param providerClass
-     * @return
-     */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public final static <T extends SSH2Holders> T getInstance(Class<T> providerClass) {
-        T t = (T) registry.get(providerClass);
-        if (isNull(t)) {
-            synchronized (SSH2Holders.class) {
-                t = (T) registry.get(providerClass);
-                if (isNull(t)) {
-                    registry.put(providerClass, (t = ObjectInstantiators.newInstance(providerClass)));
-                }
-            }
-        }
-        return t;
-    }
+@Slf4j
+public abstract class SshHelperBase<S, F> {
 
     //
     // --- Transfer function. ---
@@ -205,7 +163,7 @@ public abstract class SSH2Holders<S, F> {
      * @return
      * @throws IOException
      */
-    public Ssh2ExecResult execWaitForResponse(
+    public SSHExecResult execWaitForResponse(
             @NotBlank String host,
             @NotBlank String user,
             char[] pemPrivateKey,
@@ -227,7 +185,7 @@ public abstract class SSH2Holders<S, F> {
      * @return
      * @throws IOException
      */
-    public abstract Ssh2ExecResult execWaitForResponse(
+    public abstract SSHExecResult execWaitForResponse(
             @NotBlank String host,
             @Min(1) int port,
             @NotBlank String user,
@@ -361,13 +319,7 @@ public abstract class SSH2Holders<S, F> {
      * @return
      * @throws Exception
      */
-    public abstract Ssh2KeyPair generateKeypair(AlgorithmType type, String comment) throws Exception;
-
-    /**
-     * {@link SSH2Holders} providers registry.
-     */
-    @SuppressWarnings("rawtypes")
-    private final static Map<Class<? extends SSH2Holders>, SSH2Holders> registry = new HashMap<>();
+    public abstract SSHKeyPair generateKeypair(AlgorithmType type, String comment) throws Exception;
 
     /**
      * Default IO buffer size.
@@ -375,13 +327,13 @@ public abstract class SSH2Holders<S, F> {
     final public static int DEFAULT_TRANSFER_BUFFER = 1024 * 6;
 
     /**
-     * {@link Ssh2ExecResult}
+     * {@link SSHExecResult}
      * 
      * @author James Wong &lt;jameswong1376@gmail.com&gt;
      * @version 2020年1月9日 v1.0.0
      * @see
      */
-    public final static class Ssh2ExecResult {
+    public static class SSHExecResult {
 
         /** Remote commands exit signal. */
         final private String exitSignal;
@@ -395,7 +347,7 @@ public abstract class SSH2Holders<S, F> {
         /** Error message */
         final private String errmsg;
 
-        public Ssh2ExecResult(String exitSignal, Integer exitCode, String message, String errmsg) {
+        public SSHExecResult(String exitSignal, Integer exitCode, String message, String errmsg) {
             super();
             this.exitSignal = exitSignal;
             this.exitCode = exitCode;
@@ -422,13 +374,13 @@ public abstract class SSH2Holders<S, F> {
     }
 
     /**
-     * {@link Ssh2KeyPair}
+     * {@link SSHKeyPair}
      * 
      * @author James Wong &lt;jameswong1376@gmail.com&gt;
      * @version 2020年2月4日 v1.0.0
      * @see
      */
-    public final static class Ssh2KeyPair {
+    public static class SSHKeyPair {
 
         /** Generate ssh2 privateKey. */
         final private String privateKey;
@@ -436,7 +388,7 @@ public abstract class SSH2Holders<S, F> {
         /** Generate ssh2 publicKey. */
         final private String publicKey;
 
-        public Ssh2KeyPair(String privateKey, String publicKey) {
+        public SSHKeyPair(String privateKey, String publicKey) {
             notNullOf(privateKey, "privateKey");
             notNullOf(publicKey, "publicKey");
             this.privateKey = privateKey;

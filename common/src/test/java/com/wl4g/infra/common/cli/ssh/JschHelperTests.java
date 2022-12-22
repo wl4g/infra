@@ -13,24 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.common.cli.ssh2;
+package com.wl4g.infra.common.cli.ssh;
 
-import com.wl4g.infra.common.cli.ssh2.SSH2Holders.AlgorithmType;
-import com.wl4g.infra.common.cli.ssh2.SSH2Holders.Ssh2KeyPair;
+import com.wl4g.infra.common.cli.ssh.SshHelperBase.AlgorithmType;
+import com.wl4g.infra.common.cli.ssh.SshHelperBase.SSHKeyPair;
 
 /**
- * {@link JschHolderTests}
+ * {@link JschHelperTests}
  * 
  * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @author vjay
  * @version 2020年5月23日 v1.0.0
  * @see
  */
-public class JschHolderTests {
+public class JschHelperTests {
 
     public static void main(String[] args) throws Exception {
-        JschHolder jh = new JschHolder();
-        Ssh2KeyPair keypair = jh.generateKeypair(AlgorithmType.RSA, "Auto-generate-by-test");
+        JschHelper jh = new JschHelper();
+        SSHKeyPair keypair = jh.generateKeypair(AlgorithmType.RSA, "Auto-generate-by-test");
         System.out.println(keypair.getPublicKey());
         System.out.println(keypair.getPrivateKey());
     }

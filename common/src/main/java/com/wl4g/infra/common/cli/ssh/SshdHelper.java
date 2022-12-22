@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.common.cli.ssh2;
+package com.wl4g.infra.common.cli.ssh;
 
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
@@ -56,7 +56,13 @@ import lombok.CustomLog;
  */
 @Beta
 @CustomLog
-public class SshdHolder extends SSH2Holders<ChannelExec, ScpClient> {
+public class SshdHelper extends SshHelperBase<ChannelExec, ScpClient> {
+
+    private static final SshdHelper DEFAULT = new SshdHelper();
+
+    public static SshdHelper getInstance() {
+        return DEFAULT;
+    }
 
     // --- Transfer files. ---
 
@@ -160,7 +166,7 @@ public class SshdHolder extends SSH2Holders<ChannelExec, ScpClient> {
 
     // --- Execution commands. ---
 
-    public Ssh2ExecResult execWaitForResponse(
+    public SSHExecResult execWaitForResponse(
             String host,
             int port,
             String user,
@@ -177,7 +183,7 @@ public class SshdHolder extends SSH2Holders<ChannelExec, ScpClient> {
             if (nonNull(session.getErr())) {
                 errmsg = session.getErr().toString();
             }
-            return new Ssh2ExecResult(session.getExitSignal(), session.getExitStatus(), msg, errmsg);
+            return new SSHExecResult(session.getExitSignal(), session.getExitStatus(), msg, errmsg);
         }, timeoutMs);
     }
 
@@ -213,7 +219,7 @@ public class SshdHolder extends SSH2Holders<ChannelExec, ScpClient> {
         notNullOf(processor, "processor");
 
         // Fallback uses the local current user private key by default.
-        if (isNull(pemPrivateKey)) {
+        if (isNull(pemPrivateKey) && isNull(password)) {
             pemPrivateKey = getDefaultLocalUserPrivateKey();
         }
 
@@ -282,7 +288,7 @@ public class SshdHolder extends SSH2Holders<ChannelExec, ScpClient> {
             String user,
             char[] pemPrivateKey,
             String password) throws IOException, GeneralSecurityException {
-        ClientSession session = client.connect(user, host, Objects.isNull(port) ? 22 : port).verify(10000).getSession();
+        final ClientSession session = client.connect(user, host, Objects.isNull(port) ? 22 : port).verify(10000).getSession();
         if (nonNull(pemPrivateKey)) {
             Iterable<KeyPair> keyPairs = SecurityUtils.loadKeyPairIdentities(session, null,
                     getStrToStream(new String(pemPrivateKey)), null);
@@ -295,8 +301,7 @@ public class SshdHolder extends SSH2Holders<ChannelExec, ScpClient> {
             notNullOf(password, "password");
             session.addPasswordIdentity(password); // for password-based
         }
-        // authentication
-        AuthFuture verify = session.auth().verify(10000);
+        AuthFuture verify = session.auth().verify(10_000);
         if (!verify.isSuccess()) {
             throw new GeneralSecurityException("auth fail");
         }
@@ -304,34 +309,9 @@ public class SshdHolder extends SSH2Holders<ChannelExec, ScpClient> {
         return session;
     }
 
-    /**
-     * auth with password (unused now)
-     *
-     * @param host
-     * @param port
-     * @param user
-     * @param password
-     * @return
-     * @throws IOException
-     * @throws GeneralSecurityException
-     */
-    // private ClientSession authWithPassword(SshClient client, String host,
-    // Integer port, String user, String password)
-    // throws IOException, GeneralSecurityException {
-    // ClientSession session = client.connect(user, host, Objects.isNull(port) ?
-    // 22 : port).verify(10000).getSession();
-    // session.addPasswordIdentity(password); // for password-based
-    // // authentication
-    // AuthFuture verify = session.auth().verify(10000);
-    // if (!verify.isSuccess()) {
-    // throw new GeneralSecurityException("auth fail");
-    // }
-    // return session;
-    // }
-
     // --- Tool function's. ---
     @Override
-    public Ssh2KeyPair generateKeypair(AlgorithmType type, String comment) throws Exception {
+    public SSHKeyPair generateKeypair(AlgorithmType type, String comment) throws Exception {
         throw new UnsupportedOperationException();
     }
 

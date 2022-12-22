@@ -74,6 +74,12 @@
             <groupId>com.wl4g</groupId>
             <artifactId>infra-common</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>1.70</version>
+            <scope>provided</scope>
+        </dependency>
         <!-- SPOTBUGS -->
         <dependency>
             <groupId>com.github.spotbugs</groupId>

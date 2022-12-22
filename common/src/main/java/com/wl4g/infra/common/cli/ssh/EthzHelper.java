@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.common.cli.ssh2;
+package com.wl4g.infra.common.cli.ssh;
 
 import static ch.ethz.ssh2.ChannelCondition.CLOSED;
-import static com.wl4g.infra.common.collection.CollectionUtils2.isEmptyArray;
 import static com.wl4g.infra.common.io.ByteStreamUtils.readFullyToString;
 import static com.wl4g.infra.common.lang.Assert2.hasText;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
@@ -24,35 +23,45 @@ import static com.wl4g.infra.common.lang.Assert2.isTrue;
 import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import org.apache.commons.lang3.StringUtils;
-
-import com.wl4g.infra.common.annotation.Stable;
 import com.wl4g.infra.common.function.CallbackFunction;
 import com.wl4g.infra.common.function.ProcessFunction;
+import com.wl4g.infra.common.lang.EnvironmentUtil;
 
 import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.SCPClient;
 import ch.ethz.ssh2.SCPInputStream;
 import ch.ethz.ssh2.SCPOutputStream;
+import ch.ethz.ssh2.ServerHostKeyVerifier;
 import ch.ethz.ssh2.Session;
+import lombok.CustomLog;
 
 /**
- * Ethz based SSH2 tools.
+ * Ethz based SSH2 tools. </br>
+ *
+ * Notice: Cannot negotiate, proposals do not match.
  *
  * @author James Wong <jameswong1376@gmail.com>
  * @version v1.0 2019年5月24日
- * @since
  */
-@Stable
-public class EthzHolder extends SSH2Holders<Session, SCPClient> {
+@Deprecated
+@CustomLog
+public class EthzHelper extends SshHelperBase<Session, SCPClient> {
+
+    private static final EthzHelper DEFAULT = new EthzHelper();
+
+    public static EthzHelper getInstance() {
+        return DEFAULT;
+    }
 
     // --- Transfer files. ---
 
@@ -145,7 +154,7 @@ public class EthzHolder extends SSH2Holders<Session, SCPClient> {
         Connection conn = null;
         try {
             // Transfer file(put/get).
-            processor.process(new SCPClient(conn = createSsh2Connection(host, port, user, pemPrivateKey, password)));
+            processor.process(new SCPClient(conn = createConnection(host, port, user, pemPrivateKey, password)));
         } catch (Exception e) {
             throw e;
         } finally {
@@ -162,7 +171,7 @@ public class EthzHolder extends SSH2Holders<Session, SCPClient> {
     // --- Execution commands. ---
 
     @Override
-    public Ssh2ExecResult execWaitForResponse(
+    public SSHExecResult execWaitForResponse(
             String host,
             int port,
             String user,
@@ -178,7 +187,7 @@ public class EthzHolder extends SSH2Holders<Session, SCPClient> {
             if (nonNull(session.getStderr())) {
                 errmsg = readFullyToString(session.getStderr());
             }
-            return new Ssh2ExecResult(session.getExitSignal(), session.getExitStatus(), message, errmsg);
+            return new SSHExecResult(session.getExitSignal(), session.getExitStatus(), message, errmsg);
         }, timeoutMs);
     }
 
@@ -214,7 +223,7 @@ public class EthzHolder extends SSH2Holders<Session, SCPClient> {
         notNullOf(processor, "processor");
 
         // Fallback uses the local current user private key by default.
-        if (isNull(pemPrivateKey)) {
+        if (isNull(pemPrivateKey) && isNull(password)) {
             pemPrivateKey = getDefaultLocalUserPrivateKey();
         }
 
@@ -222,7 +231,7 @@ public class EthzHolder extends SSH2Holders<Session, SCPClient> {
         Session session = null;
         try {
             // Session & send command.
-            session = (conn = createSsh2Connection(host, port, user, pemPrivateKey, password)).openSession();
+            session = (conn = createConnection(host, port, user, pemPrivateKey, password)).openSession();
             log.info("SSH2 sending command to {}@{}, ({})", user, host, command);
 
             session.execCommand(command, "UTF-8");
@@ -254,24 +263,22 @@ public class EthzHolder extends SSH2Holders<Session, SCPClient> {
      * @return
      * @throws IOException
      */
-    private final Connection createSsh2Connection(String host, int port, String user, char[] pemPrivateKey, String password)
-            throws IOException {
+    Connection createConnection(String host, int port, String user, char[] pemPrivateKey, String password) throws IOException {
         hasTextOf(host, "host");
         isTrueOf(port >= 1, "port>=1");
         hasTextOf(user, "user");
         // notNullOf(pemPrivateKey, "pemPrivateKey");
-        isTrueOf(!isEmptyArray(pemPrivateKey) || StringUtils.isNotBlank(password), "pemPrivateKey");
+        isTrueOf(nonNull(pemPrivateKey) || isNotBlank(password), "pemPrivateKey");
 
-        Connection conn = new Connection(host);
-        conn.connect();
+        final Connection conn = new Connection(host);
+        conn.connect(ALL_TRUST, CONNECTION_TIMEOUT, KEX_TIMEOUT);
 
-        if (!isEmptyArray(pemPrivateKey)) {
-            // Authentication with pub-key.
-            isTrue(conn.authenticateWithPublicKey(user, pemPrivateKey, null), String
-                    .format("Failed to SSH2 authenticate with %s@%s privateKey(%s)", user, host, new String(pemPrivateKey)));
+        if (nonNull(pemPrivateKey)) {
+            isTrue(conn.authenticateWithPublicKey(user, pemPrivateKey, null),
+                    format("Failed to SSH authenticate with %s@%s privateKey(%s)", user, host, new String(pemPrivateKey)));
         } else {
             isTrue(conn.authenticateWithPassword(user, password),
-                    String.format("Failed to SSH2 authenticate with %s@%s password(%s)", user, host, password));
+                    format("Failed to SSH authenticate with %s@%s password(%s)", user, host, password));
         }
 
         log.debug("SSH2 connected to {}@{}", user, host);
@@ -281,8 +288,19 @@ public class EthzHolder extends SSH2Holders<Session, SCPClient> {
     // --- Tool function's. ---
 
     @Override
-    public Ssh2KeyPair generateKeypair(AlgorithmType type, String comment) throws Exception {
+    public SSHKeyPair generateKeypair(AlgorithmType type, String comment) throws Exception {
         throw new UnsupportedOperationException();
     }
+
+    private static final ServerHostKeyVerifier ALL_TRUST = new ServerHostKeyVerifier() {
+        @Override
+        public boolean verifyServerHostKey(String hostname, int port, String serverHostKeyAlgorithm, byte[] serverHostKey)
+                throws Exception {
+            return true;
+        }
+    };
+
+    private static final int CONNECTION_TIMEOUT = EnvironmentUtil.getIntProperty("ETHZ_SSH_CONNECTION_TIMEOUT", 3_000);
+    private static final int KEX_TIMEOUT = EnvironmentUtil.getIntProperty("ETHZ_SSH_KEX_TIMEOUT", 20_000);
 
 }

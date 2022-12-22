@@ -538,8 +538,7 @@ public abstract class CollectionUtils2 extends CollectionUtils {
      * @param collection
      * @return
      */
-    @SuppressWarnings("unchecked")
-    public static <T> boolean isEmptyArray(T... array) {
+    public static <T> boolean isEmptyArray(T[] array) {
         return isNull(array) || array.length <= 0;
     }
 

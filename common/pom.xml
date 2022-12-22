@@ -234,7 +234,8 @@
         <dependency>
             <groupId>com.hierynomus</groupId>
             <artifactId>sshj</artifactId>
-            <!-- @see com.wl4g.infra.common.cli.ssh2.SSH2Holders#getDefault() -->
+            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <!-- Ethz -->
         <dependency>
@@ -265,7 +266,6 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.quartz-scheduler</groupId>

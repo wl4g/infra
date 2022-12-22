@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.common.cli.ssh2;
+package com.wl4g.infra.common.cli.ssh;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 
 import com.google.common.annotations.Beta;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.KeyPair;
 import com.wl4g.infra.common.function.CallbackFunction;
 import com.wl4g.infra.common.function.ProcessFunction;
-
-import java.io.*;
 
 /**
  * Jsch based SSH2 tools.
@@ -31,7 +32,14 @@ import java.io.*;
  * @since
  */
 @Beta
-public class JschHolder extends SSH2Holders<Void, Void> {
+// @CustomLog
+public class JschHelper extends SshHelperBase<Void, Void> {
+
+    private static final JschHelper DEFAULT = new JschHelper();
+
+    public static JschHelper getInstance() {
+        return DEFAULT;
+    }
 
     // --- Transfer files. ---
 
@@ -73,7 +81,7 @@ public class JschHolder extends SSH2Holders<Void, Void> {
     // --- Execution commands. ---
 
     @Override
-    public Ssh2ExecResult execWaitForResponse(
+    public SSHExecResult execWaitForResponse(
             String host,
             int port,
             String user,
@@ -112,7 +120,7 @@ public class JschHolder extends SSH2Holders<Void, Void> {
     // --- Tool function's. ---
 
     @Override
-    public Ssh2KeyPair generateKeypair(AlgorithmType type, String comment) throws Exception {
+    public SSHKeyPair generateKeypair(AlgorithmType type, String comment) throws Exception {
         int algType = KeyPair.RSA;
         if (type == AlgorithmType.DSA) {
             algType = KeyPair.DSA;
@@ -143,7 +151,7 @@ public class JschHolder extends SSH2Holders<Void, Void> {
         // System.out.println(privateKeyString.length());
         // System.out.println(privateKeyString);
 
-        return new Ssh2KeyPair(privateKey, publicKey);
+        return new SSHKeyPair(privateKey, publicKey);
     }
 
 }

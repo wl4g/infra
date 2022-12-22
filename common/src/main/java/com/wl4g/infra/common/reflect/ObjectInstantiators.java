@@ -43,16 +43,16 @@ public abstract class ObjectInstantiators {
         if (!Objects.isNull(objenesis)) {
             try {
                 return (T) objenesisStdNewInstanceMethod.invoke(objenesis, new Object[] { objectClass });
-            } catch (Exception ex) {
-                throw new Error("Unexpected reflection exception - " + ex.getClass().getName() + ": " + ex.getMessage());
+            } catch (Exception e) {
+                throw new Error(format("Unexpected reflection exception of %s: %s", e.getClass().getName(), e.getMessage()), e);
             }
         }
         try {
             return (T) objectClass.newInstance();
         } catch (IllegalAccessException e) {
-            throw new Error(format("Instantiate class without access: %s", objectClass));
+            throw new Error(format("Instantiate class without access for %s", objectClass), e);
         } catch (InstantiationException e) {
-            throw new Error(format("Cannot instantiate class without default constructor: %s", objectClass));
+            throw new Error(format("Cannot instantiate class without default constructor for %s", objectClass), e);
         }
     }
 

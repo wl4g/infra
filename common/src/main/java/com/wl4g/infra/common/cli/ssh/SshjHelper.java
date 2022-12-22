@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.common.cli.ssh2;
+package com.wl4g.infra.common.cli.ssh;
 
-import static com.wl4g.infra.common.collection.CollectionUtils2.isEmptyArray;
 import static com.wl4g.infra.common.io.ByteStreamUtils.readFullyToString;
 import static com.wl4g.infra.common.lang.Assert2.hasText;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
@@ -32,10 +31,11 @@ import java.io.IOException;
 import javax.validation.constraints.NotNull;
 
 import com.google.common.annotations.Beta;
-import com.wl4g.infra.common.cli.ssh2.SshjHolder.CommandSessionWrapper;
+import com.wl4g.infra.common.cli.ssh.SshjHelper.CommandSessionWrapper;
 import com.wl4g.infra.common.function.CallbackFunction;
 import com.wl4g.infra.common.function.ProcessFunction;
 
+import lombok.CustomLog;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.connection.channel.direct.Session.Command;
@@ -53,7 +53,14 @@ import net.schmizz.sshj.xfer.scp.ScpCommandLine;
  * @since
  */
 @Beta
-public class SshjHolder extends SSH2Holders<CommandSessionWrapper, SCPFileTransfer> {
+@CustomLog
+public class SshjHelper extends SshHelperBase<CommandSessionWrapper, SCPFileTransfer> {
+
+    private static final SshjHelper DEFAULT = new SshjHelper();
+
+    public static SshjHelper getInstance() {
+        return DEFAULT;
+    }
 
     // --- Transfer files. ---
 
@@ -165,7 +172,7 @@ public class SshjHolder extends SSH2Holders<CommandSessionWrapper, SCPFileTransf
 
     // --- Execution commands. ---
 
-    public Ssh2ExecResult execWaitForResponse(
+    public SSHExecResult execWaitForResponse(
             String host,
             int port,
             String user,
@@ -182,7 +189,7 @@ public class SshjHolder extends SSH2Holders<CommandSessionWrapper, SCPFileTransf
             if (nonNull(cmd.getErrorStream())) {
                 errmsg = readFullyToString(cmd.getErrorStream());
             }
-            return new Ssh2ExecResult(nonNull(cmd.getExitSignal()) ? cmd.getExitSignal().toString() : null, cmd.getExitStatus(),
+            return new SSHExecResult(nonNull(cmd.getExitSignal()) ? cmd.getExitSignal().toString() : null, cmd.getExitStatus(),
                     message, errmsg);
         }, timeoutMs);
     }
@@ -219,7 +226,7 @@ public class SshjHolder extends SSH2Holders<CommandSessionWrapper, SCPFileTransf
         notNullOf(processor, "processor");
 
         // Fallback uses the local current user private key by default.
-        if (isNull(pemPrivateKey)) {
+        if (isNull(pemPrivateKey) && isNull(password)) {
             pemPrivateKey = getDefaultLocalUserPrivateKey();
         }
 
@@ -231,7 +238,7 @@ public class SshjHolder extends SSH2Holders<CommandSessionWrapper, SCPFileTransf
             ssh.addHostKeyVerifier(new PromiscuousVerifier());
             ssh.connect(host);
 
-            if (!isEmptyArray(pemPrivateKey)) {
+            if (nonNull(pemPrivateKey)) {
                 KeyProvider keyProvider = ssh.loadKeys(new String(pemPrivateKey), null, null);
                 ssh.authPublickey(user, keyProvider);
             } else {
@@ -271,7 +278,7 @@ public class SshjHolder extends SSH2Holders<CommandSessionWrapper, SCPFileTransf
     // --- Tool function's. ---
 
     @Override
-    public Ssh2KeyPair generateKeypair(AlgorithmType type, String comment) throws Exception {
+    public SSHKeyPair generateKeypair(AlgorithmType type, String comment) throws Exception {
         throw new UnsupportedOperationException();
     }
 
