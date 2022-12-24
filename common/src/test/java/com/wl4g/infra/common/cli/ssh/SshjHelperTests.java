@@ -65,9 +65,9 @@ public class SshjHelperTests {
         // Test execute command
         SshHelperBase.SSHExecResult res = SshjHelper.getInstance()
                 .execWaitForResponse("localhost", "prometheus", null, "123456", "ls -al /tmp", 60000);
-        System.out.println("success=" + res.getMessage());
-        System.out.println("fail=" + res.getErrmsg());
-        System.out.println("exitCode=" + res.getExitCode());
+        System.out.println("success=" + res.getStdout());
+        System.out.println("fail=" + res.getStderr());
+        System.out.println("exitCode=" + res.getCode());
     }
 
     @Test

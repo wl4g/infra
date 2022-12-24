@@ -61,9 +61,9 @@ public class SshdHelperTests {
     public void testExecCatCommand() throws Exception {
         String cmd = "cat /tmp/test_vim_file.txt";
         SSHExecResult resp = SshdHelper.getInstance().execWaitForResponse("127.0.0.1", "prometheus", null, "123456", cmd, 3_000);
-        out.println("stdout=" + resp.getMessage());
-        out.println("stderr=" + resp.getErrmsg());
-        out.println("exitCode=" + resp.getExitCode());
+        out.println("stdout=" + resp.getStdout());
+        out.println("stderr=" + resp.getStderr());
+        out.println("exitCode=" + resp.getCode());
     }
 
     @Test

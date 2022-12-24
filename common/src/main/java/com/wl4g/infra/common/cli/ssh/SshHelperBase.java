@@ -32,6 +32,7 @@ import javax.validation.constraints.NotNull;
 import com.wl4g.infra.common.function.CallbackFunction;
 import com.wl4g.infra.common.function.ProcessFunction;
 
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -333,42 +334,43 @@ public abstract class SshHelperBase<S, F> {
      * @version 2020年1月9日 v1.0.0
      * @see
      */
+    @ToString
     public static class SSHExecResult {
 
         /** Remote commands exit signal. */
-        final private String exitSignal;
+        final private String signal;
 
         /** Remote commands exit code. */
-        final private Integer exitCode;
+        final private Integer code;
 
-        /** Standard message */
-        final private String message;
+        /** Standard stdout */
+        final private String stdout;
 
-        /** Error message */
-        final private String errmsg;
+        /** Error stdout */
+        final private String stderr;
 
-        public SSHExecResult(String exitSignal, Integer exitCode, String message, String errmsg) {
+        public SSHExecResult(String signal, Integer code, String stdout, String stderr) {
             super();
-            this.exitSignal = exitSignal;
-            this.exitCode = exitCode;
-            this.message = message;
-            this.errmsg = errmsg;
+            this.signal = signal;
+            this.code = code;
+            this.stdout = stdout;
+            this.stderr = stderr;
         }
 
-        public String getExitSignal() {
-            return exitSignal;
+        public String getSignal() {
+            return signal;
         }
 
-        public Integer getExitCode() {
-            return exitCode;
+        public Integer getCode() {
+            return code;
         }
 
-        public String getMessage() {
-            return message;
+        public String getStdout() {
+            return stdout;
         }
 
-        public String getErrmsg() {
-            return errmsg;
+        public String getStderr() {
+            return stderr;
         }
 
     }

@@ -2,6 +2,8 @@ package com.wl4g.infra.common.graalvm.feature;
 
 import java.security.Security;
 
+import org.bouncycastle.crypto.CryptoServicesRegistrar;
+import org.bouncycastle.jcajce.provider.drbg.DRBG;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.graalvm.nativeimage.ImageSingletons;
 import org.graalvm.nativeimage.hosted.Feature;
@@ -34,4 +36,21 @@ public class BouncyCastleFeature implements Feature {
         Security.addProvider(new BouncyCastleProvider());
     }
 
+    @Override
+    public void duringSetup(DuringSetupAccess access) {
+        // programmatically re-run class initialization at runtime
+        // (equivalent to the (deprecated)
+        // --rerun-class-initialization-at-runtime=
+        // command-line option for GraalVM's native-image command)
+        RuntimeClassInitializationSupport rci = ImageSingletons.lookup(RuntimeClassInitializationSupport.class);
+        // all org.bouncycastle packages are initialized at build time,
+        // but some specific classes need be re-initialized at runtime
+        // due to static SecureRandom seeding
+        rci.rerunInitialization(CryptoServicesRegistrar.class,
+                "See https://github.com/micronaut-projects/micronaut-oracle-cloud/pull/17#discussion_r472955378");
+        rci.rerunInitialization(DRBG.Default.class,
+                "See https://github.com/micronaut-projects/micronaut-oracle-cloud/pull/17#discussion_r472955378");
+        rci.rerunInitialization(DRBG.NonceAndIV.class,
+                "See https://github.com/micronaut-projects/micronaut-oracle-cloud/pull/17#discussion_r472955378");
+    }
 }

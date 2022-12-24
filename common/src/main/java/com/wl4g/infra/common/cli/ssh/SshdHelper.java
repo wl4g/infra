@@ -52,7 +52,7 @@ import lombok.CustomLog;
  *
  * @author James Wong <jameswong1376@gmail.com>
  * @version v1.0 2019年5月24日
- * @since
+ * @see https://github.com/insinfo/java_native/tree/main/app/src/main/java/demo
  */
 @Beta
 @CustomLog
