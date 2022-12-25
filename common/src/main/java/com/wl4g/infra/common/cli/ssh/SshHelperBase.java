@@ -32,6 +32,7 @@ import javax.validation.constraints.NotNull;
 import com.wl4g.infra.common.function.CallbackFunction;
 import com.wl4g.infra.common.function.ProcessFunction;
 
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
@@ -327,27 +328,20 @@ public abstract class SshHelperBase<S, F> {
      */
     final public static int DEFAULT_TRANSFER_BUFFER = 1024 * 6;
 
-    /**
-     * {@link SSHExecResult}
-     * 
-     * @author James Wong &lt;jameswong1376@gmail.com&gt;
-     * @version 2020年1月9日 v1.0.0
-     * @see
-     */
     @ToString
     public static class SSHExecResult {
 
         /** Remote commands exit signal. */
-        final private String signal;
+        private final String signal;
 
         /** Remote commands exit code. */
-        final private Integer code;
+        private final Integer code;
 
         /** Standard stdout */
-        final private String stdout;
+        private final String stdout;
 
         /** Error stdout */
-        final private String stderr;
+        private final String stderr;
 
         public SSHExecResult(String signal, Integer code, String stdout, String stderr) {
             super();
@@ -375,20 +369,14 @@ public abstract class SshHelperBase<S, F> {
 
     }
 
-    /**
-     * {@link SSHKeyPair}
-     * 
-     * @author James Wong &lt;jameswong1376@gmail.com&gt;
-     * @version 2020年2月4日 v1.0.0
-     * @see
-     */
+    @NoArgsConstructor
     public static class SSHKeyPair {
 
         /** Generate ssh2 privateKey. */
-        final private String privateKey;
+        private String privateKey;
 
         /** Generate ssh2 publicKey. */
-        final private String publicKey;
+        private String publicKey;
 
         public SSHKeyPair(String privateKey, String publicKey) {
             notNullOf(privateKey, "privateKey");

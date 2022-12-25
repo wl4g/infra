@@ -314,6 +314,38 @@
   "allPublicMethods" : true
 },
 {
+  "name":"com.wl4g.infra.common.cli.ssh.SshHelperBase$SSHExecResult",
+  "allPublicConstructors": true,
+  "allPublicMethods": true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"<init>","parameterTypes":["java.lang.String","java.lang.Integer","java.lang.String","java.lang.String"] }, 
+    {"name":"getSignal","parameterTypes":[] }, 
+    {"name":"getCode","parameterTypes":[] }, 
+    {"name":"getStdout","parameterTypes":[] }, 
+    {"name":"getStderr","parameterTypes":[] }, 
+    {"name":"setSignal","parameterTypes":["java.lang.String"] }, 
+    {"name":"setCode","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"setStdout","parameterTypes":["java.lang.String"] }, 
+    {"name":"setStderr","parameterTypes":["java.lang.String"] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.infra.common.cli.ssh.SshHelperBase$SSHKeyPair",
+  "allPublicConstructors": true,
+  "allPublicMethods": true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"<init>","parameterTypes":["java.lang.String","java.lang.String"] }, 
+    {"name":"getPrivateKey","parameterTypes":[] }, 
+    {"name":"getPublicKey","parameterTypes":[] }, 
+    {"name":"setPrivateKey","parameterTypes":["java.lang.String"] }, 
+    {"name":"setPublicKey","parameterTypes":["java.lang.String"] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
   "name":"org.apache.commons.pool2.impl.EvictionConfig",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,

@@ -20,7 +20,10 @@ import static com.wl4g.infra.common.lang.ClassUtils2.resolveClassNameNullable;
 import static com.wl4g.infra.common.lang.DateUtils2.getDate;
 import static com.wl4g.infra.common.lang.EnvironmentUtil.getStringProperty;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.invokeMethod;
+import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.lang.String.format;
+import static java.lang.System.err;
+import static java.lang.System.out;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -125,11 +128,19 @@ public class ArthasAttacher {
     }
 
     static void logInfo(String format, Object... args) {
-        System.out.println("[".concat(getDate("yyyy-MM-dd HH:mm:ss")).concat("] ").concat(format(format, args)));
+        final Map<String, String> logmsg = new HashMap<>();
+        logmsg.put("timestamp", getDate("yyyy-MM-dd HH:mm:ss"));
+        logmsg.put("level", "INFO");
+        logmsg.put("message", format(format, args));
+        out.println(toJSONString(logmsg));
     }
 
     static void logWarn(String format, Object... args) {
-        System.err.println("[".concat(getDate("yyyy-MM-dd HH:mm:ss")).concat("] ").concat(format(format, args)));
+        final Map<String, String> logmsg = new HashMap<>();
+        logmsg.put("timestamp", getDate("yyyy-MM-dd HH:mm:ss"));
+        logmsg.put("level", "WARN");
+        logmsg.put("message", format(format, args));
+        err.println(toJSONString(logmsg));
     }
 
     public static final String ARTHAS_AGENT_CLASS = "com.taobao.arthas.agent.attach.ArthasAgent";
