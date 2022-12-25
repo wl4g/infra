@@ -51,6 +51,24 @@
   "name":"java.util.concurrent.Callable"
 },
 {
+  "name":"java.util.concurrent.Future"
+},
+{
+  "name":"java.lang.Runnable"
+},
+{
+  "name":"java.util.Function"
+},
+{
+  "name":"java.util.Supplier"
+},
+{
+  "name":"com.google.common.base.Function"
+},
+{
+  "name":"com.google.common.base.Supplier"
+},
+{
   "name":"sun.misc.Unsafe",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
@@ -349,12 +367,19 @@
   ]
 },
 {
+  "name":"com.wl4g.infra.common.function.CallbackFunction",
+  "allPublicConstructors": true,
+  "allPublicMethods": true
+},
+{
+  "name":"com.wl4g.infra.common.function.ProcessFunction",
+  "allPublicConstructors": true,
+  "allPublicMethods": true
+},
+{
   "name":"com.wl4g.infra.common.task.CompleteTaskListener",
   "allPublicConstructors": true,
-  "allPublicMethods": true,
-  "methods":[
-    {"name":"<init>","parameterTypes":[] }
-  ]
+  "allPublicMethods": true
 },
 {
   "name":"com.wl4g.infra.common.task.GenericTaskRunner",
