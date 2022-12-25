@@ -25,6 +25,7 @@ import java.util.concurrent.TimeoutException;
  * @version v1.0 2019年10月17日
  * @since
  */
+@FunctionalInterface
 public interface CompleteTaskListener {
 
     /**

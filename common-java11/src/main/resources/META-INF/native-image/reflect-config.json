@@ -48,6 +48,9 @@
   "name":"java.util.Calendar"
 },
 {
+  "name":"java.util.concurrent.Callable"
+},
+{
   "name":"sun.misc.Unsafe",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
@@ -343,6 +346,31 @@
     {"name":"setPrivateKey","parameterTypes":["java.lang.String"] }, 
     {"name":"setPublicKey","parameterTypes":["java.lang.String"] }, 
     {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.infra.common.task.CompleteTaskListener",
+  "allPublicConstructors": true,
+  "allPublicMethods": true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.infra.common.task.GenericTaskRunner",
+  "allPublicConstructors": true,
+  "allPublicMethods": true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] },
+    {"name":"<init>","parameterTypes":["com.wl4g.infra.common.task.RunnerProperties"] }
+  ]
+},
+{
+  "name":"com.wl4g.infra.common.task.RunnerProperties",
+  "allPublicConstructors": true,
+  "allPublicMethods": true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }
   ]
 },
 {
