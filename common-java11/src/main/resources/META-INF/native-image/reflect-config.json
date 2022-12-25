@@ -497,6 +497,15 @@
   ]
 },
 {
+  "name":"com.zaxxer.hikari.HikariDataSource",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"close","parameterTypes":[] }, 
+    {"name":"isClosed","parameterTypes":[] }
+  ]
+},
+{
   "name":"com.zaxxer.hikari.util.ConcurrentBag$IConcurrentBagEntry",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
