@@ -57,10 +57,10 @@
   "name":"java.lang.Runnable"
 },
 {
-  "name":"java.util.Function"
+  "name":"java.util.function.Function"
 },
 {
-  "name":"java.util.Supplier"
+  "name":"java.util.function.Supplier"
 },
 {
   "name":"com.google.common.base.Function"

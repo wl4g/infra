@@ -32,7 +32,10 @@ import javax.validation.constraints.NotNull;
 import com.wl4g.infra.common.function.CallbackFunction;
 import com.wl4g.infra.common.function.ProcessFunction;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
@@ -328,6 +331,9 @@ public abstract class SshHelperBase<S, F> {
      */
     final public static int DEFAULT_TRANSFER_BUFFER = 1024 * 6;
 
+    @Getter
+    @Setter
+    @AllArgsConstructor
     @ToString
     public static class SSHExecResult {
 
@@ -342,31 +348,6 @@ public abstract class SshHelperBase<S, F> {
 
         /** Error stdout */
         private final String stderr;
-
-        public SSHExecResult(String signal, Integer code, String stdout, String stderr) {
-            super();
-            this.signal = signal;
-            this.code = code;
-            this.stdout = stdout;
-            this.stderr = stderr;
-        }
-
-        public String getSignal() {
-            return signal;
-        }
-
-        public Integer getCode() {
-            return code;
-        }
-
-        public String getStdout() {
-            return stdout;
-        }
-
-        public String getStderr() {
-            return stderr;
-        }
-
     }
 
     @NoArgsConstructor

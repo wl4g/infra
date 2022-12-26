@@ -1,8 +1,8 @@
 [
     {"interfaces": ["java.util.concurrent.Callable"] },
     {"interfaces": ["java.util.concurrent.Future"] },
-    {"interfaces": ["java.util.Function"] },
-    {"interfaces": ["java.util.Supplier"] },
+    {"interfaces": ["java.util.function.Function"] },
+    {"interfaces": ["java.util.function.Supplier"] },
     {"interfaces": ["com.google.common.base.Function"] },
     {"interfaces": ["com.google.common.base.Supplier"] },
     {"interfaces": ["com.wl4g.infra.common.task.CompleteTaskListener"] },
