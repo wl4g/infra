@@ -435,6 +435,96 @@
   "queryAllDeclaredMethods":true
 },
 {
+  "name":"org.apache.commons.dbcp2.BasicDataSource",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true, 
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"evict","parameterTypes":[] }, 
+    {"name":"close","parameterTypes":[] }
+  ]
+},
+{
+  "name":"org.apache.commons.dbcp2.DelegatingCallableStatement",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true, 
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }
+  ]
+},
+{
+  "name":"org.apache.commons.dbcp2.DelegatingDatabaseMetaData",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true, 
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }
+  ]
+},
+{
+  "name":"org.apache.commons.dbcp2.DelegatingPreparedStatement",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true, 
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }
+  ]
+},
+{
+  "name":"org.apache.commons.dbcp2.DelegatingResultSet",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true, 
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }
+  ]
+},
+{
+  "name":"org.apache.commons.dbcp2.PoolableCallableStatement",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true, 
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }
+  ]
+},
+{
+  "name":"org.apache.commons.dbcp2.PoolablePreparedStatement",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true, 
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }
+  ]
+},
+{
+  "name":"org.apache.commons.dbcp2.PoolingConnection",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true, 
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }
+  ]
+},
+{
+  "name":"org.apache.commons.dbcp2.PStmtKey",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true, 
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }
+  ]
+},
+{
+  "name":"org.apache.commons.dbcp2.impl.LinkedBlockingDeque$Node",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true, 
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }
+  ]
+},
+{
+  "name":"org.apache.commons.dbcp2.impl.GenericKeyedObjectPool$ObjectDeque",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true, 
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }
+  ]
+},
+{
   "name":"com.zaxxer.hikari.HikariConfig",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
@@ -503,6 +593,108 @@
   "methods":[
     {"name":"close","parameterTypes":[] }, 
     {"name":"isClosed","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.zaxxer.hikari.pool.HikariPool",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":["com.zaxxer.hikari.HikariConfig"] }, 
+    {"name":"getConnection","parameterTypes":[]},
+    {"name":"getConnection","parameterTypes":["long"]},
+    {"name":"shutdown","parameterTypes":[]},
+    {"name":"evictConnection","parameterTypes":["java.sql.Connection"]},
+    {"name":"setMetricRegistry","parameterTypes":["java.lang.Object"]},
+    {"name":"setMetricsTrackerFactory","parameterTypes":["com.zaxxer.hikari.metrics.MetricsTrackerFactory"]},
+    {"name":"setHealthCheckRegistry","parameterTypes":["java.lang.Object"]},
+    {"name":"addBagItem","parameterTypes":["int"]},
+    {"name":"getActiveConnections","parameterTypes":[]},
+    {"name":"getIdleConnections","parameterTypes":[]},
+    {"name":"getTotalConnections","parameterTypes":[]},
+    {"name":"getThreadsAwaitingConnection","parameterTypes":[]},
+    {"name":"softEvictConnections","parameterTypes":[]},
+    {"name":"suspendPool","parameterTypes":[]},
+    {"name":"resumePool","parameterTypes":[]},
+    {"name":"logPoolState","parameterTypes":["[Ljava.lang.String;"]},
+    {"name":"recycle","parameterTypes":["com.zaxxer.hikari.pool.PoolEntry"] },
+    {"name":"closeConnection","parameterTypes":["com.zaxxer.hikari.pool.PoolEntry","java.lang.String"] },
+    {"name":"getPoolStateCounts","parameterTypes":[]},
+    {"name":"createPoolEntry","parameterTypes":[]},
+    {"name":"fillPool","parameterTypes":[]},
+    {"name":"abortActiveConnections","parameterTypes":["java.util.concurrent.ExecutorService"] },
+    {"name":"checkFailFast","parameterTypes":[]},
+    {"name":"throwPoolInitializationException","parameterTypes":["java.lang.Throwable"]},
+    {"name":"softEvictConnection","parameterTypes":["com.zaxxer.hikari.pool.PoolEntry","java.lang.String","boolean"] },
+    {"name":"initializeHouseKeepingExecutorService","parameterTypes":[]},
+    {"name":"destroyHouseKeepingExecutorService","parameterTypes":[]},
+    {"name":"getPoolStats","parameterTypes":[]},
+    {"name":"createTimeoutException","parameterTypes":["long"]}
+  ]
+},
+{
+  "name":"com.zaxxer.hikari.SQLExceptionOverride",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"adjudicate","parameterTypes":["java.sql.SQLException"] }
+  ]
+},
+{
+  "name":"com.zaxxer.hikari.pool.HikariPool$PoolEntryCreator",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":["java.lang.String"] }, 
+    {"name":"call","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.zaxxer.hikari.pool.HikariPool$HouseKeeper",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"run","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.zaxxer.hikari.pool.HikariPool$MaxLifetimeTask",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":["com.zaxxer.hikari.pool.PoolEntry"] }, 
+    {"name":"run","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.zaxxer.hikari.pool.HikariPool$KeepaliveTask",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":["com.zaxxer.hikari.pool.PoolEntry"] }, 
+    {"name":"run","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.zaxxer.hikari.util.ConcurrentBag",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"borrow","parameterTypes":["long","java.util.concurrent.TimeUnit"]}, 
+    {"name":"requite","parameterTypes":["com.zaxxer.hikari.pool.PoolEntry"]}, 
+    {"name":"add","parameterTypes":["com.zaxxer.hikari.pool.PoolEntry"]}, 
+    {"name":"remove","parameterTypes":["com.zaxxer.hikari.pool.PoolEntry"]}, 
+    {"name":"close","parameterTypes":[]}, 
+    {"name":"values","parameterTypes":["int"]}, 
+    {"name":"values","parameterTypes":[]}, 
+    {"name":"reserve","parameterTypes":["com.zaxxer.hikari.pool.PoolEntry"]}, 
+    {"name":"unreserve","parameterTypes":["com.zaxxer.hikari.pool.PoolEntry"]}, 
+    {"name":"getWaiting","parameterTypes":["com.zaxxer.hikari.pool.PoolEntryhreadCount"]}, 
+    {"name":"getCount","parameterTypes":["int"]}, 
+    {"name":"getStateCounts","parameterTypes":[]}, 
+    {"name":"size","parameterTypes":[]}, 
+    {"name":"dumpState","parameterTypes":[]}
   ]
 },
 {

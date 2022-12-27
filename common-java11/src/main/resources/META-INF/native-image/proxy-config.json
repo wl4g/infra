@@ -10,5 +10,10 @@
     {"interfaces": ["com.wl4g.infra.common.function.ProcessFunction"] },
     {"interfaces": ["org.apache.sshd.common.session.SessionListener"] }, 
     {"interfaces": ["org.apache.sshd.common.channel.ChannelListener"] },
-    {"interfaces": ["org.apache.sshd.common.forward.PortForwardingEventListener"] } 
+    {"interfaces": ["org.apache.sshd.common.forward.PortForwardingEventListener"] }, 
+    {"interfaces": ["com.zaxxer.hikari.pool.HikariPool$PoolEntryCreator"] }, 
+    {"interfaces": ["com.zaxxer.hikari.pool.HikariPool$HouseKeeper"] }, 
+    {"interfaces": ["com.zaxxer.hikari.pool.HikariPool$MaxLifetimeTask"] }, 
+    {"interfaces": ["com.zaxxer.hikari.pool.HikariPool$KeepaliveTask"] }, 
+    {"interfaces": ["com.zaxxer.hikari.SQLExceptionOverride"] }
 ]
