@@ -145,16 +145,13 @@ public abstract class JacksonUtils {
             return null;
         }
         try {
-            final SerializationConfig config = DEFAULT_OBJECT_MAPPER.getSerializationConfig();
-            ObjectWriter writer = DEFAULT_OBJECT_MAPPER.writer();
+            SerializationConfig config = DEFAULT_OBJECT_MAPPER.getSerializationConfig();
             if (nonNull(ignoreProperties) && ignoreProperties.length > 0) {
-                config.withFilters(new SimpleFilterProvider().addFilter(ExcludePropertyFilter.FILTER_ID,
+                config = config.withFilters(new SimpleFilterProvider().addFilter(ExcludePropertyFilter.FILTER_ID,
                         new ExcludePropertyFilter(transformProperties, Sets.newHashSet(ignoreProperties))));
             }
-            if (isPretty) {
-                writer = new CustomObjectWriter(DEFAULT_OBJECT_MAPPER, config, null, config.getDefaultPrettyPrinter());
-            }
-            return writer.writeValueAsString(object);
+            final PrettyPrinter pp = isPretty ? config.getDefaultPrettyPrinter() : null;
+            return new CustomObjectWriter(DEFAULT_OBJECT_MAPPER, config, null, pp).writeValueAsString(object);
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException(e);
         }
