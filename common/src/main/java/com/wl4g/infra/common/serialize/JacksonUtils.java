@@ -16,6 +16,7 @@
 package com.wl4g.infra.common.serialize;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.util.Objects.isNull;
@@ -56,6 +57,7 @@ import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.PropertyWriter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import com.fasterxml.jackson.databind.util.NameTransformer;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.collect.Sets;
@@ -92,7 +94,7 @@ public abstract class JacksonUtils {
      * @return
      */
     public static String toJSONString(@Nullable Object object, boolean isPretty) {
-        return toJSONString(object, isPretty, DEFAULT_IGNORE_PROPERTIES);
+        return toJSONString(object, isPretty, null, DEFAULT_IGNORE_PROPERTIES);
     }
 
     /**
@@ -104,7 +106,7 @@ public abstract class JacksonUtils {
      * @return
      */
     public static String toJSONString(@Nullable Object object, @Nullable String... ignoreProperties) {
-        return toJSONString(object, false, ignoreProperties);
+        return toJSONString(object, false, null, ignoreProperties);
     }
 
     /**
@@ -112,10 +114,15 @@ public abstract class JacksonUtils {
      * 
      * @param object
      * @param isPretty
+     * @param transformProperties
      * @param ignoreProperties
      * @return
      */
-    public static String toJSONString(@Nullable Object object, boolean isPretty, @Nullable String... ignoreProperties) {
+    public static String toJSONString(
+            @Nullable Object object,
+            boolean isPretty,
+            @Nullable Map<String, String> transformProperties,
+            @Nullable String... ignoreProperties) {
         if (isNull(object)) {
             return null;
         }
@@ -124,7 +131,7 @@ public abstract class JacksonUtils {
                     : DEFAULT_OBJECT_MAPPER.writer();
             if (nonNull(ignoreProperties) && ignoreProperties.length > 0) {
                 final FilterProvider provider = new SimpleFilterProvider().addFilter(ExcludePropertyFilter.FILTER_ID,
-                        new ExcludePropertyFilter(Sets.newHashSet(ignoreProperties)));
+                        new ExcludePropertyFilter(transformProperties, Sets.newHashSet(ignoreProperties)));
                 writer = DEFAULT_OBJECT_MAPPER.writer(provider);
             }
             return writer.writeValueAsString(object);
@@ -515,12 +522,11 @@ public abstract class JacksonUtils {
     static class ExcludePropertyFilter extends SimpleBeanPropertyFilter {
         static final String FILTER_ID = ExcludePropertyFilter.class.getSimpleName();
 
-        /**
-         * Sets of property names to filter out.
-         */
-        protected final Set<String> excludeProperties;
+        final @Nullable Map<String, String> transformProperties;
+        final @Nullable Set<String> excludeProperties;
 
-        public ExcludePropertyFilter(Set<String> excludeProperties) {
+        public ExcludePropertyFilter(Map<String, String> transformProperties, Set<String> excludeProperties) {
+            this.transformProperties = transformProperties;
             this.excludeProperties = excludeProperties;
         }
 
@@ -549,8 +555,20 @@ public abstract class JacksonUtils {
                 // Ignore for exclude properties.
                 final ExcludePropertyFilter filter = notNullOf(provider.findPropertyFilter(ExcludePropertyFilter.FILTER_ID, null),
                         "filter");
+                final Map<String, String> transformProperties = safeMap(filter.getTransformProperties());
                 return safeList(beanProperties).stream()
                         .filter(bp -> !filter.getExcludeProperties().contains(bp.getName()))
+                        .map(bp -> bp.rename(new NameTransformer() {
+                            @Override
+                            public String transform(String name) {
+                                return transformProperties.getOrDefault(name, name);
+                            }
+
+                            @Override
+                            public String reverse(String transformed) {
+                                return transformed;
+                            }
+                        }))
                         .collect(toList());
             }
             return beanProperties;
