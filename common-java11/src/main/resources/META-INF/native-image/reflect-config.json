@@ -815,6 +815,112 @@
   ]
 },
 {
+  "name":"org.simpleframework.xml.core.ElementLabel",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":["org.simpleframework.xml.core.Contact","org.simpleframework.xml.Element","org.simpleframework.xml.stream.Format"] },
+    {"name":"getDecorator","parameterTypes":[] },
+    {"name":"getType","parameterTypes":["java.lang.Class"] },
+    {"name":"getConverter","parameterTypes":["org.simpleframework.xml.core.Context"] },
+    {"name":"getEmpty","parameterTypes":["org.simpleframework.xml.core.Context"] },
+    {"name":"getName","parameterTypes":[] },
+    {"name":"getPath","parameterTypes":[] },
+    {"name":"getExpression","parameterTypes":[] },
+    {"name":"getAnnotation","parameterTypes":[] },
+    {"name":"getContact","parameterTypes":[] },
+    {"name":"getOverride","parameterTypes":[] },
+    {"name":"getType","parameterTypes":[] },
+    {"name":"isRequired","parameterTypes":[] },
+    {"name":"isData","parameterTypes":[] },
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"org.simpleframework.xml.stream.Format",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] },
+    {"name":"<init>","parameterTypes":["java.lang.String"] },
+    {"name":"<init>","parameterTypes":["int","java.lang.String"] },
+    {"name":"<init>","parameterTypes":["org.simpleframework.xml.stream.Verbosity"] },
+    {"name":"<init>","parameterTypes":["int","org.simpleframework.xml.stream.Verbosity"] },
+    {"name":"<init>","parameterTypes":["org.simpleframework.xml.stream.Style"] },
+    {"name":"<init>","parameterTypes":["org.simpleframework.xml.stream.Style","org.simpleframework.xml.stream.Verbosity"] },
+    {"name":"<init>","parameterTypes":["int","org.simpleframework.xml.stream.Style"] },
+    {"name":"<init>","parameterTypes":["int","org.simpleframework.xml.stream.Style","org.simpleframework.xml.stream.Verbosity"] },
+    {"name":"<init>","parameterTypes":["int","java.lang.String","org.simpleframework.xml.stream.Style"] },
+    {"name":"<init>","parameterTypes":["int","java.lang.String","org.simpleframework.xml.stream.Style","org.simpleframework.xml.stream.Verbosity"] },
+    {"name":"getIndent","parameterTypes":[] },
+    {"name":"getProlog","parameterTypes":[] },
+    {"name":"getStyle","parameterTypes":[] },
+    {"name":"getVerbosity","parameterTypes":[] },
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"org.simpleframework.xml.stream.Style",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true
+},
+{
+  "name":"org.simpleframework.xml.stream.IdentityStyle",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] },
+    {"name":"getAttribute","parameterTypes":["java.lang.String"] },
+    {"name":"getElement","parameterTypes":["java.lang.String"] },
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"org.simpleframework.xml.stream.HyphenStyle",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] },
+    {"name":"getAttribute","parameterTypes":["java.lang.String"] },
+    {"name":"setAttribute","parameterTypes":["java.lang.String","java.lang.String"] },
+    {"name":"getElement","parameterTypes":["java.lang.String"] },
+    {"name":"setElement","parameterTypes":["java.lang.String","java.lang.String"] },
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"org.simpleframework.xml.stream.CamelCaseStyle",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] },
+    {"name":"<init>","parameterTypes":["boolean","boolean"] },
+    {"name":"getAttribute","parameterTypes":["java.lang.String"] },
+    {"name":"setAttribute","parameterTypes":["java.lang.String","java.lang.String"] },
+    {"name":"getElement","parameterTypes":["java.lang.String"] },
+    {"name":"setElement","parameterTypes":["java.lang.String","java.lang.String"] },
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"org.simpleframework.xml.stream.HyphenBuilder",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true
+},
+{
+  "name":"org.simpleframework.xml.stream.Verbosity",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true
+},
+{
   "name":"org.graalvm.polyglot.Engine",
   "methods":[{"name":"getImpl","parameterTypes":[] }]
 },
