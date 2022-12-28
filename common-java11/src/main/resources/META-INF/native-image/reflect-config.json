@@ -776,6 +776,45 @@
   ]
 },
 {
+  "name":"io.minio.messages.DeleteObject",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":["java.lang.String"] }, 
+    {"name":"<init>","parameterTypes":["java.lang.String","java.lang.String"] }
+  ]
+},
+{
+  "name":"io.minio.messages.DeleteResult",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"<init>","parameterTypes":["io.minio.messages.DeleteError"] }, 
+    {"name":"objectList","parameterTypes":[] }
+  ]
+},
+{
+  "name":"io.minio.messages.ErrorResponse",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"<init>","parameterTypes":["java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String"] }, 
+    {"name":"code","parameterTypes":[] },
+    {"name":"message","parameterTypes":[] },
+    {"name":"bucketName","parameterTypes":[] },
+    {"name":"objectName","parameterTypes":[] },
+    {"name":"hostId","parameterTypes":[] },
+    {"name":"requestId","parameterTypes":[] },
+    {"name":"resource","parameterTypes":[] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
   "name":"org.graalvm.polyglot.Engine",
   "methods":[{"name":"getImpl","parameterTypes":[] }]
 },
