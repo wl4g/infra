@@ -36,6 +36,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -71,7 +72,42 @@ public class JacksonUtilsTests {
     @Test
     public void testToJSONStringWithIgnoreAndTransformProperties() {
         TestUserBean bean1 = new TestUserBean(1313466574534868992L, "jack", singletonMap("foo", "bar"));
-        System.out.println(toJSONString(DEFAULT_MODIFIER_MAPPER, bean1, true, singletonMap("id", "_id"), "name"));
+        String json = toJSONString(DEFAULT_MODIFIER_MAPPER, bean1, true, singletonMap("id", "_id"), "name");
+        System.out.println(json);
+        assert !json.contains("\"id\"");
+        assert json.contains("\"_id\"");
+        assert !json.contains("\"name\"");
+    }
+
+    @Test
+    public void testJSONView() {
+        TestUserInfo user = new TestUserInfo(1313466574534868992L, "jack", singletonMap("foo", "bar"));
+        String json1 = toJSONString(DEFAULT_MODIFIER_MAPPER, IgnoreNameView.class, user, false, null);
+        System.out.println("json1 : " + json1);
+        assert !json1.contains("\"id\"");
+
+        String json2 = toJSONString(DEFAULT_MODIFIER_MAPPER, AllView.class, user, false, null);
+        System.out.println("json2 : " + json2);
+        final TestUserInfo user1 = parseJSON(DEFAULT_MODIFIER_MAPPER, IgnoreNameView.class, json2, TestUserInfo.class);
+        System.out.println(user1);
+        assert user1.getId() == null;
+    }
+
+    @Getter
+    @Setter
+    @ToString
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class TestUserInfo {
+        private @JsonView({ AllView.class }) Long id;
+        private @JsonView({ AllView.class, IgnoreNameView.class }) String name;
+        private Map<String, String> attributes = new HashMap<>();
+    }
+
+    public static interface AllView {
+    }
+
+    public static interface IgnoreNameView {
     }
 
     @Getter

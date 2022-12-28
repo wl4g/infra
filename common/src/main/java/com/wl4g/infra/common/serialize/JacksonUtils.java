@@ -44,16 +44,22 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.PrettyPrinter;
 import com.fasterxml.jackson.core.TreeNode;
+import com.fasterxml.jackson.core.filter.TokenFilter;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.BeanDescription;
+import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.InjectableValues;
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
+import com.fasterxml.jackson.databind.deser.DataFormatReaders;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
@@ -148,7 +154,8 @@ public abstract class JacksonUtils {
     }
 
     /**
-     * Object to JSON strings.
+     * Object to JSON strings. </br>
+     * see: https://www.baeldung.com/jackson-ignore-properties-on-serialization
      * 
      * @param mapper
      *            When using a custom modifier, you should use an independent
@@ -170,14 +177,45 @@ public abstract class JacksonUtils {
             final boolean isPretty,
             final @Nullable Map<String, String> transformProperties,
             final @Nullable String... ignoreProperties) {
+        return toJSONString(mapper, null, object, isPretty, transformProperties, ignoreProperties);
+    }
+
+    /**
+     * Object to JSON strings. </br>
+     * see: https://www.baeldung.com/jackson-ignore-properties-on-serialization
+     * 
+     * @param mapper
+     *            When using a custom modifier, you should use an independent
+     *            objectMapper, because the same objectmapper instance will
+     *            cache the serializer of the target bean, which may cause the
+     *            modifier to fail, see source code:
+     *            {@link com.fasterxml.jackson.databind.SerializerProvider#findTypedValueSerializer(java.lang.Class,boolean,com.fasterxml.jackson.databind.BeanProperty)}
+     *            {@link com.fasterxml.jackson.databind.SerializerProvider#_knownSerializers}
+     *            {@link com.fasterxml.jackson.databind.ser.impl.ReadOnlyClassToSerializerMap#typedValueSerializer(com.fasterxml.jackson.databind.JavaType)}
+     * @param object
+     * @param view
+     * @param isPretty
+     * @param transformProperties
+     * @param ignoreProperties
+     * @return
+     */
+    public static String toJSONString(
+            final @NotNull ObjectMapper mapper,
+            final @Nullable Class<?> view,
+            final @Nullable Object object,
+            final boolean isPretty,
+            final @Nullable Map<String, String> transformProperties,
+            final @Nullable String... ignoreProperties) {
         notNullOf(mapper, "mapper");
         if (isNull(object)) {
             return null;
         }
         try {
             final SerializationConfig config = mapper.getSerializationConfig()
-                    .withFilters(new SimpleFilterProvider().addFilter(ExcludePropertyFilter.FILTER_ID,
-                            new ExcludePropertyFilter(safeMap(transformProperties), safeArrayToSet(ignoreProperties))));
+                    .withFilters(new SimpleFilterProvider().addFilter(TransformPropertyFilter.FILTER_ID,
+                            new TransformPropertyFilter(safeMap(transformProperties), safeArrayToSet(ignoreProperties))))
+                    .withView(view);
+
             final PrettyPrinter pp = isPretty ? config.getDefaultPrettyPrinter() : null;
             return new CustomObjectWriter(mapper, config, null, pp).writeValueAsString(object);
         } catch (JsonProcessingException e) {
@@ -192,7 +230,7 @@ public abstract class JacksonUtils {
      * @param clazz
      * @return
      */
-    public static <T> T parseJSON(@Nullable String content, @NotNull Class<T> clazz) {
+    public static <T> T parseJSON(final @Nullable String content, final @NotNull Class<T> clazz) {
         notNullOf(clazz, "clazz");
         if (isBlank(content)) {
             return null;
@@ -211,7 +249,7 @@ public abstract class JacksonUtils {
      * @param clazz
      * @return
      */
-    public static <T> T parseJSON(@Nullable InputStream src, @NotNull Class<T> clazz) {
+    public static <T> T parseJSON(final @Nullable InputStream src, final @NotNull Class<T> clazz) {
         notNullOf(clazz, "clazz");
         if (isNull(src)) {
             return null;
@@ -230,7 +268,7 @@ public abstract class JacksonUtils {
      * @param valueTypeRef
      * @return
      */
-    public static <T> T parseJSON(@Nullable File src, @NotNull Class<T> clazz) {
+    public static <T> T parseJSON(final @Nullable File src, final @NotNull Class<T> clazz) {
         notNullOf(clazz, "clazz");
         if (isNull(src)) {
             return null;
@@ -249,7 +287,7 @@ public abstract class JacksonUtils {
      * @param valueTypeRef
      * @return
      */
-    public static <T> T parseJSON(@Nullable File src, @NotNull TypeReference<T> valueTypeRef) {
+    public static <T> T parseJSON(final @Nullable File src, final @NotNull TypeReference<T> valueTypeRef) {
         notNullOf(valueTypeRef, "valueTypeRef");
         if (isNull(src)) {
             return null;
@@ -268,7 +306,7 @@ public abstract class JacksonUtils {
      * @param valueTypeRef
      * @return
      */
-    public static <T> T parseJSON(@Nullable InputStream src, @NotNull TypeReference<T> valueTypeRef) {
+    public static <T> T parseJSON(final @Nullable InputStream src, final @NotNull TypeReference<T> valueTypeRef) {
         notNullOf(valueTypeRef, "valueTypeRef");
         if (isNull(src)) {
             return null;
@@ -287,13 +325,88 @@ public abstract class JacksonUtils {
      * @param valueTypeRef
      * @return
      */
-    public static <T> T parseJSON(@Nullable String content, @NotNull TypeReference<T> valueTypeRef) {
+    public static <T> T parseJSON(final @Nullable String content, final @NotNull TypeReference<T> valueTypeRef) {
+        return parseJSON(DEFAULT_OBJECT_MAPPER, null, content, valueTypeRef);
+    }
+
+    /**
+     * Parse object string from JSON strings.
+     * 
+     * @param view
+     * @param content
+     * @param valueType
+     * @return
+     */
+    public static <T> T parseJSON(
+            final @Nullable Class<?> view,
+            final @Nullable String content,
+            final @NotNull Class<T> valueType) {
+        return parseJSON(DEFAULT_OBJECT_MAPPER, view, content, valueType);
+    }
+
+    /**
+     * Parse object string from JSON strings.
+     * 
+     * @param mapper
+     * @param view
+     * @param content
+     * @param valueType
+     * @return
+     */
+    public static <T> T parseJSON(
+            final @NotNull ObjectMapper mapper,
+            final @Nullable Class<?> view,
+            final @Nullable String content,
+            final @NotNull Class<T> valueType) {
+        notNullOf(valueType, "valueType");
+        if (isBlank(content)) {
+            return null;
+        }
+        try {
+            return mapper.readerWithView(view)
+                    .readValue(mapper.getFactory().createParser(content), mapper.getTypeFactory().constructType(valueType));
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    /**
+     * Parse object string from JSON strings.
+     * 
+     * @param view
+     * @param content
+     * @param valueTypeRef
+     * @return
+     */
+    public static <T> T parseJSON(
+            final @Nullable Class<?> view,
+            final @Nullable String content,
+            final @NotNull TypeReference<T> valueTypeRef) {
+        return parseJSON(DEFAULT_OBJECT_MAPPER, view, content, valueTypeRef);
+    }
+
+    /**
+     * Parse object string from JSON strings.
+     * 
+     * @param mapper
+     * @param view
+     * @param content
+     * @param valueTypeRef
+     * @return
+     */
+    public static <T> T parseJSON(
+            final @NotNull ObjectMapper mapper,
+            final @Nullable Class<?> view,
+            final @Nullable String content,
+            final @NotNull TypeReference<T> valueTypeRef) {
+        notNullOf(mapper, "mapper");
         notNullOf(valueTypeRef, "valueTypeRef");
         if (isBlank(content)) {
             return null;
         }
         try {
-            return DEFAULT_OBJECT_MAPPER.readValue(content, valueTypeRef);
+            return mapper.readerWithView(view)
+                    .readValue(mapper.getFactory().createParser(content), mapper.getTypeFactory().constructType(valueTypeRef));
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
@@ -303,16 +416,16 @@ public abstract class JacksonUtils {
      * Parse {@link TreeNode} to object.
      * 
      * @param object
-     * @param extractPathExpr
+     * @param atPathExpr
      * @return
      */
-    public static <T> T parseFromNode(@Nullable TreeNode node, @NotBlank String extractPathExpr, @NotNull Class<T> clazz) {
-        hasTextOf(extractPathExpr, "extractPathExpr");
+    public static <T> T parseFromNode(@Nullable TreeNode node, @NotBlank String atPathExpr, @NotNull Class<T> clazz) {
+        hasTextOf(atPathExpr, "atPathExpr");
         if (isNull(node)) {
             return null;
         }
         try {
-            final TreeNode objNode = node.at(extractPathExpr);
+            final TreeNode objNode = node.at(atPathExpr);
             if (objNode.size() > 0) {
                 return DEFAULT_OBJECT_MAPPER.treeToValue(objNode, clazz);
             }
@@ -326,7 +439,7 @@ public abstract class JacksonUtils {
      * Parse object to {@link JsonNode}.
      * 
      * @param object
-     * @param extractPathExpr
+     * @param atPathExpr
      * @return
      */
     public static JsonNode parseToNode(@Nullable String content) {
@@ -341,11 +454,44 @@ public abstract class JacksonUtils {
      * @return
      */
     public static JsonNode parseToNode(@Nullable String content, @Nullable String atPathExpr) {
+        return parseToNode(DEFAULT_OBJECT_MAPPER, null, content, atPathExpr);
+    }
+
+    /**
+     * Parse object to {@link JsonNode}.
+     * 
+     * @param view
+     * @param object
+     * @param atPathExpr
+     * @return
+     */
+    public static JsonNode parseToNode(
+            final @Nullable Class<?> view,
+            final @Nullable String content,
+            final @Nullable String atPathExpr) {
+        return parseToNode(DEFAULT_OBJECT_MAPPER, view, content, atPathExpr);
+    }
+
+    /**
+     * Parse object to {@link JsonNode}.
+     * 
+     * @param mapper
+     * @param view
+     * @param object
+     * @param atPathExpr
+     * @return
+     */
+    public static JsonNode parseToNode(
+            final @NotNull ObjectMapper mapper,
+            final @Nullable Class<?> view,
+            final @Nullable String content,
+            final @Nullable String atPathExpr) {
+        notNullOf(mapper, "mapper");
         if (isBlank(content)) {
             return null;
         }
         try {
-            return DEFAULT_OBJECT_MAPPER.readTree(content).requiredAt(atPathExpr);
+            return mapper.readerWithView(view).readTree(content).requiredAt(atPathExpr);
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException(e);
         }
@@ -571,7 +717,8 @@ public abstract class JacksonUtils {
             @Override
             public void setupModule(SetupContext context) {
                 super.setupModule(context);
-                context.addBeanSerializerModifier(new ExcludePropertiesSerializerModifier());
+                context.addBeanSerializerModifier(new TransformPropertiesSerializerModifier());
+                context.addBeanDeserializerModifier(new TransformPropertiesDeserializerModifier());
             }
         });
         return mapper;
@@ -604,17 +751,47 @@ public abstract class JacksonUtils {
         protected CustomObjectWriter(ObjectWriter base, JsonFactory f) {
             super(base, f);
         }
+    }
 
+    public static class CustomObjectReader extends ObjectReader {
+        private static final long serialVersionUID = 1L;
+
+        protected CustomObjectReader(ObjectMapper mapper, DeserializationConfig config) {
+            super(mapper, config);
+        }
+
+        protected CustomObjectReader(ObjectMapper mapper, DeserializationConfig config, JavaType valueType, Object valueToUpdate,
+                FormatSchema schema, InjectableValues injectableValues) {
+            super(mapper, config, valueType, valueToUpdate, schema, injectableValues);
+        }
+
+        protected CustomObjectReader(ObjectReader base, DeserializationConfig config, JavaType valueType,
+                JsonDeserializer<Object> rootDeser, Object valueToUpdate, FormatSchema schema, InjectableValues injectableValues,
+                DataFormatReaders dataFormatReaders) {
+            super(base, config, valueType, rootDeser, valueToUpdate, schema, injectableValues, dataFormatReaders);
+        }
+
+        protected CustomObjectReader(ObjectReader base, DeserializationConfig config) {
+            super(base, config);
+        }
+
+        protected CustomObjectReader(ObjectReader base, JsonFactory f) {
+            super(base, f);
+        }
+
+        protected CustomObjectReader(ObjectReader base, TokenFilter filter) {
+            super(base, filter);
+        }
     }
 
     @Getter
-    public static class ExcludePropertyFilter extends SimpleBeanPropertyFilter {
-        static final String FILTER_ID = ExcludePropertyFilter.class.getSimpleName();
+    public static class TransformPropertyFilter extends SimpleBeanPropertyFilter {
+        static final String FILTER_ID = TransformPropertyFilter.class.getSimpleName();
 
         final @NotNull Map<String, String> transformProperties;
         final @NotNull Set<String> excludeProperties;
 
-        public ExcludePropertyFilter(Map<String, String> transformProperties, Set<String> excludeProperties) {
+        public TransformPropertyFilter(Map<String, String> transformProperties, Set<String> excludeProperties) {
             this.transformProperties = notNullOf(transformProperties, "transformProperties");
             this.excludeProperties = notNullOf(excludeProperties, "excludeProperties");
         }
@@ -630,8 +807,7 @@ public abstract class JacksonUtils {
         }
     }
 
-    public static class ExcludePropertiesSerializerModifier extends BeanSerializerModifier {
-
+    public static class TransformPropertiesSerializerModifier extends BeanSerializerModifier {
         // In this method you can add, remove or replace any of passed
         // properties.
         @Override
@@ -642,8 +818,8 @@ public abstract class JacksonUtils {
             final FilterProvider provider = config.getFilterProvider();
             if (nonNull(provider)) {
                 // Ignore for exclude properties.
-                final ExcludePropertyFilter filter = notNullOf(provider.findPropertyFilter(ExcludePropertyFilter.FILTER_ID, null),
-                        "filter");
+                final TransformPropertyFilter filter = notNullOf(
+                        provider.findPropertyFilter(TransformPropertyFilter.FILTER_ID, null), "filter");
                 return safeList(beanProperties).stream()
                         .filter(bp -> !filter.getExcludeProperties().contains(bp.getName()))
                         .map(bp -> bp.rename(new NameTransformer() {
@@ -661,6 +837,24 @@ public abstract class JacksonUtils {
             }
             return beanProperties;
         }
+    }
+
+    public static class TransformPropertiesDeserializerModifier extends BeanDeserializerModifier {
+        // @Override
+        // public List<BeanPropertyDefinition> updateProperties(
+        // DeserializationConfig config,
+        // BeanDescription beanDesc,
+        // List<BeanPropertyDefinition> propDefs) {
+        // final List<BeanPropertyDefinition> _propDefs =
+        // safeList(propDefs);
+        // for (int i = 0; i < _propDefs.size(); i++) {
+        // BeanPropertyDefinition definition = _propDefs.get(i);
+        // if (definition.getName().equals("embedded")) {
+        // _propDefs.set(i, definition.withSimpleName("_embedded"));
+        // }
+        // }
+        // return _propDefs;
+        // }
     }
 
     /**

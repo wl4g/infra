@@ -339,6 +339,20 @@
   "allPublicConstructors": true,
   "allPublicMethods": true,
   "methods":[
+    {"name":"<init>","parameterTypes":["com.fasterxml.jackson.databind.ObjectMapper","com.fasterxml.jackson.databind.DeserializationConfig"] }, 
+    {"name":"<init>","parameterTypes":["com.fasterxml.jackson.databind.ObjectMapper","com.fasterxml.jackson.databind.DeserializationConfig","com.fasterxml.jackson.databind.JavaType","java.lang.Object","com.fasterxml.jackson.core.FormatSchema","com.fasterxml.jackson.databind.InjectableValues"] }, 
+    {"name":"<init>","parameterTypes":["com.fasterxml.jackson.databind.ObjectReader","com.fasterxml.jackson.databind.DeserializationConfig","com.fasterxml.jackson.databind.JavaType","com.fasterxml.jackson.databind.JsonDeserializer","java.lang.Object","com.fasterxml.jackson.core.FormatSchema","com.fasterxml.jackson.databind.InjectableValues","com.fasterxml.jackson.databind.deser.DataFormatReaders"] }, 
+    {"name":"<init>","parameterTypes":["com.fasterxml.jackson.databind.ObjectReader","com.fasterxml.jackson.databind.DeserializationConfig"] }, 
+    {"name":"<init>","parameterTypes":["com.fasterxml.jackson.databind.ObjectReader","com.fasterxml.jackson.core.JsonFactory"] }, 
+    {"name":"<init>","parameterTypes":["com.fasterxml.jackson.databind.ObjectReader","com.fasterxml.jackson.core.filter.TokenFilter"] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.infra.common.serialize.JacksonUtils$CustomObjectReader",
+  "allPublicConstructors": true,
+  "allPublicMethods": true,
+  "methods":[
     {"name":"<init>","parameterTypes":["com.fasterxml.jackson.databind.ObjectMapper","com.fasterxml.jackson.databind.SerializationConfig","com.fasterxml.jackson.databind.JavaType","com.fasterxml.jackson.core.PrettyPrinter"] }, 
     {"name":"<init>","parameterTypes":["com.fasterxml.jackson.databind.ObjectMapper","com.fasterxml.jackson.databind.SerializationConfig"] }, 
     {"name":"<init>","parameterTypes":["com.fasterxml.jackson.databind.ObjectMapper","com.fasterxml.jackson.databind.SerializationConfig","com.fasterxml.jackson.core.FormatSchema"] }, 
@@ -349,7 +363,17 @@
   ]
 },
 {
-  "name":"com.wl4g.infra.common.serialize.JacksonUtils$ExcludePropertiesSerializerModifier",
+  "name":"com.wl4g.infra.common.serialize.JacksonUtils$TransformPropertyFilter",
+  "allPublicConstructors": true,
+  "allPublicMethods": true,
+  "methods":[
+    {"name":"<init>","parameterTypes":["java.util.Set"] }, 
+    {"name":"getExcludeProperties","parameterTypes":[] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.infra.common.serialize.JacksonUtils$TransformPropertiesSerializerModifier",
   "allPublicConstructors": true,
   "allPublicMethods": true,
   "methods":[
@@ -358,12 +382,11 @@
   ]
 },
 {
-  "name":"com.wl4g.infra.common.serialize.JacksonUtils$ExcludePropertyFilter",
+  "name":"com.wl4g.infra.common.serialize.JacksonUtils$TransformPropertiesDeserializerModifier",
   "allPublicConstructors": true,
   "allPublicMethods": true,
   "methods":[
-    {"name":"<init>","parameterTypes":["java.util.Set"] }, 
-    {"name":"getExcludeProperties","parameterTypes":[] }, 
+    {"name":"<init>","parameterTypes":[] }, 
     {"name":"toString","parameterTypes":[] }
   ]
 },
