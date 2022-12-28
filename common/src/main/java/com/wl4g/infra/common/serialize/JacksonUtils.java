@@ -234,6 +234,17 @@ public abstract class JacksonUtils {
      * @param extractPathExpr
      * @return
      */
+    public static JsonNode parseToNode(@Nullable String content) {
+        return parseToNode(content, null);
+    }
+
+    /**
+     * Parse object to {@link JsonNode}.
+     * 
+     * @param object
+     * @param extractPathExpr
+     * @return
+     */
     public static JsonNode parseToNode(@Nullable String content, @Nullable String extractPathExpr) {
         if (isBlank(content)) {
             return null;
