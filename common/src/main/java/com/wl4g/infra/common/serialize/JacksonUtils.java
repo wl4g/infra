@@ -113,6 +113,21 @@ public abstract class JacksonUtils {
      * Object to JSON strings.
      * 
      * @param object
+     * @param transformProperties
+     * @param ignoreProperties
+     * @return
+     */
+    public static String toJSONString(
+            @Nullable Object object,
+            @Nullable Map<String, String> transformProperties,
+            @Nullable String... ignoreProperties) {
+        return toJSONString(object, false, transformProperties, ignoreProperties);
+    }
+
+    /**
+     * Object to JSON strings.
+     * 
+     * @param object
      * @param isPretty
      * @param transformProperties
      * @param ignoreProperties
