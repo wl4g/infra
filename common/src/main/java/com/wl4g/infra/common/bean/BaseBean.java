@@ -31,6 +31,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.wl4g.infra.common.bridge.RpcContextHolderBridges;
 
 import io.swagger.annotations.ApiModelProperty;
@@ -183,6 +184,7 @@ public abstract class BaseBean implements Serializable {
     // swagger requires read-only, there is a conflict, so we should solve this
     // problem on the swagger side.
     // @JsonIgnoreProperties(allowGetters = true, allowSetters = false)
+    @JsonView(JsonForRestReadMarker.class)
     private transient String humanCreateDate;
 
     /**
@@ -197,6 +199,7 @@ public abstract class BaseBean implements Serializable {
     // swagger requires read-only, there is a conflict, so we should solve this
     // problem on the swagger side.
     // @JsonIgnoreProperties(allowGetters = true, allowSetters = false)
+    @JsonView(JsonForRestReadMarker.class)
     private transient String humanUpdateDate;
 
     /**
@@ -336,6 +339,9 @@ public abstract class BaseBean implements Serializable {
          */
         public static transient final String CURRENT_BEANID_KEY = "currentInsertionBean";
 
+    }
+
+    public static interface JsonForRestReadMarker {
     }
 
     /**

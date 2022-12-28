@@ -81,14 +81,14 @@ public class JacksonUtilsTests {
 
     @Test
     public void testJSONView() {
-        TestUserInfo user = new TestUserInfo(1313466574534868992L, "jack", singletonMap("foo", "bar"));
-        String json1 = toJSONString(DEFAULT_MODIFIER_MAPPER, IgnoreNameView.class, user, false, null);
+        TestUserInfo user = new TestUserInfo(1313466574534868992L, 36, "james", "wong", singletonMap("foo", "bar"));
+        String json1 = toJSONString(IgnoreFieldView.class, user, false, null);
         System.out.println("json1 : " + json1);
         assert !json1.contains("\"id\"");
 
-        String json2 = toJSONString(DEFAULT_MODIFIER_MAPPER, AllView.class, user, false, null);
+        String json2 = toJSONString(AllView.class, user, false, null);
         System.out.println("json2 : " + json2);
-        final TestUserInfo user1 = parseJSON(DEFAULT_MODIFIER_MAPPER, IgnoreNameView.class, json2, TestUserInfo.class);
+        final TestUserInfo user1 = parseJSON(IgnoreFieldView.class, json2, TestUserInfo.class);
         System.out.println(user1);
         assert user1.getId() == null;
     }
@@ -100,14 +100,16 @@ public class JacksonUtilsTests {
     @NoArgsConstructor
     public static class TestUserInfo {
         private @JsonView({ AllView.class }) Long id;
-        private @JsonView({ AllView.class, IgnoreNameView.class }) String name;
+        private Integer age;
+        private @JsonView({ IgnoreFieldView.class }) String firstName;
+        private @JsonView({ AllView.class, IgnoreFieldView.class }) String lastName;
         private Map<String, String> attributes = new HashMap<>();
     }
 
     public static interface AllView {
     }
 
-    public static interface IgnoreNameView {
+    public static interface IgnoreFieldView {
     }
 
     @Getter

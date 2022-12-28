@@ -181,6 +181,24 @@ public abstract class JacksonUtils {
     }
 
     /**
+     * Object to JSON strings.
+     * 
+     * @param view
+     * @param isPretty
+     * @param transformProperties
+     * @param ignoreProperties
+     * @return
+     */
+    public static String toJSONString(
+            final @Nullable Class<?> view,
+            final @Nullable Object object,
+            final boolean isPretty,
+            final @Nullable Map<String, String> transformProperties,
+            final @Nullable String... ignoreProperties) {
+        return toJSONString(DEFAULT_OBJECT_MAPPER, view, object, isPretty, transformProperties, ignoreProperties);
+    }
+
+    /**
      * Object to JSON strings. </br>
      * see: https://www.baeldung.com/jackson-ignore-properties-on-serialization
      * 

@@ -1243,5 +1243,10 @@
     {"name":"setDelFlag","parameterTypes":["java.lang.Integer"] }, 
     {"name":"toString","parameterTypes":[] }
   ]
+},
+{
+  "name":"com.wl4g.infra.common.bean.BaseBean$JsonForRestReadMarker",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true
 }
 ]
