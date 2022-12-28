@@ -62,6 +62,13 @@ public class JacksonUtilsTests {
         System.out.println(parsed2);
     }
 
+    @Test
+    public void testToJSONStringWithIgnoreProperties() {
+        TestBarBean bar = new TestBarBean("myBar");
+        TestUserBean bean1 = new TestUserBean(1313466574534868992L, "jack", singletonMap("foo", toJSONString(bar)));
+        System.out.println(toJSONString(bean1, "name"));
+    }
+
     @Getter
     @Setter
     @ToString

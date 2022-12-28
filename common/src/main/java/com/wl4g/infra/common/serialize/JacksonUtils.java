@@ -15,10 +15,12 @@
  */
 package com.wl4g.infra.common.serialize;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.File;
@@ -29,6 +31,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
@@ -37,17 +40,29 @@ import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
+import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.PropertyWriter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.google.common.collect.Sets;
 import com.wl4g.infra.common.reflect.ResolvableType;
 import com.wl4g.infra.common.reflect.TypeUtils2;
+
+import lombok.Getter;
 
 /**
  * JACKSON utility tools.
@@ -77,14 +92,42 @@ public abstract class JacksonUtils {
      * @return
      */
     public static String toJSONString(@Nullable Object object, boolean isPretty) {
+        return toJSONString(object, isPretty, DEFAULT_IGNORE_PROPERTIES);
+    }
+
+    /**
+     * Object to JSON strings.
+     * 
+     * @param object
+     * @param isPretty
+     * @param ignoreProperties
+     * @return
+     */
+    public static String toJSONString(@Nullable Object object, @Nullable String... ignoreProperties) {
+        return toJSONString(object, false, ignoreProperties);
+    }
+
+    /**
+     * Object to JSON strings.
+     * 
+     * @param object
+     * @param isPretty
+     * @param ignoreProperties
+     * @return
+     */
+    public static String toJSONString(@Nullable Object object, boolean isPretty, @Nullable String... ignoreProperties) {
         if (isNull(object)) {
             return null;
         }
         try {
-            if (isPretty) {
-                return defaultObjectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
+            ObjectWriter writer = isPretty ? DEFAULT_OBJECT_MAPPER.writerWithDefaultPrettyPrinter()
+                    : DEFAULT_OBJECT_MAPPER.writer();
+            if (nonNull(ignoreProperties) && ignoreProperties.length > 0) {
+                final FilterProvider provider = new SimpleFilterProvider().addFilter(ExcludePropertyFilter.FILTER_ID,
+                        new ExcludePropertyFilter(Sets.newHashSet(ignoreProperties)));
+                writer = DEFAULT_OBJECT_MAPPER.writer(provider);
             }
-            return defaultObjectMapper.writeValueAsString(object);
+            return writer.writeValueAsString(object);
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException(e);
         }
@@ -103,7 +146,7 @@ public abstract class JacksonUtils {
             return null;
         }
         try {
-            return defaultObjectMapper.readValue(content, clazz);
+            return DEFAULT_OBJECT_MAPPER.readValue(content, clazz);
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
         }
@@ -122,7 +165,7 @@ public abstract class JacksonUtils {
             return null;
         }
         try {
-            return defaultObjectMapper.readValue(src, clazz);
+            return DEFAULT_OBJECT_MAPPER.readValue(src, clazz);
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
         }
@@ -141,7 +184,7 @@ public abstract class JacksonUtils {
             return null;
         }
         try {
-            return defaultObjectMapper.readValue(src, clazz);
+            return DEFAULT_OBJECT_MAPPER.readValue(src, clazz);
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
@@ -160,7 +203,7 @@ public abstract class JacksonUtils {
             return null;
         }
         try {
-            return defaultObjectMapper.readValue(src, valueTypeRef);
+            return DEFAULT_OBJECT_MAPPER.readValue(src, valueTypeRef);
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
@@ -179,7 +222,7 @@ public abstract class JacksonUtils {
             return null;
         }
         try {
-            return defaultObjectMapper.readValue(src, valueTypeRef);
+            return DEFAULT_OBJECT_MAPPER.readValue(src, valueTypeRef);
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
@@ -198,7 +241,7 @@ public abstract class JacksonUtils {
             return null;
         }
         try {
-            return defaultObjectMapper.readValue(content, valueTypeRef);
+            return DEFAULT_OBJECT_MAPPER.readValue(content, valueTypeRef);
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
@@ -219,7 +262,7 @@ public abstract class JacksonUtils {
         try {
             final TreeNode objNode = node.at(extractPathExpr);
             if (objNode.size() > 0) {
-                return defaultObjectMapper.treeToValue(objNode, clazz);
+                return DEFAULT_OBJECT_MAPPER.treeToValue(objNode, clazz);
             }
             return null;
         } catch (JsonProcessingException e) {
@@ -242,15 +285,15 @@ public abstract class JacksonUtils {
      * Parse object to {@link JsonNode}.
      * 
      * @param object
-     * @param extractPathExpr
+     * @param atPathExpr
      * @return
      */
-    public static JsonNode parseToNode(@Nullable String content, @Nullable String extractPathExpr) {
+    public static JsonNode parseToNode(@Nullable String content, @Nullable String atPathExpr) {
         if (isBlank(content)) {
             return null;
         }
         try {
-            return defaultObjectMapper.readTree(content).requiredAt(extractPathExpr);
+            return DEFAULT_OBJECT_MAPPER.readTree(content).requiredAt(atPathExpr);
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException(e);
         }
@@ -268,7 +311,7 @@ public abstract class JacksonUtils {
             return null;
         }
         try {
-            return defaultObjectMapper.readValue(content, listStringTypeRef);
+            return DEFAULT_OBJECT_MAPPER.readValue(content, listStringTypeRef);
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
@@ -286,7 +329,7 @@ public abstract class JacksonUtils {
             return null;
         }
         try {
-            return defaultObjectMapper.readValue(content, listMapStringTypeRef);
+            return DEFAULT_OBJECT_MAPPER.readValue(content, listMapStringTypeRef);
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
@@ -304,7 +347,7 @@ public abstract class JacksonUtils {
             return null;
         }
         try {
-            return defaultObjectMapper.readValue(content, listMapObjectTypeRef);
+            return DEFAULT_OBJECT_MAPPER.readValue(content, listMapObjectTypeRef);
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
@@ -322,7 +365,7 @@ public abstract class JacksonUtils {
             return null;
         }
         try {
-            return defaultObjectMapper.readValue(content, mapObjectTypeRef);
+            return DEFAULT_OBJECT_MAPPER.readValue(content, mapObjectTypeRef);
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
@@ -343,7 +386,7 @@ public abstract class JacksonUtils {
         if (isNull(bean)) {
             return null;
         }
-        return defaultObjectMapper.convertValue(bean, toType);
+        return DEFAULT_OBJECT_MAPPER.convertValue(bean, toType);
     }
 
     /**
@@ -361,11 +404,11 @@ public abstract class JacksonUtils {
         if (isNull(bean)) {
             return null;
         }
-        return defaultObjectMapper.convertValue(bean, valueTypeRef);
+        return DEFAULT_OBJECT_MAPPER.convertValue(bean, valueTypeRef);
     }
 
     /**
-     * Convert value to Java type.</br>
+     * The convert value to Java type.</br>
      * 
      * @see com.fasterxml.jackson.databind.ObjectMapper#convertValue(Object,
      *      JavaType)
@@ -379,11 +422,11 @@ public abstract class JacksonUtils {
         if (isNull(bean)) {
             return null;
         }
-        return defaultObjectMapper.convertValue(bean, toJavaType);
+        return DEFAULT_OBJECT_MAPPER.convertValue(bean, toJavaType);
     }
 
     /**
-     * Deep cloning object with JSON serial-deserial.
+     * The deep cloning object with JSON serial-deserial.
      * 
      * @param obj
      * @return
@@ -401,7 +444,7 @@ public abstract class JacksonUtils {
             if (!isNull(generics) && generics.length == 1) {
                 Class<?> clazz = generics[0].getRawClass();
                 if (!isNull(clazz)) {
-                    reader = defaultObjectMapper.readerForListOf(clazz);
+                    reader = DEFAULT_OBJECT_MAPPER.readerForListOf(clazz);
                 }
             }
             if (isNull(reader)) { // Fallback
@@ -411,7 +454,7 @@ public abstract class JacksonUtils {
                 }
                 Iterator<Object> it = collect.iterator();
                 if (it.hasNext()) {
-                    reader = defaultObjectMapper.readerForListOf(it.next().getClass());
+                    reader = DEFAULT_OBJECT_MAPPER.readerForListOf(it.next().getClass());
                 }
             }
             try {
@@ -432,6 +475,14 @@ public abstract class JacksonUtils {
         return (T) parseJSON(toJSONString(obj), obj.getClass());
     }
 
+    /**
+     * The override merge object to target.
+     * 
+     * @param <T>
+     * @param obj
+     * @param overrideObj
+     * @return
+     */
     public static <T> T mergeWithOverride(@Nullable T obj, @Nullable T overrideObj) {
         if (isNull(obj) && nonNull(overrideObj)) {
             return overrideObj;
@@ -443,7 +494,7 @@ public abstract class JacksonUtils {
             return null;
         }
         try {
-            ObjectReader reader = defaultObjectMapper.readerForUpdating(obj);
+            ObjectReader reader = DEFAULT_OBJECT_MAPPER.readerForUpdating(obj);
             return reader.readValue(toJSONString(overrideObj));
         } catch (JsonProcessingException e) {
             throw new IllegalStateException(e);
@@ -457,13 +508,60 @@ public abstract class JacksonUtils {
      */
     @NotNull
     public static final ObjectMapper getDefaultObjectMapper() {
-        return defaultObjectMapper;
+        return DEFAULT_OBJECT_MAPPER;
+    }
+
+    @Getter
+    static class ExcludePropertyFilter extends SimpleBeanPropertyFilter {
+        static final String FILTER_ID = ExcludePropertyFilter.class.getSimpleName();
+
+        /**
+         * Sets of property names to filter out.
+         */
+        protected final Set<String> excludeProperties;
+
+        public ExcludePropertyFilter(Set<String> excludeProperties) {
+            this.excludeProperties = excludeProperties;
+        }
+
+        @Override
+        protected boolean include(BeanPropertyWriter writer) {
+            return !excludeProperties.contains(writer.getName());
+        }
+
+        @Override
+        protected boolean include(PropertyWriter writer) {
+            return !excludeProperties.contains(writer.getName());
+        }
+    }
+
+    static class ExcludePropertiesSerializerModifier extends BeanSerializerModifier {
+
+        // In this method you can add, remove or replace any of passed
+        // properties.
+        @Override
+        public List<BeanPropertyWriter> changeProperties(
+                SerializationConfig config,
+                BeanDescription beanDesc,
+                List<BeanPropertyWriter> beanProperties) {
+            final FilterProvider provider = config.getFilterProvider();
+            if (nonNull(provider)) {
+                // Ignore for exclude properties.
+                final ExcludePropertyFilter filter = notNullOf(provider.findPropertyFilter(ExcludePropertyFilter.FILTER_ID, null),
+                        "filter");
+                return safeList(beanProperties).stream()
+                        .filter(bp -> !filter.getExcludeProperties().contains(bp.getName()))
+                        .collect(toList());
+            }
+            return beanProperties;
+        }
     }
 
     /**
      * Default {@link ObjectMapper} instance.
      */
-    private static final ObjectMapper defaultObjectMapper = new ObjectMapper();
+    private static final ObjectMapper DEFAULT_OBJECT_MAPPER = new ObjectMapper();
+    private static final String[] DEFAULT_IGNORE_PROPERTIES = new String[0];
 
     private static final TypeReference<List<String>> listStringTypeRef = new TypeReference<List<String>>() {
     };
@@ -477,9 +575,17 @@ public abstract class JacksonUtils {
     static {
         getDefaultObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         getDefaultObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        getDefaultObjectMapper().registerModule(new SimpleModule());
         getDefaultObjectMapper().registerModule(new JavaTimeModule());
         getDefaultObjectMapper().registerModule(new JSR310Module());
+        getDefaultObjectMapper().registerModule(new SimpleModule() {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void setupModule(SetupContext context) {
+                super.setupModule(context);
+                context.addBeanSerializerModifier(new ExcludePropertiesSerializerModifier());
+            }
+        });
     }
 
 }
