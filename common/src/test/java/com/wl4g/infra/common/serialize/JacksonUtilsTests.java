@@ -71,8 +71,8 @@ public class JacksonUtilsTests {
 
     @Test
     public void testToJSONStringWithIgnoreAndTransformProperties() {
-        TestUserBean bean1 = new TestUserBean(1313466574534868992L, "jack", singletonMap("foo", "bar"));
-        String json = toJSONString(DEFAULT_MODIFIER_MAPPER, bean1, true, singletonMap("id", "_id"), "name");
+        TestUserBean user = new TestUserBean(1313466574534868992L, "jack", singletonMap("foo", "bar"));
+        String json = toJSONString(DEFAULT_MODIFIER_MAPPER, user, true, singletonMap("id", "_id"), "name");
         System.out.println(json);
         assert !json.contains("\"id\"");
         assert json.contains("\"_id\"");

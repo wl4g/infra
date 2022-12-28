@@ -15,7 +15,6 @@
  */
 package com.wl4g.infra.common.bean;
 
-import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -36,11 +35,12 @@ import com.wl4g.infra.common.bridge.RpcContextHolderBridges;
 
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiModelProperty.AccessMode;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
@@ -53,6 +53,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @SuperBuilder
+@ToString
 @NoArgsConstructor
 public abstract class BaseBean implements Serializable {
     private static final long serialVersionUID = 8940373806493080114L;
@@ -298,11 +299,6 @@ public abstract class BaseBean implements Serializable {
     }
 
     // --- Functions. ---
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName().concat("<").concat(toJSONString(this)).concat(">");
-    }
 
     /**
      * Internal utility for {@link BaseBean}

@@ -60,6 +60,7 @@ import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
 import com.fasterxml.jackson.databind.deser.DataFormatReaders;
+import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
@@ -522,15 +523,20 @@ public abstract class JacksonUtils {
      * @param valueTypeRef
      * @return
      */
-    public static List<String> parseArrayString(@Nullable String content) {
-        if (isNull(content)) {
-            return null;
-        }
-        try {
-            return DEFAULT_OBJECT_MAPPER.readValue(content, LIST_STRING_TYPE_REF);
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e);
-        }
+    public static List<String> parseArrayString(final @Nullable String content) {
+        return parseArrayString(null, content);
+    }
+
+    /**
+     * Parse array parameterized map string from JSON strings.
+     * 
+     * @param view
+     * @param content
+     * @param valueTypeRef
+     * @return
+     */
+    public static List<String> parseArrayString(final @Nullable Class<?> view, final @Nullable String content) {
+        return parseJSON(DEFAULT_OBJECT_MAPPER, view, content, LIST_STRING_TYPE_REF);
     }
 
     /**
@@ -541,32 +547,31 @@ public abstract class JacksonUtils {
      * @return
      */
     public static List<Map<String, String>> parseArrayMapString(@Nullable String content) {
-        if (isNull(content)) {
-            return null;
-        }
-        try {
-            return DEFAULT_OBJECT_MAPPER.readValue(content, LIST_MAP_STRING_TYPE_REF);
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e);
-        }
+        return parseArrayMapString(null, content);
+    }
+
+    /**
+     * Parse array parameterized map string from JSON strings.
+     * 
+     * @param view
+     * @param content
+     * @param valueTypeRef
+     * @return
+     */
+    public static List<Map<String, String>> parseArrayMapString(final @Nullable Class<?> view, @Nullable String content) {
+        return parseJSON(DEFAULT_OBJECT_MAPPER, view, content, LIST_MAP_STRING_TYPE_REF);
     }
 
     /**
      * Parse array parameterized map object from JSON strings.
      * 
+     * @param view
      * @param content
      * @param valueTypeRef
      * @return
      */
-    public static List<Map<String, Object>> parseArrayMapObject(@Nullable String content) {
-        if (isNull(content)) {
-            return null;
-        }
-        try {
-            return DEFAULT_OBJECT_MAPPER.readValue(content, LIST_MAP_OBJECT_TYPE_REF);
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e);
-        }
+    public static List<Map<String, Object>> parseArrayMapObject(final @Nullable Class<?> view, @Nullable String content) {
+        return parseJSON(DEFAULT_OBJECT_MAPPER, view, content, LIST_MAP_OBJECT_TYPE_REF);
     }
 
     /**
@@ -577,14 +582,19 @@ public abstract class JacksonUtils {
      * @return
      */
     public static Map<String, Object> parseMapObject(@Nullable String content) {
-        if (isNull(content)) {
-            return null;
-        }
-        try {
-            return DEFAULT_OBJECT_MAPPER.readValue(content, MAP_OBJECT_TYPE_REF);
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e);
-        }
+        return parseMapObject(null, content);
+    }
+
+    /**
+     * Parse map parameterized object from JSON strings.
+     * 
+     * @param view
+     * @param content
+     * @param valueTypeRef
+     * @return
+     */
+    public static Map<String, Object> parseMapObject(final @Nullable Class<?> view, @Nullable String content) {
+        return parseJSON(DEFAULT_OBJECT_MAPPER, view, content, MAP_OBJECT_TYPE_REF);
     }
 
     /**
@@ -858,21 +868,20 @@ public abstract class JacksonUtils {
     }
 
     public static class TransformPropertiesDeserializerModifier extends BeanDeserializerModifier {
-        // @Override
-        // public List<BeanPropertyDefinition> updateProperties(
-        // DeserializationConfig config,
-        // BeanDescription beanDesc,
-        // List<BeanPropertyDefinition> propDefs) {
-        // final List<BeanPropertyDefinition> _propDefs =
-        // safeList(propDefs);
-        // for (int i = 0; i < _propDefs.size(); i++) {
-        // BeanPropertyDefinition definition = _propDefs.get(i);
-        // if (definition.getName().equals("embedded")) {
-        // _propDefs.set(i, definition.withSimpleName("_embedded"));
-        // }
-        // }
-        // return _propDefs;
-        // }
+        @Override
+        public List<BeanPropertyDefinition> updateProperties(
+                DeserializationConfig config,
+                BeanDescription beanDesc,
+                List<BeanPropertyDefinition> propDefs) {
+            final List<BeanPropertyDefinition> _propDefs = safeList(propDefs);
+            for (int i = 0; i < _propDefs.size(); i++) {
+                BeanPropertyDefinition definition = _propDefs.get(i);
+                if (definition.getName().equals("id")) {
+                    _propDefs.set(i, definition.withSimpleName("_id"));
+                }
+            }
+            return _propDefs;
+        }
     }
 
     /**
