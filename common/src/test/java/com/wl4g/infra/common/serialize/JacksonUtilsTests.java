@@ -38,6 +38,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -48,6 +49,11 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 public class JacksonUtilsTests {
+
+    // Notice: When using a custom modifier, you should use an independent
+    // objectMapper, because the same objectmapper instance will cache the
+    // serializer of the target bean, which may cause the modifier to fail.
+    static final ObjectMapper DEFAULT_MODIFIER_MAPPER = JacksonUtils.newDefaultObjectMapper();
 
     //
     // ----- General parse. -----
@@ -65,7 +71,7 @@ public class JacksonUtilsTests {
     @Test
     public void testToJSONStringWithIgnoreAndTransformProperties() {
         TestUserBean bean1 = new TestUserBean(1313466574534868992L, "jack", singletonMap("foo", "bar"));
-        System.out.println(toJSONString(bean1, singletonMap("id", "_id"), "name"));
+        System.out.println(toJSONString(DEFAULT_MODIFIER_MAPPER, bean1, true, singletonMap("id", "_id"), "name"));
     }
 
     @Getter

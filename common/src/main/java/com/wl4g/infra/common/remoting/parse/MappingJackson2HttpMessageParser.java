@@ -52,7 +52,7 @@ public class MappingJackson2HttpMessageParser extends AbstractJackson2HttpMessag
      * configuration provided by {@link Jackson2ObjectMapperBuilder}.
      */
     public MappingJackson2HttpMessageParser() {
-        this(JacksonUtils.getDefaultObjectMapper());
+        this(JacksonUtils.newDefaultObjectMapper());
     }
 
     /**

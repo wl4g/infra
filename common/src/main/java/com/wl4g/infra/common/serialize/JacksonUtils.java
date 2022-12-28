@@ -15,6 +15,7 @@
  */
 package com.wl4g.infra.common.serialize;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToSet;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
@@ -63,7 +64,6 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.fasterxml.jackson.databind.util.NameTransformer;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.google.common.collect.Sets;
 import com.wl4g.infra.common.reflect.ResolvableType;
 import com.wl4g.infra.common.reflect.TypeUtils2;
 
@@ -85,7 +85,7 @@ public abstract class JacksonUtils {
      * @param object
      * @return
      */
-    public static String toJSONString(@Nullable Object object) {
+    public static String toJSONString(final @Nullable Object object) {
         return toJSONString(object, false);
     }
 
@@ -96,40 +96,68 @@ public abstract class JacksonUtils {
      * @param isPretty
      * @return
      */
-    public static String toJSONString(@Nullable Object object, boolean isPretty) {
-        return toJSONString(object, isPretty, null, DEFAULT_IGNORE_PROPERTIES);
+    public static String toJSONString(final @Nullable Object object, final boolean isPretty) {
+        return toJSONString(DEFAULT_OBJECT_MAPPER, object, isPretty, null, DEFAULT_IGNORE_PROPERTIES);
     }
 
     /**
      * Object to JSON strings.
      * 
+     * @param mapper
+     *            When using a custom modifier, you should use an independent
+     *            objectMapper, because the same objectmapper instance will
+     *            cache the serializer of the target bean, which may cause the
+     *            modifier to fail, see source code:
+     *            {@link com.fasterxml.jackson.databind.SerializerProvider#findTypedValueSerializer(java.lang.Class,boolean,com.fasterxml.jackson.databind.BeanProperty)}
+     *            {@link com.fasterxml.jackson.databind.SerializerProvider#_knownSerializers}
+     *            {@link com.fasterxml.jackson.databind.ser.impl.ReadOnlyClassToSerializerMap#typedValueSerializer(com.fasterxml.jackson.databind.JavaType)}
      * @param object
      * @param isPretty
      * @param ignoreProperties
      * @return
      */
-    public static String toJSONString(@Nullable Object object, @Nullable String... ignoreProperties) {
-        return toJSONString(object, false, null, ignoreProperties);
+    public static String toJSONString(
+            final @NotNull ObjectMapper mapper,
+            final @Nullable Object object,
+            final @Nullable String... ignoreProperties) {
+        return toJSONString(mapper, object, false, null, ignoreProperties);
     }
 
     /**
      * Object to JSON strings.
      * 
+     * @param mapper
+     *            When using a custom modifier, you should use an independent
+     *            objectMapper, because the same objectmapper instance will
+     *            cache the serializer of the target bean, which may cause the
+     *            modifier to fail, see source code:
+     *            {@link com.fasterxml.jackson.databind.SerializerProvider#findTypedValueSerializer(java.lang.Class,boolean,com.fasterxml.jackson.databind.BeanProperty)}
+     *            {@link com.fasterxml.jackson.databind.SerializerProvider#_knownSerializers}
+     *            {@link com.fasterxml.jackson.databind.ser.impl.ReadOnlyClassToSerializerMap#typedValueSerializer(com.fasterxml.jackson.databind.JavaType)}
      * @param object
      * @param transformProperties
      * @param ignoreProperties
      * @return
      */
     public static String toJSONString(
-            @Nullable Object object,
-            @Nullable Map<String, String> transformProperties,
-            @Nullable String... ignoreProperties) {
-        return toJSONString(object, false, transformProperties, ignoreProperties);
+            final @NotNull ObjectMapper mapper,
+            final @Nullable Object object,
+            final @Nullable Map<String, String> transformProperties,
+            final @Nullable String... ignoreProperties) {
+        return toJSONString(mapper, object, false, transformProperties, ignoreProperties);
     }
 
     /**
      * Object to JSON strings.
      * 
+     * @param mapper
+     *            When using a custom modifier, you should use an independent
+     *            objectMapper, because the same objectmapper instance will
+     *            cache the serializer of the target bean, which may cause the
+     *            modifier to fail, see source code:
+     *            {@link com.fasterxml.jackson.databind.SerializerProvider#findTypedValueSerializer(java.lang.Class,boolean,com.fasterxml.jackson.databind.BeanProperty)}
+     *            {@link com.fasterxml.jackson.databind.SerializerProvider#_knownSerializers}
+     *            {@link com.fasterxml.jackson.databind.ser.impl.ReadOnlyClassToSerializerMap#typedValueSerializer(com.fasterxml.jackson.databind.JavaType)}
      * @param object
      * @param isPretty
      * @param transformProperties
@@ -137,21 +165,21 @@ public abstract class JacksonUtils {
      * @return
      */
     public static String toJSONString(
-            @Nullable Object object,
-            boolean isPretty,
-            @Nullable Map<String, String> transformProperties,
-            @Nullable String... ignoreProperties) {
+            final @NotNull ObjectMapper mapper,
+            final @Nullable Object object,
+            final boolean isPretty,
+            final @Nullable Map<String, String> transformProperties,
+            final @Nullable String... ignoreProperties) {
+        notNullOf(mapper, "mapper");
         if (isNull(object)) {
             return null;
         }
         try {
-            SerializationConfig config = DEFAULT_OBJECT_MAPPER.getSerializationConfig();
-            if (nonNull(ignoreProperties) && ignoreProperties.length > 0) {
-                config = config.withFilters(new SimpleFilterProvider().addFilter(ExcludePropertyFilter.FILTER_ID,
-                        new ExcludePropertyFilter(transformProperties, Sets.newHashSet(ignoreProperties))));
-            }
+            final SerializationConfig config = mapper.getSerializationConfig()
+                    .withFilters(new SimpleFilterProvider().addFilter(ExcludePropertyFilter.FILTER_ID,
+                            new ExcludePropertyFilter(safeMap(transformProperties), safeArrayToSet(ignoreProperties))));
             final PrettyPrinter pp = isPretty ? config.getDefaultPrettyPrinter() : null;
-            return new CustomObjectWriter(DEFAULT_OBJECT_MAPPER, config, null, pp).writeValueAsString(object);
+            return new CustomObjectWriter(mapper, config, null, pp).writeValueAsString(object);
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException(e);
         }
@@ -335,7 +363,7 @@ public abstract class JacksonUtils {
             return null;
         }
         try {
-            return DEFAULT_OBJECT_MAPPER.readValue(content, listStringTypeRef);
+            return DEFAULT_OBJECT_MAPPER.readValue(content, LIST_STRING_TYPE_REF);
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
@@ -353,7 +381,7 @@ public abstract class JacksonUtils {
             return null;
         }
         try {
-            return DEFAULT_OBJECT_MAPPER.readValue(content, listMapStringTypeRef);
+            return DEFAULT_OBJECT_MAPPER.readValue(content, LIST_MAP_STRING_TYPE_REF);
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
@@ -371,7 +399,7 @@ public abstract class JacksonUtils {
             return null;
         }
         try {
-            return DEFAULT_OBJECT_MAPPER.readValue(content, listMapObjectTypeRef);
+            return DEFAULT_OBJECT_MAPPER.readValue(content, LIST_MAP_OBJECT_TYPE_REF);
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
@@ -389,7 +417,7 @@ public abstract class JacksonUtils {
             return null;
         }
         try {
-            return DEFAULT_OBJECT_MAPPER.readValue(content, mapObjectTypeRef);
+            return DEFAULT_OBJECT_MAPPER.readValue(content, MAP_OBJECT_TYPE_REF);
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
@@ -526,16 +554,30 @@ public abstract class JacksonUtils {
     }
 
     /**
-     * Gets default {@link ObjectMapper}
+     * Create default {@link ObjectMapper}
      * 
      * @return
      */
     @NotNull
-    public static final ObjectMapper getDefaultObjectMapper() {
-        return DEFAULT_OBJECT_MAPPER;
+    public static final ObjectMapper newDefaultObjectMapper() {
+        final ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        mapper.registerModule(new JavaTimeModule());
+        mapper.registerModule(new JSR310Module());
+        mapper.registerModule(new SimpleModule() {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void setupModule(SetupContext context) {
+                super.setupModule(context);
+                context.addBeanSerializerModifier(new ExcludePropertiesSerializerModifier());
+            }
+        });
+        return mapper;
     }
 
-    static class CustomObjectWriter extends ObjectWriter {
+    public static class CustomObjectWriter extends ObjectWriter {
         private static final long serialVersionUID = 1L;
 
         protected CustomObjectWriter(ObjectMapper mapper, SerializationConfig config, JavaType rootType, PrettyPrinter pp) {
@@ -566,15 +608,15 @@ public abstract class JacksonUtils {
     }
 
     @Getter
-    static class ExcludePropertyFilter extends SimpleBeanPropertyFilter {
+    public static class ExcludePropertyFilter extends SimpleBeanPropertyFilter {
         static final String FILTER_ID = ExcludePropertyFilter.class.getSimpleName();
 
-        final @Nullable Map<String, String> transformProperties;
-        final @Nullable Set<String> excludeProperties;
+        final @NotNull Map<String, String> transformProperties;
+        final @NotNull Set<String> excludeProperties;
 
         public ExcludePropertyFilter(Map<String, String> transformProperties, Set<String> excludeProperties) {
-            this.transformProperties = transformProperties;
-            this.excludeProperties = excludeProperties;
+            this.transformProperties = notNullOf(transformProperties, "transformProperties");
+            this.excludeProperties = notNullOf(excludeProperties, "excludeProperties");
         }
 
         @Override
@@ -588,7 +630,7 @@ public abstract class JacksonUtils {
         }
     }
 
-    static class ExcludePropertiesSerializerModifier extends BeanSerializerModifier {
+    public static class ExcludePropertiesSerializerModifier extends BeanSerializerModifier {
 
         // In this method you can add, remove or replace any of passed
         // properties.
@@ -602,13 +644,12 @@ public abstract class JacksonUtils {
                 // Ignore for exclude properties.
                 final ExcludePropertyFilter filter = notNullOf(provider.findPropertyFilter(ExcludePropertyFilter.FILTER_ID, null),
                         "filter");
-                final Map<String, String> transformProperties = safeMap(filter.getTransformProperties());
                 return safeList(beanProperties).stream()
                         .filter(bp -> !filter.getExcludeProperties().contains(bp.getName()))
                         .map(bp -> bp.rename(new NameTransformer() {
                             @Override
                             public String transform(String name) {
-                                return transformProperties.getOrDefault(name, name);
+                                return filter.getTransformProperties().getOrDefault(name, name);
                             }
 
                             @Override
@@ -625,32 +666,16 @@ public abstract class JacksonUtils {
     /**
      * Default {@link ObjectMapper} instance.
      */
-    private static final ObjectMapper DEFAULT_OBJECT_MAPPER = new ObjectMapper();
+    public static final ObjectMapper DEFAULT_OBJECT_MAPPER = newDefaultObjectMapper();
     private static final String[] DEFAULT_IGNORE_PROPERTIES = new String[0];
 
-    private static final TypeReference<List<String>> listStringTypeRef = new TypeReference<List<String>>() {
+    private static final TypeReference<List<String>> LIST_STRING_TYPE_REF = new TypeReference<List<String>>() {
     };
-    private static final TypeReference<List<Map<String, String>>> listMapStringTypeRef = new TypeReference<List<Map<String, String>>>() {
+    private static final TypeReference<List<Map<String, String>>> LIST_MAP_STRING_TYPE_REF = new TypeReference<List<Map<String, String>>>() {
     };
-    private static final TypeReference<List<Map<String, Object>>> listMapObjectTypeRef = new TypeReference<List<Map<String, Object>>>() {
+    private static final TypeReference<List<Map<String, Object>>> LIST_MAP_OBJECT_TYPE_REF = new TypeReference<List<Map<String, Object>>>() {
     };
-    private static final TypeReference<Map<String, Object>> mapObjectTypeRef = new TypeReference<Map<String, Object>>() {
+    private static final TypeReference<Map<String, Object>> MAP_OBJECT_TYPE_REF = new TypeReference<Map<String, Object>>() {
     };
-
-    static {
-        getDefaultObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        getDefaultObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        getDefaultObjectMapper().registerModule(new JavaTimeModule());
-        getDefaultObjectMapper().registerModule(new JSR310Module());
-        getDefaultObjectMapper().registerModule(new SimpleModule() {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void setupModule(SetupContext context) {
-                super.setupModule(context);
-                context.addBeanSerializerModifier(new ExcludePropertiesSerializerModifier());
-            }
-        });
-    }
 
 }
