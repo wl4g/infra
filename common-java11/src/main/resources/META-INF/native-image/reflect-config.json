@@ -335,6 +335,20 @@
   "allPublicMethods" : true
 },
 {
+  "name":"com.wl4g.infra.common.serialize.JacksonUtils$CustomObjectWriter",
+  "allPublicConstructors": true,
+  "allPublicMethods": true,
+  "methods":[
+    {"name":"<init>","parameterTypes":["com.fasterxml.jackson.databind.ObjectMapper","com.fasterxml.jackson.databind.SerializationConfig","com.fasterxml.jackson.databind.JavaType","com.fasterxml.jackson.core.PrettyPrinter"] }, 
+    {"name":"<init>","parameterTypes":["com.fasterxml.jackson.databind.ObjectMapper","com.fasterxml.jackson.databind.SerializationConfig"] }, 
+    {"name":"<init>","parameterTypes":["com.fasterxml.jackson.databind.ObjectMapper","com.fasterxml.jackson.databind.SerializationConfig","com.fasterxml.jackson.core.FormatSchema"] }, 
+    {"name":"<init>","parameterTypes":["com.fasterxml.jackson.databind.ObjectMapper","com.fasterxml.jackson.databind.SerializationConfig","com.fasterxml.jackson.databind.ObjectWriter$GeneratorSettings","com.fasterxml.jackson.databind.ObjectWriter$Prefetch"] }, 
+    {"name":"<init>","parameterTypes":["com.fasterxml.jackson.databind.ObjectWriter","com.fasterxml.jackson.databind.SerializationConfig"] }, 
+    {"name":"<init>","parameterTypes":["com.fasterxml.jackson.databind.ObjectWriter","com.fasterxml.jackson.core.JsonFactory"] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
   "name":"com.wl4g.infra.common.serialize.JacksonUtils$ExcludePropertiesSerializerModifier",
   "allPublicConstructors": true,
   "allPublicMethods": true,

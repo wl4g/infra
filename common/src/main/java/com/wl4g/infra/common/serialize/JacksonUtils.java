@@ -38,7 +38,10 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.core.FormatSchema;
+import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.PrettyPrinter;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.BeanDescription;
@@ -142,12 +145,14 @@ public abstract class JacksonUtils {
             return null;
         }
         try {
-            ObjectWriter writer = isPretty ? DEFAULT_OBJECT_MAPPER.writerWithDefaultPrettyPrinter()
-                    : DEFAULT_OBJECT_MAPPER.writer();
+            final SerializationConfig config = DEFAULT_OBJECT_MAPPER.getSerializationConfig();
+            ObjectWriter writer = DEFAULT_OBJECT_MAPPER.writer();
             if (nonNull(ignoreProperties) && ignoreProperties.length > 0) {
-                final FilterProvider provider = new SimpleFilterProvider().addFilter(ExcludePropertyFilter.FILTER_ID,
-                        new ExcludePropertyFilter(transformProperties, Sets.newHashSet(ignoreProperties)));
-                writer = DEFAULT_OBJECT_MAPPER.writer(provider);
+                config.withFilters(new SimpleFilterProvider().addFilter(ExcludePropertyFilter.FILTER_ID,
+                        new ExcludePropertyFilter(transformProperties, Sets.newHashSet(ignoreProperties))));
+            }
+            if (isPretty) {
+                writer = new CustomObjectWriter(DEFAULT_OBJECT_MAPPER, config, null, config.getDefaultPrettyPrinter());
             }
             return writer.writeValueAsString(object);
         } catch (JsonProcessingException e) {
@@ -531,6 +536,36 @@ public abstract class JacksonUtils {
     @NotNull
     public static final ObjectMapper getDefaultObjectMapper() {
         return DEFAULT_OBJECT_MAPPER;
+    }
+
+    static class CustomObjectWriter extends ObjectWriter {
+        private static final long serialVersionUID = 1L;
+
+        protected CustomObjectWriter(ObjectMapper mapper, SerializationConfig config, JavaType rootType, PrettyPrinter pp) {
+            super(mapper, config, rootType, pp);
+        }
+
+        protected CustomObjectWriter(ObjectMapper mapper, SerializationConfig config) {
+            super(mapper, config);
+        }
+
+        protected CustomObjectWriter(ObjectMapper mapper, SerializationConfig config, FormatSchema s) {
+            super(mapper, config, s);
+        }
+
+        protected CustomObjectWriter(ObjectWriter base, SerializationConfig config, GeneratorSettings genSettings,
+                Prefetch prefetch) {
+            super(base, config, genSettings, prefetch);
+        }
+
+        protected CustomObjectWriter(ObjectWriter base, SerializationConfig config) {
+            super(base, config);
+        }
+
+        protected CustomObjectWriter(ObjectWriter base, JsonFactory f) {
+            super(base, f);
+        }
+
     }
 
     @Getter
