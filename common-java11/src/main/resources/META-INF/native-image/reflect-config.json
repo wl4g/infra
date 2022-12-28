@@ -834,6 +834,115 @@
   ]
 },
 {
+  "name":"com.wl4g.infra.common.remoting.standard.HttpStatus",
+  "allPublicConstructors": true,
+  "allPublicMethods": true,
+  "methods":[
+    {"name":"<init>","parameterTypes":["int","java.lang.String"] }, 
+    {"name":"value","parameterTypes":[] }, 
+    {"name":"getReasonPhrase","parameterTypes":[] }, 
+    {"name":"series","parameterTypes":[] }, 
+    {"name":"is1xxInformational","parameterTypes":[] }, 
+    {"name":"is2xxSuccessful","parameterTypes":[] }, 
+    {"name":"is3xxRedirection","parameterTypes":[] }, 
+    {"name":"is4xxClientError","parameterTypes":[] }, 
+    {"name":"is5xxServerError","parameterTypes":[] }, 
+    {"name":"isError","parameterTypes":[] }, 
+    {"name":"valueOf","parameterTypes":["int"] }, 
+    {"name":"resolve","parameterTypes":["int"] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.infra.common.remoting.HttpResponseEntity",
+  "allPublicConstructors": true,
+  "allPublicMethods": true,
+  "methods":[
+    {"name":"<init>","parameterTypes":["com.wl4g.infra.common.remoting.standard.HttpStatus"] }, 
+    {"name":"<init>","parameterTypes":["java.lang.Object","com.wl4g.infra.common.remoting.standard.HttpStatus"] }, 
+    {"name":"getStatusCode","parameterTypes":[] }, 
+    {"name":"getStatusCodeValue","parameterTypes":[] }, 
+    {"name":"status","parameterTypes":["com.wl4g.infra.common.remoting.standard.HttpStatus"] }, 
+    {"name":"status","parameterTypes":["int"] }, 
+    {"name":"ok","parameterTypes":[] }, 
+    {"name":"ok","parameterTypes":["java.lang.Object"] }, 
+    {"name":"created","parameterTypes":["java.net.URI"] }, 
+    {"name":"accepted","parameterTypes":[] }, 
+    {"name":"noContent","parameterTypes":[] }, 
+    {"name":"badRequest","parameterTypes":[] }, 
+    {"name":"notFound","parameterTypes":[] }, 
+    {"name":"unprocessableEntity","parameterTypes":[] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.infra.common.remoting.HttpResponseEntity$DefaultBuilder",
+  "allPublicConstructors": true,
+  "allPublicMethods": true,
+  "methods":[
+    {"name":"<init>","parameterTypes":["java.lang.Object"] }, 
+    {"name":"header","parameterTypes":["java.lang.String","[Ljava.lang.String;"] }, 
+    {"name":"headers","parameterTypes":["com.wl4g.infra.common.remoting.standard.HttpHeaders"] }, 
+    {"name":"allow","parameterTypes":["[Lio.netty.handler.codec.http.HttpMethod;"] }, 
+    {"name":"contentLength","parameterTypes":["int"] }, 
+    {"name":"contentType","parameterTypes":["com.wl4g.infra.common.remoting.standard.HttpMediaType"] }, 
+    {"name":"eTag","parameterTypes":["java.lang.String"] }, 
+    {"name":"lastModified","parameterTypes":["long"] }, 
+    {"name":"location","parameterTypes":["java.net.URI"] }, 
+    {"name":"cacheControl","parameterTypes":["com.wl4g.infra.common.remoting.standard.CacheControl"] }, 
+    {"name":"varyBy","parameterTypes":["[Ljava.lang.String;"] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.infra.common.remoting.standard.HttpHeaders",
+  "allPublicConstructors": true,
+  "allPublicMethods": true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"<init>","parameterTypes":["com.wl4g.infra.common.collection.multimap.MultiValueMap"] }, 
+    {"name":"getOrEmpty","parameterTypes":["java.lang.String"] }, 
+    {"name":"getAccept","parameterTypes":[] }, 
+    {"name":"setAccept","parameterTypes":["java.util.List"] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"io.netty.handler.codec.http.HttpMethod",
+  "allPublicConstructors": true,
+  "allPublicMethods": true,
+  "methods":[
+    {"name":"<init>","parameterTypes":["java.lang.String"] }, 
+    {"name":"valueOf","parameterTypes":["java.lang.String"] }, 
+    {"name":"name","parameterTypes":[] }, 
+    {"name":"asciiName","parameterTypes":[] }, 
+    {"name":"compareTo","parameterTypes":["io.netty.handler.codec.http.HttpMethod"] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.infra.common.remoting.standard.CacheControl",
+  "allPublicConstructors": true,
+  "allPublicMethods": true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"empty","parameterTypes":[] }, 
+    {"name":"maxAge","parameterTypes":["long","java.util.concurrent.TimeUnit"] }, 
+    {"name":"noCache","parameterTypes":[] }, 
+    {"name":"noStore","parameterTypes":[] }, 
+    {"name":"mustRevalidate","parameterTypes":[] }, 
+    {"name":"noTransform","parameterTypes":[] }, 
+    {"name":"cachePublic","parameterTypes":[] }, 
+    {"name":"cachePrivate","parameterTypes":[] }, 
+    {"name":"proxyRevalidate","parameterTypes":[] }, 
+    {"name":"sMaxAge","parameterTypes":["long","java.util.concurrent.TimeUnit"] }, 
+    {"name":"staleWhileRevalidate","parameterTypes":["long","java.util.concurrent.TimeUnit"] }, 
+    {"name":"staleIfError","parameterTypes":["long","java.util.concurrent.TimeUnit"] }, 
+    {"name":"getHeaderValue","parameterTypes":[] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
   "name":"com.wl4g.infra.common.remoting.Netty4ClientHttpRequest$RequestExecuteHandler",
   "queriedMethods":[{"name":"exceptionCaught","parameterTypes":["io.netty.channel.ChannelHandlerContext","java.lang.Throwable"] }]
 },
