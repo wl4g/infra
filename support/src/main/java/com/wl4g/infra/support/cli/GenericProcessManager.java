@@ -44,7 +44,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.sshd.client.channel.ChannelExec;
 
 import com.wl4g.infra.common.cli.ProcessUtils.DelegateProcess;
-import com.wl4g.infra.common.cli.ssh.SshHelperBase;
+import com.wl4g.infra.common.cli.ssh.SshdHelper;
 import com.wl4g.infra.common.cli.ssh.SshjHelper.CommandSessionWrapper;
 import com.wl4g.infra.common.task.RunnerProperties;
 import com.wl4g.infra.context.task.ApplicationTaskRunner;
@@ -210,11 +210,10 @@ public abstract class GenericProcessManager extends ApplicationTaskRunner<Runner
      * @throws InterruptedException
      * @throws Exception
      */
-    @SuppressWarnings("unchecked")
     protected DestroableProcess doExecRemote(RemoteDestroableCommand cmd) throws InterruptedException, Exception {
         log.info("Exec remote command: {}", cmd.getCmd());
 
-        return (DestroableProcess) SshHelperBase.getDefault()
+        return (DestroableProcess) SshdHelper.getInstance()
                 .execWaitForComplete(cmd.getHost(), cmd.getUser(), cmd.getPemPrivateKey(), cmd.getPassword(), cmd.getCmd(),
                         s -> wrapDestroableProcess(cmd.getProcessId(), cmd, s), cmd.getTimeoutMs());
     }

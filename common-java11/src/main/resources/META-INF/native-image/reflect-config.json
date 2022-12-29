@@ -367,7 +367,7 @@
   "allPublicConstructors": true,
   "allPublicMethods": true,
   "methods":[
-    {"name":"<init>","parameterTypes":["java.util.Set"] }, 
+    {"name":"<init>","parameterTypes":["java.util.Map","java.util.Set"] }, 
     {"name":"getExcludeProperties","parameterTypes":[] }, 
     {"name":"toString","parameterTypes":[] }
   ]
@@ -378,6 +378,15 @@
   "allPublicMethods": true,
   "methods":[
     {"name":"<init>","parameterTypes":[] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.infra.common.serialize.JacksonUtils$TransformContextAttributes",
+  "allPublicConstructors": true,
+  "allPublicMethods": true,
+  "methods":[
+    {"name":"<init>","parameterTypes":["java.util.Map","java.util.Set"] }, 
     {"name":"toString","parameterTypes":[] }
   ]
 },

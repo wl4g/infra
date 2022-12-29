@@ -70,8 +70,8 @@ public class JacksonUtilsTests {
     }
 
     @Test
-    public void testToJSONStringWithIgnoreAndTransformProperties() {
-        TestUserBean user = new TestUserBean(1313466574534868992L, "jack", singletonMap("foo", "bar"));
+    public void testToJSONString_with_ignore_transform_properties() {
+        TestUserBean user = new TestUserBean(66574534868992L, "jack", singletonMap("foo", "bar"));
         String json = toJSONString(DEFAULT_MODIFIER_MAPPER, user, true, singletonMap("id", "_id"), "name");
         System.out.println(json);
         assert !json.contains("\"id\"");
@@ -80,7 +80,17 @@ public class JacksonUtilsTests {
     }
 
     @Test
-    public void testJSONView() {
+    public void testParseJSON_with_ignore_transform_properties() {
+        String json = "{\"_id\":66574534868992,\"name\":\"jack\",\"attributes\":{\"foo\":\"bar\"}}";
+        System.out.println(json);
+        TestUserBean user = parseJSON(DEFAULT_MODIFIER_MAPPER, json, TestUserBean.class, singletonMap("_id", "id"), "name");
+        System.out.println(user);
+        assert user.getId() == 66574534868992L;
+        assert user.getName() == null;
+    }
+
+    @Test
+    public void testJSONView_with_custom_include_exclude_properties() {
         TestUserInfo user = new TestUserInfo(1313466574534868992L, 36, "james", "wong", singletonMap("foo", "bar"));
         String json1 = toJSONString(IgnoreFieldView.class, user, false, null);
         System.out.println("json1 : " + json1);

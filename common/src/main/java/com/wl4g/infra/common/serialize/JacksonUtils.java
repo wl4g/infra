@@ -20,9 +20,11 @@ import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static java.util.Collections.emptyMap;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.File;
@@ -34,6 +36,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
@@ -41,6 +44,7 @@ import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.core.FormatSchema;
 import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.PrettyPrinter;
 import com.fasterxml.jackson.core.TreeNode;
@@ -58,6 +62,9 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.cfg.ContextAttributes;
+import com.fasterxml.jackson.databind.deser.BeanDeserializer;
+import com.fasterxml.jackson.databind.deser.BeanDeserializerBase;
 import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
 import com.fasterxml.jackson.databind.deser.DataFormatReaders;
 import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
@@ -85,6 +92,10 @@ import lombok.Getter;
  */
 @SuppressWarnings("deprecation")
 public abstract class JacksonUtils {
+
+    //
+    // --- Serialize Function. ---
+    //
 
     /**
      * Object to JSON strings.
@@ -178,7 +189,7 @@ public abstract class JacksonUtils {
             final boolean isPretty,
             final @Nullable Map<String, String> transformProperties,
             final @Nullable String... ignoreProperties) {
-        return toJSONString(mapper, null, object, isPretty, transformProperties, ignoreProperties);
+        return _toJSONString(mapper, null, object, isPretty, transformProperties, ignoreProperties);
     }
 
     /**
@@ -196,7 +207,7 @@ public abstract class JacksonUtils {
             final boolean isPretty,
             final @Nullable Map<String, String> transformProperties,
             final @Nullable String... ignoreProperties) {
-        return toJSONString(DEFAULT_OBJECT_MAPPER, view, object, isPretty, transformProperties, ignoreProperties);
+        return _toJSONString(DEFAULT_OBJECT_MAPPER, view, object, isPretty, transformProperties, ignoreProperties);
     }
 
     /**
@@ -218,7 +229,7 @@ public abstract class JacksonUtils {
      * @param ignoreProperties
      * @return
      */
-    public static String toJSONString(
+    public static String _toJSONString(
             final @NotNull ObjectMapper mapper,
             final @Nullable Class<?> view,
             final @Nullable Object object,
@@ -242,125 +253,170 @@ public abstract class JacksonUtils {
         }
     }
 
+    //
+    // --- Deserialize with Collection Function. ---
+    //
+
+    /**
+     * Parse array parameterized map string from JSON strings.
+     * 
+     * @param json
+     * @param valueTypeRef
+     * @return
+     */
+    public static List<String> parseArrayString(final @Nullable String jsonString) {
+        return parseArrayString(null, jsonString);
+    }
+
+    /**
+     * Parse array parameterized map string from JSON strings.
+     * 
+     * @param view
+     * @param json
+     * @param valueTypeRef
+     * @return
+     */
+    public static List<String> parseArrayString(final @Nullable Class<?> view, final @Nullable String jsonString) {
+        return parseJSON(DEFAULT_OBJECT_MAPPER, view, jsonString, LIST_STRING_TYPE_REF, null);
+    }
+
+    /**
+     * Parse array parameterized map string from JSON strings.
+     * 
+     * @param json
+     * @param valueTypeRef
+     * @return
+     */
+    public static List<Map<String, String>> parseArrayMapString(@Nullable String jsonString) {
+        return parseArrayMapString(null, jsonString);
+    }
+
+    /**
+     * Parse array parameterized map string from JSON strings.
+     * 
+     * @param view
+     * @param json
+     * @param valueTypeRef
+     * @return
+     */
+    public static List<Map<String, String>> parseArrayMapString(final @Nullable Class<?> view, @Nullable String jsonString) {
+        return parseJSON(DEFAULT_OBJECT_MAPPER, view, jsonString, LIST_MAP_STRING_TYPE_REF, null);
+    }
+
+    /**
+     * Parse array parameterized map object from JSON strings.
+     * 
+     * @param view
+     * @param json
+     * @param valueTypeRef
+     * @return
+     */
+    public static List<Map<String, Object>> parseArrayMapObject(final @Nullable Class<?> view, @Nullable String jsonString) {
+        return parseJSON(DEFAULT_OBJECT_MAPPER, view, jsonString, LIST_MAP_OBJECT_TYPE_REF, null);
+    }
+
+    /**
+     * Parse map parameterized object from JSON strings.
+     * 
+     * @param json
+     * @param valueTypeRef
+     * @return
+     */
+    public static Map<String, Object> parseMapObject(@Nullable String jsonString) {
+        return parseMapObject(null, jsonString);
+    }
+
+    /**
+     * Parse map parameterized object from JSON strings.
+     * 
+     * @param view
+     * @param json
+     * @param valueTypeRef
+     * @return
+     */
+    public static Map<String, Object> parseMapObject(final @Nullable Class<?> view, @Nullable String jsonString) {
+        return parseJSON(DEFAULT_OBJECT_MAPPER, view, jsonString, MAP_OBJECT_TYPE_REF, null);
+    }
+
+    //
+    // --- Deserialize with JavaBean Function. ---
+    //
+
     /**
      * Parse object from JSON strings.
      * 
-     * @param content
-     * @param clazz
+     * @param json
+     * @param valueType
      * @return
      */
-    public static <T> T parseJSON(final @Nullable String content, final @NotNull Class<T> clazz) {
-        notNullOf(clazz, "clazz");
-        if (isBlank(content)) {
-            return null;
-        }
-        try {
-            return DEFAULT_OBJECT_MAPPER.readValue(content, clazz);
-        } catch (IOException e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
-    /**
-     * Parse object from JSON {@link InputStream}.
-     * 
-     * @param src
-     * @param clazz
-     * @return
-     */
-    public static <T> T parseJSON(final @Nullable InputStream src, final @NotNull Class<T> clazz) {
-        notNullOf(clazz, "clazz");
-        if (isNull(src)) {
-            return null;
-        }
-        try {
-            return DEFAULT_OBJECT_MAPPER.readValue(src, clazz);
-        } catch (IOException e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
-    /**
-     * Parse object from JSON {@link File}.
-     * 
-     * @param content
-     * @param valueTypeRef
-     * @return
-     */
-    public static <T> T parseJSON(final @Nullable File src, final @NotNull Class<T> clazz) {
-        notNullOf(clazz, "clazz");
-        if (isNull(src)) {
-            return null;
-        }
-        try {
-            return DEFAULT_OBJECT_MAPPER.readValue(src, clazz);
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
-    /**
-     * Parse object from JSON {@link File}.
-     * 
-     * @param content
-     * @param valueTypeRef
-     * @return
-     */
-    public static <T> T parseJSON(final @Nullable File src, final @NotNull TypeReference<T> valueTypeRef) {
-        notNullOf(valueTypeRef, "valueTypeRef");
-        if (isNull(src)) {
-            return null;
-        }
-        try {
-            return DEFAULT_OBJECT_MAPPER.readValue(src, valueTypeRef);
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
-    /**
-     * Parse object from JSON {@link InputStream}.
-     * 
-     * @param content
-     * @param valueTypeRef
-     * @return
-     */
-    public static <T> T parseJSON(final @Nullable InputStream src, final @NotNull TypeReference<T> valueTypeRef) {
-        notNullOf(valueTypeRef, "valueTypeRef");
-        if (isNull(src)) {
-            return null;
-        }
-        try {
-            return DEFAULT_OBJECT_MAPPER.readValue(src, valueTypeRef);
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
-    /**
-     * Parse object string from JSON strings.
-     * 
-     * @param content
-     * @param valueTypeRef
-     * @return
-     */
-    public static <T> T parseJSON(final @Nullable String content, final @NotNull TypeReference<T> valueTypeRef) {
-        return parseJSON(DEFAULT_OBJECT_MAPPER, null, content, valueTypeRef);
+    public static <T> T parseJSON(final @Nullable String jsonString, final @NotNull Class<T> valueType) {
+        return parseJSON(DEFAULT_OBJECT_MAPPER, jsonString, valueType, null);
     }
 
     /**
      * Parse object string from JSON strings.
      * 
      * @param view
-     * @param content
+     * @param jsonFile
      * @param valueType
      * @return
      */
     public static <T> T parseJSON(
             final @Nullable Class<?> view,
-            final @Nullable String content,
+            final @Nullable File jsonFile,
             final @NotNull Class<T> valueType) {
-        return parseJSON(DEFAULT_OBJECT_MAPPER, view, content, valueType);
+        final ObjectMapper mapper = DEFAULT_OBJECT_MAPPER;
+        return _parseJSON(mapper, null, () -> {
+            try {
+                return isNull(jsonFile) ? null : mapper.getFactory().createParser(jsonFile);
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
+        }, () -> mapper.getTypeFactory().constructType(valueType), null);
+    }
+
+    /**
+     * Parse object string from JSON strings.
+     * 
+     * @param view
+     * @param jsonInputStream
+     * @param valueType
+     * @return
+     */
+    public static <T> T parseJSON(
+            final @Nullable Class<?> view,
+            final @Nullable InputStream jsonInputStream,
+            final @NotNull Class<T> valueType) {
+        final ObjectMapper mapper = DEFAULT_OBJECT_MAPPER;
+        return _parseJSON(mapper, null, () -> {
+            try {
+                return isNull(jsonInputStream) ? null : mapper.getFactory().createParser(jsonInputStream);
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
+        }, () -> mapper.getTypeFactory().constructType(valueType), null);
+    }
+
+    /**
+     * Parse object string from JSON strings.
+     * 
+     * @param view
+     * @param json
+     * @param valueType
+     * @return
+     */
+    public static <T> T parseJSON(
+            final @Nullable Class<?> view,
+            final @Nullable String jsonString,
+            final @NotNull Class<T> valueType) {
+        final ObjectMapper mapper = DEFAULT_OBJECT_MAPPER;
+        return _parseJSON(mapper, null, () -> {
+            try {
+                return isNull(jsonString) ? null : mapper.getFactory().createParser(jsonString);
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
+        }, () -> mapper.getTypeFactory().constructType(valueType), null);
     }
 
     /**
@@ -368,40 +424,70 @@ public abstract class JacksonUtils {
      * 
      * @param mapper
      * @param view
-     * @param content
+     * @param json
      * @param valueType
+     * @param transformProperties
+     * @param ignoreProperties
      * @return
      */
     public static <T> T parseJSON(
             final @NotNull ObjectMapper mapper,
-            final @Nullable Class<?> view,
-            final @Nullable String content,
-            final @NotNull Class<T> valueType) {
-        notNullOf(valueType, "valueType");
-        if (isBlank(content)) {
-            return null;
-        }
-        try {
-            return mapper.readerWithView(view)
-                    .readValue(mapper.getFactory().createParser(content), mapper.getTypeFactory().constructType(valueType));
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e);
-        }
+            final @Nullable String jsonString,
+            final @NotNull Class<T> valueType,
+            final @Nullable Map<String, String> transformProperties,
+            final @Nullable String... ignoreProperties) {
+        return _parseJSON(mapper, null, () -> {
+            try {
+                return mapper.getFactory().createParser(jsonString);
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
+        }, () -> mapper.getTypeFactory().constructType(valueType), transformProperties, ignoreProperties);
+    }
+
+    /**
+     * Parse object string from JSON strings.
+     * 
+     * @param json
+     * @param valueTypeRef
+     * @return
+     */
+    public static <T> T parseJSON(final @Nullable String jsonString, final @NotNull TypeReference<T> valueTypeRef) {
+        return parseJSON(DEFAULT_OBJECT_MAPPER, null, jsonString, valueTypeRef, null);
     }
 
     /**
      * Parse object string from JSON strings.
      * 
      * @param view
-     * @param content
+     * @param json
      * @param valueTypeRef
      * @return
      */
     public static <T> T parseJSON(
             final @Nullable Class<?> view,
-            final @Nullable String content,
+            final @Nullable String jsonString,
             final @NotNull TypeReference<T> valueTypeRef) {
-        return parseJSON(DEFAULT_OBJECT_MAPPER, view, content, valueTypeRef);
+        return parseJSON(DEFAULT_OBJECT_MAPPER, view, jsonString, valueTypeRef, null);
+    }
+
+    /**
+     * Parse object string from JSON strings.
+     * 
+     * @param mapper
+     * @param json
+     * @param valueTypeRef
+     * @param transformProperties
+     * @param ignoreProperties
+     * @return
+     */
+    public static <T> T parseJSON(
+            final @NotNull ObjectMapper mapper,
+            final @Nullable String jsonString,
+            final @NotNull TypeReference<T> valueTypeRef,
+            final @Nullable Map<String, String> transformProperties,
+            final @Nullable String... ignoreProperties) {
+        return parseJSON(mapper, null, jsonString, valueTypeRef, transformProperties, ignoreProperties);
     }
 
     /**
@@ -409,27 +495,65 @@ public abstract class JacksonUtils {
      * 
      * @param mapper
      * @param view
-     * @param content
+     * @param json
      * @param valueTypeRef
+     * @param transformProperties
+     * @param ignoreProperties
      * @return
      */
     public static <T> T parseJSON(
             final @NotNull ObjectMapper mapper,
             final @Nullable Class<?> view,
-            final @Nullable String content,
-            final @NotNull TypeReference<T> valueTypeRef) {
+            final @Nullable String jsonString,
+            final @NotNull TypeReference<T> valueTypeRef,
+            final @Nullable Map<String, String> transformProperties,
+            final @Nullable String... ignoreProperties) {
+        return _parseJSON(mapper, view, () -> {
+            try {
+                return isNull(jsonString) ? null : mapper.getFactory().createParser(jsonString);
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
+        }, () -> mapper.getTypeFactory().constructType(valueTypeRef), transformProperties, ignoreProperties);
+    }
+
+    /**
+     * Parse object string from JSON strings.
+     * 
+     * @param mapper
+     * @param view
+     * @param jsonParserSupplier
+     * @param valueJavaTypeSupplier
+     * @param transformProperties
+     * @param ignoreProperties
+     * @return
+     */
+    public static <T> T _parseJSON(
+            final @NotNull ObjectMapper mapper,
+            final @Nullable Class<?> view,
+            final @NotNull Supplier<JsonParser> jsonParserSupplier,
+            final @NotNull Supplier<JavaType> valueJavaTypeSupplier,
+            final @Nullable Map<String, String> transformProperties,
+            final @Nullable String... ignoreProperties) {
         notNullOf(mapper, "mapper");
-        notNullOf(valueTypeRef, "valueTypeRef");
-        if (isBlank(content)) {
+        notNullOf(jsonParserSupplier, "jsonParserSupplier");
+        notNullOf(valueJavaTypeSupplier, "valueJavaTypeSupplier");
+        final JsonParser jsonParser = jsonParserSupplier.get();
+        if (isNull(jsonParser)) {
             return null;
         }
         try {
-            return mapper.readerWithView(view)
-                    .readValue(mapper.getFactory().createParser(content), mapper.getTypeFactory().constructType(valueTypeRef));
+            final DeserializationConfig config = mapper.getDeserializationConfig()
+                    .with(new TransformContextAttributes(safeMap(transformProperties), safeArrayToSet(ignoreProperties)));
+            return new CustomObjectReader(mapper, config).withView(view).readValue(jsonParser, valueJavaTypeSupplier.get());
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
     }
+
+    //
+    // --- Deserialize with JsonNode Function. ---
+    //
 
     /**
      * Parse {@link TreeNode} to object.
@@ -438,7 +562,7 @@ public abstract class JacksonUtils {
      * @param atPathExpr
      * @return
      */
-    public static <T> T parseFromNode(@Nullable TreeNode node, @NotBlank String atPathExpr, @NotNull Class<T> clazz) {
+    public static <T> T parseFromNode(@Nullable TreeNode node, @NotBlank String atPathExpr, @NotNull Class<T> valueType) {
         hasTextOf(atPathExpr, "atPathExpr");
         if (isNull(node)) {
             return null;
@@ -446,7 +570,7 @@ public abstract class JacksonUtils {
         try {
             final TreeNode objNode = node.at(atPathExpr);
             if (objNode.size() > 0) {
-                return DEFAULT_OBJECT_MAPPER.treeToValue(objNode, clazz);
+                return DEFAULT_OBJECT_MAPPER.treeToValue(objNode, valueType);
             }
             return null;
         } catch (JsonProcessingException e) {
@@ -461,8 +585,8 @@ public abstract class JacksonUtils {
      * @param atPathExpr
      * @return
      */
-    public static JsonNode parseToNode(@Nullable String content) {
-        return parseToNode(content, null);
+    public static JsonNode parseToNode(@Nullable String jsonString) {
+        return parseToNode(jsonString, null);
     }
 
     /**
@@ -472,8 +596,8 @@ public abstract class JacksonUtils {
      * @param atPathExpr
      * @return
      */
-    public static JsonNode parseToNode(@Nullable String content, @Nullable String atPathExpr) {
-        return parseToNode(DEFAULT_OBJECT_MAPPER, null, content, atPathExpr);
+    public static JsonNode parseToNode(@Nullable String jsonString, @Nullable String atPathExpr) {
+        return parseToNode(DEFAULT_OBJECT_MAPPER, null, jsonString, atPathExpr);
     }
 
     /**
@@ -486,9 +610,9 @@ public abstract class JacksonUtils {
      */
     public static JsonNode parseToNode(
             final @Nullable Class<?> view,
-            final @Nullable String content,
+            final @Nullable String jsonString,
             final @Nullable String atPathExpr) {
-        return parseToNode(DEFAULT_OBJECT_MAPPER, view, content, atPathExpr);
+        return parseToNode(DEFAULT_OBJECT_MAPPER, view, jsonString, atPathExpr);
     }
 
     /**
@@ -496,106 +620,29 @@ public abstract class JacksonUtils {
      * 
      * @param mapper
      * @param view
-     * @param object
+     * @param jsonString
      * @param atPathExpr
      * @return
      */
     public static JsonNode parseToNode(
             final @NotNull ObjectMapper mapper,
             final @Nullable Class<?> view,
-            final @Nullable String content,
+            final @Nullable String jsonString,
             final @Nullable String atPathExpr) {
         notNullOf(mapper, "mapper");
-        if (isBlank(content)) {
+        if (isBlank(jsonString)) {
             return null;
         }
         try {
-            return mapper.readerWithView(view).readTree(content).requiredAt(atPathExpr);
+            return mapper.readerWithView(view).readTree(jsonString).requiredAt(atPathExpr);
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException(e);
         }
     }
 
-    /**
-     * Parse array parameterized map string from JSON strings.
-     * 
-     * @param content
-     * @param valueTypeRef
-     * @return
-     */
-    public static List<String> parseArrayString(final @Nullable String content) {
-        return parseArrayString(null, content);
-    }
-
-    /**
-     * Parse array parameterized map string from JSON strings.
-     * 
-     * @param view
-     * @param content
-     * @param valueTypeRef
-     * @return
-     */
-    public static List<String> parseArrayString(final @Nullable Class<?> view, final @Nullable String content) {
-        return parseJSON(DEFAULT_OBJECT_MAPPER, view, content, LIST_STRING_TYPE_REF);
-    }
-
-    /**
-     * Parse array parameterized map string from JSON strings.
-     * 
-     * @param content
-     * @param valueTypeRef
-     * @return
-     */
-    public static List<Map<String, String>> parseArrayMapString(@Nullable String content) {
-        return parseArrayMapString(null, content);
-    }
-
-    /**
-     * Parse array parameterized map string from JSON strings.
-     * 
-     * @param view
-     * @param content
-     * @param valueTypeRef
-     * @return
-     */
-    public static List<Map<String, String>> parseArrayMapString(final @Nullable Class<?> view, @Nullable String content) {
-        return parseJSON(DEFAULT_OBJECT_MAPPER, view, content, LIST_MAP_STRING_TYPE_REF);
-    }
-
-    /**
-     * Parse array parameterized map object from JSON strings.
-     * 
-     * @param view
-     * @param content
-     * @param valueTypeRef
-     * @return
-     */
-    public static List<Map<String, Object>> parseArrayMapObject(final @Nullable Class<?> view, @Nullable String content) {
-        return parseJSON(DEFAULT_OBJECT_MAPPER, view, content, LIST_MAP_OBJECT_TYPE_REF);
-    }
-
-    /**
-     * Parse map parameterized object from JSON strings.
-     * 
-     * @param content
-     * @param valueTypeRef
-     * @return
-     */
-    public static Map<String, Object> parseMapObject(@Nullable String content) {
-        return parseMapObject(null, content);
-    }
-
-    /**
-     * Parse map parameterized object from JSON strings.
-     * 
-     * @param view
-     * @param content
-     * @param valueTypeRef
-     * @return
-     */
-    public static Map<String, Object> parseMapObject(final @Nullable Class<?> view, @Nullable String content) {
-        return parseJSON(DEFAULT_OBJECT_MAPPER, view, content, MAP_OBJECT_TYPE_REF);
-    }
+    //
+    // --- Conversion Function. ---
+    //
 
     /**
      * Convert value to target type.</br>
@@ -668,9 +715,9 @@ public abstract class JacksonUtils {
             ObjectReader reader = null;
             ResolvableType[] generics = resolver.getGenerics();
             if (!isNull(generics) && generics.length == 1) {
-                Class<?> clazz = generics[0].getRawClass();
-                if (!isNull(clazz)) {
-                    reader = DEFAULT_OBJECT_MAPPER.readerForListOf(clazz);
+                Class<?> valueType = generics[0].getRawClass();
+                if (!isNull(valueType)) {
+                    reader = DEFAULT_OBJECT_MAPPER.readerForListOf(valueType);
                 }
             }
             if (isNull(reader)) { // Fallback
@@ -726,6 +773,10 @@ public abstract class JacksonUtils {
             throw new IllegalStateException(e);
         }
     }
+
+    //
+    // --- Helper Function. ---
+    //
 
     /**
      * Create default {@link ObjectMapper}
@@ -843,11 +894,14 @@ public abstract class JacksonUtils {
                 SerializationConfig config,
                 BeanDescription beanDesc,
                 List<BeanPropertyWriter> beanProperties) {
+
             final FilterProvider provider = config.getFilterProvider();
             if (nonNull(provider)) {
-                // Ignore for exclude properties.
+                // Filtering for ignore properties.
                 final TransformPropertyFilter filter = notNullOf(
                         provider.findPropertyFilter(TransformPropertyFilter.FILTER_ID, null), "filter");
+
+                // Transform properties.
                 return safeList(beanProperties).stream()
                         .filter(bp -> !filter.getExcludeProperties().contains(bp.getName()))
                         .map(bp -> bp.rename(new NameTransformer() {
@@ -863,24 +917,85 @@ public abstract class JacksonUtils {
                         }))
                         .collect(toList());
             }
+
             return beanProperties;
         }
     }
 
+    @Getter
+    public static class TransformContextAttributes extends ContextAttributes.Impl {
+        private static final long serialVersionUID = 1L;
+        static final String ATTRIBUTES_ID = TransformContextAttributes.class.getSimpleName();
+
+        final @NotNull Map<String, String> transformProperties;
+        final @NotNull Set<String> excludeProperties;
+
+        public TransformContextAttributes(Map<String, String> transformProperties, Set<String> excludeProperties) {
+            super(emptyMap()); // Nothing shared
+            this.transformProperties = notNullOf(transformProperties, "transformProperties");
+            this.excludeProperties = notNullOf(excludeProperties, "excludeProperties");
+        }
+    }
+
+    public static class TransformBeanDeserializer extends BeanDeserializer {
+        private static final long serialVersionUID = 1L;
+
+        protected TransformBeanDeserializer(BeanDeserializerBase src, NameTransformer unwrapper) {
+            super(src, unwrapper);
+        }
+    }
+
     public static class TransformPropertiesDeserializerModifier extends BeanDeserializerModifier {
+
+        @Override
+        public JsonDeserializer<?> modifyDeserializer(
+                DeserializationConfig config,
+                BeanDescription beanDesc,
+                JsonDeserializer<?> deserializer) {
+            if (deserializer instanceof BeanDeserializerBase) {
+                final TransformContextAttributes attributes = notNullOf(config.getAttributes(), "attributes");
+                // Notice: It needs to be reversed here, that is, from
+                // key->value to value->key, because the java bean property name
+                // is modified here, that is, the modification of the java bean
+                // property name to be consistent with the key in the json
+                // string will take effect.
+                final Map<String, String> reverseTransformProperties = attributes.getTransformProperties()
+                        .entrySet()
+                        .stream()
+                        .collect(toMap(e -> e.getValue(), e -> e.getKey()));
+
+                // Transform properties.
+                return new TransformBeanDeserializer((BeanDeserializerBase) deserializer, new NameTransformer() {
+                    @Override
+                    public String transform(String name) {
+                        final Object transformed = reverseTransformProperties.getOrDefault(name, name);
+                        return (String) transformed;
+                    }
+
+                    @Override
+                    public String reverse(String transformed) {
+                        return transformed;
+                    }
+                });
+            }
+            return deserializer;
+        }
+
         @Override
         public List<BeanPropertyDefinition> updateProperties(
                 DeserializationConfig config,
                 BeanDescription beanDesc,
                 List<BeanPropertyDefinition> propDefs) {
-            final List<BeanPropertyDefinition> _propDefs = safeList(propDefs);
-            for (int i = 0; i < _propDefs.size(); i++) {
-                BeanPropertyDefinition definition = _propDefs.get(i);
-                if (definition.getName().equals("id")) {
-                    _propDefs.set(i, definition.withSimpleName("_id"));
+            final TransformContextAttributes attributes = notNullOf(config.getAttributes(), "attributes");
+            // Remove for ignore properties.
+            final Iterator<BeanPropertyDefinition> it = safeList(propDefs).iterator();
+            while (it.hasNext()) {
+                BeanPropertyDefinition definition = it.next();
+                if (attributes.getExcludeProperties().contains(definition.getName())) {
+                    it.remove();
                 }
             }
-            return _propDefs;
+            return propDefs;
         }
     }
 
