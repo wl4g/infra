@@ -6,6 +6,7 @@
     {"interfaces": ["com.google.common.base.Function"] },
     {"interfaces": ["com.google.common.base.Supplier"] },
     {"interfaces": ["com.wl4g.infra.common.bean.BaseBean$JsonForRestReadMarker"] },
+    {"interfaces": ["com.wl4g.infra.common.serialize.BsonUtils2$Converter"] },
     {"interfaces": ["com.wl4g.infra.common.task.CompleteTaskListener"] },
     {"interfaces": ["com.wl4g.infra.common.function.CallbackFunction"] },
     {"interfaces": ["com.wl4g.infra.common.function.ProcessFunction"] },

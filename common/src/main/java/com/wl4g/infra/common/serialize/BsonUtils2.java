@@ -730,7 +730,7 @@ public abstract class BsonUtils2 {
      *
      * @author Mark Paluch
      */
-    static class EmptyDocument extends Document {
+    public static class EmptyDocument extends Document {
         private static final long serialVersionUID = 1L;
 
         @Override
@@ -797,7 +797,7 @@ public abstract class BsonUtils2 {
     }
 
     @FunctionalInterface
-    static interface Converter<S, T> {
+    public static interface Converter<S, T> {
 
         /**
          * Convert the source object of type {@code S} to target type {@code T}.
