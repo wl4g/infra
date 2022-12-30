@@ -15,26 +15,19 @@
  */
 package com.wl4g.infra.common.lang;
 
-import static java.lang.Math.max;
 import static java.lang.String.format;
-import static java.lang.System.getenv;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.startsWithAny;
-import static org.apache.commons.lang3.SystemUtils.JAVA_VERSION;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotBlank;
 
 import org.apache.commons.lang3.StringUtils;
-
-import com.wl4g.infra.common.reflect.ObjectInstantiators;
 
 /**
  * Assertion utility class that assists in validating arguments.
@@ -174,13 +167,67 @@ public abstract class Assert2 {
      * @throws IllegalArgumentException
      *             if {@code expression} is {@code false}
      */
-    public static void isTrue(
+    public @Deprecated static void isTrue(
             boolean expression,
             Class<? extends RuntimeException> exceptionClass,
             String fmtMessage,
             Object... args) {
         if (!expression) {
-            doWrapException(exceptionClass, fmtMessage, args);
+            doWrapException(null, fmtMessage, args);
+        }
+    }
+
+    /**
+     * Assert a boolean expression, throwing an {@code IllegalArgumentException}
+     * if the expression evaluates to {@code false}.
+     * 
+     * <pre class="code">
+     * Assert2.isTrue(i &gt; 0, "The value must be greater than zero");
+     * </pre>
+     * 
+     * @param expression
+     *            a boolean expression
+     * @param exceptionFunction
+     *            get exception class function
+     * @param fmtMessage
+     *            the exception message to use if the assertion fails
+     * @throws IllegalArgumentException
+     *             if {@code expression} is {@code false}
+     */
+    public static void isTrue(
+            boolean expression,
+            Function<String, ? extends RuntimeException> exceptionFunction,
+            String fmtMessage,
+            Object... args) {
+        if (!expression) {
+            doWrapException(exceptionFunction, fmtMessage, args);
+        }
+    }
+
+    /**
+     * Assert a boolean expression, throwing an {@code IllegalArgumentException}
+     * if the expression evaluates to {@code false}.
+     * 
+     * <pre class="code">
+     * Assert2.isTrue(i &gt; 0, "The value must be greater than zero");
+     * </pre>
+     * 
+     * @param expression
+     *            a boolean expression
+     * @param exceptionClass
+     *            Throwable class
+     * @param messageSupplier
+     *            a supplier for the exception message to use if the assertion
+     *            fails
+     * @throws IllegalArgumentException
+     *             if {@code expression} is {@code false}
+     */
+    public @Deprecated static void isTrue(
+            boolean expression,
+            Class<? extends RuntimeException> exceptionClass,
+            Supplier<String> messageSupplier) {
+        if (!expression) {
+            doWrapException(null, nullSafeGet(messageSupplier));
         }
     }
 
@@ -204,10 +251,10 @@ public abstract class Assert2 {
      */
     public static void isTrue(
             boolean expression,
-            Class<? extends RuntimeException> exceptionClass,
+            Function<String, ? extends RuntimeException> exceptionFunction,
             Supplier<String> messageSupplier) {
         if (!expression) {
-            doWrapException(exceptionClass, nullSafeGet(messageSupplier));
+            doWrapException(exceptionFunction, nullSafeGet(messageSupplier));
         }
     }
 
@@ -273,13 +320,40 @@ public abstract class Assert2 {
      *             if the object is {@code null}
      */
     @SuppressWarnings("unchecked")
-    public static <T> T isNull(
+    public @Deprecated static <T> T isNull(
             Object object,
             Class<? extends RuntimeException> exceptionClass,
             String fmtMessage,
             Object... args) {
         if (object != null) {
-            doWrapException(exceptionClass, fmtMessage, args);
+            doWrapException(null, fmtMessage, args);
+        }
+        return (T) object;
+    }
+
+    /**
+     * Assert that an object is {@code null}.
+     * 
+     * <pre class="code">
+     * Assert2.isNull(value, "The value must be null");
+     * </pre>
+     * 
+     * @param object
+     *            the object to check
+     * @param exceptionFunction
+     * @param fmtMessage
+     *            the exception message to use if the assertion fails
+     * @throws IllegalArgumentException
+     *             if the object is {@code null}
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T isNull(
+            Object object,
+            Function<String, ? extends RuntimeException> exceptionFunction,
+            String fmtMessage,
+            Object... args) {
+        if (object != null) {
+            doWrapException(exceptionFunction, fmtMessage, args);
         }
         return (T) object;
     }
@@ -357,13 +431,40 @@ public abstract class Assert2 {
      *             if the object is {@code null}
      */
     @SuppressWarnings("unchecked")
-    public static <T> T notNull(
+    public @Deprecated static <T> T notNull(
             Object object,
             Class<? extends RuntimeException> exceptionClass,
             String fmtMessage,
             Object... args) {
         if (object == null) {
-            doWrapException(exceptionClass, fmtMessage, args);
+            doWrapException(null, fmtMessage, args);
+        }
+        return (T) object;
+    }
+
+    /**
+     * Assert that an object is not {@code null}.
+     * 
+     * <pre class="code">
+     * Assert2.notNull(clazz, "The class must not be null");
+     * </pre>
+     * 
+     * @param object
+     *            the object to check
+     * @param exceptionFunction
+     * @param fmtMessage
+     *            the exception message to use if the assertion fails
+     * @throws IllegalArgumentException
+     *             if the object is {@code null}
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T notNull(
+            Object object,
+            Function<String, ? extends RuntimeException> exceptionFunction,
+            String fmtMessage,
+            Object... args) {
+        if (object == null) {
+            doWrapException(exceptionFunction, fmtMessage, args);
         }
         return (T) object;
     }
@@ -386,12 +487,39 @@ public abstract class Assert2 {
      *             if the object is {@code null}
      */
     @SuppressWarnings("unchecked")
-    public static <T> T notNull(
+    public @Deprecated static <T> T notNull(
             Object object,
             Class<? extends RuntimeException> exceptionClass,
             Supplier<String> messageSupplier) {
         if (object == null) {
-            doWrapException(exceptionClass, nullSafeGet(messageSupplier));
+            doWrapException(null, nullSafeGet(messageSupplier));
+        }
+        return (T) object;
+    }
+
+    /**
+     * Assert that an object is not {@code null}.
+     * 
+     * <pre class="code">
+     * Assert2.notNull(clazz, "The class must not be null");
+     * </pre>
+     * 
+     * @param object
+     *            the object to check
+     * @param exceptionFunction
+     * @param messageSupplier
+     *            a supplier for the exception message to use if the assertion
+     *            fails
+     * @throws IllegalArgumentException
+     *             if the object is {@code null}
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T notNull(
+            Object object,
+            Function<String, ? extends RuntimeException> exceptionFunction,
+            Supplier<String> messageSupplier) {
+        if (object == null) {
+            doWrapException(exceptionFunction, nullSafeGet(messageSupplier));
         }
         return (T) object;
     }
@@ -528,13 +656,43 @@ public abstract class Assert2 {
      *             if the text does not contain valid text content
      */
     @SuppressWarnings("unchecked")
-    public static <T> T hasText(
+    public @Deprecated static <T> T hasText(
             String text,
             Class<? extends RuntimeException> exceptionClass,
             String fmtMessage,
             Object... args) {
         if (!isNotBlank(text)) {
-            doWrapException(exceptionClass, fmtMessage, args);
+            doWrapException(null, fmtMessage, args);
+        }
+        return (T) text;
+    }
+
+    /**
+     * Assert that the given String contains valid text content; that is, it
+     * must not be {@code null} and must contain at least one non-whitespace
+     * character.
+     * 
+     * <pre class="code">
+     * Assert2.hasText(name, "'name' must not be empty");
+     * </pre>
+     * 
+     * @param text
+     *            the String to check
+     * @param exceptionFunction
+     * @param fmtMessage
+     *            the exception message to use if the assertion fails
+     * @see StringUtils#hasText
+     * @throws IllegalArgumentException
+     *             if the text does not contain valid text content
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T hasText(
+            String text,
+            Function<String, ? extends RuntimeException> exceptionFunction,
+            String fmtMessage,
+            Object... args) {
+        if (!isNotBlank(text)) {
+            doWrapException(exceptionFunction, fmtMessage, args);
         }
         return (T) text;
     }
@@ -560,9 +718,42 @@ public abstract class Assert2 {
      *             if the text does not contain valid text content
      */
     @SuppressWarnings("unchecked")
-    public static <T> T hasText(String text, Class<? extends RuntimeException> exceptionClass, Supplier<String> messageSupplier) {
+    public @Deprecated static <T> T hasText(
+            String text,
+            Class<? extends RuntimeException> exceptionClass,
+            Supplier<String> messageSupplier) {
         if (!isNotBlank(text)) {
-            doWrapException(exceptionClass, nullSafeGet(messageSupplier));
+            doWrapException(null, nullSafeGet(messageSupplier));
+        }
+        return (T) text;
+    }
+
+    /**
+     * Assert that the given String contains valid text content; that is, it
+     * must not be {@code null} and must contain at least one non-whitespace
+     * character.
+     * 
+     * <pre class="code">
+     * Assert2.hasText(name, "'name' must not be empty");
+     * </pre>
+     * 
+     * @param text
+     *            the String to check
+     * @param exceptionFunction
+     * @param messageSupplier
+     *            a supplier for the exception message to use if the assertion
+     *            fails
+     * @see StringUtils#hasText
+     * @throws IllegalArgumentException
+     *             if the text does not contain valid text content
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T hasText(
+            String text,
+            Function<String, ? extends RuntimeException> exceptionFunction,
+            Supplier<String> messageSupplier) {
+        if (!isNotBlank(text)) {
+            doWrapException(exceptionFunction, nullSafeGet(messageSupplier));
         }
         return (T) text;
     }
@@ -698,13 +889,41 @@ public abstract class Assert2 {
      *             if the object array is {@code null} or contains no elements
      */
     @SuppressWarnings("unchecked")
-    public static <T> T notEmpty(
+    public @Deprecated static <T> T notEmpty(
             Object[] array,
             Class<? extends RuntimeException> exceptionClass,
             String fmtMessage,
             Object... args) {
         if (array == null || array.length == 0) {
-            doWrapException(exceptionClass, fmtMessage, args);
+            doWrapException(null, fmtMessage, args);
+        }
+        return (T) array;
+    }
+
+    /**
+     * Assert that an array contains elements; that is, it must not be
+     * {@code null} and must contain at least one element.
+     * 
+     * <pre class="code">
+     * Assert2.notEmpty(array, "The array must contain elements");
+     * </pre>
+     * 
+     * @param array
+     *            the array to check
+     * @param exceptionFunction
+     * @param fmtMessage
+     *            the exception message to use if the assertion fails
+     * @throws IllegalArgumentException
+     *             if the object array is {@code null} or contains no elements
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T notEmpty(
+            Object[] array,
+            Function<String, ? extends RuntimeException> exceptionFunction,
+            String fmtMessage,
+            Object... args) {
+        if (array == null || array.length == 0) {
+            doWrapException(exceptionFunction, fmtMessage, args);
         }
         return (T) array;
     }
@@ -728,12 +947,40 @@ public abstract class Assert2 {
      *             if the object array is {@code null} or contains no elements
      */
     @SuppressWarnings("unchecked")
-    public static <T> T notEmpty(
+    public @Deprecated static <T> T notEmpty(
             Object[] array,
             Class<? extends RuntimeException> exceptionClass,
             Supplier<String> messageSupplier) {
         if (array == null || array.length == 0) {
-            doWrapException(exceptionClass, nullSafeGet(messageSupplier));
+            doWrapException(null, nullSafeGet(messageSupplier));
+        }
+        return (T) array;
+    }
+
+    /**
+     * Assert that an array contains elements; that is, it must not be
+     * {@code null} and must contain at least one element.
+     * 
+     * <pre class="code">
+     * Assert2.notEmpty(array, "The array must contain elements");
+     * </pre>
+     * 
+     * @param array
+     *            the array to check
+     * @param exceptionFunction
+     * @param messageSupplier
+     *            a supplier for the exception message to use if the assertion
+     *            fails
+     * @throws IllegalArgumentException
+     *             if the object array is {@code null} or contains no elements
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T notEmpty(
+            Object[] array,
+            Function<String, ? extends RuntimeException> exceptionFunction,
+            Supplier<String> messageSupplier) {
+        if (array == null || array.length == 0) {
+            doWrapException(exceptionFunction, nullSafeGet(messageSupplier));
         }
         return (T) array;
     }
@@ -811,7 +1058,7 @@ public abstract class Assert2 {
      * @throws IllegalArgumentException
      *             if the object array contains a {@code null} element
      */
-    public static void noNullElements(
+    public @Deprecated static void noNullElements(
             Object[] array,
             Class<? extends RuntimeException> exceptionClass,
             String fmtMessage,
@@ -819,7 +1066,38 @@ public abstract class Assert2 {
         if (array != null) {
             for (Object element : array) {
                 if (element == null) {
-                    doWrapException(exceptionClass, fmtMessage, args);
+                    doWrapException(null, fmtMessage, args);
+                }
+            }
+        }
+    }
+
+    /**
+     * Assert that an array contains no {@code null} elements.
+     * <p>
+     * Note: Does not complain if the array is empty!
+     * 
+     * <pre class="code">
+     * Assert2.noNullElements(array, "The array must contain non-null elements");
+     * </pre>
+     * 
+     * @param array
+     *            the array to check
+     * @param exceptionFunction
+     * @param fmtMessage
+     *            the exception message to use if the assertion fails
+     * @throws IllegalArgumentException
+     *             if the object array contains a {@code null} element
+     */
+    public static void noNullElements(
+            Object[] array,
+            Function<String, ? extends RuntimeException> exceptionFunction,
+            String fmtMessage,
+            Object... args) {
+        if (array != null) {
+            for (Object element : array) {
+                if (element == null) {
+                    doWrapException(exceptionFunction, fmtMessage, args);
                 }
             }
         }
@@ -877,13 +1155,41 @@ public abstract class Assert2 {
      *             if the collection is {@code null} or contains no elements
      */
     @SuppressWarnings("unchecked")
-    public static <T> T notEmpty(
+    public @Deprecated static <T> T notEmpty(
             Collection<?> collection,
             Class<? extends RuntimeException> exceptionClass,
             String fmtMessage,
             Object... args) {
         if (collection == null || collection.isEmpty()) {
-            doWrapException(exceptionClass, fmtMessage, args);
+            doWrapException(null, fmtMessage, args);
+        }
+        return (T) collection;
+    }
+
+    /**
+     * Assert that a collection contains elements; that is, it must not be
+     * {@code null} and must contain at least one element.
+     * 
+     * <pre class="code">
+     * Assert2.notEmpty(collection, "Collection must contain elements");
+     * </pre>
+     * 
+     * @param collection
+     *            the collection to check
+     * @param exceptionFunction
+     * @param fmtMessage
+     *            the exception message to use if the assertion fails
+     * @throws IllegalArgumentException
+     *             if the collection is {@code null} or contains no elements
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T notEmpty(
+            Collection<?> collection,
+            Function<String, ? extends RuntimeException> exceptionFunction,
+            String fmtMessage,
+            Object... args) {
+        if (collection == null || collection.isEmpty()) {
+            doWrapException(exceptionFunction, fmtMessage, args);
         }
         return (T) collection;
     }
@@ -920,13 +1226,41 @@ public abstract class Assert2 {
      *             if the map is {@code null} or contains no entries
      */
     @SuppressWarnings("unchecked")
-    public static <T> T notEmpty(
+    public @Deprecated static <T> T notEmpty(
             Map<?, ?> map,
             Class<? extends RuntimeException> exceptionClass,
             String fmtMessage,
             Object... args) {
         if (map == null || map.isEmpty()) {
-            doWrapException(exceptionClass, fmtMessage, args);
+            doWrapException(null, fmtMessage, args);
+        }
+        return (T) map;
+    }
+
+    /**
+     * Assert that a Map contains entries; that is, it must not be {@code null}
+     * and must contain at least one entry.
+     * 
+     * <pre class="code">
+     * Assert2.notEmpty(map, "Map must contain entries");
+     * </pre>
+     * 
+     * @param map
+     *            the map to check
+     * @param exceptionFunction
+     * @param fmtMessage
+     *            the exception message to use if the assertion fails
+     * @throws IllegalArgumentException
+     *             if the map is {@code null} or contains no entries
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T notEmpty(
+            Map<?, ?> map,
+            Function<String, ? extends RuntimeException> exceptionFunction,
+            String fmtMessage,
+            Object... args) {
+        if (map == null || map.isEmpty()) {
+            doWrapException(exceptionFunction, fmtMessage, args);
         }
         return (T) map;
     }
@@ -1032,7 +1366,7 @@ public abstract class Assert2 {
         notNull(parentType, "ParentType to check against must not be null");
         notNull(type, "Type to check against must not be null");
         if (!parentType.isAssignableFrom(type)) {
-            doWrapException(ClassCastException.class, fmtMessage, args);
+            doWrapException(errmsg -> new ClassCastException(errmsg), fmtMessage, args);
         }
         return type;
     }
@@ -1062,7 +1396,7 @@ public abstract class Assert2 {
     public static <T> T isInstanceOf(Class<?> type, Object obj, String fmtMessage, Object... args) {
         notNull(type, "Type to check against must not be null");
         if (!type.isInstance(obj)) {
-            instanceCheckFailed(type, obj, IllegalArgumentException.class, doFormat(fmtMessage, args));
+            instanceCheckFailed(type, obj, errmsg -> new IllegalArgumentException(errmsg), doFormat(fmtMessage, args));
         }
         return (T) obj;
     }
@@ -1088,8 +1422,45 @@ public abstract class Assert2 {
     public static <T> T isInstanceOf(Class<?> type, Object obj, Supplier<String> messageSupplier) {
         notNull(type, "Type to check against must not be null");
         if (!type.isInstance(obj)) {
-            instanceCheckFailed(type, obj, IllegalArgumentException.class,
+            instanceCheckFailed(type, obj, errmsg -> new IllegalArgumentException(errmsg),
                     ASSERT_FAILED_PREFIX.concat(nullSafeGet(messageSupplier)));
+        }
+        return (T) obj;
+    }
+
+    /**
+     * Assert that the provided object is an instance of the provided class.
+     * 
+     * <pre class="code">
+     * Assert2.instanceOf(Foo.class, foo, "Foo expected");
+     * </pre>
+     * 
+     * @param type
+     *            the type to check against
+     * @param obj
+     *            the object to check
+     * @param exceptionClass
+     *            Throwable class
+     * @param fmtMessage
+     *            a message which will be prepended to provide further context.
+     *            If it is empty or ends in ":" or ";" or "," or ".", a full
+     *            exception message will be appended. If it ends in a space, the
+     *            name of the offending object's type will be appended. In any
+     *            other case, a ":" with a space and the name of the offending
+     *            object's type will be appended.
+     * @throws IllegalArgumentException
+     *             if the object is not an instance of type
+     */
+    @SuppressWarnings("unchecked")
+    public @Deprecated static <T> T isInstanceOf(
+            Class<?> type,
+            Object obj,
+            Class<? extends RuntimeException> exceptionClass,
+            String fmtMessage,
+            Object... args) {
+        notNull(type, "Type to check against must not be null");
+        if (!type.isInstance(obj)) {
+            instanceCheckFailed(type, obj, null, doFormat(fmtMessage, args));
         }
         return (T) obj;
     }
@@ -1121,12 +1492,12 @@ public abstract class Assert2 {
     public static <T> T isInstanceOf(
             Class<?> type,
             Object obj,
-            Class<? extends RuntimeException> exceptionClass,
+            Function<String, ? extends RuntimeException> exceptionFunction,
             String fmtMessage,
             Object... args) {
         notNull(type, "Type to check against must not be null");
         if (!type.isInstance(obj)) {
-            instanceCheckFailed(type, obj, exceptionClass, doFormat(fmtMessage, args));
+            instanceCheckFailed(type, obj, exceptionFunction, doFormat(fmtMessage, args));
         }
         return (T) obj;
     }
@@ -1151,14 +1522,45 @@ public abstract class Assert2 {
      *             if the object is not an instance of type
      */
     @SuppressWarnings("unchecked")
-    public static <T> T isInstanceOf(
+    public @Deprecated static <T> T isInstanceOf(
             Class<?> type,
             Object obj,
             Class<? extends RuntimeException> exceptionClass,
             Supplier<String> messageSupplier) {
         notNull(type, "Type to check against must not be null");
         if (!type.isInstance(obj)) {
-            instanceCheckFailed(type, obj, exceptionClass, nullSafeGet(messageSupplier));
+            instanceCheckFailed(type, obj, null, nullSafeGet(messageSupplier));
+        }
+        return (T) obj;
+    }
+
+    /**
+     * Assert that the provided object is an instance of the provided class.
+     * 
+     * <pre class="code">
+     * Assert2.instanceOf(Foo.class, foo, "Foo expected");
+     * </pre>
+     * 
+     * @param type
+     *            the type to check against
+     * @param obj
+     *            the object to check
+     * @param exceptionFunction
+     * @param messageSupplier
+     *            a supplier for the exception message to use if the assertion
+     *            fails
+     * @throws IllegalArgumentException
+     *             if the object is not an instance of type
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T isInstanceOf(
+            Class<?> type,
+            Object obj,
+            Function<String, ? extends RuntimeException> exceptionFunction,
+            Supplier<String> messageSupplier) {
+        notNull(type, "Type to check against must not be null");
+        if (!type.isInstance(obj)) {
+            instanceCheckFailed(type, obj, exceptionFunction, nullSafeGet(messageSupplier));
         }
         return (T) obj;
     }
@@ -1207,7 +1609,42 @@ public abstract class Assert2 {
     public static void isAssignable(Class<?> superType, Class<?> subType, String fmtMessage, Object... args) {
         notNull(superType, "Super type to check against must not be null");
         if (subType == null || !superType.isAssignableFrom(subType)) {
-            assignableCheckFailed(superType, subType, IllegalArgumentException.class, doFormat(fmtMessage, args));
+            assignableCheckFailed(superType, subType, errmsg -> new IllegalArgumentException(errmsg), doFormat(fmtMessage, args));
+        }
+    }
+
+    /**
+     * Assert that {@code superType.isAssignableFrom(subType)} is {@code true}.
+     * 
+     * <pre class="code">
+     * Assert2.isAssignable(Number.class, myClass, "Number expected");
+     * </pre>
+     * 
+     * @param superType
+     *            the super type to check against
+     * @param subType
+     *            the sub type to check
+     * @param exceptionClass
+     *            Throwable class
+     * @param fmtMessage
+     *            a message which will be prepended to provide further context.
+     *            If it is empty or ends in ":" or ";" or "," or ".", a full
+     *            exception message will be appended. If it ends in a space, the
+     *            name of the offending sub type will be appended. In any other
+     *            case, a ":" with a space and the name of the offending sub
+     *            type will be appended.
+     * @throws IllegalArgumentException
+     *             if the classes are not assignable
+     */
+    public @Deprecated static void isAssignable(
+            Class<?> superType,
+            Class<?> subType,
+            Class<? extends RuntimeException> exceptionClass,
+            String fmtMessage,
+            Object... args) {
+        notNull(superType, "Super type to check against must not be null");
+        if (subType == null || !superType.isAssignableFrom(subType)) {
+            assignableCheckFailed(superType, subType, null, doFormat(fmtMessage, args));
         }
     }
 
@@ -1237,12 +1674,12 @@ public abstract class Assert2 {
     public static void isAssignable(
             Class<?> superType,
             Class<?> subType,
-            Class<? extends RuntimeException> exceptionClass,
+            Function<String, ? extends RuntimeException> exceptionFunction,
             String fmtMessage,
             Object... args) {
         notNull(superType, "Super type to check against must not be null");
         if (subType == null || !superType.isAssignableFrom(subType)) {
-            assignableCheckFailed(superType, subType, exceptionClass, doFormat(fmtMessage, args));
+            assignableCheckFailed(superType, subType, exceptionFunction, doFormat(fmtMessage, args));
         }
     }
 
@@ -1326,7 +1763,7 @@ public abstract class Assert2 {
     private static void instanceCheckFailed(
             Class<?> type,
             Object obj,
-            Class<? extends RuntimeException> exceptionClass,
+            Function<String, ? extends RuntimeException> exceptionFunction,
             String msg) {
         String className = (obj != null ? obj.getClass().getName() : "null");
         String result = "";
@@ -1343,7 +1780,7 @@ public abstract class Assert2 {
             result = result + ("Object of class [" + className + "] must be an instance of " + type);
         }
 
-        doWrapException(exceptionClass, result);
+        doWrapException(exceptionFunction, result);
     }
 
     /**
@@ -1357,7 +1794,7 @@ public abstract class Assert2 {
     private static void assignableCheckFailed(
             Class<?> superType,
             Class<?> subType,
-            Class<? extends RuntimeException> exceptionClass,
+            Function<String, ? extends RuntimeException> exceptionFunction,
             String msg) {
         String result = "";
         boolean defaultMessage = true;
@@ -1373,7 +1810,7 @@ public abstract class Assert2 {
             result = result + (subType + " is not assignable to " + superType);
         }
 
-        doWrapException(exceptionClass, result);
+        doWrapException(exceptionFunction, result);
     }
 
     private static boolean endsWithSeparator(String msg) {
@@ -1403,18 +1840,17 @@ public abstract class Assert2 {
         return (messageSupplier != null ? messageSupplier.get() : null);
     }
 
-    private static void doWrapException(Class<? extends RuntimeException> exceptionClass, String fmtMessage, Object... args) {
+    private static void doWrapException(
+            Function<String, ? extends RuntimeException> exceptionFunction,
+            @NotBlank String fmtMessage,
+            Object... args) {
         //
         // The in the environment of Quarkus2.12+java16, although I tried to
         // increase the --add-opens JVM arguments, it still failed (no private
         // access permit), so for compatibility support fallback processing.
         // see:https://stackoverflow.com/questions/69631653/quarkus-optaplanner-illegal-reflective-call
         //
-        if (ENABLE_WRAP_EXCEPTION_WITH_REFLECTION) {
-            doWrapExceptionReflection(exceptionClass, fmtMessage, args);
-        } else {
-            doWrapExceptionWithJava9PlusFallback(exceptionClass, fmtMessage, args);
-        }
+        doWrapExceptionReflection(exceptionFunction, fmtMessage, args);
     }
 
     /**
@@ -1423,97 +1859,72 @@ public abstract class Assert2 {
      * access permit), so for compatibility support fallback processing.
      * see:https://stackoverflow.com/questions/69631653/quarkus-optaplanner-illegal-reflective-call
      * 
-     * @param exceptionClass
+     * @param exceptionFunction
      * @param fmtMessage
      * @param args
      */
     private static void doWrapExceptionReflection(
-            Class<? extends RuntimeException> exceptionClass,
-            String fmtMessage,
-            Object... args) {
-        RuntimeException th = newRuntimeExceptionInstance(exceptionClass);
-        // Initializing cause message
-        try {
-            detailMessageField.set(th, ASSERT_FAILED_PREFIX.concat(doFormat(fmtMessage, args)));
-        } catch (Exception ex) {
-            throw new Error(
-                    "Unexpected reflection exception - ".concat(ex.getClass().getName()).concat(": ").concat(ex.getMessage()));
-        }
-
-        // Remove useless stack elements
-        StackTraceElement[] stackEles = th.getStackTrace();
-        List<StackTraceElement> availableStackEles = new ArrayList<>(max(stackEles.length - 5, 5));
-        for (int i = 0, j = 0; i < stackEles.length; i++) {
-            StackTraceElement st = stackEles[i];
-            if (j == 0) {
-                if (NEW_RUNTIMEEXCEPTION_INSTANCE_METHOD.equals(st.getClassName().concat("#").concat(st.getMethodName())))
-                    j = i;
-            } else
-                availableStackEles.add(st);
-        }
-        th.setStackTrace(availableStackEles.toArray(new StackTraceElement[] {}));
-        throw th;
-    }
-
-    private static void doWrapExceptionWithJava9PlusFallback(
-            Class<? extends RuntimeException> exceptionClass,
-            String fmtMessage,
+            Function<String, ? extends RuntimeException> exceptionFunction,
+            @NotBlank String fmtMessage,
             Object... args) {
         final String errmsg = doFormat(fmtMessage, args);
-        // RuntimeException th = null;
-        // try {
-        // Constructor<? extends RuntimeException> constructor =
-        // exceptionClass.getConstructor(Throwable.class);
-        // if (nonNull(constructor)) {
-        // th = constructor.newInstance(new IllegalArgumentException(errmsg));
-        // }
-        // } catch (InstantiationException | IllegalAccessException |
-        // IllegalArgumentException | InvocationTargetException
-        // | NoSuchMethodException ex) {
-        // throw new Error(
-        // "Unexpected reflection exception -
-        // ".concat(ex.getClass().getName()).concat(":
-        // ").concat(ex.getMessage()));
-        // }
-        throw new IllegalArgumentException(errmsg); // Fallback
-    }
+        RuntimeException th = null;
+        if (Objects.isNull(exceptionFunction) || Objects.isNull(th = exceptionFunction.apply(errmsg))) {
+            th = new IllegalArgumentException(errmsg);
+        }
 
-    /**
-     * New create throwable instance.
-     * 
-     * @param exceptionClass
-     * @return
-     */
-    private static RuntimeException newRuntimeExceptionInstance(Class<? extends RuntimeException> exceptionClass) {
-        return ObjectInstantiators.newInstance(exceptionClass);
-    }
+        // @formatter:off
+        //try {
+        //    detailMessageField.set(th, ASSERT_FAILED_PREFIX.concat(doFormat(fmtMessage, args)));
+        //} catch (Exception ex) {
+        //    throw new Error(
+        //            "Unexpected reflection exception - ".concat(ex.getClass().getName()).concat(": ").concat(ex.getMessage()));
+        //}
+        //
+        //// Remove useless stack elements
+        //StackTraceElement[] stackEles = th.getStackTrace();
+        //List<StackTraceElement> availableStackEles = new ArrayList<>(max(stackEles.length - 5, 5));
+        //for (int i = 0, j = 0; i < stackEles.length; i++) {
+        //    StackTraceElement st = stackEles[i];
+        //    if (j == 0) {
+        //        if (NEW_RUNTIMEEXCEPTION_INSTANCE_METHOD.equals(st.getClassName().concat("#").concat(st.getMethodName())))
+        //            j = i;
+        //    } else
+        //        availableStackEles.add(st);
+        //}
+        //th.setStackTrace(availableStackEles.toArray(new StackTraceElement[] {}));
+        // @formatter:on
 
-    /**
-     * Enable reflection to automatically wrap exceptions. </br>
-     * e.g: 1.8.0_281 / 11.0.10 / 15.0.1
-     */
-    private static final boolean ENABLE_WRAP_EXCEPTION_WITH_REFLECTION = StringUtils2.isTrue(
-            getenv("ENABLE_WRAP_EXCEPTION_WITH_REFLECTION"), false) && startsWithAny(JAVA_VERSION, "1.5", "1.6", "1.7", "1.8");
+        throw th;
+    }
 
     /**
      * @see new IllegalArgumentException("[Assertion failed] - xxx required");
      */
     private static String ASSERT_FAILED_PREFIX = "[AF] - ";
-    private static String NEW_RUNTIMEEXCEPTION_INSTANCE_METHOD = Assert2.class.getName() + "#newRuntimeExceptionInstance";
-    private static Field detailMessageField;
-    private static Field causeField;
 
-    static {
-        if (ENABLE_WRAP_EXCEPTION_WITH_REFLECTION) {
-            try {
-                detailMessageField = Throwable.class.getDeclaredField("detailMessage");
-                causeField = Throwable.class.getDeclaredField("cause");
-                detailMessageField.setAccessible(true);
-                causeField.setAccessible(true);
-            } catch (Exception e) {
-                throw new IllegalStateException(e);
-            }
-        }
-    }
+    // @formatter:off
+    /**
+     * Enable reflection to automatically wrap exceptions. </br>
+     * e.g: 1.8.0_281 / 11.0.10 / 15.0.1
+     */
+    //private static final boolean ENABLE_WRAP_EXCEPTION_WITH_REFLECTION = StringUtils2.isTrue(
+    //        getenv("ENABLE_WRAP_EXCEPTION_WITH_REFLECTION"), false) && startsWithAny(JAVA_VERSION, "1.5", "1.6", "1.7", "1.8");
+    //
+    //private static Field detailMessageField;
+    //private static Field causeField;
+    //static {
+    //    if (ENABLE_WRAP_EXCEPTION_WITH_REFLECTION) {
+    //        try {
+    //            detailMessageField = Throwable.class.getDeclaredField("detailMessage");
+    //            causeField = Throwable.class.getDeclaredField("cause");
+    //            detailMessageField.setAccessible(true);
+    //            causeField.setAccessible(true);
+    //        } catch (Exception e) {
+    //            throw new IllegalStateException(e);
+    //        }
+    //    }
+    //}
+    // @formatter:on
 
 }

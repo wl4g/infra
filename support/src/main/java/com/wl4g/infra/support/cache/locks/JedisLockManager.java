@@ -49,7 +49,7 @@ public class JedisLockManager {
     protected static final String NAMESPACE = "reentrantUnfairLock.";
     protected static final String NXXX = "NX";
     protected static final String EXPX = "PX";
-    protected static final long FRAME_INTERVAL_MS = 50L;
+    protected static final long FRAME_INTERVAL_MS = 30L;
     protected static final String UNLOCK_LUA = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
     protected final SmartLogger log = getLogger(getClass());
 

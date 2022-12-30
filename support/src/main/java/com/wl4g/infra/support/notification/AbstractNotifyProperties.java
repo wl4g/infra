@@ -135,7 +135,7 @@ public abstract class AbstractNotifyProperties implements NotifyProperties {
         int firstStart = tplMessage.indexOf("$");
         if (firstStart > -1) {
             int firstEnd = tplMessage.indexOf("}");
-            isTrue(firstEnd > -1, NotificationMessageParseException.class,
+            isTrue(firstEnd > -1, errmsg -> new NotificationMessageParseException(errmsg),
                     "Notification message template syntax error, No ending '}' after start index: %s", firstStart);
 
             String firstVar = EMPTY;

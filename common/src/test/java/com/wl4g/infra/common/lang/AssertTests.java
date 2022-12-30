@@ -39,30 +39,16 @@ public class AssertTests {
         // isInstanceOf(String.class, new Object(), "Must be not empty");
     }
 
-    @Test
+    @Test(expected = MyRuntimeException1.class)
     public void testAssertionWithExceptionClassSuccess() {
         Object obj = null;
-        try {
-            notNull(obj, MyRuntimeException1.class, "Failed to xxx1");
-            throw new IllegalStateException("Assertion failed");
-        } catch (MyRuntimeException1 | IllegalArgumentException e) {
-            // success
-            System.out.println("Assertion Result: " + e.getMessage());
-        }
+        notNull(obj, errmsg -> new MyRuntimeException1(errmsg), "Failed to xxx1");
     }
 
-    @Test
+    @Test(expected = MyRuntimeException2.class)
     public void testAssertionWithExceptionClassFailure() {
-        try {
-            Object obj = null;
-            notNull(obj, MyRuntimeException2.class, "Failed to xxx2");
-        } catch (Error e) {
-            // success
-            System.out.println("Assertion Result: " + e.getMessage());
-        } catch (Throwable e) {
-            // failure
-            throw e;
-        }
+        Object obj = null;
+        notNull(obj, errmsg -> new MyRuntimeException2(errmsg), "Failed to xxx2");
     }
 
     public static class MyRuntimeException1 extends RuntimeException {
