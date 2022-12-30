@@ -18,7 +18,6 @@ package com.wl4g.infra.common.locks;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.interrupted;
@@ -32,9 +31,9 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 
 import com.google.common.annotations.Beta;
-import com.wl4g.infra.common.jedis.JedisService;
-import com.wl4g.infra.common.log.SmartLogger;
+import com.wl4g.infra.common.jedis.JedisClient;
 
+import lombok.CustomLog;
 import redis.clients.jedis.params.SetParams;
 
 /**
@@ -44,19 +43,17 @@ import redis.clients.jedis.params.SetParams;
  * @version v1.0 2019年3月19日
  * @since
  */
+@CustomLog
 public class JedisLockManager {
     protected static final String NAMESPACE = "reentrantUnfairLock.";
     protected static final String NXXX = "NX";
     protected static final String EXPX = "PX";
     protected static final long FRAME_INTERVAL_MS = 30L;
     protected static final String UNLOCK_LUA = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
-    protected final SmartLogger log = getLogger(getClass());
+    protected final JedisClient jedisClient;
 
-    protected final JedisService jedisService;
-
-    public JedisLockManager(JedisService jedisService) {
-        notNullOf(jedisService, "jedisService");
-        this.jedisService = jedisService;
+    public JedisLockManager(JedisClient jedisClient) {
+        this.jedisClient = notNullOf(jedisClient, "jedisClient");
     }
 
     /**
@@ -113,7 +110,7 @@ public class JedisLockManager {
      *      Redlock failover analysis</a>
      */
     @Beta
-    final class FastReentrantUnfairDistributedRedLock extends AbstractDistributedLock {
+    class FastReentrantUnfairDistributedRedLock extends AbstractDistributedLock {
         private static final long serialVersionUID = -1909894475263151824L;
 
         /**
@@ -132,7 +129,7 @@ public class JedisLockManager {
         }
 
         public FastReentrantUnfairDistributedRedLock(String name, long expiredMs, AtomicLong counter) {
-            super((NAMESPACE + name), getThreadCurrentProcessId(), expiredMs);
+            super((NAMESPACE.concat(name)), getThreadCurrentProcessId(), expiredMs);
             isTrueOf(counter.get() >= 0, "counter >= 0");
             this.counter = counter;
         }
@@ -178,7 +175,7 @@ public class JedisLockManager {
         @Override
         public void unlock() {
             // Obtain locked processId.
-            String acquiredProcessId = jedisService.getJedisClient().get(getLockName());
+            String acquiredProcessId = jedisClient.get(getLockName());
             // Current thread is holder?
             if (!requestId.equals(acquiredProcessId)) {
                 log.debug("No need to unlock of requestId: {}, acquiredProcessId: {}, counter: {}", requestId, acquiredProcessId,
@@ -191,8 +188,7 @@ public class JedisLockManager {
             log.debug("No need to unlock and reenter the stack lock layer, counter: {}", counter);
 
             if (counter.longValue() == 0L) { // All thread stack layers exited?
-                Object res = jedisService.getJedisClient()
-                        .eval(UNLOCK_LUA, singletonList(getLockName()), singletonList(requestId));
+                Object res = jedisClient.eval(UNLOCK_LUA, singletonList(getLockName()), singletonList(requestId));
                 if (!assertValidity(res)) {
                     log.debug("Failed to unlock for %{}@{}", requestId, getLockName());
                 } else {
@@ -213,7 +209,7 @@ public class JedisLockManager {
          * @return
          */
         private final boolean doTryAcquire() {
-            String acquiredProcessId = jedisService.getJedisClient().get(getLockName()); // Locked-processId.
+            String acquiredProcessId = jedisClient.get(getLockName()); // Locked-processId.
             if (requestId.equals(acquiredProcessId)) {
                 // Obtain lock record once cumulatively.
                 counter.incrementAndGet();
@@ -227,7 +223,7 @@ public class JedisLockManager {
 
             // Try to acquire a new lock from the server.
             SetParams params = SetParams.setParams().nx().px(expiredMs);
-            if (assertValidity(jedisService.getJedisClient().set(getLockName(), requestId, params))) {
+            if (assertValidity(jedisClient.set(getLockName(), requestId, params))) {
                 // Obtain lock record once cumulatively.
                 counter.incrementAndGet();
                 return true;
