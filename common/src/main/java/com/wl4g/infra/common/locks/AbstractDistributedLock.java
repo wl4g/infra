@@ -13,16 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.support.cache.locks;
+package com.wl4g.infra.common.locks;
 
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
 import static com.wl4g.infra.common.lang.SystemUtils2.GLOBAL_PROCESS_SERIAL;
-import static org.springframework.util.Assert.hasText;
-import static org.springframework.util.Assert.isTrue;
 
 import java.io.Serializable;
 import java.util.concurrent.locks.Lock;
 
 import com.google.common.annotations.Beta;
+
+import lombok.Getter;
 
 /**
  * Abstract distributed lock.</br>
@@ -32,11 +34,12 @@ import com.google.common.annotations.Beta;
  * @since
  */
 @Beta
+@Getter
 public abstract class AbstractDistributedLock implements Lock, Serializable {
     private static final long serialVersionUID = -3633610156752730462L;
 
     /** Current locker name. */
-    protected final String name;
+    protected final String lockName;
 
     /** Current locker request ID. */
     protected final String requestId;
@@ -44,12 +47,10 @@ public abstract class AbstractDistributedLock implements Lock, Serializable {
     /** Current locker expired time(MS). */
     protected final long expiredMs;
 
-    public AbstractDistributedLock(String name, String requestId, long expiredMs) {
-        hasText(name, "Lock name must not be empty.");
-        hasText(requestId, "Lock current processId must not be empty.");
-        isTrue(expiredMs > 0, "Lock expiredMs must greater than 0");
-        this.name = name;
-        this.requestId = requestId;
+    public AbstractDistributedLock(String lockName, String requestId, long expiredMs) {
+        isTrueOf(expiredMs > 0, "expiredMs > 0");
+        this.lockName = hasTextOf(lockName, "lockName");
+        this.requestId = hasTextOf(requestId, "requestId");
         this.expiredMs = expiredMs;
     }
 

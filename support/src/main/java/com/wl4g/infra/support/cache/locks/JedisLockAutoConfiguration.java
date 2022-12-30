@@ -24,6 +24,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 
 import com.wl4g.infra.common.jedis.JedisService;
+import com.wl4g.infra.common.locks.JedisLockManager;
 import com.wl4g.infra.support.cache.jedis.JedisClientAutoConfiguration;
 
 /**

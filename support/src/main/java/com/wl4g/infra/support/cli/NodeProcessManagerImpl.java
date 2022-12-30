@@ -32,8 +32,8 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.util.Assert;
 
 import com.wl4g.infra.common.jedis.JedisService;
+import com.wl4g.infra.common.locks.JedisLockManager;
 import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor;
-import com.wl4g.infra.support.cache.locks.JedisLockManager;
 import com.wl4g.infra.support.cli.destroy.DestroySignal;
 import com.wl4g.infra.support.cli.destroy.DestroySignalMessage;
 import com.wl4g.infra.support.cli.process.DestroableProcess;
