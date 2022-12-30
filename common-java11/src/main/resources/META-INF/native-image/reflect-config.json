@@ -54,6 +54,9 @@
   "name":"java.util.concurrent.Future"
 },
 {
+  "name":"java.util.concurrent.TimeUnit"
+},
+{
   "name":"java.lang.Runnable"
 },
 {
