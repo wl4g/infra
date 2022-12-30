@@ -41,7 +41,7 @@ public class JedisLockAutoConfiguration {
 
     @Bean
     public JedisLockManager jedisLockManager(JedisService jedisService) {
-        return new JedisLockManager(jedisService);
+        return new JedisLockManager(jedisService.getJedisClient());
     }
 
 }
