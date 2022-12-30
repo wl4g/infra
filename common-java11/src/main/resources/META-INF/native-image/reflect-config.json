@@ -39,13 +39,16 @@
   "name":"java.util.LinkedHashMap"
 },
 {
-  "name":"java.concurrent.ConcurrentHashMap"
-},
-{
   "name":"java.util.Date"
 },
 {
   "name":"java.util.Calendar"
+},
+{
+  "name":"java.concurrent.ConcurrentHashMap"
+},
+{
+  "name":"java.util.concurrent.locks.Lock"
 },
 {
   "name":"java.util.concurrent.Callable"
