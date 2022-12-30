@@ -30,6 +30,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+
 import com.google.common.annotations.Beta;
 import com.wl4g.infra.common.jedis.JedisClient;
 
@@ -59,26 +62,26 @@ public class JedisLockManager {
     /**
      * Get and create {@link FastReentrantUnfairDistributedRedLock} with name.
      * 
-     * @param name
+     * @param lockName
      * @return
      */
-    public Lock getLock(String name) {
-        return getLock(name, 10, TimeUnit.SECONDS);
+    public Lock getLock(@NotBlank String lockName) {
+        return getLock(lockName, 10, TimeUnit.SECONDS);
     }
 
     /**
      * Get and create {@link FastReentrantUnfairDistributedRedLock} with name.
      * 
-     * @param name
+     * @param lockName
      * @param expiredAt
      * @param unit
      * @return
      */
-    public Lock getLock(String name, long expiredAt, TimeUnit unit) {
-        hasTextOf(name, "Lock name must not be empty.");
+    public Lock getLock(@NotBlank String lockName, @Min(0) long expiredAt, TimeUnit unit) {
+        hasTextOf(lockName, "lockName");
         isTrueOf(expiredAt > 0, "expiredAt > 0");
         notNullOf(unit, "unit");
-        return new FastReentrantUnfairDistributedRedLock(name, unit.toMillis(expiredAt));
+        return new FastReentrantUnfairDistributedRedLock(lockName, unit.toMillis(expiredAt));
     }
 
     /**
