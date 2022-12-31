@@ -341,6 +341,34 @@
   "allPublicMethods" : true
 },
 {
+  "name":"com.wl4g.infra.common.locks.JedisLockManager",
+  "allPublicConstructors": true,
+  "allPublicMethods": true,
+  "methods":[
+    {"name":"<init>","parameterTypes":["com.wl4g.infra.common.jedis.JedisClient"] }, 
+    {"name":"getLock","parameterTypes":["java.lang.String"] }, 
+    {"name":"getLock","parameterTypes":["java.lang.String","long","java.util.concurrent.TimeUnit"] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.infra.common.locks.JedisLockManager$FastReentrantUnfairDistributedRedLock",
+  "allPublicConstructors": true,
+  "allPublicMethods": true,
+  "methods":[
+    {"name":"<init>","parameterTypes":["com.wl4g.infra.common.jedis.JedisClient","java.lang.String","long"] }, 
+    {"name":"<init>","parameterTypes":["com.wl4g.infra.common.jedis.JedisClient","java.lang.String","long","long"] }, 
+    {"name":"<init>","parameterTypes":["com.wl4g.infra.common.jedis.JedisClient","java.lang.String","long","java.util.concurrent.atomic.AtomicLong"] }, 
+    {"name":"lock","parameterTypes":[] },
+    {"name":"lockInterruptibly","parameterTypes":[] },
+    {"name":"tryLock","parameterTypes":[] },
+    {"name":"tryLock","parameterTypes":["long","java.util.concurrent.TimeUnit"] },
+    {"name":"unlock","parameterTypes":[] },
+    {"name":"newCondition","parameterTypes":[] },
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
   "name":"com.wl4g.infra.common.serialize.JacksonUtils$CustomObjectWriter",
   "allPublicConstructors": true,
   "allPublicMethods": true,
