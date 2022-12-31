@@ -25,6 +25,7 @@ import java.util.concurrent.locks.Lock;
 import com.google.common.annotations.Beta;
 
 import lombok.Getter;
+import lombok.ToString;
 
 /**
  * Abstract distributed lock.</br>
@@ -35,6 +36,7 @@ import lombok.Getter;
  */
 @Beta
 @Getter
+@ToString(callSuper = true)
 public abstract class AbstractDistributedLock implements Lock, Serializable {
     private static final long serialVersionUID = -3633610156752730462L;
 

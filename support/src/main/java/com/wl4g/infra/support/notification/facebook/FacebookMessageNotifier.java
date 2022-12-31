@@ -33,7 +33,7 @@ public class FacebookMessageNotifier extends AbstractMessageNotifier<FacebookNot
 
     @Override
     public NotifierKind kind() {
-        return NotifierKind.Apns;
+        return NotifierKind.Facebook;
     }
 
     @Override

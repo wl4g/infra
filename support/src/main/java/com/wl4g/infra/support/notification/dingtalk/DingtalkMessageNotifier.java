@@ -33,7 +33,7 @@ public class DingtalkMessageNotifier extends AbstractMessageNotifier<DingtalkNot
 
     @Override
     public NotifierKind kind() {
-        return NotifierKind.Apns;
+        return NotifierKind.Dingtalk;
     }
 
     @Override

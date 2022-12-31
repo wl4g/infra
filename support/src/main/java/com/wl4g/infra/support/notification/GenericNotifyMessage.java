@@ -35,6 +35,8 @@ import org.springframework.validation.annotation.Validated;
 
 import com.wl4g.infra.common.web.rest.RespBase.DataMap;
 
+import lombok.Getter;
+
 /**
  * {@link GenericNotifyMessage}
  * 
@@ -42,6 +44,7 @@ import com.wl4g.infra.common.web.rest.RespBase.DataMap;
  * @version 2020年3月14日 v1.0.0
  * @see
  */
+@Getter
 @Validated
 public class GenericNotifyMessage implements NotifyMessage {
     private static final long serialVersionUID = 7422435702403504747L;
@@ -119,11 +122,6 @@ public class GenericNotifyMessage implements NotifyMessage {
         return this;
     }
 
-    @Override
-    public String getTemplateKey() {
-        return templateKey;
-    }
-
     /**
      * Sets notification message content template ID
      * 
@@ -187,11 +185,6 @@ public class GenericNotifyMessage implements NotifyMessage {
         return this;
     }
 
-    @Override
-    public String getCallbackId() {
-        return callbackId;
-    }
-
     /**
      * Sets notification receipt ID, which can be used to process reliable
      * message confirmation application (optional), string type, 1-15 bytes
@@ -200,7 +193,7 @@ public class GenericNotifyMessage implements NotifyMessage {
      * @param callbackId
      * @return
      */
-    public GenericNotifyMessage setCallbackId(@NotBlank String callbackId) {
+    public GenericNotifyMessage withCallbackId(@NotBlank String callbackId) {
         this.callbackId = callbackId;
         return this;
     }

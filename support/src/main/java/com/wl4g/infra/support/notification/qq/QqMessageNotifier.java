@@ -26,7 +26,7 @@ public class QqMessageNotifier extends AbstractMessageNotifier<QqNotifyPropertie
 
     @Override
     public NotifierKind kind() {
-        return NotifierKind.Apns;
+        return NotifierKind.Qq;
     }
 
     @Override

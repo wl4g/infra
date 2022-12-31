@@ -26,7 +26,7 @@ public class BarkMessageNotifier extends AbstractMessageNotifier<BarkNotifyPrope
 
     @Override
     public NotifierKind kind() {
-        return NotifierKind.Apns;
+        return NotifierKind.Bark;
     }
 
     @Override
