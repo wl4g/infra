@@ -42,14 +42,14 @@ import com.google.common.base.Charsets;
 import lombok.Getter;
 
 /**
- * {@link StandandLoggingOutputStream}
+ * {@link JdkLoggingOutputStream}
  * 
  * @author James Wong
  * @version 2023-01-04
  * @since v1.0.0
  */
 @Getter
-public class StandandLoggingOutputStream extends OutputStream {
+public class JdkLoggingOutputStream extends OutputStream {
     private final static ThreadLocal<DateTimeFormatter> dateFormatterLocal = ThreadLocal
             .withInitial(() -> DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS").withZone(ZoneId.systemDefault()));
 
@@ -60,19 +60,18 @@ public class StandandLoggingOutputStream extends OutputStream {
     private final Logger logger;
     private final boolean isStdErr;
 
-    public StandandLoggingOutputStream() {
+    public JdkLoggingOutputStream() {
         this(false);
     }
 
-    public StandandLoggingOutputStream(boolean isStdErr) {
+    public JdkLoggingOutputStream(boolean isStdErr) {
         this(null, null, null, null, true, isStdErr);
     }
 
-    public StandandLoggingOutputStream(@Nullable String filePattern, @Nullable Level level,
-            @Nullable @Min(1024) Integer fileMaxSize, @Nullable @Min(1) Integer fileMaxCount, boolean enableConsole,
-            boolean isStdErr) {
+    public JdkLoggingOutputStream(@Nullable String filePattern, @Nullable Level level, @Nullable @Min(1024) Integer fileMaxSize,
+            @Nullable @Min(1) Integer fileMaxCount, boolean enableConsole, boolean isStdErr) {
         this.filePattern = nonNull(filePattern) ? filePattern
-                : JAVA_IO_TMPDIR.concat("/").concat(StandandLoggingOutputStream.class.getSimpleName()).concat(".log");
+                : JAVA_IO_TMPDIR.concat("/").concat(JdkLoggingOutputStream.class.getSimpleName()).concat(".log");
         this.level = nonNull(level) ? level : Level.ALL;
         if (nonNull(fileMaxSize)) {
             isTrueOf(fileMaxSize >= 1024, "fileMaxSize >= 1024");
@@ -84,7 +83,7 @@ public class StandandLoggingOutputStream extends OutputStream {
         this.fileMaxSize = nonNull(fileMaxSize) ? fileMaxSize : 512 * 1024 * 1024;
         this.fileMaxCount = nonNull(fileMaxSize) ? fileMaxSize : 10;
         try {
-            this.logger = Logger.getLogger(StandandLoggingOutputStream.class.getName());
+            this.logger = Logger.getLogger(JdkLoggingOutputStream.class.getName());
             final FileHandler handler = new FileHandler(this.filePattern, this.fileMaxSize, this.fileMaxCount, true);
             handler.setEncoding("UTF-8");
             handler.setLevel(this.level);

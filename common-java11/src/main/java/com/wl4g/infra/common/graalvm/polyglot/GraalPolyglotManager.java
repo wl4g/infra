@@ -15,12 +15,14 @@
  */
 package com.wl4g.infra.common.graalvm.polyglot;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.isTrue;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.lang.EnvironmentUtil.getBooleanProperty;
 import static com.wl4g.infra.common.lang.EnvironmentUtil.getIntProperty;
 import static com.wl4g.infra.common.lang.EnvironmentUtil.getProperty;
+import static com.wl4g.infra.common.lang.StringUtils2.eqIgnCase;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -152,8 +154,12 @@ public class GraalPolyglotManager implements Closeable {
         }
     }
 
-    public ContextWrapper getContext() {
-        return contextPool.take();
+    public ContextWrapper getContext(@Nullable Map<String, Object> metadata) {
+        return getContext(true, metadata);
+    }
+
+    public ContextWrapper getContext(boolean must, @Nullable Map<String, Object> metadata) {
+        return contextPool.take(must, metadata);
     }
 
     @Slf4j
@@ -188,33 +194,32 @@ public class GraalPolyglotManager implements Closeable {
         // throw new IllegalStateException("Could not got context from pool");
         // }
 
-        public ContextWrapper take() {
-            return take(null);
-        }
-
-        public ContextWrapper take(@Nullable Map<String, Object> metadata) {
-            return take(true, metadata);
-        }
-
         protected ContextWrapper take(boolean must, @Nullable Map<String, Object> metadata) {
             // Gets statistics
             int usedSize = 0;
             ContextWrapper takeContext = null;
             for (int i = 0; i < contextCached.length; i++) {
-                ContextWrapper context = contextCached[i];
+                final ContextWrapper context = contextCached[i];
                 if (nonNull(context)) {
                     if (context.isOpened()) {
                         ++usedSize;
+                    } else if (nonNull(metadata)) {
+                        final Map<String, Object> _metadata = safeMap(context.getMetadata());
+                        if (safeMap(metadata).entrySet()
+                                .stream()
+                                .anyMatch(e -> eqIgnCase(_metadata.get(e.getKey()), e.getValue()))) {
+                            takeContext = context;
+                        }
                     } else {
                         takeContext = context;
                     }
                 }
             }
-            // New instantiate context.
-            if (checkInstantiateLimit(takeContext, usedSize)) {
+            // Checking for new instantiate context.
+            if (checkNewInstantiate(takeContext, usedSize)) {
                 synchronized (this) {
-                    if (checkInstantiateLimit(takeContext, usedSize)) { // limit-max
-                        takeContext = contextCached[totalSize.get()] = newInstantiate(metadata);
+                    if (checkNewInstantiate(takeContext, usedSize)) { // limit-max
+                        takeContext = contextCached[totalSize.get()] = newInstance(metadata);
                     }
                 }
             }
@@ -228,15 +233,15 @@ public class GraalPolyglotManager implements Closeable {
             return null;
         }
 
-        private ContextWrapper newInstantiate(@Nullable Map<String, Object> metadata) {
+        private ContextWrapper newInstance(@Nullable Map<String, Object> metadata) {
             try {
-                return new ContextWrapper("context-pool-" + totalSize.getAndIncrement(), instantiator.apply(metadata));
+                return new ContextWrapper("graal-ctx-pool-" + totalSize.getAndIncrement(), instantiator.apply(metadata));
             } catch (Exception e) {
                 throw new IllegalStateException("Unable to new instantiate context object.", e);
             }
         }
 
-        private boolean checkInstantiateLimit(ContextWrapper takeContext, int usedSize) {
+        private boolean checkNewInstantiate(ContextWrapper takeContext, int usedSize) {
             return (isNull(takeContext) || usedSize >= totalSize.get()) && totalSize.get() < maxSize;
         }
 

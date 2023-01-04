@@ -49,7 +49,7 @@ public class GraalPolyglotManagerTests {
         try (SimpleFastContextPool pool = new SimpleFastContextPool(10, metadata -> Context.create());) {
             try {
                 for (int i = 0; i < 10; i++) {
-                    ContextWrapper context = pool.take();
+                    ContextWrapper context = pool.take(true, null);
                     System.out.println("The " + i + " take context: " + context);
                 }
                 System.out.println("Assertion success");
@@ -65,7 +65,7 @@ public class GraalPolyglotManagerTests {
         try (SimpleFastContextPool pool = new SimpleFastContextPool(10, metadata -> Context.create());) {
             try {
                 for (int i = 0; i < 11; i++) {
-                    ContextWrapper context = pool.take();
+                    ContextWrapper context = pool.take(true, null);
                     System.out.println("The " + i + " take context: " + context);
                 }
             } catch (IllegalStateException e) {
@@ -81,7 +81,7 @@ public class GraalPolyglotManagerTests {
         try (SimpleFastContextPool pool = new SimpleFastContextPool(10, metadata -> Context.create());) {
             try {
                 for (int i = 0; i < 20; i++) {
-                    try (ContextWrapper context = pool.take();) {
+                    try (ContextWrapper context = pool.take(true, null);) {
                         System.out.println("The " + i + " take context: " + context);
                     }
                 }
@@ -113,7 +113,7 @@ public class GraalPolyglotManagerTests {
                 new Thread(() -> {
                     long begin = currentTimeMillis();
 
-                    try (ContextWrapper context = pool.take();) {
+                    try (ContextWrapper context = pool.take(true, null);) {
                         context.leave();
                         System.out.println(format("[java] [%s] - running ...", Thread.currentThread().getName()));
 
@@ -164,7 +164,7 @@ public class GraalPolyglotManagerTests {
                 + "'; const foo = new Foo(); console.log(foo.square(64));";
 
         try (GraalPolyglotManager manager = new GraalPolyglotManager(10,
-                metadata -> Context.newBuilder("js").allowIO(true).build()); ContextWrapper context = manager.getContext();) {
+                metadata -> Context.newBuilder("js").allowIO(true).build()); ContextWrapper context = manager.getContext(null);) {
             // Source.newBuilder("js",esmScript1File).mimeType("application/javascript+module").build();
             Value result = context.eval(Source.newBuilder("js", esmScript2, "test.mjs").build());
 
@@ -204,7 +204,7 @@ public class GraalPolyglotManagerTests {
                 // Create context with IO support and experimental options.
                 metadata -> Context.newBuilder("js").allowExperimentalOptions(true).allowIO(true).options(options).build());) {
             // Require a module
-            Value module = manager.getContext().eval("js", "require('Foo');");
+            Value module = manager.getContext(null).eval("js", "require('Foo');");
             System.out.println(module);
         }
     }

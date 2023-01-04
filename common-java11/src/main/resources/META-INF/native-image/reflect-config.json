@@ -18,6 +18,12 @@
   "name":"java.lang.Byte"
 },
 {
+  "name":"java.lang.reflect.Field"
+},
+{
+  "name":"java.lang.reflect.Method"
+},
+{
   "name":"java.math.BigInteger"
 },
 {
@@ -61,6 +67,12 @@
 },
 {
   "name":"java.util.concurrent.TimeUnit"
+},
+{
+  "name":"java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask"
+},
+{
+  "name":"java.util.concurrent.ScheduledThreadPoolExecutor"
 },
 {
   "name":"java.lang.Runnable"
@@ -344,7 +356,12 @@
   "allPublicMethods" : true
 },
 {
-  "name":"com.wl4g.infra.common.graalvm.polyglot.StandandLoggingOutputStream",
+  "name":"com.wl4g.infra.common.reflect.ReflectionUtils2",
+  "allPublicConstructors" : true,
+  "allPublicMethods" : true
+},
+{
+  "name":"com.wl4g.infra.common.graalvm.polyglot.JdkLoggingOutputStream",
   "allPublicConstructors": true,
   "allPublicMethods": true,
   "methods":[
