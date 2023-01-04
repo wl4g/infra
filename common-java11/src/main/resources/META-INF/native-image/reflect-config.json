@@ -45,6 +45,9 @@
   "name":"java.util.Calendar"
 },
 {
+  "name":"java.util.logging.Level"
+},
+{
   "name":"java.concurrent.ConcurrentHashMap"
 },
 {
@@ -339,6 +342,19 @@
   "name":"org.bouncycastle.jcajce.provider.asymmetric.RSA$Mappings",
   "allPublicConstructors" : true,
   "allPublicMethods" : true
+},
+{
+  "name":"com.wl4g.infra.common.graalvm.polyglot.StandandLoggingOutputStream",
+  "allPublicConstructors": true,
+  "allPublicMethods": true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"<init>","parameterTypes":["boolean"] }, 
+    {"name":"<init>","parameterTypes":["java.lang.String","java.util.logging.Level","java.lang.Integer","java.lang.Integer","boolean","boolean"] }, 
+    {"name":"write","parameterTypes":["int"] }, 
+    {"name":"write","parameterTypes":["[Lbyte;","int","int"] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
 },
 {
   "name":"com.wl4g.infra.common.locks.JedisLockManager",

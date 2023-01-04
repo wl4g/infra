@@ -1,4 +1,4 @@
-package com.wl4g.infra.common.graalvm;
+package com.wl4g.infra.common.graalvm.polyglot;
 
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.util.Collections.singletonMap;

@@ -155,17 +155,27 @@
                 <dependency>
                     <groupId>org.graalvm.sdk</groupId>
                     <artifactId>graal-sdk</artifactId>
-                    <optional>true</optional>
+                    <scope>provided</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.graalvm.js</groupId>
                     <artifactId>js</artifactId>
-                    <optional>true</optional>
+                    <scope>provided</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.graalvm.js</groupId>
                     <artifactId>js-scriptengine</artifactId>
-                    <optional>true</optional>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.graalvm.truffle</groupId>
+                    <artifactId>truffle-api</artifactId>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.graalvm.nativeimage</groupId>
+                    <artifactId>svm</artifactId>
+                    <scope>provided</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.graalvm.tools</groupId>
@@ -178,11 +188,6 @@
                     <artifactId>chromeinspector</artifactId>
                     <optional>true</optional>
                     <scope>runtime</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.graalvm.nativeimage</groupId>
-                    <artifactId>svm</artifactId>
-                    <scope>provided</scope>
                 </dependency>
             </dependencies>
             <build>

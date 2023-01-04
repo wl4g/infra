@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.common.graalvm;
+package com.wl4g.infra.common.graalvm.polyglot;
 
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
@@ -31,8 +31,8 @@ import org.graalvm.polyglot.Value;
 import org.junit.Test;
 
 import com.google.common.base.Charsets;
-import com.wl4g.infra.common.graalvm.GraalPolyglotManager.ContextWrapper;
-import com.wl4g.infra.common.graalvm.GraalPolyglotManager.SimpleFastContextPool;
+import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager.ContextWrapper;
+import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager.SimpleFastContextPool;
 import com.wl4g.infra.common.io.FileIOUtils;
 
 /**
@@ -46,7 +46,7 @@ public class GraalPolyglotManagerTests {
 
     @Test
     public void testTakeNoOverflow() throws Exception {
-        try (SimpleFastContextPool pool = new SimpleFastContextPool(1, 10, () -> Context.create());) {
+        try (SimpleFastContextPool pool = new SimpleFastContextPool(10, metadata -> Context.create());) {
             try {
                 for (int i = 0; i < 10; i++) {
                     ContextWrapper context = pool.take();
@@ -62,7 +62,7 @@ public class GraalPolyglotManagerTests {
 
     @Test(expected = IllegalStateException.class)
     public void testTakeOverflow() throws Exception {
-        try (SimpleFastContextPool pool = new SimpleFastContextPool(1, 10, () -> Context.create());) {
+        try (SimpleFastContextPool pool = new SimpleFastContextPool(10, metadata -> Context.create());) {
             try {
                 for (int i = 0; i < 11; i++) {
                     ContextWrapper context = pool.take();
@@ -78,7 +78,7 @@ public class GraalPolyglotManagerTests {
 
     @Test
     public void testTakeNoOverflowWithRelease() throws Exception {
-        try (SimpleFastContextPool pool = new SimpleFastContextPool(1, 10, () -> Context.create());) {
+        try (SimpleFastContextPool pool = new SimpleFastContextPool(10, metadata -> Context.create());) {
             try {
                 for (int i = 0; i < 20; i++) {
                     try (ContextWrapper context = pool.take();) {
@@ -107,8 +107,8 @@ public class GraalPolyglotManagerTests {
         List<Exception> exceptions = new ArrayList<>();
         CountDownLatch latch = new CountDownLatch(threadCount);
 
-        try (SimpleFastContextPool pool = new SimpleFastContextPool(1, poolMaxSize,
-                () -> Context.newBuilder("js").allowIO(true).build());) {
+        try (SimpleFastContextPool pool = new SimpleFastContextPool(poolMaxSize,
+                metadata -> Context.newBuilder("js").allowIO(true).build());) {
             for (int i = 0; i < threadCount; i++) {
                 new Thread(() -> {
                     long begin = currentTimeMillis();
@@ -163,8 +163,8 @@ public class GraalPolyglotManagerTests {
         String esmScript2 = "import {Foo} from '" + esmScript1File.getAbsolutePath()
                 + "'; const foo = new Foo(); console.log(foo.square(64));";
 
-        try (GraalPolyglotManager manager = new GraalPolyglotManager(1, 10, () -> Context.newBuilder("js").allowIO(true).build());
-                ContextWrapper context = manager.getContext();) {
+        try (GraalPolyglotManager manager = new GraalPolyglotManager(10,
+                metadata -> Context.newBuilder("js").allowIO(true).build()); ContextWrapper context = manager.getContext();) {
             // Source.newBuilder("js",esmScript1File).mimeType("application/javascript+module").build();
             Value result = context.eval(Source.newBuilder("js", esmScript2, "test.mjs").build());
 
@@ -200,9 +200,9 @@ public class GraalPolyglotManagerTests {
         // (optional) Node.js built-in replacements as a comma separated list.
         // options.put("js.commonjs-core-modules-replacements","buffer:buffer/,path:path-browserify");
 
-        try (GraalPolyglotManager manager = new GraalPolyglotManager(1, 10,
+        try (GraalPolyglotManager manager = new GraalPolyglotManager(10,
                 // Create context with IO support and experimental options.
-                () -> Context.newBuilder("js").allowExperimentalOptions(true).allowIO(true).options(options).build());) {
+                metadata -> Context.newBuilder("js").allowExperimentalOptions(true).allowIO(true).options(options).build());) {
             // Require a module
             Value module = manager.getContext().eval("js", "require('Foo');");
             System.out.println(module);

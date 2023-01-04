@@ -13,7 +13,7 @@
 // * See the License for the specific language governing permissions and
 // * limitations under the License.
 // */
-//package com.wl4g.infra.common.graalvm;
+//package com.wl4g.infra.common.graalvm.feature;
 //
 //import org.apache.commons.logging.LogFactory;
 //import org.apache.commons.logging.impl.JBossLogFactory;

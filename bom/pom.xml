@@ -1092,23 +1092,35 @@
                 <artifactId>js-scriptengine</artifactId>
                 <version>${graalvm.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.graalvm.tools</groupId>
-                <artifactId>profiler</artifactId>
+             <dependency>
+                <groupId>org.graalvm.truffle</groupId>
+                <artifactId>truffle-api</artifactId>
                 <version>${graalvm.version}</version>
-                <scope>runtime</scope>
             </dependency>
             <dependency>
-                <groupId>org.graalvm.tools</groupId>
-                <artifactId>chromeinspector</artifactId>
+                <groupId>org.graalvm.compiler</groupId>
+                <artifactId>compiler-management</artifactId>
                 <version>${graalvm.version}</version>
-                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.graalvm.compiler</groupId>
+                <artifactId>compiler</artifactId>
+                <version>${graalvm.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.graalvm.nativeimage</groupId>
                 <artifactId>svm</artifactId>
                 <version>${graalvm.version}</version>
-                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.graalvm.tools</groupId>
+                <artifactId>profiler</artifactId>
+                <version>${graalvm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.graalvm.tools</groupId>
+                <artifactId>chromeinspector</artifactId>
+                <version>${graalvm.version}</version>
             </dependency>
             <!-- SPOTBUGS -->
             <dependency>

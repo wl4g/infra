@@ -55,6 +55,10 @@ public abstract class EnvironmentUtil {
     /** Process environment map cache. */
     public static final Map<String, String> ENV = Collections.unmodifiableMap(System.getenv());
 
+    public static String getProperty(@NotBlank String key, @Nullable String defaultValue) {
+        return getStringProperty(key, defaultValue);
+    }
+
     public static String getStringProperty(@NotBlank String key, @Nullable String defaultValue) {
         hasTextOf(key, "key");
         String value = ENV.get(replace(key, ".", "_").toUpperCase());
