@@ -83,7 +83,7 @@ public class JdkLoggingOutputStream extends OutputStream {
         this.fileMaxSize = nonNull(fileMaxSize) ? fileMaxSize : 512 * 1024 * 1024;
         this.fileMaxCount = nonNull(fileMaxSize) ? fileMaxSize : 10;
         try {
-            this.logger = Logger.getLogger(JdkLoggingOutputStream.class.getName());
+            this.logger = Logger.getLogger(JdkLoggingOutputStream.class.getName() + "." + isStdErr);
             final FileHandler handler = new FileHandler(this.filePattern, this.fileMaxSize, this.fileMaxCount, true);
             handler.setEncoding("UTF-8");
             handler.setLevel(this.level);
