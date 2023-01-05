@@ -20,15 +20,16 @@ import static com.wl4g.infra.common.lang.Exceptions.getStackTraceAsString;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.SystemUtils.JAVA_IO_TMPDIR;
+import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -50,8 +51,6 @@ import lombok.Getter;
  */
 @Getter
 public class JdkLoggingOutputStream extends OutputStream {
-    private final static ThreadLocal<DateTimeFormatter> dateFormatterLocal = ThreadLocal
-            .withInitial(() -> DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS").withZone(ZoneId.systemDefault()));
 
     private final String filePattern;
     private final Level level;
@@ -81,29 +80,30 @@ public class JdkLoggingOutputStream extends OutputStream {
         }
         // The default by 512MB
         this.fileMaxSize = nonNull(fileMaxSize) ? fileMaxSize : 512 * 1024 * 1024;
-        this.fileMaxCount = nonNull(fileMaxSize) ? fileMaxSize : 10;
+        this.fileMaxCount = nonNull(fileMaxCount) ? fileMaxCount : 10;
         try {
             this.logger = Logger.getLogger(JdkLoggingOutputStream.class.getName() + "." + isStdErr);
-            final FileHandler handler = new FileHandler(this.filePattern, this.fileMaxSize, this.fileMaxCount, true);
-            handler.setEncoding("UTF-8");
-            handler.setLevel(this.level);
-            handler.setFormatter(new SimpleFormatter() {
-                @Override
-                public String format(LogRecord record) {
-                    final Map<String, Object> json = new HashMap<>();
-                    json.put("level", record.getLevel().getName());
-                    json.put("date", dateFormatterLocal.get().format(record.getInstant()));
-                    json.put("threadId", record.getThreadID());
-                    json.put("sequence", record.getSequenceNumber());
-                    json.put("message", record.getMessage());
-                    json.put("cause", getStackTraceAsString(record.getThrown()));
-                    return toJSONString(json);
-                }
-            });
             this.logger.setUseParentHandlers(false);
-            this.logger.addHandler(handler);
+            final FileHandler fileHandler = new FileHandler(this.filePattern, this.fileMaxSize, this.fileMaxCount, true);
+            fileHandler.setEncoding("UTF-8");
+            fileHandler.setLevel(this.level);
+            fileHandler.setFormatter(DEFAULT_FORMATTER);
+            this.logger.addHandler(fileHandler);
             if (enableConsole) {
-                this.logger.addHandler(new ConsoleHandler());
+                this.logger.addHandler(new Handler() {
+                    @Override
+                    public void publish(LogRecord record) {
+                        System.out.print(DEFAULT_FORMATTER.format(record));
+                    }
+
+                    @Override
+                    public void flush() {
+                    }
+
+                    @Override
+                    public void close() throws SecurityException {
+                    }
+                });
             }
             this.isStdErr = isStdErr;
         } catch (Exception e) {
@@ -118,12 +118,29 @@ public class JdkLoggingOutputStream extends OutputStream {
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
-        final String message = new String(b, off, len, Charsets.UTF_8);
+        final String msg = new String(b, off, len, Charsets.UTF_8);
         if (isStdErr) {
-            logger.warning(message);
+            logger.warning(msg);
         } else {
-            logger.info(message);
+            logger.info(msg);
         }
     }
+
+    static final ThreadLocal<DateTimeFormatter> DEFAULT_DATE_FORMATTER_LOCAL = ThreadLocal
+            .withInitial(() -> DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS").withZone(ZoneId.systemDefault()));
+
+    static final SimpleFormatter DEFAULT_FORMATTER = new SimpleFormatter() {
+        @Override
+        public String format(LogRecord record) {
+            final Map<String, Object> json = new LinkedHashMap<>();
+            json.put("timestamp", DEFAULT_DATE_FORMATTER_LOCAL.get().format(record.getInstant()));
+            json.put("level", record.getLevel().getName());
+            json.put("threadId", record.getThreadID());
+            json.put("sequence", record.getSequenceNumber());
+            json.put("message", record.getMessage());
+            json.put("cause", getStackTraceAsString(record.getThrown()));
+            return toJSONString(json).concat(LINE_SEPARATOR);
+        }
+    };
 
 }

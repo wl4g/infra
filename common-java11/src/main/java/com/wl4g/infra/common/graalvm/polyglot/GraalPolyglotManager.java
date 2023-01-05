@@ -21,6 +21,7 @@ import static com.wl4g.infra.common.lang.Assert2.isTrue;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.lang.EnvironmentUtil.getBooleanProperty;
 import static com.wl4g.infra.common.lang.EnvironmentUtil.getIntProperty;
+import static com.wl4g.infra.common.lang.EnvironmentUtil.getLongProperty;
 import static com.wl4g.infra.common.lang.EnvironmentUtil.getProperty;
 import static com.wl4g.infra.common.lang.StringUtils2.eqIgnCase;
 import static java.lang.String.format;
@@ -111,7 +112,7 @@ public class GraalPolyglotManager implements Closeable {
                         .useSystemExit(getBooleanProperty("graaljs.useSystemExit", false))
                         .currentWorkingDirectory(workingDir.toPath())
                         .resourceLimits(ResourceLimits.newBuilder()
-                                .statementLimit(getIntProperty("graaljs.resourceLimits", 1024), null)
+                                .statementLimit(getLongProperty("graaljs.resourceLimits", Long.MAX_VALUE), null)
                                 .build())
                         // Note: The custom logHandler is invalid for
                         // 'console.log'
