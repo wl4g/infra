@@ -419,7 +419,7 @@ public class MyUserInfo implements Serializable {
 		}
 
 		/**
-		 * NoOp {@link Attributes}
+		 * NONE {@link Attributes}
 		 */
 		final public static Attributes NOOP = new Attributes() {
 			private static final long serialVersionUID = 6965759508221042024L;
@@ -755,7 +755,7 @@ public class MyUserInfo implements Serializable {
 		 * @param openId
 		 * @param unionId
 		 *            May be empty, Unionid is possible only when WeChat or
-		 *            Facebook public platforms
+		 *            FACEBOOK public platforms
 		 */
 		public SnsAuthorizingParameter(String provider, String openId, String unionId) {
 			notNull(provider, "'provider' must not be null");
@@ -832,7 +832,7 @@ public class MyUserInfo implements Serializable {
 		}
 
 		/**
-		 * NoOp {@link PrincipalOrganization}
+		 * NONE {@link PrincipalOrganization}
 		 */
 		final public static PrincipalOrganization NOOP = new PrincipalOrganization() {
 
@@ -994,7 +994,7 @@ public class MyUserInfo implements Serializable {
 		}
 
 		/**
-		 * NoOp {@link OrganizationInfo}
+		 * NONE {@link OrganizationInfo}
 		 */
 		final public static OrganizationInfo NOOP = new OrganizationInfo() {
 			private static final long serialVersionUID = 6965751111221042024L;

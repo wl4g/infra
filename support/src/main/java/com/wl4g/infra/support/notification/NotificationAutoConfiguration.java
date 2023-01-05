@@ -15,11 +15,13 @@
  */
 package com.wl4g.infra.support.notification;
 
+import static com.wl4g.infra.common.notification.NoneMessageNotifier.DEFAULT_NO_OP;
 import static com.wl4g.infra.support.constant.SupportInfraConstant.CONF_PREFIX_INFRA_SUPPORT_NOTIFY;
-import static com.wl4g.infra.support.notification.NoOpMessageNotifier.DefaultNoOp;
 import static java.util.stream.Collectors.toList;
 
 import java.util.List;
+
+import javax.validation.Validator;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -27,28 +29,29 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
-import com.wl4g.infra.core.framework.operator.GenericOperatorAdapter;
-import com.wl4g.infra.support.notification.MessageNotifier.NotifierKind;
-import com.wl4g.infra.support.notification.apns.ApnsMessageNotifier;
-import com.wl4g.infra.support.notification.apns.ApnsNotifyProperties;
-import com.wl4g.infra.support.notification.bark.BarkMessageNotifier;
-import com.wl4g.infra.support.notification.bark.BarkNotifyProperties;
-import com.wl4g.infra.support.notification.dingtalk.DingtalkMessageNotifier;
-import com.wl4g.infra.support.notification.dingtalk.DingtalkNotifyProperties;
-import com.wl4g.infra.support.notification.facebook.FacebookMessageNotifier;
-import com.wl4g.infra.support.notification.facebook.FacebookNotifyProperties;
-import com.wl4g.infra.support.notification.mail.MailMessageNotifier;
-import com.wl4g.infra.support.notification.mail.MailNotifyProperties;
-import com.wl4g.infra.support.notification.qq.QqMessageNotifier;
-import com.wl4g.infra.support.notification.qq.QqNotifyProperties;
-import com.wl4g.infra.support.notification.sms.AliyunSmsMessageNotifier;
-import com.wl4g.infra.support.notification.sms.SmsNotifyProperties;
-import com.wl4g.infra.support.notification.twitter.TwitterMessageNotifier;
-import com.wl4g.infra.support.notification.twitter.TwitterNotifyProperties;
-import com.wl4g.infra.support.notification.vms.AliyunVmsMessageNotifier;
-import com.wl4g.infra.support.notification.vms.VmsNotifyProperties;
-import com.wl4g.infra.support.notification.wechat.WechatMessageNotifier;
-import com.wl4g.infra.support.notification.wechat.WechatNotifyProperties;
+import com.wl4g.infra.common.framework.operator.GenericOperatorAdapter;
+import com.wl4g.infra.common.notification.MessageNotifier;
+import com.wl4g.infra.common.notification.MessageNotifier.NotifierKind;
+import com.wl4g.infra.common.notification.apns.ApnsMessageNotifier;
+import com.wl4g.infra.common.notification.apns.ApnsNotifyProperties;
+import com.wl4g.infra.common.notification.bark.BarkMessageNotifier;
+import com.wl4g.infra.common.notification.bark.BarkNotifyProperties;
+import com.wl4g.infra.common.notification.dingtalk.DingtalkMessageNotifier;
+import com.wl4g.infra.common.notification.dingtalk.DingtalkNotifyProperties;
+import com.wl4g.infra.common.notification.facebook.FacebookMessageNotifier;
+import com.wl4g.infra.common.notification.facebook.FacebookNotifyProperties;
+import com.wl4g.infra.common.notification.mail.MailMessageNotifier;
+import com.wl4g.infra.common.notification.mail.MailNotifyProperties;
+import com.wl4g.infra.common.notification.qq.QqMessageNotifier;
+import com.wl4g.infra.common.notification.qq.QqNotifyProperties;
+import com.wl4g.infra.common.notification.sms.AliyunSmsMessageNotifier;
+import com.wl4g.infra.common.notification.sms.SmsNotifyProperties;
+import com.wl4g.infra.common.notification.twitter.TwitterMessageNotifier;
+import com.wl4g.infra.common.notification.twitter.TwitterNotifyProperties;
+import com.wl4g.infra.common.notification.vms.AliyunVmsMessageNotifier;
+import com.wl4g.infra.common.notification.vms.VmsNotifyProperties;
+import com.wl4g.infra.common.notification.wechat.WechatMessageNotifier;
+import com.wl4g.infra.common.notification.wechat.WechatNotifyProperties;
 
 /**
  * Notification message service auto configuration
@@ -139,62 +142,62 @@ public class NotificationAutoConfiguration {
 
     @Bean
     @ConditionalOnBean(ApnsNotifyProperties.class)
-    public ApnsMessageNotifier apnsMessageNotifier(ApnsNotifyProperties config) {
-        return new ApnsMessageNotifier(config);
+    public ApnsMessageNotifier apnsMessageNotifier(ApnsNotifyProperties config, Validator validator) {
+        return new ApnsMessageNotifier(config, validator);
     }
 
     @Bean
     @ConditionalOnBean(BarkNotifyProperties.class)
-    public BarkMessageNotifier barkMessageNotifier(BarkNotifyProperties config) {
-        return new BarkMessageNotifier(config);
+    public BarkMessageNotifier barkMessageNotifier(BarkNotifyProperties config, Validator validator) {
+        return new BarkMessageNotifier(config, validator);
     }
 
     @Bean
     @ConditionalOnBean(DingtalkNotifyProperties.class)
-    public DingtalkMessageNotifier dingtalkMessageNotifier(DingtalkNotifyProperties config) {
-        return new DingtalkMessageNotifier(config);
+    public DingtalkMessageNotifier dingtalkMessageNotifier(DingtalkNotifyProperties config, Validator validator) {
+        return new DingtalkMessageNotifier(config, validator);
     }
 
     @Bean
     @ConditionalOnBean(FacebookNotifyProperties.class)
-    public FacebookMessageNotifier facebookMessageNotifier(FacebookNotifyProperties config) {
-        return new FacebookMessageNotifier(config);
+    public FacebookMessageNotifier facebookMessageNotifier(FacebookNotifyProperties config, Validator validator) {
+        return new FacebookMessageNotifier(config, validator);
     }
 
     @Bean
     @ConditionalOnBean(MailNotifyProperties.class)
-    public MailMessageNotifier mailMessageNotifier(MailNotifyProperties config) {
-        return new MailMessageNotifier(config);
+    public MailMessageNotifier mailMessageNotifier(MailNotifyProperties config, Validator validator) {
+        return new MailMessageNotifier(config, validator);
     }
 
     @Bean
     @ConditionalOnBean(QqNotifyProperties.class)
-    public QqMessageNotifier qqMessageNotifier(QqNotifyProperties config) {
-        return new QqMessageNotifier(config);
+    public QqMessageNotifier qqMessageNotifier(QqNotifyProperties config, Validator validator) {
+        return new QqMessageNotifier(config, validator);
     }
 
     @Bean
     @ConditionalOnBean(SmsNotifyProperties.class)
-    public AliyunSmsMessageNotifier aliyunSmsMessageNotifier(SmsNotifyProperties config) {
-        return new AliyunSmsMessageNotifier(config);
+    public AliyunSmsMessageNotifier aliyunSmsMessageNotifier(SmsNotifyProperties config, Validator validator) {
+        return new AliyunSmsMessageNotifier(config, validator);
     }
 
     @Bean
     @ConditionalOnBean(VmsNotifyProperties.class)
-    public AliyunVmsMessageNotifier aliyunVmsMessageNotifier(VmsNotifyProperties config) {
-        return new AliyunVmsMessageNotifier(config);
+    public AliyunVmsMessageNotifier aliyunVmsMessageNotifier(VmsNotifyProperties config, Validator validator) {
+        return new AliyunVmsMessageNotifier(config, validator);
     }
 
     @Bean
     @ConditionalOnBean(WechatNotifyProperties.class)
-    public WechatMessageNotifier wechatMessageNotifier(WechatNotifyProperties config) {
-        return new WechatMessageNotifier(config);
+    public WechatMessageNotifier wechatMessageNotifier(WechatNotifyProperties config, Validator validator) {
+        return new WechatMessageNotifier(config, validator);
     }
 
     @Bean
     @ConditionalOnBean(TwitterNotifyProperties.class)
-    public TwitterMessageNotifier twitterMessageNotifier(TwitterNotifyProperties config) {
-        return new TwitterMessageNotifier(config);
+    public TwitterMessageNotifier twitterMessageNotifier(TwitterNotifyProperties config, Validator validator) {
+        return new TwitterMessageNotifier(config, validator);
     }
 
     /**
@@ -224,32 +227,31 @@ public class NotificationAutoConfiguration {
     public GenericOperatorAdapter<NotifierKind, MessageNotifier> compositeMessageNotifierAdapter(
             List<MessageNotifier> notifiers) {
         return new GenericOperatorAdapter<NotifierKind, MessageNotifier>(
-                notifiers.stream().map(n -> ((MessageNotifier) n)).collect(toList()), DefaultNoOp) {
+                notifiers.stream().map(n -> ((MessageNotifier) n)).collect(toList()), DEFAULT_NO_OP) {
         };
     }
 
     /**
-     * Default NoOp message notifier.
+     * Default NONE message notifier.
      */
     @Bean
     @ConditionalOnMissingBean(name = BEAN_NOTIFIER_ADAPTER)
-    public NoOpMessageNotifierAdapter noOpCompositeMessageNotifierAdapter() {
-        return new NoOpMessageNotifierAdapter();
+    public NoneMessageNotifierAdapter noneCompositeMessageNotifierAdapter() {
+        return new NoneMessageNotifierAdapter();
     }
 
     /**
-     * {@link NoOpMessageNotifierAdapter}
+     * {@link NoneMessageNotifierAdapter}
      *
      * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
      * @version v1.0 2020年6月4日
      * @since
      */
-    public static class NoOpMessageNotifierAdapter extends GenericOperatorAdapter<NotifierKind, MessageNotifier> {
+    public static class NoneMessageNotifierAdapter extends GenericOperatorAdapter<NotifierKind, MessageNotifier> {
 
-        public NoOpMessageNotifierAdapter() {
-            super(DefaultNoOp);
+        public NoneMessageNotifierAdapter() {
+            super(DEFAULT_NO_OP);
         }
-
     }
 
     public static final String BEAN_NOTIFIER_ADAPTER = "compositeMessageNotifierAdapter";

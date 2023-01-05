@@ -58,7 +58,7 @@ public abstract class StringUtils2 extends org.apache.commons.lang3.StringUtils 
     private final static char SEPARATOR = '_';
 
     /**
-     * Mail regular expression
+     * EMAIL regular expression
      */
     private final static String REGEX_IS_MAIL = "\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*";
     /**

@@ -119,7 +119,7 @@ public class ApiVersionRequestHandlerMapping extends ReactiveHandlerMappingSuppo
         // refer:org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping.getMappingForMethod()
         if (element instanceof Method) {
             CheckMappingWrapper cm = new CheckMappingWrapper(requestMapping, versionMapping);
-            isTrue(!checkingMappings.contains(cm), AmbiguousApiVersionMappingException.class,
+            isTrue(!checkingMappings.contains(cm), errmsg -> new AmbiguousApiVersionMappingException(errmsg),
                     "Ambiguous version API mapping, please ensure that the combind of version and requestPath and requestMethod is unique. - %s",
                     cm);
             this.checkingMappings.add(cm);

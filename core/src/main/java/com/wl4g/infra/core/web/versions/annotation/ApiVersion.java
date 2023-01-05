@@ -48,7 +48,7 @@ public @interface ApiVersion {
 	 * for example:
 	 * 
 	 * <pre>
-	 * {@code @}{@link ApiVersion}({@linkplain #groups}={"Android","iOS","iPad","WebPC","WechatMp","${myconfig.apiVersion.myMobileType}"})
+	 * {@code @}{@link ApiVersion}({@linkplain #groups}={"Android","iOS","iPad","WebPC","WECHAT_MP","${myconfig.apiVersion.myMobileType}"})
 	 * </pre>
 	 * 
 	 * </br>

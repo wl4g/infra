@@ -15,11 +15,12 @@
  */
 package com.wl4g.infra.context.framework.operator;
 
-import static java.lang.reflect.Modifier.*;
+import static com.wl4g.infra.context.constant.ContextInfraConstants.CONF_PREFIX_INFRA_CORE_OPERATOR;
+import static java.lang.reflect.Modifier.isAbstract;
+import static java.lang.reflect.Modifier.isInterface;
+import static java.lang.reflect.Modifier.isPublic;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
-
-import static com.wl4g.infra.context.constant.ContextInfraConstants.CONF_PREFIX_INFRA_CORE_OPERATOR;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -34,6 +35,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
+
+import com.wl4g.infra.common.framework.operator.EmptyOperator;
+import com.wl4g.infra.common.framework.operator.GenericOperatorAdapter;
+import com.wl4g.infra.common.framework.operator.Operator;
 
 /**
  * System boot defaults auto configuration.

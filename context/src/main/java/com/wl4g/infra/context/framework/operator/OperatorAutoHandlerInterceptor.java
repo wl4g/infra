@@ -20,6 +20,7 @@ import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
+import com.wl4g.infra.common.framework.operator.Operator;
 import com.wl4g.infra.common.log.SmartLogger;
 
 /**

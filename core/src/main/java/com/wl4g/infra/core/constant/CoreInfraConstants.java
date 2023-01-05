@@ -35,42 +35,4 @@ public abstract class CoreInfraConstants extends ContextInfraConstants {
 
     public static final String CONF_PREFIX_INFRA_CORE = CONF_PREFIX_INFRA + ".core";
 
-    public static final String CONF_PREFIX_INFRA_CORE_HTTP_REMOTE = CONF_PREFIX_INFRA_CORE + ".http-remote";
-
-    public static final String CONF_PREFIX_INFRA_CORE_BOOTSTRAPPING = CONF_PREFIX_INFRA_CORE + ".bootstrapping";
-
-    public static final String CONF_PREFIX_INFRA_CORE_LOGGING = CONF_PREFIX_INFRA_CORE + ".logging";
-
-    public static final String CONF_PREFIX_INFRA_CORE_TRACE = CONF_PREFIX_INFRA_CORE + ".trace";
-
-    public static final String CONF_PREFIX_INFRA_CORE_NAMING_PROTOYPE = CONF_PREFIX_INFRA_CORE + ".naming-beanfactory";
-
-    public static final String CONF_PREFIX_INFRA_CORE_OPERATOR = CONF_PREFIX_INFRA_CORE + ".generic-operator";
-
-    public static final String CONF_PREFIX_INFRA_CORE_SMART_PROXY = CONF_PREFIX_INFRA_CORE + ".smart-proxies";
-
-    public static final String CONF_PREFIX_INFRA_CORE_WEB_HUMAN_DATE_CONVERTER = CONF_PREFIX_INFRA_CORE
-            + ".web.human-date-converter";
-
-    public static final String CONF_PREFIX_INFRA_CORE_WEB_GLOBAL_ERROR = CONF_PREFIX_INFRA_CORE + ".web.global-error";
-
-    public static final String CONF_PREFIX_INFRA_CORE_WEB_EMBED_WEBAPP = CONF_PREFIX_INFRA_CORE + ".web.embedded-webapps";
-
-    /**
-     * The alias for OpenTracing 'traceId'.
-     */
-    public static final String TRACE_REQUEST_ID_HEADER = "X-Request-Id";
-
-    /**
-     * The alias for OpenTracing 'spanId'.
-     */
-    public static final String TRACE_REQUEST_SEQ_HEADER = "X-Request-Seq";
-
-    /**
-     * Reactive trace webFilter order. Note: If it is integrated in the
-     * Iam-Gateway project, you need to take care of him, hereby the default
-     * definition is: -50
-     */
-    public static final int TRACE_ORDER = getIntProperty("TRACE_ORDER", -50);
-
 }
