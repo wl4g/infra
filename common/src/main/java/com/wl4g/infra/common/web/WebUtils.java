@@ -620,7 +620,7 @@ public abstract class WebUtils {
      * {@link org.springframework.web.servlet.function.ServerRequest}(reactive)
      * etc
      * 
-     * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+     * @author James Wong <jameswong1376@gmail.com>>
      * @version v1.0 2020-09-15
      * @since
      */

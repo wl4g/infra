@@ -25,7 +25,7 @@ import com.wl4g.infra.common.lang.Assert2;
  * KeySpec wrapper, include e.g.: RSA key pair algorithm and AES single key
  * algorithm key packaging.
  *
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2019-08-28
  * @since
  */

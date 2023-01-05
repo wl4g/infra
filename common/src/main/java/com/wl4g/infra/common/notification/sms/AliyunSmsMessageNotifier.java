@@ -31,13 +31,12 @@ import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
-import com.wl4g.infra.common.annotation.Stable;
+import com.wl4g.infra.common.annotation.Todo;
 import com.wl4g.infra.common.notification.AbstractMessageNotifier;
 import com.wl4g.infra.common.notification.GenericNotifyMessage;
 import com.wl4g.infra.common.notification.NotificationException;
 import com.wl4g.infra.common.notification.sms.SmsNotifyProperties.AliyunSmsNotifyProperties;
 
-@Stable
 public class AliyunSmsMessageNotifier extends AbstractMessageNotifier<SmsNotifyProperties> {
     private IAcsClient acsClient;
 
@@ -100,6 +99,7 @@ public class AliyunSmsMessageNotifier extends AbstractMessageNotifier<SmsNotifyP
 
     }
 
+    @Todo
     @Override
     public <R> R sendForReply(GenericNotifyMessage message) {
         throw new UnsupportedOperationException();

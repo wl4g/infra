@@ -67,7 +67,7 @@ import redis.clients.jedis.resps.KeyedZSetElement;
 /**
  * {@link JedisCluster} jedis client wrapper.
  *
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2020-08-03
  * @since
  */

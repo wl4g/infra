@@ -42,6 +42,7 @@ public class AES128CBCPKCS5Tests {
         CodecSource genKey = aes.generateKey();
         out.println("new generateKey => (" + genKey.toBase64() + ")" + genKey.getBytes().length + "bytes");
 
+        // 由于使用了 (PKCS7)Padding 模式, 因此加密数据字节长度不足时会自动填充为 16 的倍数
         String plainText = "abcdefghijklmnopqrstuvwxyz";
         CodecSource key = new CodecSource("1234567812345678"); // must 16bytes
         CodecSource iv = new CodecSource("1234567890123456");

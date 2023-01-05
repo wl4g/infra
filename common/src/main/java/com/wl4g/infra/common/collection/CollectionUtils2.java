@@ -57,7 +57,7 @@ import com.wl4g.infra.common.lang.ObjectUtils2;
  * Miscellaneous collection utility methods. Mainly for internal use within the
  * framework.
  * 
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2018年11月4日
  * @since
  */

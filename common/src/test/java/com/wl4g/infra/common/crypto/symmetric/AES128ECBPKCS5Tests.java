@@ -36,11 +36,12 @@ import com.wl4g.infra.common.codec.CodecSource;
  */
 public class AES128ECBPKCS5Tests {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception { 
         AES128ECBPKCS5 aes = new AES128ECBPKCS5();
         CodecSource genKey = aes.generateKey();
         out.println("new generateKey => (" + genKey.toBase64() + ")" + genKey.getBytes().length + "bytes");
 
+        // 由于使用了 (PKCS7)Padding 模式, 因此加密数据字节长度不足时会自动填充为 16 的倍数
         String plainText = "abcdefghijklmnopqrstuvwxyz";
         CodecSource key = new CodecSource("1234567812345678"); // must 16bytes
         CodecSource cipherText = aes.encrypt(key.getBytes(), new CodecSource(plainText));

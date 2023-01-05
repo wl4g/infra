@@ -16,9 +16,9 @@
 package com.wl4g.infra.common.crypto.symmetric;
 
 /**
- * {@link AES128CBCPKCS5}
+ * 由于使用了 (PKCS5)Padding 模式, 因此加密数据字节长度不足时会自动填充为 16 的倍数
  *
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2020年5月27日
  * @since
  */

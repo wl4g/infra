@@ -47,54 +47,6 @@ import com.wl4g.infra.common.notification.wechat.WechatNotifyProperties;
  */
 public class NotificationBuilder {
 
-    //
-    // --- Notify properties. ---
-    //
-
-    public ApnsNotifyProperties buildApnsNotifyProperties() {
-        return new ApnsNotifyProperties();
-    }
-
-    public BarkNotifyProperties buildBarkNotifyProperties() {
-        return new BarkNotifyProperties();
-    }
-
-    public DingtalkNotifyProperties buildDingtalkNotifyProperties() {
-        return new DingtalkNotifyProperties();
-    }
-
-    public FacebookNotifyProperties buildFacebookNotifyProperties() {
-        return new FacebookNotifyProperties();
-    }
-
-    public MailNotifyProperties buildMailNotifyProperties() {
-        return new MailNotifyProperties();
-    }
-
-    public QqNotifyProperties buildQQNotifyProperties() {
-        return new QqNotifyProperties();
-    }
-
-    public SmsNotifyProperties buildSmsNotifyProperties() {
-        return new SmsNotifyProperties();
-    }
-
-    public VmsNotifyProperties buildVmsNotifyProperties() {
-        return new VmsNotifyProperties();
-    }
-
-    public WechatNotifyProperties buildWechatNotifyProperties() {
-        return new WechatNotifyProperties();
-    }
-
-    public TwitterNotifyProperties buildTwitterNotifyProperties() {
-        return new TwitterNotifyProperties();
-    }
-
-    //
-    // --- Message notifier. ---
-    //
-
     public ApnsMessageNotifier buildApnsMessageNotifier(ApnsNotifyProperties config, Validator validator) {
         return new ApnsMessageNotifier(config, validator);
     }

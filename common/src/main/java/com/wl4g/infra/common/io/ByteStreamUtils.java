@@ -34,7 +34,7 @@ import com.wl4g.infra.common.lang.Assert2;
  * Byte stream utility. </br>
  * {@link ByteStreams}
  * 
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2019年10月23日
  * @since
  */

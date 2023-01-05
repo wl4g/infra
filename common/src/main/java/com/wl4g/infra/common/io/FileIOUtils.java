@@ -410,7 +410,7 @@ public abstract class FileIOUtils extends FileUtils {
     /**
      * Real-read logs frame wrapper.
      * 
-     * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+     * @author James Wong <jameswong1376@gmail.com>>
      * @version v1.0 2019年10月14日
      * @since
      */

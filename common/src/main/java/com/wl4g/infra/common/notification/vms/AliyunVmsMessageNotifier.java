@@ -32,7 +32,7 @@ import com.aliyuncs.DefaultAcsClient;
 import com.aliyuncs.IAcsClient;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
-import com.wl4g.infra.common.annotation.Stable;
+import com.wl4g.infra.common.annotation.Todo;
 import com.wl4g.infra.common.notification.AbstractMessageNotifier;
 import com.wl4g.infra.common.notification.GenericNotifyMessage;
 import com.wl4g.infra.common.notification.NotificationException;
@@ -44,7 +44,6 @@ import com.wl4g.infra.common.notification.NotificationException;
  * @version 2020-01-05
  * @since v1.0.0
  */
-@Stable
 public class AliyunVmsMessageNotifier extends AbstractMessageNotifier<VmsNotifyProperties> {
 
     protected IAcsClient acsClient;
@@ -112,6 +111,7 @@ public class AliyunVmsMessageNotifier extends AbstractMessageNotifier<VmsNotifyP
         }
     }
 
+    @Todo
     @Override
     public <R> R sendForReply(GenericNotifyMessage message) {
         throw new UnsupportedOperationException();

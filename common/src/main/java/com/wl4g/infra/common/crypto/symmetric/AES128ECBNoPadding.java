@@ -13,33 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.common.notification.dingtalk;
-
-import com.wl4g.infra.common.notification.NotifyProperties;
-
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+package com.wl4g.infra.common.crypto.symmetric;
 
 /**
- * {@link DingtalkNotifyProperties}
- * 
- * @author James Wong
- * @version 2022-09-15
- * @since v3.0.0
- * @see https://open-dev.dingtalk.com/apiExplorer?#/?devType=org&api=dingtalk.oapi.gettoken
+ * 1. 由于使用 NoPadding 模式, 因此加密数据字节长度必须为 16 的倍数. </br>
+ * 2. ECB 模式不支持 IV
+ *
+ * @author James Wong <jameswong1376@gmail.com>>
+ * @version v1.0 2020年5月27日
+ * @since
  */
-@Getter
-@Setter
-@NoArgsConstructor
-public class DingtalkNotifyProperties implements NotifyProperties {
+public class AES128ECBNoPadding extends JdkCryptorSupport {
 
-    private String agentId;
-    private String appKey;
-    private String appSecret;
-
-    @Override
-    public void validate() {
+    public AES128ECBNoPadding() {
+        super(new AlgorithmSpec("AES", "AES/ECB/NoPadding", false, 128, 16, 16, 16));
     }
 
 }

@@ -57,7 +57,7 @@ import com.wl4g.infra.common.resource.resolver.ClassPathResourcePatternResolver;
  * @see <a href=
  *      "https://github.com/adamheinrich/native-utils">https://github.com/adamheinrich/native-utils</a>
  *
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2019年12月3日
  * @since
  */

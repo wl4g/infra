@@ -20,7 +20,7 @@ import static java.lang.Math.abs;
 /**
  * {@link SamplePeriodFormatter}
  *
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2020年6月16日
  * @since
  */

@@ -53,7 +53,7 @@ import org.apache.commons.lang3.StringUtils;
  * {@link com.wl4g.infra.common.serialize.JaxbUtilsTests}
  * </p>
  * 
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2020-07-21
  * @since
  */
@@ -152,7 +152,7 @@ public abstract class JaxbUtils {
     /**
      * {@link JaxbConverter}
      *
-     * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+     * @author James Wong <jameswong1376@gmail.com>>
      * @version v1.0 2020-07-21
      * @since
      */
@@ -282,7 +282,7 @@ public abstract class JaxbUtils {
         /**
          * Encapsulate the case that the root element is a collection. . *
          * 
-         * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+         * @author James Wong <jameswong1376@gmail.com>>
          * @version v1.0 2020-07-20
          * @since
          */

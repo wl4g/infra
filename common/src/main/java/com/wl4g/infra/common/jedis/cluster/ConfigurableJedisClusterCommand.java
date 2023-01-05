@@ -91,7 +91,7 @@ abstract class ConfigurableJedisClusterCommand<T> extends JedisClusterCommand<T>
     /**
      * Configurable enhanced Jedis cluster connection handler.
      * 
-     * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+     * @author James Wong <jameswong1376@gmail.com>>
      * @version v1.0 2020年4月17日
      * @since
      */

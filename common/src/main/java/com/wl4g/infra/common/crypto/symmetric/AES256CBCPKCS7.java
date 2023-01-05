@@ -20,11 +20,11 @@ import java.security.Security;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 /**
- * {@link AES256CBCPKCS7}
+ * 由于使用了 (PKCS7)Padding 模式, 因此加密数据字节长度不足时会自动填充为 16 的倍数
  *
  * Note: Unlimited Oracle JCE support required.
  *
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2020年5月27日
  * @since
  */

@@ -34,7 +34,7 @@ import org.apache.commons.codec.binary.Hex;
 /**
  * Codec cryptical hash IO data source.
  * 
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2020年4月8日
  * @since
  */

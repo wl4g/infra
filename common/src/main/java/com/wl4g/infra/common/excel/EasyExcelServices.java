@@ -40,7 +40,7 @@ import com.wl4g.infra.common.reflect.ResolvableType;
 /**
  * {@link EasyExcelServices}
  *
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2020-09-22
  * @since
  */

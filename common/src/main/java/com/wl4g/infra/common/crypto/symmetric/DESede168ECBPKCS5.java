@@ -18,7 +18,7 @@ package com.wl4g.infra.common.crypto.symmetric;
 /**
  * {@link DESedeCryptor}
  *
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2020年5月27日
  * @since
  */

@@ -100,7 +100,7 @@ public class JedisLockManager {
      * copying to the slave or when the master and slave die together, there
      * will be serious consequences of locking.</font>
      * 
-     * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+     * @author James Wong <jameswong1376@gmail.com>>
      * @version v1.0 2019年3月21日
      * @since
      * @see <a href=

@@ -680,7 +680,7 @@ public class HttpMimeType implements Comparable<HttpMimeType>, Serializable {
     /**
      * Miscellaneous {@link HttpMimeType} utility methods.
      *
-     * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+     * @author James Wong <jameswong1376@gmail.com>>
      * @version v1.0 2020年7月2日
      * @since
      */

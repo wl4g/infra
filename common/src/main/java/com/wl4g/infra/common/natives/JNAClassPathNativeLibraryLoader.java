@@ -27,7 +27,7 @@ import com.sun.jna.Native;
 /**
  * {@link JNAClassPathNativeLibraryLoader}
  *
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2020年6月22日
  * @since
  * @see https://www.cnblogs.com/gwd1154978352/p/6831927.html

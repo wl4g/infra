@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
  * Placed into a separate class for visibility, so that changes to URL
  * formatting conventions will affect all users.
  * 
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @author Ben Alex
  * @version v1.0 2020年4月27日
  * @since

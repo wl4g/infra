@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Snowflake algorithms Id generator.
  *
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2018年6月10日
  * @since
  * @see <a href=
@@ -149,7 +149,7 @@ public final class SnowflakeIdGenerator {
     /**
      * {@link SingletionHolder} singletion holder
      *
-     * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+     * @author James Wong <jameswong1376@gmail.com>>
      * @version v1.0 2020年6月10日
      * @since
      */
@@ -160,7 +160,7 @@ public final class SnowflakeIdGenerator {
     /**
      * {@link BitsDefine}
      *
-     * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+     * @author James Wong <jameswong1376@gmail.com>>
      * @version v1.0 2020-10-09
      * @since
      */

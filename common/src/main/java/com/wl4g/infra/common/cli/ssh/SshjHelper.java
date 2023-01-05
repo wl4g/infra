@@ -285,7 +285,7 @@ public class SshjHelper extends SshHelperBase<CommandSessionWrapper, SCPFileTran
     /**
      * {@link CommandSessionWrapper}
      *
-     * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+     * @author James Wong <jameswong1376@gmail.com>>
      * @version v1.0 2020-10-09
      * @since
      */

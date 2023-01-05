@@ -20,7 +20,7 @@ import com.google.common.annotations.Beta;
 /**
  * {@link Blowfish128CBC}
  *
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2020年5月27日
  * @since
  */

@@ -35,7 +35,7 @@ import javax.validation.constraints.NotBlank;
  * The deletion tool class that supports wildcards is similar to
  * "<code>rm -rf /tmp/aa*</code>" of the shell command.
  *
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2020年4月1日
  * @since
  */

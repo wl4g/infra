@@ -37,7 +37,7 @@ import static com.wl4g.infra.common.lang.Assert2.notNullOf;
  * 
  * 平面(List)树与children树互转器. {@link TreeConvertor}
  *
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2017-09-08
  * @since
  * @param <T>
@@ -248,7 +248,7 @@ public class TreeConvertor<T extends TreeNode<T>> {
     /**
      * TreeConvert转换器节点操作接口. {@link TreeNode}
      *
-     * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+     * @author James Wong <jameswong1376@gmail.com>>
      * @version v1.0 2017-09-08
      * @since
      * @param <T>
@@ -307,7 +307,7 @@ public class TreeConvertor<T extends TreeNode<T>> {
     /**
      * {@link NodeIdMatcher}
      *
-     * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+     * @author James Wong <jameswong1376@gmail.com>>
      * @version v1.0 2020-11-04
      * @since
      */

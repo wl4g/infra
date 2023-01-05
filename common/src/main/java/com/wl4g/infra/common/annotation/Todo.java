@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
  * etc., but not implemented temporarily. It will not affect the actual
  * operation of the code.
  *
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2020-11-04
  * @since
  */
