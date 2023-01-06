@@ -31,7 +31,6 @@ import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
-import com.wl4g.infra.common.annotation.Todo;
 import com.wl4g.infra.common.notification.AbstractMessageNotifier;
 import com.wl4g.infra.common.notification.GenericNotifyMessage;
 import com.wl4g.infra.common.notification.NotificationException;
@@ -61,11 +60,11 @@ public class AliyunSmsMessageNotifier extends AbstractMessageNotifier<SmsNotifyP
         // 初始化ascClient,暂时不支持多region（请勿修改）
         IClientProfile profile = DefaultProfile.getProfile(aliyun.getRegionId(), aliyun.getAccessKeyId(),
                 aliyun.getAccessKeySecret());
-        acsClient = new DefaultAcsClient(profile);
+        this.acsClient = new DefaultAcsClient(profile);
     }
 
     @Override
-     public void send(GenericNotifyMessage msg) {
+    public Object send(GenericNotifyMessage msg) {
         try {
             isTrue(msg.getToObjects().size() < 1000, "Group numbers exceeds the limit (<1000)");
 
@@ -85,24 +84,20 @@ public class AliyunSmsMessageNotifier extends AbstractMessageNotifier<SmsNotifyP
             // 可选:outId为提供给业务方扩展字段,最终在短信回执消息中将此值带回给调用者
             req.setOutId(msg.getCallbackId());
             // 请求失败这里会抛ClientException异常
-            SendSmsResponse resp = acsClient.getAcsResponse(req);
+            final SendSmsResponse resp = acsClient.getAcsResponse(req);
             if (!isNull(resp) && "OK".equalsIgnoreCase(resp.getCode())) {
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug("Successed response: {}, request: {}", toJSONString(resp), toJSONString(req));
-                else
+                } else {
                     log.info("Successed message: {}, numbers: {}", resp.getMessage(), msg.getToObjects());
-            } else
+                }
+            } else {
                 log.warn("Failed response: {}, request: {}", toJSONString(resp), toJSONString(req));
+            }
+            return resp;
         } catch (Exception e) {
             throw new NotificationException(kind(), e.getMessage(), e);
         }
-
-    }
-
-    @Todo
-    @Override
-    public <R> R sendForReply(GenericNotifyMessage message) {
-        throw new UnsupportedOperationException();
     }
 
 }

@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -51,20 +52,17 @@ public class GenericNotifyMessage implements NotifyMessage {
     /**
      * The notification target objects.
      */
-    @NotEmpty
-    private List<String> toObjects = synchronizedList(new ArrayList<>(4));
+    private @NotEmpty List<String> toObjects = synchronizedList(new ArrayList<>(4));
 
     /**
      * Notification message template key-name.
      */
-    @NotBlank
-    private String templateKey;
+    private @Nullable String templateKey;
 
     /**
      * The value list of the notification message content placeholder parameter.
      */
-    @NotNull
-    private DataMap<Object> parameters = new DataMap<Object>(4) {
+    private @NotNull DataMap<Object> parameters = new DataMap<Object>(4) {
         private static final long serialVersionUID = 1299361493607274200L;
 
         @Override
@@ -79,14 +77,18 @@ public class GenericNotifyMessage implements NotifyMessage {
      * message confirmation application (optional), string type, 1-15 bytes
      * long.
      */
-    private String callbackId;
+    private @Nullable String callbackId;
 
     public GenericNotifyMessage() {
     }
 
+    public GenericNotifyMessage(@NotBlank String singleToObject) {
+        addToObjects(singleToObject);
+    }
+
     public GenericNotifyMessage(@NotBlank String singleToObject, @NotBlank String templateKey) {
         addToObjects(singleToObject);
-        setTemplateKey(templateKey);
+        withTemplateKey(hasTextOf(templateKey, "templateKey"));
     }
 
     @Override
@@ -108,15 +110,15 @@ public class GenericNotifyMessage implements NotifyMessage {
     /**
      * Add notification target objects.
      * 
-     * @param toObjectArray
+     * @param toObjects
      * @return
      */
-    public GenericNotifyMessage addToObjects(@NotEmpty String... toObjectArray) {
-        if (!isNull(toObjectArray) && toObjectArray.length > 0) {
-            for (String s : toObjectArray) {
+    public GenericNotifyMessage addToObjects(@NotEmpty String... toObjects) {
+        if (!isNull(toObjects) && toObjects.length > 0) {
+            for (String s : toObjects) {
                 hasText(s, "Notification to target object element must not be null.");
             }
-            toObjects.addAll(asList(toObjectArray).stream().filter(t -> !isNull(t)).collect(toList()));
+            this.toObjects.addAll(asList(toObjects).stream().filter(t -> !isNull(t)).collect(toList()));
         }
         return this;
     }
@@ -127,15 +129,10 @@ public class GenericNotifyMessage implements NotifyMessage {
      * @param templateKey
      * @return
      */
-    public GenericNotifyMessage setTemplateKey(@NotBlank String templateKey) {
-        hasTextOf(templateKey, "templateKey");
+    public GenericNotifyMessage withTemplateKey(@Nullable String templateKey) {
+        // this.templateKey = hasTextOf(templateKey, "templateKey");
         this.templateKey = templateKey;
         return this;
-    }
-
-    @Override
-    public DataMap<Object> getParameters() {
-        return parameters;
     }
 
     @SuppressWarnings("unchecked")

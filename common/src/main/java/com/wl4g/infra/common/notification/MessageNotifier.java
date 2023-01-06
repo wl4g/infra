@@ -68,17 +68,7 @@ public interface MessageNotifier extends Operator<NotifierKind> {
      * 
      * @param msg
      */
-    void send(GenericNotifyMessage msg);
-
-    /**
-     * Sending notification message for complete reply.
-     * 
-     * @param <T>
-     * @param <R>
-     * @param msg
-     * @return
-     */
-    <R> R sendForReply(GenericNotifyMessage msg);
+    Object send(GenericNotifyMessage msg);
 
     /**
      * Notification privoder kind.

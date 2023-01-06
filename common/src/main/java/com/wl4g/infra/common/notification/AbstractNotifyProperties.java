@@ -51,8 +51,7 @@ public abstract class AbstractNotifyProperties implements NotifyProperties {
      * 
      * @see http://www.bejson.com/convert/unicode_chinese/
      */
-    @NotEmpty
-    private Properties templates = new Properties();
+    private @NotEmpty Properties templates = new Properties();
 
     public boolean isCaseSensitive() {
         return caseSensitive;

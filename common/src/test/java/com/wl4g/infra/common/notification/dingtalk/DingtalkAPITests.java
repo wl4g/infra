@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.common.notification;
+package com.wl4g.infra.common.notification.dingtalk;
 
+import static com.wl4g.infra.common.lang.EnvironmentUtil.getStringProperty;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 
 import java.io.IOException;
@@ -23,17 +24,16 @@ import java.util.Map;
 import org.junit.Test;
 
 import com.wl4g.infra.common.io.ByteStreamUtils;
-import com.wl4g.infra.common.lang.EnvironmentUtil;
-import com.wl4g.infra.common.notification.dingtalk.DingtalkMessageNotifier;
-import com.wl4g.infra.common.notification.dingtalk.DingtalkMessageNotifier.AccessToken;
-import com.wl4g.infra.common.notification.dingtalk.DingtalkMessageNotifier.AccessTokenResult;
-import com.wl4g.infra.common.notification.dingtalk.DingtalkMessageNotifier.CreateSceneGroupV2;
-import com.wl4g.infra.common.notification.dingtalk.DingtalkMessageNotifier.CreateSceneGroupV2Result;
-import com.wl4g.infra.common.notification.dingtalk.DingtalkMessageNotifier.GetUserIdByMobileResult;
-import com.wl4g.infra.common.notification.dingtalk.DingtalkMessageNotifier.MsgKeyType;
-import com.wl4g.infra.common.notification.dingtalk.DingtalkMessageNotifier.RobotGroupMessagesSend;
-import com.wl4g.infra.common.notification.dingtalk.DingtalkMessageNotifier.RobotGroupMessagesSendResult;
-import com.wl4g.infra.common.notification.dingtalk.DingtalkMessageNotifier.SampleActionCard6Param;
+import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI;
+import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.AccessToken;
+import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.AccessTokenResult;
+import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.CreateSceneGroupV2;
+import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.CreateSceneGroupV2Result;
+import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.GetUserIdByMobileResult;
+import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.MsgKeyType;
+import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.RobotGroupMessagesSend;
+import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.RobotGroupMessagesSendResult;
+import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.SampleActionCard6Param;
 import com.wl4g.infra.common.web.server.SimpleHTTPServer;
 import com.wl4g.infra.common.web.server.SimpleHTTPServer.ContextHandler;
 import com.wl4g.infra.common.web.server.SimpleHTTPServer.Request;
@@ -41,34 +41,33 @@ import com.wl4g.infra.common.web.server.SimpleHTTPServer.Response;
 import com.wl4g.infra.common.web.server.SimpleHTTPServer.VirtualHost;
 
 /**
- * {@link DingtalkMessageNotifierTests}
+ * {@link DingtalkAPITests}
  * 
  * @author James Wong
  * @version 2020-01-05
  * @since v1.0.0
  */
-public class DingtalkMessageNotifierTests {
+public class DingtalkAPITests {
 
-    static String test_appKey = EnvironmentUtil.getStringProperty("TEST_APP_KEY", "dingbhyrzjxx6qjhjcdr");
-    static String test_appSecret = EnvironmentUtil.getStringProperty("TEST_APP_SECRET", "");
-    static String test_accessToken = EnvironmentUtil.getStringProperty("TEST_ACCESS_TOKEN", "03ac6a7029ab339387b301e29e7ec094");
-    static String test_mobile = EnvironmentUtil.getStringProperty("TEST_MOBILE", "180xxxxxxxx");
-    static String test_templateId = EnvironmentUtil.getStringProperty("TEST_TEMPLATE_ID", "4ba6847f-b9b0-42ca-96ea-22c4ed8a3fbd");
-    static String test_userId = EnvironmentUtil.getStringProperty("TEST_USER_ID", "6165471647114842627");
+    static String test_appKey = getStringProperty("TEST_APP_KEY", "dingbhyrzjxx6qjhjcdr");
+    static String test_appSecret = getStringProperty("TEST_APP_SECRET", "");
+    static String test_accessToken = getStringProperty("TEST_ACCESS_TOKEN", "a74c93b76b893a3996a243ddadbdf078");
+    static String test_mobile = getStringProperty("TEST_MOBILE", "180xxxxxxxx");
+    static String test_templateId = getStringProperty("TEST_TEMPLATE_ID", "4ba6847f-b9b0-42ca-96ea-22c4ed8a3fbd");
+    static String test_userId = getStringProperty("TEST_USER_ID", "6165471647114842627");
 
-    static String test_openConversationId = EnvironmentUtil.getStringProperty("TEST_OPEN_CONVERSATION_ID",
-            "cida2/N03cn0u2YXFI1iNujJQ==");
+    static String test_openConversationId = getStringProperty("TEST_OPEN_CONVERSATION_ID", "cidG+niQ3Ny\\/NwUc5KE7mANUQ==");
+    static String test_robotCode = getStringProperty("TEST_ROBOT_CODE", "dingbhyrzjxx6qjhjcdr");
 
-    static String test_robotCode = EnvironmentUtil.getStringProperty("TEST_ROBOT_CODE", "dingbhyrzjxx6qjhjcdr");
+    static String test_aesToken = getStringProperty("TEST_AES_TOKEN", "H792gCFQzB2BP");
+    static String test_aesKey = getStringProperty("TEST_AES_KEY", "bnGUZ3cqz6GgsG7B8LxBQeLcwYFDXKGMwXczNXBwCg9");
 
-    static String test_aesToken = EnvironmentUtil.getStringProperty("TEST_AES_TOKEN", "H792gCFQzB2BP");
-    static String test_aesKey = EnvironmentUtil.getStringProperty("TEST_AES_KEY", "bnGUZ3cqz6GgsG7B8LxBQeLcwYFDXKGMwXczNXBwCg9");
     // https://open.dingtalk.com/document/org/push-events?spm=a2q3p.21071111.0.0.2de165eeGAgfux
-    static String test_corpId = EnvironmentUtil.getStringProperty("TEST_CORP_ID", test_appKey);
+    static String test_corpId = getStringProperty("TEST_CORP_ID", test_appKey);
 
     @Test
     public void testGetAccessToken() {
-        final AccessTokenResult result = DingtalkMessageNotifier
+        final AccessTokenResult result = DingtalkAPI
                 .getAccessToken(AccessToken.builder().appKey(test_appKey).appSecret(test_appSecret).build());
         System.out.println(result);
         test_accessToken = result.getAccessToken();
@@ -76,14 +75,14 @@ public class DingtalkMessageNotifierTests {
 
     @Test
     public void testGetUserIdByMobile() {
-        final GetUserIdByMobileResult result = DingtalkMessageNotifier.getUserIdByMobile(test_accessToken, test_mobile);
+        final GetUserIdByMobileResult result = DingtalkAPI.getUserIdByMobile(test_accessToken, test_mobile);
         System.out.println(result);
         test_userId = result.getUserid();
     }
 
     @Test
     public void testCreateSceneGroupV2() {
-        final CreateSceneGroupV2Result result = DingtalkMessageNotifier.createSceneGroupV2(test_accessToken,
+        final CreateSceneGroupV2Result result = DingtalkAPI.createSceneGroupV2(test_accessToken,
                 CreateSceneGroupV2.builder()
                         .title("测试群-01")
                         .template_id(test_templateId)
@@ -106,7 +105,7 @@ public class DingtalkMessageNotifierTests {
                 .buttonUrl2("https://qq.com")
                 .build();
 
-        final RobotGroupMessagesSendResult result = DingtalkMessageNotifier.sendRobotGroupMessages(test_accessToken,
+        final RobotGroupMessagesSendResult result = DingtalkAPI.sendRobotGroupMessages(test_accessToken,
                 RobotGroupMessagesSend.builder()
                         .msgKey(MsgKeyType.sampleActionCard6)
                         .msgParam(toJSONString(param))
@@ -175,8 +174,8 @@ public class DingtalkMessageNotifierTests {
                 String nonce = req.getParams().get("nonce");
                 String bodyJson = ByteStreamUtils.readFullyToString(req.getBody(), "UTF-8");
 
-                final Map<String, String> result = DingtalkMessageNotifier.processCallback(test_aesToken, test_aesKey,
-                        test_corpId, signature, timestamp, nonce, bodyJson, eventJson -> {
+                final Map<String, String> result = DingtalkAPI.processCallback(test_aesToken, test_aesKey, test_corpId, signature,
+                        timestamp, nonce, bodyJson, eventJson -> {
                             System.out.println("eventJson: " + eventJson);
                         });
 
@@ -185,7 +184,7 @@ public class DingtalkMessageNotifierTests {
                 return 0;
             }
         }, "GET", "POST");
-        System.out.println(DingtalkMessageNotifierTests.class.getSimpleName() + " : " + " Listen serve on 8000");
+        System.out.println(DingtalkAPITests.class.getSimpleName() + " : " + " Listen serve on 8000");
         serve.start();
     }
 

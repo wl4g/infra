@@ -78,7 +78,7 @@ public class MailMessageNotifier extends AbstractMessageNotifier<MailNotifyPrope
      * @param simpleMessages
      */
     @Override
-    public void send(GenericNotifyMessage msg) {
+    public Object send(GenericNotifyMessage msg) {
         String mailMsgType = msg.getParameterAsString(KEY_MAILMSG_TYPE, "simple");
         switch (mailMsgType) {
         case KEY_MAILMSG_VALUE_SIMPLE:
@@ -106,12 +106,7 @@ public class MailMessageNotifier extends AbstractMessageNotifier<MailNotifyPrope
         default:
             throw new UnsupportedOperationException(format("No supported mail message type of %s", mailMsgType));
         }
-
-    }
-
-    @Override
-    public <R> R sendForReply(GenericNotifyMessage message) {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     /**

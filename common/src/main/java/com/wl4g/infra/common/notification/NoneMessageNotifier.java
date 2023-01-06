@@ -26,11 +26,11 @@ public class NoneMessageNotifier extends AbstractMessageNotifier<NotifyPropertie
 
     final public static MessageNotifier DEFAULT_NO_OP = new NoneMessageNotifier();
 
-    public NoneMessageNotifier() {  
+    public NoneMessageNotifier() {
         super(new NotifyProperties() {
             @Override
             public void validate() {
-            }   
+            }
         }, null);
     }
 
@@ -40,14 +40,8 @@ public class NoneMessageNotifier extends AbstractMessageNotifier<NotifyPropertie
     }
 
     @Override
-    public void send(GenericNotifyMessage msg) {
-        log.warn("Lost!!! this is an empty message notifier. Please check if the notifier is configured correctly!");
-    }
-
-    @SuppressWarnings({ "unchecked" })
-    @Override
-    public Object sendForReply(GenericNotifyMessage msg) {
-        log.warn("Lost!!! this is an empty message notifier. Please check if the notifier is configured correctly!");
+    public Object send(GenericNotifyMessage msg) {
+        log.warn("NONE NOTIFIER! This is an empty message notifier. Please check if the notifier is configured correctly!");
         return null;
     }
 

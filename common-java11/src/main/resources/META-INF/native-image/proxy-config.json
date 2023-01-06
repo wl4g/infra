@@ -1,4 +1,5 @@
 [
+    {"interfaces": ["java.lang.Runnable"] },
     {"interfaces": ["java.util.concurrent.locks.Lock"] },
     {"interfaces": ["java.util.concurrent.Callable"] },
     {"interfaces": ["java.util.concurrent.Future"] },

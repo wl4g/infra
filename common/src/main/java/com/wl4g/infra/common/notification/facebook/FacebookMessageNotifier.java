@@ -41,12 +41,7 @@ public class FacebookMessageNotifier extends AbstractMessageNotifier<FacebookNot
     }
 
     @Override
-    public void send(GenericNotifyMessage message) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public <R> R sendForReply(GenericNotifyMessage message) {
+    public Object send(GenericNotifyMessage message) {
         throw new UnsupportedOperationException();
     }
 

@@ -15,11 +15,20 @@
  */
 package com.wl4g.infra.common.notification.dingtalk;
 
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+
+import java.util.Properties;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+
 import com.wl4g.infra.common.notification.NotifyProperties;
 
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 /**
  * {@link DingtalkNotifyProperties}
@@ -31,15 +40,19 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 public class DingtalkNotifyProperties implements NotifyProperties {
 
     private String agentId;
-    private String appKey;
-    private String appSecret;
+    private @NotBlank String appKey;
+    private @NotBlank String appSecret;
+    private @NotEmpty @Default Properties templates = new Properties();
 
     @Override
     public void validate() {
+        hasTextOf(appKey, "appKey");
+        hasTextOf(appSecret, "appSecret");
     }
 
 }

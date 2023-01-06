@@ -32,7 +32,6 @@ import com.aliyuncs.DefaultAcsClient;
 import com.aliyuncs.IAcsClient;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
-import com.wl4g.infra.common.annotation.Todo;
 import com.wl4g.infra.common.notification.AbstractMessageNotifier;
 import com.wl4g.infra.common.notification.GenericNotifyMessage;
 import com.wl4g.infra.common.notification.NotificationException;
@@ -67,7 +66,7 @@ public class AliyunVmsMessageNotifier extends AbstractMessageNotifier<VmsNotifyP
 
     @SuppressWarnings("unchecked")
     @Override
-    public void send(GenericNotifyMessage msg) {
+    public Object send(GenericNotifyMessage msg) {
         CommonRequest req = new CommonRequest();
         req.setSysMethod(MethodType.POST);
         req.setSysDomain("dyvmsapi.aliyuncs.com");
@@ -94,27 +93,25 @@ public class AliyunVmsMessageNotifier extends AbstractMessageNotifier<VmsNotifyP
 
         try {
             log.debug("Aliyun vms request: {}", () -> toJSONString(req));
-            CommonResponse resp = acsClient.getCommonResponse(req);
+            final CommonResponse resp = acsClient.getCommonResponse(req);
             if (!isNull(resp) && !isBlank(resp.getData())) {
                 Properties body = parseJSON(resp.getData(), Properties.class);
                 if (!isNull(body) && "OK".equalsIgnoreCase((String) body.get("Code"))) {
-                    if (log.isDebugEnabled())
+                    if (log.isDebugEnabled()) {
                         log.debug("Successed response: {}, request: {}", resp.getData(), toJSONString(req));
-                    else
+                    } else {
                         log.info("Successed calledNumer: {}, message: {}", calledNumber, msg.getParameters());
-                } else
+                    }
+                } else {
                     log.warn("Failed response: {}, request: {}", resp.getData(), toJSONString(req));
-            } else
+                }
+            } else {
                 throw new NotificationException(kind(), format("Failed to vms request", toJSONString(req)));
+            }
+            return resp;
         } catch (Exception e) {
             throw new NotificationException(kind(), e.getMessage(), e);
         }
-    }
-
-    @Todo
-    @Override
-    public <R> R sendForReply(GenericNotifyMessage message) {
-        throw new UnsupportedOperationException();
     }
 
     /**
