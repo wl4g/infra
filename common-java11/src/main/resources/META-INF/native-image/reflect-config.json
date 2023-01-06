@@ -54,6 +54,9 @@
   "name":"java.util.logging.Level"
 },
 {
+  "name":"java.sql.Date"
+},
+{
   "name":"java.concurrent.ConcurrentHashMap"
 },
 {
