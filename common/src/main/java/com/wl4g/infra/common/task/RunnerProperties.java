@@ -165,9 +165,9 @@ public class RunnerProperties implements Serializable {
         SYNC, ASYNC, NOSTARTUP;
     }
 
-    private static final StartupMode DEFAULT_STARTUP_MODE = StartupMode.SYNC;
-    private static final int DEFAULT_CONCURRENCY = -1;
-    private static final long DEFAULT_KEEP_ALIVE_TIME = 0L;
-    private static final int DEFAULT_ACCEPT_QUEUE = 1;
+    public static final StartupMode DEFAULT_STARTUP_MODE = StartupMode.SYNC;
+    public static final int DEFAULT_CONCURRENCY = -1;
+    public static final long DEFAULT_KEEP_ALIVE_TIME = 0L;
+    public static final int DEFAULT_ACCEPT_QUEUE = 1;
 
 }

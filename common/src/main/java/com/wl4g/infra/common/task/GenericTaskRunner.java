@@ -15,7 +15,10 @@
  */
 package com.wl4g.infra.common.task;
 
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.lang.Assert2.state;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static java.util.Objects.isNull;
@@ -24,9 +27,15 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.log.SmartLogger;
 
@@ -74,7 +83,7 @@ public abstract class GenericTaskRunner<C extends RunnerProperties> implements C
     /**
      * Startup and initialization.
      */
-    public void start() {
+    public GenericTaskRunner<C> start() {
         if (running.compareAndSet(false, true)) {
             // Call PreStartup
             startingPropertiesSet();
@@ -82,8 +91,8 @@ public abstract class GenericTaskRunner<C extends RunnerProperties> implements C
             // Create worker(if necessary)
             if (config.getConcurrency() > 0) {
                 // See:https://www.jianshu.com/p/e7ab1ac8eb4c
-                ThreadFactory tf = new NamedThreadFactory(getThreadNamePrefix().concat("-worker"));
-                worker = new SafeScheduledTaskPoolExecutor(config.getConcurrency(), config.getKeepAliveTime(), tf,
+                this.worker = newScheduledExecutor(config.getConcurrency(),
+                        new NamedThreadFactory(getThreadNamePrefix().concat("-worker")), config.getKeepAliveTime(),
                         config.getAcceptQueue(), config.getReject());
             } else {
                 log.warn("No start threads worker, because the number of workthreads is less than 0");
@@ -95,8 +104,8 @@ public abstract class GenericTaskRunner<C extends RunnerProperties> implements C
                 run(); // Sync execution.
                 break;
             case ASYNC:
-                masterThread = new NamedThreadFactory(getThreadNamePrefix().concat("-header")).newThread(this);
-                masterThread.start();
+                this.masterThread = new NamedThreadFactory(getThreadNamePrefix().concat("-header")).newThread(this);
+                this.masterThread.start();
                 break;
             default:
                 break;
@@ -107,6 +116,8 @@ public abstract class GenericTaskRunner<C extends RunnerProperties> implements C
         } else {
             log.warn("Could not startup runner! because already builders are read-only and do not allow task modification");
         }
+
+        return this;
     }
 
     /**
@@ -245,9 +256,58 @@ public abstract class GenericTaskRunner<C extends RunnerProperties> implements C
     }
 
     /**
+     * New {@link SafeScheduledTaskPoolExecutor} with default configuration.
+     * 
+     * @param prefix
+     * @return
+     */
+    public static SafeScheduledTaskPoolExecutor newDefaultScheduledExecutor(final @NotBlank String prefix) {
+        return newDefaultScheduledExecutor(prefix, 1, 2);
+    }
+
+    /**
+     * New {@link SafeScheduledTaskPoolExecutor} with default configuration.
+     * 
+     * @param prefix
+     * @param concurrency
+     * @return
+     */
+    public static SafeScheduledTaskPoolExecutor newDefaultScheduledExecutor(
+            final @NotBlank String prefix,
+            final @Min(1) int concurrency,
+            final @Min(1) int acceptQueue) {
+        isTrueOf(concurrency > 0, "concurrency > 0");
+        final ThreadFactory tf = new NamedThreadFactory(hasTextOf(prefix, "prefix"));
+        return new SafeScheduledTaskPoolExecutor(concurrency, RunnerProperties.DEFAULT_KEEP_ALIVE_TIME, tf, acceptQueue,
+                new AbortPolicy());
+    }
+
+    /**
+     * New {@link SafeScheduledTaskPoolExecutor}
+     * 
+     * @param concurrency
+     * @param threadFactory
+     * @param keepAliveTime
+     * @param acceptQueue
+     * @param reject
+     * @return
+     */
+    public static SafeScheduledTaskPoolExecutor newScheduledExecutor(
+            final @Min(1) int concurrency,
+            final @NotNull ThreadFactory threadFactory,
+            final @NotNull long keepAliveTime,
+            final @NotNull int acceptQueue,
+            final @NotNull RejectedExecutionHandler reject) {
+        isTrueOf(concurrency > 0, "concurrency > 0");
+        notNullOf(threadFactory, "threadFactory");
+        notNullOf(reject, "reject");
+        return new SafeScheduledTaskPoolExecutor(concurrency, keepAliveTime, threadFactory, acceptQueue, reject);
+    }
+
+    /**
      * The named thread factory
      */
-    private class NamedThreadFactory implements ThreadFactory {
+    static class NamedThreadFactory implements ThreadFactory {
         private final AtomicInteger threads = new AtomicInteger(1);
         private final ThreadGroup group;
         private final String prefix;
