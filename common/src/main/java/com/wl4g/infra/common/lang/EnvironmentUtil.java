@@ -55,8 +55,16 @@ public abstract class EnvironmentUtil {
     /** Process environment map cache. */
     public static final Map<String, String> ENV = Collections.unmodifiableMap(System.getenv());
 
+    public static String getProperty(@NotBlank String key) {
+        return getProperty(key, null);
+    }
+
     public static String getProperty(@NotBlank String key, @Nullable String defaultValue) {
         return getStringProperty(key, defaultValue);
+    }
+
+    public static String getStringProperty(@NotBlank String key) {
+        return getStringProperty(key, null);
     }
 
     public static String getStringProperty(@NotBlank String key, @Nullable String defaultValue) {
@@ -68,9 +76,17 @@ public abstract class EnvironmentUtil {
         return isNull(value) ? defaultValue : value;
     }
 
+    public static long getLongProperty(@NotNull String key) {
+        return getLongProperty(key, -1L);
+    }
+
     public static long getLongProperty(@NotNull String key, @Nullable long defaultValue) {
         Long value = parseLongOrNull(getStringProperty(key, null));
         return nonNull(value) ? value : defaultValue;
+    }
+
+    public static int getIntProperty(@NotNull String key) {
+        return getIntProperty(key, -1);
     }
 
     public static int getIntProperty(@NotNull String key, @Nullable int defaultValue) {
@@ -78,14 +94,26 @@ public abstract class EnvironmentUtil {
         return nonNull(value) ? value : defaultValue;
     }
 
+    public static float getFloatProperty(@NotNull String key) {
+        return getFloatProperty(key, -1f);
+    }
+
     public static float getFloatProperty(@NotNull String key, @Nullable float defaultValue) {
         Float value = parseFloatOrNull(getStringProperty(key, null));
         return nonNull(value) ? value : defaultValue;
     }
 
+    public static double getDoubleProperty(@NotNull String key) {
+        return getDoubleProperty(key, -1d);
+    }
+
     public static double getDoubleProperty(@NotNull String key, @Nullable double defaultValue) {
         Double value = parseDoubleOrNull(getStringProperty(key, null));
         return nonNull(value) ? value : defaultValue;
+    }
+
+    public static boolean getBooleanProperty(@NotNull String key) {
+        return getBooleanProperty(key, false);
     }
 
     public static boolean getBooleanProperty(@NotNull String key, @Nullable boolean defaultValue) {

@@ -31,9 +31,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.wl4g.infra.common.annotation.Todo;
 import com.wl4g.infra.common.notification.AbstractMessageNotifier;
@@ -45,7 +42,6 @@ import com.wl4g.infra.common.remoting.RestClient;
 import com.wl4g.infra.common.remoting.standard.HttpHeaders;
 
 import io.netty.handler.codec.http.HttpMethod;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder.Default;
 import lombok.CustomLog;
 import lombok.Getter;
@@ -193,7 +189,7 @@ public class DingtalkMessageNotifier extends AbstractMessageNotifier<DingtalkNot
      * 
      * @param aesToken
      * @param aesKey
-     * @param ownerKey
+     * @param corpId
      *            1. 开发者后台配置的订阅事件为应用级事件推送，此时OWNER_KEY为应用的APP_KEY. </br>
      *            2. 调用订阅事件接口订阅的事件为企业级事件推送,
      *            此时OWNER_KEY为：企业的appkey（企业内部应用）或SUITE_KEY（三方应用）
@@ -208,7 +204,7 @@ public class DingtalkMessageNotifier extends AbstractMessageNotifier<DingtalkNot
     public static Map<String, String> processCallback(
             final @NotBlank String aesToken,
             final @NotBlank String aesKey,
-            final @NotBlank String ownerKey,
+            final @NotBlank String corpId,
             final @NotBlank String signature,
             final @NotBlank String timestamp,
             final @NotBlank String nonce,
@@ -216,7 +212,7 @@ public class DingtalkMessageNotifier extends AbstractMessageNotifier<DingtalkNot
             final @NotNull Consumer<JsonNode> process) {
         hasTextOf(aesToken, "aesToken");
         hasTextOf(aesKey, "aesKey");
-        hasTextOf(ownerKey, "ownerKey");
+        hasTextOf(corpId, "corpId");
         hasTextOf(timestamp, "timestamp");
         hasTextOf(nonce, "nonce");
         hasTextOf(bodyJson, "bodyJson");
@@ -226,16 +222,12 @@ public class DingtalkMessageNotifier extends AbstractMessageNotifier<DingtalkNot
             final JsonNode json = parseToNode(bodyJson);
             final String encryptMsg = json.requiredAt("/encrypt").asText();
 
-            final DingCallbackCrypto crypto = new DingCallbackCrypto(aesToken, aesKey, ownerKey);
+            final DingCallbackCrypto crypto = new DingCallbackCrypto(aesToken, aesKey, corpId);
             final String decryptMsg = crypto.getDecryptMsg(signature, timestamp, nonce, encryptMsg);
 
             // 提取回调请求的明文事件JSON数据
             final JsonNode eventJson = parseToNode(decryptMsg);
-
-            if (log.isInfoEnabled()) {
-                final String eventType = eventJson.requiredAt("/EventType").asText();
-                log.info("Received event: {}", eventType);
-            }
+            log.debug("Received event: {}", eventJson.requiredAt("/EventType").asText());
 
             // 处理事件消息
             process.accept(eventJson);
@@ -420,20 +412,20 @@ public class DingtalkMessageNotifier extends AbstractMessageNotifier<DingtalkNot
     }
 
     // @formatter:off
-    @Schema(oneOf = { SimpleTextMsgParam.class, SimpleMarkdownMsgParam.class, SimpleImageMsgParam.class, SimpleLinkMsgParam.class,
-            SampleActionCardParam.class, SampleActionCard2Param.class, SampleActionCard3Param.class, SampleActionCard4Param.class,
-            SampleActionCard5Param.class, SampleActionCard6Param.class }, discriminatorProperty = "@type")
-    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type", visible = true)
-    @JsonSubTypes({ @Type(value = SimpleTextMsgParam.class, name = "sampleText"),
-            @Type(value = SimpleMarkdownMsgParam.class, name = "sampleMarkdown"),
-            @Type(value = SimpleImageMsgParam.class, name = "sampleImageMsg"),
-            @Type(value = SimpleLinkMsgParam.class, name = "sampleLink"),
-            @Type(value = SampleActionCardParam.class, name = "sampleActionCard"),
-            @Type(value = SampleActionCard2Param.class, name = "sampleActionCard2"),
-            @Type(value = SampleActionCard3Param.class, name = "sampleActionCard3"),
-            @Type(value = SampleActionCard4Param.class, name = "sampleActionCard4"),
-            @Type(value = SampleActionCard5Param.class, name = "sampleActionCard5"),
-            @Type(value = SampleActionCard6Param.class, name = "sampleActionCard6") })
+    //@Schema(oneOf = { SimpleTextMsgParam.class, SimpleMarkdownMsgParam.class, SimpleImageMsgParam.class, SimpleLinkMsgParam.class,
+    //        SampleActionCardParam.class, SampleActionCard2Param.class, SampleActionCard3Param.class, SampleActionCard4Param.class,
+    //        SampleActionCard5Param.class, SampleActionCard6Param.class }, discriminatorProperty = "@type")
+    //@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type", visible = true)
+    //@JsonSubTypes({ @Type(value = SimpleTextMsgParam.class, name = "sampleText"),
+    //        @Type(value = SimpleMarkdownMsgParam.class, name = "sampleMarkdown"),
+    //        @Type(value = SimpleImageMsgParam.class, name = "sampleImageMsg"),
+    //        @Type(value = SimpleLinkMsgParam.class, name = "sampleLink"),
+    //        @Type(value = SampleActionCardParam.class, name = "sampleActionCard"),
+    //        @Type(value = SampleActionCard2Param.class, name = "sampleActionCard2"),
+    //        @Type(value = SampleActionCard3Param.class, name = "sampleActionCard3"),
+    //        @Type(value = SampleActionCard4Param.class, name = "sampleActionCard4"),
+    //        @Type(value = SampleActionCard5Param.class, name = "sampleActionCard5"),
+    //        @Type(value = SampleActionCard6Param.class, name = "sampleActionCard6") })
     // @formatter:on
     @Getter
     @Setter

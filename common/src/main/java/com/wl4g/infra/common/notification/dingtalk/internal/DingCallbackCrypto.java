@@ -1,18 +1,16 @@
 package com.wl4g.infra.common.notification.dingtalk.internal;
 
-import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
-
 import java.io.ByteArrayOutputStream;
+import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.Permission;
 import java.security.PermissionCollection;
+import java.security.Security;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import java.security.Security;
-import java.lang.reflect.Field;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
@@ -230,13 +228,13 @@ public class DingCallbackCrypto {
         try {
             String[] array = new String[] { token, timestamp, nonce, encrypt };
             Arrays.sort(array);
-            System.out.println(toJSONString(array));
+            // System.out.println(toJSONString(array));
             StringBuffer sb = new StringBuffer();
             for (int i = 0; i < 4; i++) {
                 sb.append(array[i]);
             }
             String str = sb.toString();
-            System.out.println(str);
+            // System.out.println(str);
             MessageDigest md = MessageDigest.getInstance("SHA-1");
             md.update(str.getBytes());
             byte[] digest = md.digest();
