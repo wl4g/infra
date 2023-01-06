@@ -52,7 +52,11 @@ public class MappingJackson2HttpMessageParser extends AbstractJackson2HttpMessag
      * configuration provided by {@link Jackson2ObjectMapperBuilder}.
      */
     public MappingJackson2HttpMessageParser() {
-        this(JacksonUtils.newDefaultObjectMapper());
+        // TODO 当启用扩展支持时，反序列化时会报错 cast exception:
+        // com.fasterxml.jackson.databind.cfg.ContextAttributes.Impl to
+        // com.wl4g.infra.common.serialize.JacksonUtils.TransformContextAttributes
+        // ???
+        this(JacksonUtils.newDefaultObjectMapper(false));
     }
 
     /**
@@ -62,8 +66,10 @@ public class MappingJackson2HttpMessageParser extends AbstractJackson2HttpMessag
      * 
      * @see Jackson2ObjectMapperBuilder#json()
      */
+    @SuppressWarnings("deprecation")
     public MappingJackson2HttpMessageParser(ObjectMapper objectMapper) {
-        super(objectMapper, HttpMediaType.APPLICATION_JSON, new HttpMediaType("application", "*+json"));
+        super(objectMapper, HttpMediaType.APPLICATION_JSON, HttpMediaType.APPLICATION_JSON_UTF8,
+                new HttpMediaType("application", "*+json"));
     }
 
     /**

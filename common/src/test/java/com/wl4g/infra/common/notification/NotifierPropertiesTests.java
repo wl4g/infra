@@ -21,13 +21,13 @@ import java.util.Map;
 import org.junit.Test;
 
 /**
- * {@link NotifierMessageTests}
+ * {@link NotifierPropertiesTests}
  * 
  * @author James Wong
  * @version 2020-01-05
  * @since v1.0.0
  */
-public class NotifierMessageTests {
+public class NotifierPropertiesTests {
 
     @Test
     public void testConfigPropertiesResolve() {

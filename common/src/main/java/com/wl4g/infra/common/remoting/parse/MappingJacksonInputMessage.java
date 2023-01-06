@@ -27,9 +27,7 @@ import com.wl4g.infra.common.remoting.standard.HttpHeaders;
 public class MappingJacksonInputMessage implements HttpInputMessage {
 
     private final InputStream body;
-
     private final HttpHeaders headers;
-
     private Class<?> deserializationView;
 
     public MappingJacksonInputMessage(InputStream body, HttpHeaders headers) {

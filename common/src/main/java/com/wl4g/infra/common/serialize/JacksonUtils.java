@@ -778,13 +778,19 @@ public abstract class JacksonUtils {
     // --- Helper Function. ---
     //
 
+    @NotNull
+    public static final ObjectMapper newDefaultObjectMapper() {
+        return newDefaultObjectMapper(true);
+    }
+
     /**
      * Create default {@link ObjectMapper}
      * 
+     * @param enableExtension
      * @return
      */
     @NotNull
-    public static final ObjectMapper newDefaultObjectMapper() {
+    public static final ObjectMapper newDefaultObjectMapper(final boolean enableExtension) {
         final ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
@@ -796,8 +802,10 @@ public abstract class JacksonUtils {
             @Override
             public void setupModule(SetupContext context) {
                 super.setupModule(context);
-                context.addBeanSerializerModifier(new TransformPropertiesSerializerModifier());
-                context.addBeanDeserializerModifier(new TransformPropertiesDeserializerModifier());
+                if (enableExtension) {
+                    context.addBeanSerializerModifier(new TransformPropertiesSerializerModifier());
+                    context.addBeanDeserializerModifier(new TransformPropertiesDeserializerModifier());
+                }
             }
         });
         return mapper;
@@ -953,30 +961,34 @@ public abstract class JacksonUtils {
                 BeanDescription beanDesc,
                 JsonDeserializer<?> deserializer) {
             if (deserializer instanceof BeanDeserializerBase) {
-                final TransformContextAttributes attributes = notNullOf(config.getAttributes(), "attributes");
-                // Notice: It needs to be reversed here, that is, from
-                // key->value to value->key, because the java bean property name
-                // is modified here, that is, the modification of the java bean
-                // property name to be consistent with the key in the json
-                // string will take effect.
-                final Map<String, String> reverseTransformProperties = attributes.getTransformProperties()
-                        .entrySet()
-                        .stream()
-                        .collect(toMap(e -> e.getValue(), e -> e.getKey()));
+                final ContextAttributes attr = config.getAttributes();
+                notNullOf(attr, "attributes");
+                if (attr instanceof TransformContextAttributes) {
+                    final TransformContextAttributes attributes = (TransformContextAttributes) attr;
+                    // Notice: It needs to be reversed here, that is, from
+                    // key->value to value->key, because the java bean property
+                    // name is modified here, that is, the modification of the
+                    // java bean property name to be consistent with the key in
+                    // the json string will take effect.
+                    final Map<String, String> reverseTransformProperties = attributes.getTransformProperties()
+                            .entrySet()
+                            .stream()
+                            .collect(toMap(e -> e.getValue(), e -> e.getKey()));
 
-                // Transform properties.
-                return new TransformBeanDeserializer((BeanDeserializerBase) deserializer, new NameTransformer() {
-                    @Override
-                    public String transform(String name) {
-                        final Object transformed = reverseTransformProperties.getOrDefault(name, name);
-                        return (String) transformed;
-                    }
+                    // Transform properties.
+                    return new TransformBeanDeserializer((BeanDeserializerBase) deserializer, new NameTransformer() {
+                        @Override
+                        public String transform(String name) {
+                            final Object transformed = reverseTransformProperties.getOrDefault(name, name);
+                            return (String) transformed;
+                        }
 
-                    @Override
-                    public String reverse(String transformed) {
-                        return transformed;
-                    }
-                });
+                        @Override
+                        public String reverse(String transformed) {
+                            return transformed;
+                        }
+                    });
+                }
             }
             return deserializer;
         }
