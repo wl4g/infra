@@ -17,13 +17,19 @@ package com.wl4g.infra.common.notification.dingtalk;
 
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notEmptyOf;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.sendRobotGroupMessages;
 
 import javax.validation.Validator;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.notification.AbstractMessageNotifier;
 import com.wl4g.infra.common.notification.GenericNotifyMessage;
 import com.wl4g.infra.common.notification.dingtalk.internal.DingCallbackCrypto;
+import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI;
+import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.CreateSceneGroupV2;
+import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.CreateSceneGroupV2Result;
 import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.MsgKeyType;
 import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.RobotGroupMessagesSend;
 
@@ -199,9 +205,18 @@ public class DingtalkMessageNotifier extends AbstractMessageNotifier<DingtalkNot
         return sendRobotGroupMessages(accessToken, request);
     }
 
+    public CreateSceneGroupV2Result createSceneGroupV2(
+            final @NotBlank String accessToken,
+            final @NotNull CreateSceneGroupV2 request) {
+        hasTextOf(accessToken, "accessToken");
+        notNullOf(request, "request");
+        return DingtalkAPI.createSceneGroupV2(accessToken, request);
+    }
+
     public static final String KEY_ACCESS_TOKEN = "accessToken";
     public static final String KEY_MSG_KEY = "msgKey";
     public static final String KEY_MSG_PARAM = "msgParam";
     public static final String KEY_OPEN_CONVERSATION_ID = "openConversationId";
+    public static final String KEY_SCENES_GROUP_V2_TEMPLATE_ID = "scenesGroupV2TemplateId";
     public static final String KEY_ROBOT_CODE = "robotCode";
 }
