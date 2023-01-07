@@ -18,6 +18,10 @@ package com.wl4g.infra.common.graalvm;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToList;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
+import static java.lang.String.format;
+import static java.lang.System.err;
+import static java.lang.System.exit;
+import static java.lang.System.out;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
@@ -55,10 +59,10 @@ public class NativeReflectionConfigGenerateTool {
     @SuppressWarnings({ "deprecation" })
     public static void main(String[] args) throws Exception {
         if (args.length < 2) {
-            System.err.println(
+            err.println(
                     "Usage: {<classesDirs> <classPackages>}\n\tclassesDirs    The target classes base directory. eg: $PROJECT/target/classes"
                             + "\n\tclassPackages  The find package filter. eg: com.xxx.xx.service");
-            System.exit(1);
+            exit(1);
         }
         final String baseDirs = args[0];
         final String classPackages = args[1];
@@ -70,17 +74,17 @@ public class NativeReflectionConfigGenerateTool {
                 throw new IllegalArgumentException(e);
             }
         }).collect(toSet());
-        System.out.println("finding of URLs: " + findUrls);
+        out.println("finding of URLs: " + findUrls);
 
         final Set<String> findClassPackages = safeArrayToList(split(classPackages, ",")).stream().collect(toSet());
-        System.out.println("finding of classPackages: " + findClassPackages);
+        out.println("finding of classPackages: " + findClassPackages);
 
         final Collection<Class<?>> classes = ReflectionUtils3.findClassesAll(findClassPackages, findUrls);
         final String classesString = classes.stream().map(cls -> cls.getName()).collect(joining("\n"));
-        System.out.println("\n--- Found classes: ---\n\n" + classesString);
+        out.println("\n--- Found classes: ---\n\n" + classesString);
 
         final List<ReflectionConfigItem> items = buildReflectionConfigItems(classes);
-        System.out.println("\n\n--- Generated reflection config items json: ---\n\n");
+        out.println("\n\n--- Generated reflection config items json: ---\n\n");
         String reflectConfigJson = toJSONString(items, true);
 
         // Custom humnan line and space format.
@@ -96,7 +100,7 @@ public class NativeReflectionConfigGenerateTool {
                 .replace("[ ]", "[]")
                 .replace("]\n  }]", "]}\n  ]");
 
-        System.out.println(reflectConfigJson);
+        out.println(reflectConfigJson);
     }
 
     public static List<ReflectionConfigItem> buildReflectionConfigItems(Collection<Class<?>> classes) {
@@ -115,7 +119,8 @@ public class NativeReflectionConfigGenerateTool {
                                                 .collect(toList()))
                                         .build();
                             } catch (Exception e) {
-                                System.err.println("[WARNING] Unable to load constructor methods. reason: " + e.getMessage());
+                                err.println(format("[WARNING] Unable to load constructor methods of %s#%s. reason: %s",
+                                        cls.getName(), m.getName(), e.getMessage()));
                                 return null;
                             }
                         })
@@ -123,7 +128,8 @@ public class NativeReflectionConfigGenerateTool {
                         .collect(toList());
                 allItem.addAll(constructorMethodItems);
             } catch (Throwable e) {
-                System.err.println("[WARNING] Unable to load constructor methods. reason: " + e.getMessage());
+                err.println(
+                        format("[WARNING] Unable to load constructor methods of %s. reason: %s", cls.getName(), e.getMessage()));
             }
 
             try {
@@ -138,7 +144,8 @@ public class NativeReflectionConfigGenerateTool {
                                                 .collect(toList()))
                                         .build();
                             } catch (Exception e) {
-                                System.err.println("[WARNING] Unable to load member methods. reason: " + e.getMessage());
+                                err.println(format("[WARNING] Unable to load member methods of %s#%s. reason: %s",
+                                        cls.getName(), m.getName(), e.getMessage()));
                                 return null;
                             }
                         })
@@ -146,7 +153,8 @@ public class NativeReflectionConfigGenerateTool {
                         .collect(toList());
                 allItem.addAll(memberMethodItems);
             } catch (Throwable e) {
-                System.err.println("[WARNING] Unable to load member methods. reason: " + e.getMessage());
+                err.println(
+                        format("[WARNING] Unable to load member methods of %s. reason: %s", cls.getName(), e.getMessage()));
             }
 
             try {
@@ -161,7 +169,8 @@ public class NativeReflectionConfigGenerateTool {
                                                 .collect(toList()))
                                         .build();
                             } catch (Exception e) {
-                                System.err.println("[WARNING] Unable to load static methods. reason: " + e.getMessage());
+                                err.println(format("[WARNING] Unable to load static methods of %s#%s. reason: %s",
+                                        cls.getName(), m.getName(), e.getMessage()));
                                 return null;
                             }
                         })
@@ -169,7 +178,8 @@ public class NativeReflectionConfigGenerateTool {
                         .collect(toList());
                 allItem.addAll(staticMethodItems);
             } catch (Throwable e) {
-                System.err.println("[WARNING] Unable to load static methods. reason: " + e.getMessage());
+                err.println(
+                        format("[WARNING] Unable to load static methods of %s. reason: %s", cls.getName(), e.getMessage()));
             }
 
             return ReflectionConfigItem.builder().name(cls.getName()).methods(allItem).build();
