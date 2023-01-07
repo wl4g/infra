@@ -367,6 +367,9 @@ public abstract class JacksonUtils {
             final @Nullable Class<?> view,
             final @Nullable File jsonFile,
             final @NotNull Class<T> valueType) {
+        if (isNull(jsonFile)) {
+            return null;
+        }
         final ObjectMapper mapper = DEFAULT_OBJECT_MAPPER;
         return _parseJSON(mapper, null, () -> {
             try {
@@ -389,6 +392,9 @@ public abstract class JacksonUtils {
             final @Nullable Class<?> view,
             final @Nullable InputStream jsonInputStream,
             final @NotNull Class<T> valueType) {
+        if (isNull(jsonInputStream)) {
+            return null;
+        }
         final ObjectMapper mapper = DEFAULT_OBJECT_MAPPER;
         return _parseJSON(mapper, null, () -> {
             try {
@@ -411,6 +417,9 @@ public abstract class JacksonUtils {
             final @Nullable Class<?> view,
             final @Nullable String jsonString,
             final @NotNull Class<T> valueType) {
+        if (isBlank(jsonString)) {
+            return null;
+        }
         final ObjectMapper mapper = DEFAULT_OBJECT_MAPPER;
         return _parseJSON(mapper, null, () -> {
             try {
@@ -438,6 +447,9 @@ public abstract class JacksonUtils {
             final @NotNull Class<T> valueType,
             final @Nullable Map<String, String> transformProperties,
             final @Nullable String... ignoreProperties) {
+        if (isBlank(jsonString)) {
+            return null;
+        }
         return _parseJSON(mapper, null, () -> {
             try {
                 return mapper.getFactory().createParser(jsonString);
