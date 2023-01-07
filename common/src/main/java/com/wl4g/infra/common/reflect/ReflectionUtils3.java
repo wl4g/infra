@@ -35,6 +35,7 @@ import javax.validation.constraints.NotNull;
 
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
+import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ConfigurationBuilder;
 
 import com.wl4g.infra.common.lang.ClassUtils2;
@@ -48,6 +49,7 @@ import lombok.CustomLog;
  * @version 2023-01-07
  * @since v3.0.0
  */
+@SuppressWarnings("deprecation")
 @CustomLog
 public abstract class ReflectionUtils3 extends ReflectionUtils2 {
 
@@ -59,8 +61,20 @@ public abstract class ReflectionUtils3 extends ReflectionUtils2 {
      */
     public static Reflections buildDefaultResourceReflections(final @NotNull Set<String> classPackages) {
         notNullOf(classPackages, "classPackages");
-        ConfigurationBuilder config = ConfigurationBuilder.build(classPackages)
-                .setScanners(Scanners.Resources, Scanners.TypesAnnotated, Scanners.SubTypes);
+        // @formatter:off
+        final ConfigurationBuilder config = ConfigurationBuilder.build()
+                .forPackages(classPackages.toArray(new String[0]))
+                .setParallel(false)
+                // 虽然新版推荐使用枚举 Scanners.SubTypes 但它存在巨坑, 即默认扫描会排除超类是 java.lang.Object 的所有类, 因此这里必须使用自定义(或设置)的 SubTypeScanner.
+                // 问题源码分析参见:
+                // https://github.com/ronmamo/reflections/blob/0.10.2/src/main/java/org/reflections/scanners/Scanners.java#L50
+                // https://github.com/ronmamo/reflections/blob/0.10.2/src/main/java/org/reflections/Reflections.java#L186
+                // https://github.com/ronmamo/reflections/blob/0.10.2/src/main/java/org/reflections/scanners/Scanners.java#L201
+                .setScanners(new SubTypesScanner(false), Scanners.TypesAnnotated, Scanners.Resources /*Scanners.SubTypes*//*, Scanners.TypesAnnotated, Scanners.Resources, Scanners.ConstructorsAnnotated,
+                        Scanners.ConstructorsParameter, Scanners.ConstructorsSignature, Scanners.FieldsAnnotated,
+                        Scanners.ConstructorsSignature, Scanners.MethodsAnnotated, Scanners.MethodsParameter,
+                        Scanners.MethodsReturn, Scanners.MethodsSignature*/);
+        // @formatter:on
         return new Reflections(config);
     }
 
@@ -88,19 +102,37 @@ public abstract class ReflectionUtils3 extends ReflectionUtils2 {
             final @NotNull Set<String> classPackages,
             final @NotNull Collection<URL> findUrls) {
         final String[] classPackageArray = classPackages.toArray(new String[0]);
-        return (Collection<Class<?>>) doFind(classPackages, findUrls,
-                reflections -> safeSet(reflections.getAll(Scanners.SubTypes)).stream()
-                        .filter(name -> startsWithAny(name, classPackageArray))
-                        .map(name -> {
-                            try {
-                                return ClassUtils2.forName(name, null);
-                            } catch (ClassNotFoundException | LinkageError e) {
-                                log.warn("Unable to load class. reason: {}", e.getMessage());
-                                return null;
-                            }
-                        })
-                        .filter(cls -> nonNull(cls))
-                        .collect(toSet()));
+        return (Collection<Class<?>>) doFind(classPackages, findUrls, reflections -> {
+            Set<String> subTypesAll = reflections.getAll(Scanners.SubTypes);
+            // Set<String> typesAnnotatedAll =
+            // reflections.getAll(Scanners.TypesAnnotated);
+            // Set<String> resourcesAnnotatedAll =
+            // reflections.getAll(Scanners.Resources);
+            // Set<String> constructorsAnnotatedAll =
+            // reflections.getAll(Scanners.ConstructorsAnnotated);
+            // Set<String> constructorsParameterAll =
+            // reflections.getAll(Scanners.ConstructorsParameter);
+            // Set<String> constructorsSignatureAll =
+            // reflections.getAll(Scanners.ConstructorsSignature);
+            // Set<String> fieldsAnnotatedAll =
+            // reflections.getAll(Scanners.FieldsAnnotated);
+            // Set<String> methodsAnnotatedAll =
+            // reflections.getAll(Scanners.MethodsAnnotated);
+            // Set<String> methodsParameterAll =
+            // reflections.getAll(Scanners.MethodsParameter);
+            // Set<String> methodsReturnAll =
+            // reflections.getAll(Scanners.MethodsReturn);
+            // Set<String> methodsSignatureAll =
+            // reflections.getAll(Scanners.MethodsSignature);
+            return safeSet(subTypesAll).stream().filter(name -> startsWithAny(name, classPackageArray)).map(name -> {
+                try {
+                    return ClassUtils2.forName(name, null);
+                } catch (ClassNotFoundException | LinkageError e) {
+                    log.warn("Unable to load class. reason: {}", e.getMessage());
+                    return null;
+                }
+            }).filter(cls -> nonNull(cls)).collect(toSet());
+        });
     }
 
     @SuppressWarnings("unchecked")

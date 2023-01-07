@@ -18,6 +18,7 @@ package com.wl4g.infra.common.graalvm;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToList;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.replace;
@@ -74,10 +75,11 @@ public class NativeReflectionConfigGenerateTool {
         System.out.println("finding of classPackages: " + findClassPackages);
 
         final Collection<Class<?>> classes = ReflectionUtils3.findClassesAll(findClassPackages, findUrls);
-        System.out.println("Found classes: " + classes);
+        final String classesString = classes.stream().map(cls -> cls.getName()).collect(joining("\n"));
+        System.out.println("--- Found classes: ---\n\n" + classesString);
 
         final List<ReflectionConfigItem> items = buildReflectionConfigItems(classes);
-        System.out.println("\n\n--- Generated reflection config items json: ---\n\n\n");
+        System.out.println("\n\n--- Generated reflection config items json: ---\n\n");
         System.out.println(toJSONString(items, true));
     }
 
