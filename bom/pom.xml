@@ -162,6 +162,8 @@
         <arthas.version>3.6.6</arthas.version>
         <!-- SPOTBUGS -->
         <spotbugs.version>4.1.2</spotbugs.version>
+        <!-- Reflections -->
+        <reflections.version>0.10.2</reflections.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -1092,7 +1094,7 @@
                 <artifactId>js-scriptengine</artifactId>
                 <version>${graalvm.version}</version>
             </dependency>
-             <dependency>
+            <dependency>
                 <groupId>org.graalvm.truffle</groupId>
                 <artifactId>truffle-api</artifactId>
                 <version>${graalvm.version}</version>
@@ -1127,6 +1129,12 @@
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-annotations</artifactId>
                 <version>${spotbugs.version}</version>
+            </dependency>
+            <!-- Reflections -->
+            <dependency>
+                <groupId>org.reflections</groupId>
+                <artifactId>reflections</artifactId>
+                <version>${reflections.version}</version>
             </dependency>
             <!-- Arthas (see:https://arthas.aliyun.com/doc/spring-boot-starter.html) -->
             <dependency>

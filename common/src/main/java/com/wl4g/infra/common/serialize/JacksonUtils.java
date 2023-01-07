@@ -50,6 +50,8 @@ import com.fasterxml.jackson.core.PrettyPrinter;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.core.filter.TokenFilter;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.core.util.DefaultIndenter;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -808,6 +810,11 @@ public abstract class JacksonUtils {
                 }
             }
         });
+
+        DefaultPrettyPrinter customPrettyPrinter = new DefaultPrettyPrinter();
+        customPrettyPrinter.indentArraysWith(DefaultIndenter.instance);
+        // customPrettyPrinter.indentObjectsWith(NopIndenter.instance);
+        mapper.setDefaultPrettyPrinter(customPrettyPrinter);
         return mapper;
     }
 
