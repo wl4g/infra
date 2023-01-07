@@ -93,7 +93,8 @@ public class NativeReflectionConfigGenerateTool {
                 .replace("{\"name\" :", "{\"name\":")
                 .replace("    {\n    \"name\" :", "    {\"name\":")
                 .replace("\" :", "\":")
-                .replace("[ ]", "[]");
+                .replace("[ ]", "[]")
+                .replace("]\n  }]", "]}\n  ]");
 
         System.out.println(reflectConfigJson);
     }
