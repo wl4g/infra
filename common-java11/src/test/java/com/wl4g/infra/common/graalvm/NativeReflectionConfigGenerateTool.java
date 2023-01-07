@@ -91,7 +91,8 @@ public class NativeReflectionConfigGenerateTool {
                 .replace("  \"methods\" : [{", "  \"methods\": [\n    {")
                 .replace("{\"name\" :", "{\"name\":")
                 .replace("    {\n    \"name\" :", "    {\"name\":")
-                .replace("\" :", "\":");
+                .replace("\" :", "\":")
+                .replace("[ ]", "[]");
 
         System.out.println(reflectConfigJson);
     }
