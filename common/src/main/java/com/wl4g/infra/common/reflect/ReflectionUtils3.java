@@ -64,7 +64,6 @@ public abstract class ReflectionUtils3 extends ReflectionUtils2 {
         // @formatter:off
         final ConfigurationBuilder config = ConfigurationBuilder.build()
                 .forPackages(classPackages.toArray(new String[0]))
-                .setParallel(false)
                 // 虽然新版推荐使用枚举 Scanners.SubTypes 但它存在巨坑, 即默认扫描会排除超类是 java.lang.Object 的所有类, 因此这里必须使用自定义(或设置)的 SubTypeScanner.
                 // 问题源码分析参见:
                 // https://github.com/ronmamo/reflections/blob/0.10.2/src/main/java/org/reflections/scanners/Scanners.java#L50

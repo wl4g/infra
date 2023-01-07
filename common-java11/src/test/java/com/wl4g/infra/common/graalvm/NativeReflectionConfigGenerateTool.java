@@ -80,7 +80,20 @@ public class NativeReflectionConfigGenerateTool {
 
         final List<ReflectionConfigItem> items = buildReflectionConfigItems(classes);
         System.out.println("\n\n--- Generated reflection config items json: ---\n\n");
-        System.out.println(toJSONString(items, true));
+        String reflectConfigJson = toJSONString(items, true);
+
+        // Custom humnan line and space format.
+        reflectConfigJson = reflectConfigJson.replaceAll("\\},\\{\n  \"name\"", "\\},\n\\{\n  \"name\"")
+                .replace("  },{\n    \"name\"", "  },\n    {\n    \"name\"")
+                .replace(",\n    \"parameterTypes\" :", ",\"parameterTypes\":")
+                .replace("  },\n    {\n    \"name\" :", "    },\n    {\"name\" :")
+                .replace("]\n    },", "]},")
+                .replace("  \"methods\" : [{", "  \"methods\": [\n    {")
+                .replace("{\"name\" :", "{\"name\":")
+                .replace("    {\n    \"name\" :", "    {\"name\":")
+                .replace("\" :", "\":");
+
+        System.out.println(reflectConfigJson);
     }
 
     public static List<ReflectionConfigItem> buildReflectionConfigItems(Collection<Class<?>> classes) {
