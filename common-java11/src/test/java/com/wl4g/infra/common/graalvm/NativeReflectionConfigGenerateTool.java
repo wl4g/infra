@@ -60,8 +60,8 @@ public class NativeReflectionConfigGenerateTool {
     public static void main(String[] args) throws Exception {
         if (args.length < 2) {
             err.println(
-                    "Usage: {<classesDirs> <classPackages>}\n\tclassesDirs    The target classes base directory. eg: $PROJECT/target/classes"
-                            + "\n\tclassPackages  The find package filter. eg: com.xxx.xx.service");
+                    "Usage: {<classesDirs> <classPackages>}\n\tclassesDirs    The target classes base directorys. eg: $PROJECT1/target/classes,$PROJECT2/target/classes"
+                            + "\n\tclassPackages  The find class packages filter. eg: com.myproject.module1.service,com.myproject.module2.service");
             exit(1);
         }
         final String baseDirs = args[0];
