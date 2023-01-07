@@ -18,6 +18,7 @@ package com.wl4g.infra.common.graalvm;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToList;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
+import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -25,10 +26,10 @@ import static org.apache.commons.lang3.StringUtils.replace;
 import static org.apache.commons.lang3.StringUtils.split;
 
 import java.io.File;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -76,7 +77,7 @@ public class NativeReflectionConfigGenerateTool {
 
         final Collection<Class<?>> classes = ReflectionUtils3.findClassesAll(findClassPackages, findUrls);
         final String classesString = classes.stream().map(cls -> cls.getName()).collect(joining("\n"));
-        System.out.println("--- Found classes: ---\n\n" + classesString);
+        System.out.println("\n--- Found classes: ---\n\n" + classesString);
 
         final List<ReflectionConfigItem> items = buildReflectionConfigItems(classes);
         System.out.println("\n\n--- Generated reflection config items json: ---\n\n");
@@ -99,45 +100,78 @@ public class NativeReflectionConfigGenerateTool {
 
     public static List<ReflectionConfigItem> buildReflectionConfigItems(Collection<Class<?>> classes) {
         return safeList(classes).stream().map(cls -> {
-            final List<ReflectionConfigItemMethod> constructorMethods = safeArrayToList(cls.getDeclaredConstructors()).stream()
-                    .map(m -> {
-                        return ReflectionConfigItemMethod.builder()
-                                .name("<init>")
-                                .parameterTypes(safeArrayToList(m.getParameterTypes()).stream()
-                                        .map(p -> p.getTypeName())
-                                        .collect(toList()))
-                                .build();
-                    })
-                    .collect(toList());
+            final List<ReflectionConfigItemMethod> allItem = new ArrayList<>(classes.size());
 
-            final Method[] declaredMethods = cls.getDeclaredMethods();
-            final List<ReflectionConfigItemMethod> memberMethods = safeArrayToList(declaredMethods).stream()
-                    .filter(m -> !Modifier.isStatic(m.getModifiers()))
-                    .map(m -> {
-                        return ReflectionConfigItemMethod.builder()
-                                .name(m.getName())
-                                .parameterTypes(safeArrayToList(m.getParameterTypes()).stream()
-                                        .map(p -> p.getTypeName())
-                                        .collect(toList()))
-                                .build();
-                    })
-                    .collect(toList());
+            try {
+                final List<ReflectionConfigItemMethod> constructorMethodItems = safeArrayToList(cls.getDeclaredConstructors())
+                        .stream()
+                        .map(m -> {
+                            try {
+                                return ReflectionConfigItemMethod.builder()
+                                        .name("<init>")
+                                        .parameterTypes(safeArrayToList(m.getParameterTypes()).stream()
+                                                .map(p -> p.getTypeName())
+                                                .collect(toList()))
+                                        .build();
+                            } catch (Exception e) {
+                                System.err.println("[WARNING] Unable to load constructor methods. reason: " + e.getMessage());
+                                return null;
+                            }
+                        })
+                        .filter(m -> nonNull(m))
+                        .collect(toList());
+                allItem.addAll(constructorMethodItems);
+            } catch (Throwable e) {
+                System.err.println("[WARNING] Unable to load constructor methods. reason: " + e.getMessage());
+            }
 
-            final List<ReflectionConfigItemMethod> staticMethods = safeArrayToList(cls.getDeclaredMethods()).stream()
-                    .filter(m -> Modifier.isStatic(m.getModifiers()))
-                    .map(m -> {
-                        return ReflectionConfigItemMethod.builder()
-                                .name(m.getName())
-                                .parameterTypes(safeArrayToList(m.getParameterTypes()).stream()
-                                        .map(p -> p.getTypeName())
-                                        .collect(toList()))
-                                .build();
-                    })
-                    .collect(toList());
+            try {
+                final List<ReflectionConfigItemMethod> memberMethodItems = safeArrayToList(cls.getDeclaredMethods()).stream()
+                        .filter(m -> !Modifier.isStatic(m.getModifiers()))
+                        .map(m -> {
+                            try {
+                                return ReflectionConfigItemMethod.builder()
+                                        .name(m.getName())
+                                        .parameterTypes(safeArrayToList(m.getParameterTypes()).stream()
+                                                .map(p -> p.getTypeName())
+                                                .collect(toList()))
+                                        .build();
+                            } catch (Exception e) {
+                                System.err.println("[WARNING] Unable to load member methods. reason: " + e.getMessage());
+                                return null;
+                            }
+                        })
+                        .filter(m -> nonNull(m))
+                        .collect(toList());
+                allItem.addAll(memberMethodItems);
+            } catch (Throwable e) {
+                System.err.println("[WARNING] Unable to load member methods. reason: " + e.getMessage());
+            }
 
-            constructorMethods.addAll(memberMethods);
-            constructorMethods.addAll(staticMethods);
-            return ReflectionConfigItem.builder().name(cls.getName()).methods(constructorMethods).build();
+            try {
+                final List<ReflectionConfigItemMethod> staticMethodItems = safeArrayToList(cls.getDeclaredMethods()).stream()
+                        .filter(m -> Modifier.isStatic(m.getModifiers()))
+                        .map(m -> {
+                            try {
+                                return ReflectionConfigItemMethod.builder()
+                                        .name(m.getName())
+                                        .parameterTypes(safeArrayToList(m.getParameterTypes()).stream()
+                                                .map(p -> p.getTypeName())
+                                                .collect(toList()))
+                                        .build();
+                            } catch (Exception e) {
+                                System.err.println("[WARNING] Unable to load static methods. reason: " + e.getMessage());
+                                return null;
+                            }
+                        })
+                        .filter(m -> nonNull(m))
+                        .collect(toList());
+                allItem.addAll(staticMethodItems);
+            } catch (Throwable e) {
+                System.err.println("[WARNING] Unable to load static methods. reason: " + e.getMessage());
+            }
+
+            return ReflectionConfigItem.builder().name(cls.getName()).methods(allItem).build();
         }).collect(toList());
     }
 
