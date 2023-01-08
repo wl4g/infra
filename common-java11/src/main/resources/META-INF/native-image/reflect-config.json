@@ -2311,8 +2311,9 @@
   "methods": [
     {"name": "<init>","parameterTypes": []},
     {"name": "setResult","parameterTypes": ["com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$CreateSceneGroupV2ResultContent"]},
-    {"name": "toString","parameterTypes": []},
-    {"name": "getResult","parameterTypes": []}
+    {"name": "getResult","parameterTypes": []},
+    {"name": "getRequestId","parameterTypes": []},
+    {"name": "toString","parameterTypes": []}
   ]
 },
 {

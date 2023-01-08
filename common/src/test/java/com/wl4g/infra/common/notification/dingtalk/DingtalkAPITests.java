@@ -16,7 +16,9 @@
 package com.wl4g.infra.common.notification.dingtalk;
 
 import static com.wl4g.infra.common.lang.EnvironmentUtil.getStringProperty;
+import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.IOException;
 import java.util.Map;
@@ -64,6 +66,15 @@ public class DingtalkAPITests {
 
     // https://open.dingtalk.com/document/org/push-events?spm=a2q3p.21071111.0.0.2de165eeGAgfux
     static String test_corpId = getStringProperty("TEST_CORP_ID", test_appKey);
+
+    @Test
+    public void testSerializeModel() {
+        final String createScenesGroupV2ResultJson = "{\"errcode\":0,\"errmsg\":\"ok\",\"result\":{\"chat_id\":\"chat7b43308b68ec835f9ba9a5e440a4cce6\",\"open_conversation_id\":\"cide3M7a7Ldu5TG9+8BH75JWA==\"},\"success\":true,\"request_id\":\"15rkz033zqmb8\"}";
+        final CreateSceneGroupV2Result createSceneGroupV2Result = parseJSON(createScenesGroupV2ResultJson,
+                CreateSceneGroupV2Result.class);
+        System.out.println(createSceneGroupV2Result);
+        assert !isBlank(createSceneGroupV2Result.getRequestId());
+    }
 
     @Test
     public void testGetAccessToken() {

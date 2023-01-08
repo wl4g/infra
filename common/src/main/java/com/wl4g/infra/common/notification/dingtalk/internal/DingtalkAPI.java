@@ -160,10 +160,10 @@ public class DingtalkAPI {
     @NoArgsConstructor
     @ToString(callSuper = true)
     public static class BaseResult {
-        private @JsonProperty("request_id") String requestId;
-        private Integer errcode;
-        private String errmsg;
-        private Boolean success;
+        String requestId;
+        Integer errcode;
+        String errmsg;
+        Boolean success;
     }
 
     /**
@@ -177,8 +177,10 @@ public class DingtalkAPI {
     @SuperBuilder
     @ToString(callSuper = true)
     public static class AccessToken {
-        private @NotBlank String appKey;
-        private @NotBlank String appSecret;
+        @NotBlank
+        String appKey;
+        @NotBlank
+        String appSecret;
     }
 
     @Getter
@@ -186,8 +188,10 @@ public class DingtalkAPI {
     @NoArgsConstructor
     @ToString(callSuper = true)
     public static class AccessTokenResult extends BaseResult {
-        private @NotNull Integer expireIn;
-        private @NotBlank String accessToken;
+        @NotNull
+        Integer expireIn;
+        @NotBlank
+        String accessToken;
     }
 
     /**
@@ -200,7 +204,7 @@ public class DingtalkAPI {
     @NoArgsConstructor
     @ToString(callSuper = true)
     public static class GetUserIdByMobileResult extends BaseResult {
-        private String userid;
+        String userid;
     }
 
     /**
@@ -214,27 +218,47 @@ public class DingtalkAPI {
     @NoArgsConstructor
     @ToString(callSuper = true)
     public static class CreateSceneGroupV2 {
-        private @NotBlank @Default String title = "测试群-" + currentTimeMillis();
-        private @NotBlank String template_id;
-        private @NotBlank String owner_user_id;
-        private @NotBlank String user_ids;
-        private @NotBlank String subadmin_ids;
-        private String uuid;
-        private String icon;
-        private @Default String mention_all_authority = "0";
-        private @Default String show_history_type = "0";
-        private @Default String validation_type = "0";
-        private @Default String searchable = "0";
-        private @Default String chat_banned_type = "0";
-        private @Default String management_type = "0";
-        private @Default String only_admin_can_ding = "0";
-        private @Default String all_members_can_create_mcs_conf = "1";
-        private @Default String all_members_can_create_calendar = "0";
-        private @Default String group_email_disabled = "0";
-        private @Default String only_admin_can_set_msg_top = "0";
-        private @Default String add_friend_forbidden = "0";
-        private @Default String group_live_switch = "1";
-        private @Default String members_to_admin_chat = "0";
+        @NotBlank
+        @Default
+        String title = "测试群-" + currentTimeMillis();
+        @NotBlank
+        String template_id;
+        @NotBlank
+        String owner_user_id;
+        @NotBlank
+        String user_ids;
+        @NotBlank
+        String subadmin_ids;
+        String uuid;
+        String icon;
+        @Default
+        String mention_all_authority = "0";
+        @Default
+        String show_history_type = "0";
+        @Default
+        String validation_type = "0";
+        @Default
+        String searchable = "0";
+        @Default
+        String chat_banned_type = "0";
+        @Default
+        String management_type = "0";
+        @Default
+        String only_admin_can_ding = "0";
+        @Default
+        String all_members_can_create_mcs_conf = "1";
+        @Default
+        String all_members_can_create_calendar = "0";
+        @Default
+        String group_email_disabled = "0";
+        @Default
+        String only_admin_can_set_msg_top = "0";
+        @Default
+        String add_friend_forbidden = "0";
+        @Default
+        String group_live_switch = "1";
+        @Default
+        String members_to_admin_chat = "0";
     }
 
     @Getter
@@ -242,7 +266,12 @@ public class DingtalkAPI {
     @NoArgsConstructor
     @ToString(callSuper = true)
     public static class CreateSceneGroupV2Result extends BaseResult {
-        private CreateSceneGroupV2ResultContent result;
+        CreateSceneGroupV2ResultContent result;
+
+        @JsonProperty("request_id")
+        public String getRequestId() {
+            return this.requestId;
+        }
     }
 
     @Getter
@@ -250,8 +279,10 @@ public class DingtalkAPI {
     @NoArgsConstructor
     @ToString(callSuper = true)
     public static class CreateSceneGroupV2ResultContent {
-        private @JsonProperty("chat_id") String chatId;
-        private @JsonProperty("open_conversation_id") String openConversationId;
+        @JsonProperty("chat_id")
+        String chatId;
+        @JsonProperty("open_conversation_id")
+        String openConversationId;
     }
 
     /**
@@ -265,10 +296,14 @@ public class DingtalkAPI {
     @NoArgsConstructor
     @ToString(callSuper = true)
     public static class RobotGroupMessagesSend {
-        private @NotBlank MsgKeyType msgKey;
-        private @NotBlank String msgParam;
-        private @NotBlank String openConversationId;
-        private @NotBlank String robotCode;
+        @NotBlank
+        MsgKeyType msgKey;
+        @NotBlank
+        String msgParam;
+        @NotBlank
+        String openConversationId;
+        @NotBlank
+        String robotCode;
     }
 
     @Getter
@@ -276,7 +311,7 @@ public class DingtalkAPI {
     @NoArgsConstructor
     @ToString(callSuper = true)
     public static class RobotGroupMessagesSendResult extends BaseResult {
-        private String processQueryKey;
+        String processQueryKey;
     }
 
     /**
@@ -330,7 +365,7 @@ public class DingtalkAPI {
         // @formatter:off
         //@Schema(name = "@type", implementation = MsgKeyType.class)
         //@JsonProperty(value = "@type")
-        //private @NotBlank @EnumValue(enumCls = MsgKeyType.class) MsgKeyType type;
+        //@NotBlank @EnumValue(enumCls = MsgKeyType.class) MsgKeyType type;
         // @formatter:on
     }
 
@@ -340,7 +375,8 @@ public class DingtalkAPI {
     @NoArgsConstructor
     @ToString(callSuper = true)
     public static class SimpleTextMsgParam extends MsgParamBase {
-        private @NotBlank String content;
+        @NotBlank
+        String content;
     }
 
     @Getter
@@ -349,8 +385,10 @@ public class DingtalkAPI {
     @NoArgsConstructor
     @ToString(callSuper = true)
     public static class SimpleMarkdownMsgParam extends MsgParamBase {
-        private @NotBlank String title;
-        private @NotBlank String text;
+        @NotBlank
+        String title;
+        @NotBlank
+        String text;
     }
 
     @Getter
@@ -359,7 +397,8 @@ public class DingtalkAPI {
     @NoArgsConstructor
     @ToString(callSuper = true)
     public static class SimpleImageMsgParam extends MsgParamBase {
-        private @NotBlank String photoURL;
+        @NotBlank
+        String photoURL;
     }
 
     @Getter
@@ -368,10 +407,14 @@ public class DingtalkAPI {
     @NoArgsConstructor
     @ToString(callSuper = true)
     public static class SimpleLinkMsgParam extends MsgParamBase {
-        private @NotBlank String title;
-        private @NotBlank String text;
-        private @NotBlank String picUrl;
-        private @NotBlank String messageUrl;
+        @NotBlank
+        String title;
+        @NotBlank
+        String text;
+        @NotBlank
+        String picUrl;
+        @NotBlank
+        String messageUrl;
     }
 
     @Getter
@@ -380,10 +423,14 @@ public class DingtalkAPI {
     @NoArgsConstructor
     @ToString(callSuper = true)
     public static class SampleActionCardParam extends MsgParamBase {
-        private @NotBlank String title;
-        private @NotBlank String text;
-        private @NotBlank String singleTitle;
-        private @NotBlank String singleURL;
+        @NotBlank
+        String title;
+        @NotBlank
+        String text;
+        @NotBlank
+        String singleTitle;
+        @NotBlank
+        String singleURL;
     }
 
     @Getter
@@ -392,12 +439,18 @@ public class DingtalkAPI {
     @NoArgsConstructor
     @ToString(callSuper = true)
     public static class SampleActionCard2Param extends MsgParamBase {
-        private @NotBlank String title;
-        private @NotBlank String text;
-        private @NotBlank String actionTitle1;
-        private @NotBlank String actionURL1;
-        private @NotBlank String actionTitle2;
-        private @NotBlank String actionURL2;
+        @NotBlank
+        String title;
+        @NotBlank
+        String text;
+        @NotBlank
+        String actionTitle1;
+        @NotBlank
+        String actionURL1;
+        @NotBlank
+        String actionTitle2;
+        @NotBlank
+        String actionURL2;
     }
 
     @Getter
@@ -406,14 +459,22 @@ public class DingtalkAPI {
     @NoArgsConstructor
     @ToString(callSuper = true)
     public static class SampleActionCard3Param extends MsgParamBase {
-        private @NotBlank String title;
-        private @NotBlank String text;
-        private @NotBlank String actionTitle1;
-        private @NotBlank String actionURL1;
-        private @NotBlank String actionTitle2;
-        private @NotBlank String actionURL2;
-        private @NotBlank String actionTitle3;
-        private @NotBlank String actionURL3;
+        @NotBlank
+        String title;
+        @NotBlank
+        String text;
+        @NotBlank
+        String actionTitle1;
+        @NotBlank
+        String actionURL1;
+        @NotBlank
+        String actionTitle2;
+        @NotBlank
+        String actionURL2;
+        @NotBlank
+        String actionTitle3;
+        @NotBlank
+        String actionURL3;
     }
 
     @Getter
@@ -422,16 +483,26 @@ public class DingtalkAPI {
     @NoArgsConstructor
     @ToString(callSuper = true)
     public static class SampleActionCard4Param extends MsgParamBase {
-        private @NotBlank String title;
-        private @NotBlank String text;
-        private @NotBlank String actionTitle1;
-        private @NotBlank String actionURL1;
-        private @NotBlank String actionTitle2;
-        private @NotBlank String actionURL2;
-        private @NotBlank String actionTitle3;
-        private @NotBlank String actionURL3;
-        private @NotBlank String actionTitle4;
-        private @NotBlank String actionURL4;
+        @NotBlank
+        String title;
+        @NotBlank
+        String text;
+        @NotBlank
+        String actionTitle1;
+        @NotBlank
+        String actionURL1;
+        @NotBlank
+        String actionTitle2;
+        @NotBlank
+        String actionURL2;
+        @NotBlank
+        String actionTitle3;
+        @NotBlank
+        String actionURL3;
+        @NotBlank
+        String actionTitle4;
+        @NotBlank
+        String actionURL4;
     }
 
     @Getter
@@ -440,18 +511,30 @@ public class DingtalkAPI {
     @NoArgsConstructor
     @ToString(callSuper = true)
     public static class SampleActionCard5Param extends MsgParamBase {
-        private @NotBlank String title;
-        private @NotBlank String text;
-        private @NotBlank String actionTitle1;
-        private @NotBlank String actionURL1;
-        private @NotBlank String actionTitle2;
-        private @NotBlank String actionURL2;
-        private @NotBlank String actionTitle3;
-        private @NotBlank String actionURL3;
-        private @NotBlank String actionTitle4;
-        private @NotBlank String actionURL4;
-        private @NotBlank String actionTitle5;
-        private @NotBlank String actionURL5;
+        @NotBlank
+        String title;
+        @NotBlank
+        String text;
+        @NotBlank
+        String actionTitle1;
+        @NotBlank
+        String actionURL1;
+        @NotBlank
+        String actionTitle2;
+        @NotBlank
+        String actionURL2;
+        @NotBlank
+        String actionTitle3;
+        @NotBlank
+        String actionURL3;
+        @NotBlank
+        String actionTitle4;
+        @NotBlank
+        String actionURL4;
+        @NotBlank
+        String actionTitle5;
+        @NotBlank
+        String actionURL5;
     }
 
     @Getter
@@ -460,12 +543,18 @@ public class DingtalkAPI {
     @NoArgsConstructor
     @ToString(callSuper = true)
     public static class SampleActionCard6Param extends MsgParamBase {
-        private @NotBlank String title;
-        private @NotBlank String text;
-        private @NotBlank String buttonTitle1;
-        private @NotBlank String buttonUrl1;
-        private @NotBlank String buttonTitle2;
-        private @NotBlank String buttonUrl2;
+        @NotBlank
+        String title;
+        @NotBlank
+        String text;
+        @NotBlank
+        String buttonTitle1;
+        @NotBlank
+        String buttonUrl1;
+        @NotBlank
+        String buttonTitle2;
+        @NotBlank
+        String buttonUrl2;
     }
 
     static final String ACCESS_TOKEN_URI = "https://api.dingtalk.com/v1.0/oauth2/accessToken";
