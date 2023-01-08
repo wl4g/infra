@@ -18,10 +18,12 @@ package com.wl4g.infra.common.graalvm.polyglot;
 import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
 import static com.wl4g.infra.common.lang.Exceptions.getStackTraceAsString;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
+import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.SystemUtils.JAVA_IO_TMPDIR;
 import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.time.ZoneId;
@@ -39,6 +41,7 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
 
 import com.google.common.base.Charsets;
+import com.wl4g.infra.common.io.FileIOUtils;
 
 import lombok.Getter;
 
@@ -78,6 +81,14 @@ public class JdkLoggingOutputStream extends OutputStream {
         if (nonNull(fileMaxCount)) {
             isTrueOf(fileMaxCount >= 1, "fileMaxCount >= 1");
         }
+
+        // Make ensure base directory.
+        try {
+            FileIOUtils.forceMkdirParent(new File(this.filePattern));
+        } catch (IOException e) {
+            throw new IllegalStateException(format("Cannot to create log base dir for filePattern: %s", this.filePattern), e);
+        }
+
         // The default by 512MB
         this.fileMaxSize = nonNull(fileMaxSize) ? fileMaxSize : 512 * 1024 * 1024;
         this.fileMaxCount = nonNull(fileMaxCount) ? fileMaxCount : 10;
