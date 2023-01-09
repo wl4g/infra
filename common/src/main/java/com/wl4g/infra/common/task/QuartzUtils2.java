@@ -38,6 +38,7 @@ import static org.quartz.impl.StdSchedulerFactory.PROP_THREAD_POOL_PREFIX;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Properties;
+import java.util.function.Function;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
@@ -136,7 +137,7 @@ public abstract class QuartzUtils2 {
     }
 
     public static Scheduler newDefaultScheduler(final @NotBlank String schedulerName) {
-        return newScheduler(schedulerName, 1, null, null);
+        return newScheduler(schedulerName, 1, null, null, null);
     }
 
     /**
@@ -153,7 +154,8 @@ public abstract class QuartzUtils2 {
             final @NotBlank String schedulerName,
             final @Min(1) int threadPools,
             final @Nullable Properties quartzProps,
-            final @Nullable TriggerListener triggerListener) {
+            final @Nullable TriggerListener triggerListener,
+            final @Nullable Function<TriggerFiredBundle, ? extends Job> jobInstantiator) {
         hasTextOf(schedulerName, "schedulerName");
         isTrueOf(threadPools > 0, "threadPools > 0");
         try {
@@ -169,6 +171,9 @@ public abstract class QuartzUtils2 {
             if (nonNull(triggerListener)) {
                 scheduler.getListenerManager().addTriggerListener(triggerListener);
             }
+
+            // Sets to instantiator to current.
+            currentJobInstantiatorLocal.set(jobInstantiator);
 
             return scheduler;
         } catch (final SchedulerException e) {
@@ -239,6 +244,14 @@ public abstract class QuartzUtils2 {
         @Override
         public Job newJob(TriggerFiredBundle bundle, Scheduler scheduler) throws SchedulerException {
             try {
+                final Function<TriggerFiredBundle, ? extends Job> jobInstantiator = currentJobInstantiatorLocal.get();
+                if (nonNull(jobInstantiator)) {
+                    try {
+                        return jobInstantiator.apply(bundle);
+                    } finally {
+                        currentJobInstantiatorLocal.remove();
+                    }
+                }
                 return super.newJob(bundle, scheduler);
             } catch (Exception e) {
                 final String errmsg = format("Failed to new instantiate job for : %s", bundle.getJobDetail().getJobClass());
@@ -248,5 +261,7 @@ public abstract class QuartzUtils2 {
             }
         }
     }
+
+    private static final ThreadLocal<Function<TriggerFiredBundle, ? extends Job>> currentJobInstantiatorLocal = new ThreadLocal<>();
 
 }

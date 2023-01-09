@@ -43,7 +43,14 @@ public class QuartzUtils2Tests {
     // https://github.com/sanjay035/Dynamic-Job-Scheduler/blob/main/src/main/java/com/scheduling/app/scheduler/JobScheduler.java
     @Test
     public void testSchedulerJobAndTrigger() throws Exception {
-        final Scheduler scheduler = QuartzUtils2.newScheduler("testScheduler", 2, null, null);
+        final Scheduler scheduler = QuartzUtils2.newScheduler("testScheduler", 2, null, null, bundle -> {
+            try {
+                return (Job) bundle.getJobDetail().getClass().newInstance();
+            } catch (InstantiationException | IllegalAccessException e) {
+                throw new IllegalStateException(e);
+            }
+        });
+
         scheduler.start();
 
         final JobDetail jobDetail = QuartzUtils2.newDefaultJobDetail("myJobId", MyJob.class);
