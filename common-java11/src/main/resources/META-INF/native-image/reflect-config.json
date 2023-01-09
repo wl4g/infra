@@ -365,6 +365,11 @@
   "allPublicMethods" : true
 },
 {
+  "name":"com.wl4g.infra.common.task.QuartzUtils2$CustomPropertySettingJobFactory",
+  "allPublicConstructors" : true,
+  "allPublicMethods" : true
+},
+{
   "name":"com.wl4g.infra.common.reflect.ReflectionUtils2",
   "allPublicConstructors" : true,
   "allPublicMethods" : true
