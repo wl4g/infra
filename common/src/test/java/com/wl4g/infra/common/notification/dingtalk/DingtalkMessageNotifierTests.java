@@ -28,12 +28,12 @@ import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.SampleAc
  * 
  * @author James Wong
  * @version 2020-01-05
- * @since v1.0.0
+ * @since v3.0.0
  */
 public class DingtalkMessageNotifierTests extends DingtalkAPITests {
 
     @Test
-    public void testSend() {
+    public void testDingtalkSend() {
         // @formatter:off
         //final MsgKeyType msgKey = MsgKeyType.sampleActionCard6;
         //final SampleActionCard6Param param = SampleActionCard6Param.builder()

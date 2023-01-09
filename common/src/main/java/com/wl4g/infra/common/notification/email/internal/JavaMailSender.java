@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.wl4g.infra.common.notification.mail.internal;
+package com.wl4g.infra.common.notification.email.internal;
 
 import java.io.InputStream;
 
@@ -29,7 +29,7 @@ import javax.mail.internet.MimeMessage;
  *
  * <p>
  * Clients should talk to the mail sender through this interface if they need
- * mail functionality beyond {@link com.wl4g.infra.common.notification.mail.internal.springframework.mail.SimpleMailMessage}.
+ * mail functionality beyond {@link com.wl4g.infra.common.notification.email.internal.springframework.mail.SimpleMailMessage}.
  * The production implementation is {@link JavaMailSenderImpl}; for testing,
  * mocks can be created based on this interface. Clients will typically receive
  * the JavaMailSender reference through dependency injection.
@@ -82,7 +82,7 @@ public interface JavaMailSender {
      * @param contentStream
      *            the raw MIME input stream for the message
      * @return the new MimeMessage instance
-     * @throws com.wl4g.infra.common.notification.mail.internal.springframework.mail.MailParseException
+     * @throws com.wl4g.infra.common.notification.email.internal.springframework.mail.MailParseException
      *             in case of message creation failure
      */
     MimeMessage createMimeMessage(InputStream contentStream) throws MailException;
@@ -121,9 +121,9 @@ public interface JavaMailSender {
      * 
      * @param mimeMessage
      *            message to send
-     * @throws com.wl4g.infra.common.notification.mail.internal.springframework.mail.MailAuthenticationException
+     * @throws com.wl4g.infra.common.notification.email.internal.springframework.mail.MailAuthenticationException
      *             in case of authentication failure
-     * @throws com.wl4g.infra.common.notification.mail.internal.springframework.mail.MailSendException
+     * @throws com.wl4g.infra.common.notification.email.internal.springframework.mail.MailSendException
      *             in case of failure when sending the message
      * @see #createMimeMessage
      */
@@ -135,9 +135,9 @@ public interface JavaMailSender {
      * 
      * @param mimeMessages
      *            messages to send
-     * @throws com.wl4g.infra.common.notification.mail.internal.springframework.mail.MailAuthenticationException
+     * @throws com.wl4g.infra.common.notification.email.internal.springframework.mail.MailAuthenticationException
      *             in case of authentication failure
-     * @throws com.wl4g.infra.common.notification.mail.internal.springframework.mail.MailSendException
+     * @throws com.wl4g.infra.common.notification.email.internal.springframework.mail.MailSendException
      *             in case of failure when sending a message
      * @see #createMimeMessage
      */
@@ -153,13 +153,13 @@ public interface JavaMailSender {
      * 
      * @param mimeMessagePreparator
      *            the preparator to use
-     * @throws com.wl4g.infra.common.notification.mail.internal.springframework.mail.MailPreparationException
+     * @throws com.wl4g.infra.common.notification.email.internal.springframework.mail.MailPreparationException
      *             in case of failure when preparing the message
-     * @throws com.wl4g.infra.common.notification.mail.internal.springframework.mail.MailParseException
+     * @throws com.wl4g.infra.common.notification.email.internal.springframework.mail.MailParseException
      *             in case of failure when parsing the message
-     * @throws com.wl4g.infra.common.notification.mail.internal.springframework.mail.MailAuthenticationException
+     * @throws com.wl4g.infra.common.notification.email.internal.springframework.mail.MailAuthenticationException
      *             in case of authentication failure
-     * @throws com.wl4g.infra.common.notification.mail.internal.springframework.mail.MailSendException
+     * @throws com.wl4g.infra.common.notification.email.internal.springframework.mail.MailSendException
      *             in case of failure when sending the message
      */
     void send(MimeMessagePreparator mimeMessagePreparator) throws MailException;
@@ -174,13 +174,13 @@ public interface JavaMailSender {
      * 
      * @param mimeMessagePreparators
      *            the preparator to use
-     * @throws com.wl4g.infra.common.notification.mail.internal.springframework.mail.MailPreparationException
+     * @throws com.wl4g.infra.common.notification.email.internal.springframework.mail.MailPreparationException
      *             in case of failure when preparing a message
-     * @throws com.wl4g.infra.common.notification.mail.internal.springframework.mail.MailParseException
+     * @throws com.wl4g.infra.common.notification.email.internal.springframework.mail.MailParseException
      *             in case of failure when parsing a message
-     * @throws com.wl4g.infra.common.notification.mail.internal.springframework.mail.MailAuthenticationException
+     * @throws com.wl4g.infra.common.notification.email.internal.springframework.mail.MailAuthenticationException
      *             in case of authentication failure
-     * @throws com.wl4g.infra.common.notification.mail.internal.springframework.mail.MailSendException
+     * @throws com.wl4g.infra.common.notification.email.internal.springframework.mail.MailSendException
      *             in case of failure when sending a message
      */
     void send(MimeMessagePreparator... mimeMessagePreparators) throws MailException;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.common.notification.mail;
+package com.wl4g.infra.common.notification.email;
 
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
@@ -29,7 +29,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * {@link MailNotifyProperties}, Full compatibility with native spring mail!
+ * {@link EmailNotifyProperties}, Full compatibility with native spring mail!
  * 
  * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version 2020年1月9日 v1.0.0
@@ -37,7 +37,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class MailNotifyProperties extends AbstractNotifyProperties {
+public class EmailNotifyProperties extends AbstractNotifyProperties {
     private static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
     /**
@@ -80,10 +80,7 @@ public class MailNotifyProperties extends AbstractNotifyProperties {
      */
     private String jndiName;
 
-    /**
-     * Test that the mail server is available on startup.
-     */
-    private boolean testConnection;
+    private boolean useSSL;
 
     @Override
     public void validate() {

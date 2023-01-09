@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.wl4g.infra.common.notification.mail.internal;
+package com.wl4g.infra.common.notification.email.internal;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,7 +41,7 @@ import javax.mail.internet.MimePart;
 import javax.mail.internet.MimeUtility;
 
 import com.wl4g.infra.common.lang.Assert2;
-import com.wl4g.infra.common.notification.mail.internal.JavaMailSender.MimeMessagePreparator;
+import com.wl4g.infra.common.notification.email.internal.JavaMailSender.MimeMessagePreparator;
 import com.wl4g.infra.common.resource.StreamResource;
 
 /**
@@ -49,7 +49,7 @@ import com.wl4g.infra.common.resource.StreamResource;
  *
  * <p>
  * Mirrors the simple setters of
- * {@link com.wl4g.infra.common.notification.mail.internal.springframework.mail.SimpleMailMessage}, directly applying the
+ * {@link com.wl4g.infra.common.notification.email.internal.springframework.mail.SimpleMailMessage}, directly applying the
  * values to the underlying MimeMessage. Allows for defining a character
  * encoding for the entire message, automatically applied by all methods of this
  * helper class.
@@ -84,8 +84,8 @@ import com.wl4g.infra.common.resource.StreamResource;
  * </pre>
  *
  * Consider using {@link MimeMailMessage} (which implements the common
- * {@link com.wl4g.infra.common.notification.mail.internal.springframework.mail.MailMessage} interface, just like
- * {@link com.wl4g.infra.common.notification.mail.internal.springframework.mail.SimpleMailMessage}) on top of this helper, in
+ * {@link com.wl4g.infra.common.notification.email.internal.springframework.mail.MailMessage} interface, just like
+ * {@link com.wl4g.infra.common.notification.email.internal.springframework.mail.SimpleMailMessage}) on top of this helper, in
  * order to let message population code interact with a simple message or a MIME
  * message through a common interface.
  *

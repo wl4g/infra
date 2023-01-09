@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2012 the original author or authors.
+ * Copyright 2002-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,40 +14,38 @@
  * limitations under the License.
  */
 
-package com.wl4g.infra.common.notification.mail.internal;
+package com.wl4g.infra.common.notification.email.internal;
 
 /**
- * Exception thrown on failed authentication.
+ * Exception to be thrown by user code if a mail cannot be prepared properly,
+ * for example when a FreeMarker template cannot be rendered for the mail text.
  *
- * @author Dmitriy Kopylenko
  * @author Juergen Hoeller
+ * @since 1.1
+ * @see org.springframework.ui.freemarker.FreeMarkerTemplateUtils#processTemplateIntoString
  */
 @SuppressWarnings("serial")
-public class MailAuthenticationException extends MailException {
+public class MailPreparationException extends MailException {
 
 	/**
-	 * Constructor for MailAuthenticationException.
-	 * @param msg message
+	 * Constructor for MailPreparationException.
+	 * @param msg the detail message
 	 */
-	public MailAuthenticationException(String msg) {
+	public MailPreparationException(String msg) {
 		super(msg);
 	}
 
 	/**
-	 * Constructor for MailAuthenticationException.
+	 * Constructor for MailPreparationException.
 	 * @param msg the detail message
 	 * @param cause the root cause from the mail API in use
 	 */
-	public MailAuthenticationException(String msg, Throwable cause) {
+	public MailPreparationException(String msg, Throwable cause) {
 		super(msg, cause);
 	}
 
-	/**
-	 * Constructor for MailAuthenticationException.
-	 * @param cause the root cause from the mail API in use
-	 */
-	public MailAuthenticationException(Throwable cause) {
-		super("Authentication failed", cause);
+	public MailPreparationException(Throwable cause) {
+		super("Could not prepare mail", cause);
 	}
 
 }

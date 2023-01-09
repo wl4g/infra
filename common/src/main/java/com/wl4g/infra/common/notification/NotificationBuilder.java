@@ -23,10 +23,10 @@ import com.wl4g.infra.common.notification.bark.BarkMessageNotifier;
 import com.wl4g.infra.common.notification.bark.BarkNotifyProperties;
 import com.wl4g.infra.common.notification.dingtalk.DingtalkMessageNotifier;
 import com.wl4g.infra.common.notification.dingtalk.DingtalkNotifyProperties;
+import com.wl4g.infra.common.notification.email.EmailMessageNotifier;
+import com.wl4g.infra.common.notification.email.EmailNotifyProperties;
 import com.wl4g.infra.common.notification.facebook.FacebookMessageNotifier;
 import com.wl4g.infra.common.notification.facebook.FacebookNotifyProperties;
-import com.wl4g.infra.common.notification.mail.MailMessageNotifier;
-import com.wl4g.infra.common.notification.mail.MailNotifyProperties;
 import com.wl4g.infra.common.notification.qq.QqMessageNotifier;
 import com.wl4g.infra.common.notification.qq.QqNotifyProperties;
 import com.wl4g.infra.common.notification.sms.AliyunSmsMessageNotifier;
@@ -63,8 +63,8 @@ public class NotificationBuilder {
         return new FacebookMessageNotifier(config, validator);
     }
 
-    public MailMessageNotifier mailMessageNotifier(MailNotifyProperties config, Validator validator) {
-        return new MailMessageNotifier(config, validator);
+    public EmailMessageNotifier emailMessageNotifier(EmailNotifyProperties config, Validator validator) {
+        return new EmailMessageNotifier(config, validator);
     }
 
     public QqMessageNotifier qqMessageNotifier(QqNotifyProperties config, Validator validator) {

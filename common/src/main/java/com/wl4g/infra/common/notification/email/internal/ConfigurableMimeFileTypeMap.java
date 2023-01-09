@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.wl4g.infra.common.notification.mail.internal;
+package com.wl4g.infra.common.notification.email.internal;
 
 import java.io.File;
 import java.io.IOException;

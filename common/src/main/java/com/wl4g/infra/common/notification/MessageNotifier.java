@@ -15,9 +15,11 @@
  */
 package com.wl4g.infra.common.notification;
 
+import javax.validation.constraints.NotNull;
+
 import com.wl4g.infra.common.framework.operator.Operator;
-import com.wl4g.infra.common.notification.mail.MailMessageNotifier;
 import com.wl4g.infra.common.notification.MessageNotifier.NotifierKind;
+import com.wl4g.infra.common.notification.email.EmailMessageNotifier;
 
 /**
  * <b>- Use for example:</b>
@@ -37,13 +39,13 @@ import com.wl4g.infra.common.notification.MessageNotifier.NotifierKind;
  * customize variables(Note: just match the template) ...
  *
  * // Sets mail special parameters. <font color= red><b>(Optional)</b></font>
- * //msg.addParameter({@link MailMessageNotifier#KEY_MAILMSG_SUBJECT}, "This is
+ * //msg.addParameter({@link EmailMessageNotifier#KEY_MAILMSG_SUBJECT}, "This is
  * a test message");
- * //msg.addParameter({@link MailMessageNotifier#KEY_MAILMSG_CC},
+ * //msg.addParameter({@link EmailMessageNotifier#KEY_MAILMSG_CC},
  * "test1@gmail.com");
- * //msg.addParameter({@link MailMessageNotifier#KEY_MAILMSG_BCC},
+ * //msg.addParameter({@link EmailMessageNotifier#KEY_MAILMSG_BCC},
  * "test2@qq.com");
- * //msg.addParameter({@link MailMessageNotifier#KEY_MAILMSG_REPLYTO},
+ * //msg.addParameter({@link EmailMessageNotifier#KEY_MAILMSG_REPLYTO},
  * "test3@163.com");
  *
  * // Do sent
@@ -68,7 +70,7 @@ public interface MessageNotifier extends Operator<NotifierKind> {
      * 
      * @param msg
      */
-    Object send(GenericNotifyMessage msg);
+    Object send(final @NotNull GenericNotifyMessage msg);
 
     /**
      * Notification privoder kind.

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.wl4g.infra.common.notification.mail.internal;
+package com.wl4g.infra.common.notification.email.internal;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ import javax.mail.Transport;
 import javax.mail.internet.MimeMessage;
 
 import com.wl4g.infra.common.lang.Assert2;
-import com.wl4g.infra.common.notification.mail.internal.MimeMessageHelper.SmartMimeMessage;
+import com.wl4g.infra.common.notification.email.internal.MimeMessageHelper.SmartMimeMessage;
 
 /**
  * Production implementation of the {@link JavaMailSender} interface, supporting
@@ -417,9 +417,9 @@ public class JavaMailSenderImpl implements JavaMailSender {
      *            corresponding original message objects that the MimeMessages
      *            have been created from (with same array length and indices as
      *            the "mimeMessages" array), if any
-     * @throws com.wl4g.infra.common.notification.mail.internal.springframework.mail.MailAuthenticationException
+     * @throws com.wl4g.infra.common.notification.email.internal.springframework.mail.MailAuthenticationException
      *             in case of authentication failure
-     * @throws com.wl4g.infra.common.notification.mail.internal.springframework.mail.MailSendException
+     * @throws com.wl4g.infra.common.notification.email.internal.springframework.mail.MailSendException
      *             in case of failure when sending a message
      */
     protected void doSend(MimeMessage[] mimeMessages, @Nullable Object[] originalMessages) throws MailException {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2016 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,38 +14,40 @@
  * limitations under the License.
  */
 
-package com.wl4g.infra.common.notification.mail.internal;
+package com.wl4g.infra.common.notification.email.internal;
 
 /**
- * Exception to be thrown by user code if a mail cannot be prepared properly,
- * for example when a FreeMarker template cannot be rendered for the mail text.
+ * Exception thrown if illegal message properties are encountered.
  *
+ * @author Dmitriy Kopylenko
  * @author Juergen Hoeller
- * @since 1.1
- * @see org.springframework.ui.freemarker.FreeMarkerTemplateUtils#processTemplateIntoString
  */
 @SuppressWarnings("serial")
-public class MailPreparationException extends MailException {
+public class MailParseException extends MailException {
 
 	/**
-	 * Constructor for MailPreparationException.
+	 * Constructor for MailParseException.
 	 * @param msg the detail message
 	 */
-	public MailPreparationException(String msg) {
+	public MailParseException(String msg) {
 		super(msg);
 	}
 
 	/**
-	 * Constructor for MailPreparationException.
+	 * Constructor for MailParseException.
 	 * @param msg the detail message
 	 * @param cause the root cause from the mail API in use
 	 */
-	public MailPreparationException(String msg, Throwable cause) {
+	public MailParseException(String msg, Throwable cause) {
 		super(msg, cause);
 	}
 
-	public MailPreparationException(Throwable cause) {
-		super("Could not prepare mail", cause);
+	/**
+	 * Constructor for MailParseException.
+	 * @param cause the root cause from the mail API in use
+	 */
+	public MailParseException(Throwable cause) {
+		super("Could not parse mail", cause);
 	}
 
 }

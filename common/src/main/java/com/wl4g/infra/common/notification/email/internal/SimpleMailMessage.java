@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.wl4g.infra.common.notification.mail.internal;
+package com.wl4g.infra.common.notification.email.internal;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -38,10 +38,10 @@ import com.wl4g.infra.common.lang.StringUtils2;
  * @author Juergen Hoeller
  * @since 10.09.2003
  * @see MailSender
- * @see com.wl4g.infra.common.notification.mail.internal.springframework.mail.javamail.JavaMailSender
+ * @see com.wl4g.infra.common.notification.email.internal.springframework.mail.javamail.JavaMailSender
  * @see org.springframework.mail.javamail.MimeMessagePreparator
- * @see com.wl4g.infra.common.notification.mail.internal.springframework.mail.javamail.MimeMessageHelper
- * @see com.wl4g.infra.common.notification.mail.internal.springframework.mail.javamail.MimeMailMessage
+ * @see com.wl4g.infra.common.notification.email.internal.springframework.mail.javamail.MimeMessageHelper
+ * @see com.wl4g.infra.common.notification.email.internal.springframework.mail.javamail.MimeMailMessage
  */
 @SuppressWarnings("serial")
 public class SimpleMailMessage implements MailMessage, Serializable {

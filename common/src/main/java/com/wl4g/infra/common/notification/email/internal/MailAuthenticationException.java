@@ -14,40 +14,40 @@
  * limitations under the License.
  */
 
-package com.wl4g.infra.common.notification.mail.internal;
+package com.wl4g.infra.common.notification.email.internal;
 
 /**
- * Exception thrown if illegal message properties are encountered.
+ * Exception thrown on failed authentication.
  *
  * @author Dmitriy Kopylenko
  * @author Juergen Hoeller
  */
 @SuppressWarnings("serial")
-public class MailParseException extends MailException {
+public class MailAuthenticationException extends MailException {
 
 	/**
-	 * Constructor for MailParseException.
-	 * @param msg the detail message
+	 * Constructor for MailAuthenticationException.
+	 * @param msg message
 	 */
-	public MailParseException(String msg) {
+	public MailAuthenticationException(String msg) {
 		super(msg);
 	}
 
 	/**
-	 * Constructor for MailParseException.
+	 * Constructor for MailAuthenticationException.
 	 * @param msg the detail message
 	 * @param cause the root cause from the mail API in use
 	 */
-	public MailParseException(String msg, Throwable cause) {
+	public MailAuthenticationException(String msg, Throwable cause) {
 		super(msg, cause);
 	}
 
 	/**
-	 * Constructor for MailParseException.
+	 * Constructor for MailAuthenticationException.
 	 * @param cause the root cause from the mail API in use
 	 */
-	public MailParseException(Throwable cause) {
-		super("Could not parse mail", cause);
+	public MailAuthenticationException(Throwable cause) {
+		super("Authentication failed", cause);
 	}
 
 }

@@ -47,7 +47,7 @@ import com.wl4g.infra.common.web.server.SimpleHTTPServer.VirtualHost;
  * 
  * @author James Wong
  * @version 2020-01-05
- * @since v1.0.0
+ * @since v3.0.0
  */
 public class DingtalkAPITests {
 

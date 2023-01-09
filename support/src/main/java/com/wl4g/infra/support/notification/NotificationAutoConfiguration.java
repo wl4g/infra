@@ -38,10 +38,10 @@ import com.wl4g.infra.common.notification.bark.BarkMessageNotifier;
 import com.wl4g.infra.common.notification.bark.BarkNotifyProperties;
 import com.wl4g.infra.common.notification.dingtalk.DingtalkMessageNotifier;
 import com.wl4g.infra.common.notification.dingtalk.DingtalkNotifyProperties;
+import com.wl4g.infra.common.notification.email.EmailMessageNotifier;
+import com.wl4g.infra.common.notification.email.EmailNotifyProperties;
 import com.wl4g.infra.common.notification.facebook.FacebookMessageNotifier;
 import com.wl4g.infra.common.notification.facebook.FacebookNotifyProperties;
-import com.wl4g.infra.common.notification.mail.MailMessageNotifier;
-import com.wl4g.infra.common.notification.mail.MailNotifyProperties;
 import com.wl4g.infra.common.notification.qq.QqMessageNotifier;
 import com.wl4g.infra.common.notification.qq.QqNotifyProperties;
 import com.wl4g.infra.common.notification.sms.AliyunSmsMessageNotifier;
@@ -97,8 +97,8 @@ public class NotificationAutoConfiguration {
     @Bean(name = "mailNotifyProperties")
     @ConditionalOnProperty(name = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".mail.enabled", matchIfMissing = false)
     @ConfigurationProperties(prefix = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".mail")
-    public MailNotifyProperties mailNotifyProperties() {
-        return new MailNotifyProperties();
+    public EmailNotifyProperties emailNotifyProperties() {
+        return new EmailNotifyProperties();
     }
 
     @Bean(name = "qqNotifyProperties")
@@ -165,9 +165,9 @@ public class NotificationAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnBean(MailNotifyProperties.class)
-    public MailMessageNotifier mailMessageNotifier(MailNotifyProperties config, Validator validator) {
-        return new MailMessageNotifier(config, validator);
+    @ConditionalOnBean(EmailNotifyProperties.class)
+    public EmailMessageNotifier emailMessageNotifier(EmailNotifyProperties config, Validator validator) {
+        return new EmailMessageNotifier(config, validator);
     }
 
     @Bean

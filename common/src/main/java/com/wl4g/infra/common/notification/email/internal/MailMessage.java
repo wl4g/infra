@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.wl4g.infra.common.notification.mail.internal;
+package com.wl4g.infra.common.notification.email.internal;
 
 import java.util.Date;
 
@@ -32,7 +32,7 @@ import java.util.Date;
  * @author Juergen Hoeller
  * @since 1.1.5
  * @see SimpleMailMessage
- * @see com.wl4g.infra.common.notification.mail.internal.springframework.mail.javamail.MimeMessageHelper
+ * @see com.wl4g.infra.common.notification.email.internal.springframework.mail.javamail.MimeMessageHelper
  */
 public interface MailMessage {
 
