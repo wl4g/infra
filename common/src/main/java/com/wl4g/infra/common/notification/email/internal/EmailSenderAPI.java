@@ -75,7 +75,7 @@ public class EmailSenderAPI {
         notNullOf(config, "config");
         notNullOf(msg, "msg");
 
-        final String mailMsgType = msg.getParameterAsString(KEY_MAILMSG_TYPE, "simple");
+        final String mailMsgType = msg.getParameterAsString(KEY_MAILMSG_TYPE, VALUE_MAILMSG_SIMPLE);
         Object sendMsg = null;
         switch (mailMsgType) {
         case VALUE_MAILMSG_SIMPLE:

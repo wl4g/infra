@@ -53,7 +53,7 @@ public class EmailMessageNotifierTests {
 
         final GenericNotifierParam msg = new GenericNotifierParam(test_toUser, testTemplateKey)
                 .addParameter(EmailSenderAPI.KEY_MAILMSG_TYPE, EmailSenderAPI.VALUE_MAILMSG_SIMPLE)
-                .addParameter(EmailSenderAPI.KEY_MAILMSG_SUBJECT, "Testing Sender with Simple Msg");
+                .addParameter(EmailSenderAPI.KEY_MAILMSG_SUBJECT, "Testing Sender(simple)");
 
         System.out.println("Sending ...");
         final Object result = notifier.send(msg);
@@ -61,7 +61,7 @@ public class EmailMessageNotifierTests {
     }
 
     @Test
-    public void testEmailSendMimeMessage() {
+    public void testEmailSendMimeMessage() { 
         final EmailNotifierProperties config = new EmailNotifierProperties();
         config.setProtocol("smtp");
         config.setHost(test_serveHost);
@@ -77,7 +77,7 @@ public class EmailMessageNotifierTests {
 
         final GenericNotifierParam msg = new GenericNotifierParam(test_toUser, testTemplateKey)
                 .addParameter(EmailSenderAPI.KEY_MAILMSG_TYPE, EmailSenderAPI.VALUE_MAILMSG_MIME)
-                .addParameter(EmailSenderAPI.KEY_MAILMSG_SUBJECT, "Testing Sender with Mime Msg");
+                .addParameter(EmailSenderAPI.KEY_MAILMSG_SUBJECT, "Testing Sender(mime)");
 
         System.out.println("Sending ...");
         final Object result = notifier.send(msg);

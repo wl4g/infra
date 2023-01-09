@@ -173,7 +173,7 @@ public class GenericNotifierParam implements NotifierParam {
      */
     public GenericNotifierParam addParameters(Map<String, Object> parameters) {
         if (!isNull(parameters) && !parameters.isEmpty()) {
-            parameters.putAll(parameters.entrySet()
+            this.parameters.putAll(parameters.entrySet()
                     .stream()
                     .filter(e -> !isNull(e.getKey()))
                     .collect(toMap(e -> e.getKey(), e -> e.getValue())));
