@@ -40,7 +40,7 @@ public class NoneMessageNotifier extends AbstractMessageNotifier<NotifyPropertie
     }
 
     @Override
-    public Object send(GenericNotifyMessage msg) {
+    public Object send(GenericNotifierParam msg) {
         log.warn("NONE NOTIFIER! This is an empty message notifier. Please check if the notifier is configured correctly!");
         return null;
     }

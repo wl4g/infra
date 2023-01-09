@@ -18,7 +18,7 @@ package com.wl4g.infra.common.notification.facebook;
 import com.wl4g.infra.common.notification.BasedSocialProperties;
 import com.wl4g.infra.common.notification.NotifyProperties;
 
-public class FacebookNotifyProperties extends BasedSocialProperties implements NotifyProperties {
+public class FacebookNotifierProperties extends BasedSocialProperties implements NotifyProperties {
 
     @Override
     public void validate() {

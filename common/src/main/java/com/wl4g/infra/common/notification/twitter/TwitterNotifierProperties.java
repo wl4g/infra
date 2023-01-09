@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.common.notification.qq;
+package com.wl4g.infra.common.notification.twitter;
 
+import com.wl4g.infra.common.notification.BasedSocialProperties;
 import com.wl4g.infra.common.notification.NotifyProperties;
 
-public class QqNotifyProperties implements NotifyProperties {
+public class TwitterNotifierProperties extends BasedSocialProperties implements NotifyProperties {
 
     @Override
     public void validate() {

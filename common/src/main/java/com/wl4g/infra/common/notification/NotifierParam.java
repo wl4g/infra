@@ -22,13 +22,13 @@ import java.util.Map;
 import javax.validation.constraints.NotBlank;
 
 /**
- * {@link NotifyMessage}
+ * {@link NotifierParam}
  * 
  * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version 2020年1月9日 v1.0.0
  * @see
  */
-public interface NotifyMessage extends Serializable {
+public interface NotifierParam extends Serializable {
 
     /**
      * Gets notification target objects.

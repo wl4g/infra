@@ -18,25 +18,25 @@ package com.wl4g.infra.common.notification;
 import javax.validation.Validator;
 
 import com.wl4g.infra.common.notification.apns.ApnsMessageNotifier;
-import com.wl4g.infra.common.notification.apns.ApnsNotifyProperties;
+import com.wl4g.infra.common.notification.apns.ApnsNotifierProperties;
 import com.wl4g.infra.common.notification.bark.BarkMessageNotifier;
-import com.wl4g.infra.common.notification.bark.BarkNotifyProperties;
+import com.wl4g.infra.common.notification.bark.BarkNotifierProperties;
 import com.wl4g.infra.common.notification.dingtalk.DingtalkMessageNotifier;
-import com.wl4g.infra.common.notification.dingtalk.DingtalkNotifyProperties;
+import com.wl4g.infra.common.notification.dingtalk.DingtalkNotifierProperties;
 import com.wl4g.infra.common.notification.email.EmailMessageNotifier;
-import com.wl4g.infra.common.notification.email.EmailNotifyProperties;
+import com.wl4g.infra.common.notification.email.EmailNotifierProperties;
 import com.wl4g.infra.common.notification.facebook.FacebookMessageNotifier;
-import com.wl4g.infra.common.notification.facebook.FacebookNotifyProperties;
+import com.wl4g.infra.common.notification.facebook.FacebookNotifierProperties;
 import com.wl4g.infra.common.notification.qq.QqMessageNotifier;
-import com.wl4g.infra.common.notification.qq.QqNotifyProperties;
+import com.wl4g.infra.common.notification.qq.QqNotifierProperties;
 import com.wl4g.infra.common.notification.sms.AliyunSmsMessageNotifier;
-import com.wl4g.infra.common.notification.sms.SmsNotifyProperties;
+import com.wl4g.infra.common.notification.sms.SmsNotifierProperties;
 import com.wl4g.infra.common.notification.twitter.TwitterMessageNotifier;
-import com.wl4g.infra.common.notification.twitter.TwitterNotifyProperties;
+import com.wl4g.infra.common.notification.twitter.TwitterNotifierProperties;
 import com.wl4g.infra.common.notification.vms.AliyunVmsMessageNotifier;
-import com.wl4g.infra.common.notification.vms.VmsNotifyProperties;
+import com.wl4g.infra.common.notification.vms.VmsNotifierProperties;
 import com.wl4g.infra.common.notification.wechat.WechatMessageNotifier;
-import com.wl4g.infra.common.notification.wechat.WechatNotifyProperties;
+import com.wl4g.infra.common.notification.wechat.WechatNotifierProperties;
 
 /**
  * Notification message service auto configuration
@@ -47,43 +47,43 @@ import com.wl4g.infra.common.notification.wechat.WechatNotifyProperties;
  */
 public class NotificationBuilder {
 
-    public ApnsMessageNotifier buildApnsMessageNotifier(ApnsNotifyProperties config, Validator validator) {
+    public ApnsMessageNotifier buildApnsMessageNotifier(ApnsNotifierProperties config, Validator validator) {
         return new ApnsMessageNotifier(config, validator);
     }
 
-    public BarkMessageNotifier barkMessageNotifier(BarkNotifyProperties config, Validator validator) {
+    public BarkMessageNotifier barkMessageNotifier(BarkNotifierProperties config, Validator validator) {
         return new BarkMessageNotifier(config, validator);
     }
 
-    public DingtalkMessageNotifier dingtalkMessageNotifier(DingtalkNotifyProperties config, Validator validator) {
+    public DingtalkMessageNotifier dingtalkMessageNotifier(DingtalkNotifierProperties config, Validator validator) {
         return new DingtalkMessageNotifier(config, validator);
     }
 
-    public FacebookMessageNotifier facebookMessageNotifier(FacebookNotifyProperties config, Validator validator) {
+    public FacebookMessageNotifier facebookMessageNotifier(FacebookNotifierProperties config, Validator validator) {
         return new FacebookMessageNotifier(config, validator);
     }
 
-    public EmailMessageNotifier emailMessageNotifier(EmailNotifyProperties config, Validator validator) {
+    public EmailMessageNotifier emailMessageNotifier(EmailNotifierProperties config, Validator validator) {
         return new EmailMessageNotifier(config, validator);
     }
 
-    public QqMessageNotifier qqMessageNotifier(QqNotifyProperties config, Validator validator) {
+    public QqMessageNotifier qqMessageNotifier(QqNotifierProperties config, Validator validator) {
         return new QqMessageNotifier(config, validator);
     }
 
-    public AliyunSmsMessageNotifier aliyunSmsMessageNotifier(SmsNotifyProperties config, Validator validator) {
+    public AliyunSmsMessageNotifier aliyunSmsMessageNotifier(SmsNotifierProperties config, Validator validator) {
         return new AliyunSmsMessageNotifier(config, validator);
     }
 
-    public AliyunVmsMessageNotifier aliyunVmsMessageNotifier(VmsNotifyProperties config, Validator validator) {
+    public AliyunVmsMessageNotifier aliyunVmsMessageNotifier(VmsNotifierProperties config, Validator validator) {
         return new AliyunVmsMessageNotifier(config, validator);
     }
 
-    public WechatMessageNotifier wechatMessageNotifier(WechatNotifyProperties config, Validator validator) {
+    public WechatMessageNotifier wechatMessageNotifier(WechatNotifierProperties config, Validator validator) {
         return new WechatMessageNotifier(config, validator);
     }
 
-    public TwitterMessageNotifier twitterMessageNotifier(TwitterNotifyProperties config, Validator validator) {
+    public TwitterMessageNotifier twitterMessageNotifier(TwitterNotifierProperties config, Validator validator) {
         return new TwitterMessageNotifier(config, validator);
     }
 

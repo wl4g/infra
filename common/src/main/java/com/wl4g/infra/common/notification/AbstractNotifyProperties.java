@@ -15,21 +15,31 @@
  */
 package com.wl4g.infra.common.notification;
 
-import javax.validation.constraints.NotEmpty;
-
-import com.wl4g.infra.common.collection.CollectionUtils2;
-import com.wl4g.infra.common.log.SmartLogger;
-
-import java.util.Map;
-import java.util.Properties;
-
-import static com.wl4g.infra.common.lang.Assert2.*;
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static com.wl4g.infra.common.lang.Assert2.isTrue;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toMap;
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.replace;
+import static org.apache.commons.lang3.StringUtils.replaceIgnoreCase;
+
+import java.util.Map;
+import java.util.Properties;
+
+import javax.validation.constraints.NotEmpty;
+
+import com.wl4g.infra.common.collection.CollectionUtils2;
+import com.wl4g.infra.common.log.SmartLogger;
+
+import lombok.Builder.Default;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 /**
  * Abstract Notify configuration properties.
@@ -38,13 +48,16 @@ import static org.apache.commons.lang3.StringUtils.*;
  * @version v1.0 2020年2月25日
  * @since
  */
+@SuperBuilder
+@ToString
+@NoArgsConstructor
 public abstract class AbstractNotifyProperties implements NotifyProperties {
     protected final SmartLogger log = getLogger(getClass());
 
     /**
      * Case sensitive when parsing template parameters.
      */
-    private boolean caseSensitive = false;
+    private @Default boolean caseSensitive = false;
 
     /**
      * Notification message template IDS.

@@ -19,12 +19,12 @@ import javax.validation.Validator;
 
 import com.wl4g.infra.common.annotation.Todo;
 import com.wl4g.infra.common.notification.AbstractMessageNotifier;
-import com.wl4g.infra.common.notification.GenericNotifyMessage;
+import com.wl4g.infra.common.notification.GenericNotifierParam;
 
 @Todo
-public class QqMessageNotifier extends AbstractMessageNotifier<QqNotifyProperties> {
+public class QqMessageNotifier extends AbstractMessageNotifier<QqNotifierProperties> {
 
-    public QqMessageNotifier(QqNotifyProperties config, Validator validator) {
+    public QqMessageNotifier(QqNotifierProperties config, Validator validator) {
         super(config, validator);
     }
 
@@ -34,7 +34,7 @@ public class QqMessageNotifier extends AbstractMessageNotifier<QqNotifyPropertie
     }
 
     @Override
-    public Object send(GenericNotifyMessage message) {
+    public Object send(GenericNotifierParam message) {
         throw new UnsupportedOperationException();
     }
 

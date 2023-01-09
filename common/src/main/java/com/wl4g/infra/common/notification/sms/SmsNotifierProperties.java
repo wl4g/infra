@@ -13,21 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.common.notification.vms;
+package com.wl4g.infra.common.notification.sms;
 
 import javax.validation.constraints.NotBlank;
 
 import com.wl4g.infra.common.notification.AbstractNotifyProperties;
 import com.wl4g.infra.common.notification.NotifyProperties;
-
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * {@link SmsNotifierProperties}
+ * 
+ * @author James Wong &lt;jameswong1376@gmail.com&gt;
+ * @version 2020年1月9日 v1.0.0
+ * @see
+ */
 @Getter
 @Setter
-public class VmsNotifyProperties implements NotifyProperties {
+public class SmsNotifierProperties implements NotifyProperties {
 
-    private AliyunVmsProperties aliyun = new AliyunVmsProperties();
+    private AliyunSmsNotifyProperties aliyun = new AliyunSmsNotifyProperties();
 
     @Override
     public void validate() {
@@ -35,11 +41,15 @@ public class VmsNotifyProperties implements NotifyProperties {
 
     @Getter
     @Setter
-    public static class AliyunVmsProperties extends AbstractNotifyProperties {
-        private @NotBlank String calledShowNumber;
-        private @NotBlank String regionId;
+    public static class AliyunSmsNotifyProperties extends AbstractNotifyProperties {
+        private @NotBlank String regionId = "cn-hangzhou";
+        // private @NotBlank String product = "Dysmsapi";
+        // private @NotBlank String domain = "dysmsapi.aliyuncs.com";
         private @NotBlank String accessKeyId;
         private @NotBlank String accessKeySecret;
+        private @NotBlank String signName;
+        private @NotBlank String defaultConnectTimeout = "5_000";
+        private @NotBlank String defaultReadTimeout = "10_000";
     }
 
 }

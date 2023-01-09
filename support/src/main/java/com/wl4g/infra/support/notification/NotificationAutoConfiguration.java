@@ -33,25 +33,25 @@ import com.wl4g.infra.common.framework.operator.GenericOperatorAdapter;
 import com.wl4g.infra.common.notification.MessageNotifier;
 import com.wl4g.infra.common.notification.MessageNotifier.NotifierKind;
 import com.wl4g.infra.common.notification.apns.ApnsMessageNotifier;
-import com.wl4g.infra.common.notification.apns.ApnsNotifyProperties;
+import com.wl4g.infra.common.notification.apns.ApnsNotifierProperties;
 import com.wl4g.infra.common.notification.bark.BarkMessageNotifier;
-import com.wl4g.infra.common.notification.bark.BarkNotifyProperties;
+import com.wl4g.infra.common.notification.bark.BarkNotifierProperties;
 import com.wl4g.infra.common.notification.dingtalk.DingtalkMessageNotifier;
-import com.wl4g.infra.common.notification.dingtalk.DingtalkNotifyProperties;
+import com.wl4g.infra.common.notification.dingtalk.DingtalkNotifierProperties;
 import com.wl4g.infra.common.notification.email.EmailMessageNotifier;
-import com.wl4g.infra.common.notification.email.EmailNotifyProperties;
+import com.wl4g.infra.common.notification.email.EmailNotifierProperties;
 import com.wl4g.infra.common.notification.facebook.FacebookMessageNotifier;
-import com.wl4g.infra.common.notification.facebook.FacebookNotifyProperties;
+import com.wl4g.infra.common.notification.facebook.FacebookNotifierProperties;
 import com.wl4g.infra.common.notification.qq.QqMessageNotifier;
-import com.wl4g.infra.common.notification.qq.QqNotifyProperties;
+import com.wl4g.infra.common.notification.qq.QqNotifierProperties;
 import com.wl4g.infra.common.notification.sms.AliyunSmsMessageNotifier;
-import com.wl4g.infra.common.notification.sms.SmsNotifyProperties;
+import com.wl4g.infra.common.notification.sms.SmsNotifierProperties;
 import com.wl4g.infra.common.notification.twitter.TwitterMessageNotifier;
-import com.wl4g.infra.common.notification.twitter.TwitterNotifyProperties;
+import com.wl4g.infra.common.notification.twitter.TwitterNotifierProperties;
 import com.wl4g.infra.common.notification.vms.AliyunVmsMessageNotifier;
-import com.wl4g.infra.common.notification.vms.VmsNotifyProperties;
+import com.wl4g.infra.common.notification.vms.VmsNotifierProperties;
 import com.wl4g.infra.common.notification.wechat.WechatMessageNotifier;
-import com.wl4g.infra.common.notification.wechat.WechatNotifyProperties;
+import com.wl4g.infra.common.notification.wechat.WechatNotifierProperties;
 
 /**
  * Notification message service auto configuration
@@ -69,71 +69,71 @@ public class NotificationAutoConfiguration {
     @Bean(name = "apnsNotifyProperties")
     @ConditionalOnProperty(name = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".apns.enabled", matchIfMissing = false)
     @ConfigurationProperties(prefix = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".apns")
-    public ApnsNotifyProperties apnsNotifyProperties() {
-        return new ApnsNotifyProperties();
+    public ApnsNotifierProperties apnsNotifierProperties() {
+        return new ApnsNotifierProperties();
     }
 
     @Bean(name = "barkNotifyProperties")
     @ConditionalOnProperty(name = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".bark.enabled", matchIfMissing = false)
     @ConfigurationProperties(prefix = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".bark")
-    public BarkNotifyProperties barkNotifyProperties() {
-        return new BarkNotifyProperties();
+    public BarkNotifierProperties barkNotifierProperties() {
+        return new BarkNotifierProperties();
     }
 
     @Bean(name = "dingtalkNotifyProperties")
     @ConditionalOnProperty(name = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".dingtalk.enabled", matchIfMissing = false)
     @ConfigurationProperties(prefix = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".dingtalk")
-    public DingtalkNotifyProperties dingtalkNotifyProperties() {
-        return new DingtalkNotifyProperties();
+    public DingtalkNotifierProperties dingtalkNotifierProperties() {
+        return new DingtalkNotifierProperties();
     }
 
     @Bean(name = "facebookNotifyProperties")
     @ConditionalOnProperty(name = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".facebook.enabled", matchIfMissing = false)
     @ConfigurationProperties(prefix = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".facebook")
-    public FacebookNotifyProperties facebookNotifyProperties() {
-        return new FacebookNotifyProperties();
+    public FacebookNotifierProperties facebookNotifierProperties() {
+        return new FacebookNotifierProperties();
     }
 
     @Bean(name = "mailNotifyProperties")
     @ConditionalOnProperty(name = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".mail.enabled", matchIfMissing = false)
     @ConfigurationProperties(prefix = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".mail")
-    public EmailNotifyProperties emailNotifyProperties() {
-        return new EmailNotifyProperties();
+    public EmailNotifierProperties emailNotifierProperties() {
+        return new EmailNotifierProperties();
     }
 
     @Bean(name = "qqNotifyProperties")
     @ConditionalOnProperty(name = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".qq.enabled", matchIfMissing = false)
     @ConfigurationProperties(prefix = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".qq")
-    public QqNotifyProperties qqNotifyProperties() {
-        return new QqNotifyProperties();
+    public QqNotifierProperties qqNotifierProperties() {
+        return new QqNotifierProperties();
     }
 
     @Bean(name = "smsNotifyProperties")
     @ConditionalOnProperty(name = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".sms.enabled", matchIfMissing = false)
     @ConfigurationProperties(prefix = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".sms")
-    public SmsNotifyProperties smsNotifyProperties() {
-        return new SmsNotifyProperties();
+    public SmsNotifierProperties smsNotifierProperties() {
+        return new SmsNotifierProperties();
     }
 
     @Bean(name = "vmsNotifyProperties")
     @ConditionalOnProperty(name = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".vms.enabled", matchIfMissing = false)
     @ConfigurationProperties(prefix = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".vms")
-    public VmsNotifyProperties vmsNotifyProperties() {
-        return new VmsNotifyProperties();
+    public VmsNotifierProperties vmsNotifierProperties() {
+        return new VmsNotifierProperties();
     }
 
     @Bean(name = "wechatNotifyProperties")
     @ConditionalOnProperty(name = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".wechat.enabled", matchIfMissing = false)
     @ConfigurationProperties(prefix = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".wechat")
-    public WechatNotifyProperties wechatNotifyProperties() {
-        return new WechatNotifyProperties();
+    public WechatNotifierProperties wechatNotifierProperties() {
+        return new WechatNotifierProperties();
     }
 
     @Bean(name = "twitterNotifyProperties")
     @ConditionalOnProperty(name = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".twitter.enabled", matchIfMissing = false)
     @ConfigurationProperties(prefix = CONF_PREFIX_INFRA_SUPPORT_NOTIFY + ".twitter")
-    public TwitterNotifyProperties twitterNotifyProperties() {
-        return new TwitterNotifyProperties();
+    public TwitterNotifierProperties twitterNotifierProperties() {
+        return new TwitterNotifierProperties();
     }
 
     //
@@ -141,62 +141,62 @@ public class NotificationAutoConfiguration {
     //
 
     @Bean
-    @ConditionalOnBean(ApnsNotifyProperties.class)
-    public ApnsMessageNotifier apnsMessageNotifier(ApnsNotifyProperties config, Validator validator) {
+    @ConditionalOnBean(ApnsNotifierProperties.class)
+    public ApnsMessageNotifier apnsMessageNotifier(ApnsNotifierProperties config, Validator validator) {
         return new ApnsMessageNotifier(config, validator);
     }
 
     @Bean
-    @ConditionalOnBean(BarkNotifyProperties.class)
-    public BarkMessageNotifier barkMessageNotifier(BarkNotifyProperties config, Validator validator) {
+    @ConditionalOnBean(BarkNotifierProperties.class)
+    public BarkMessageNotifier barkMessageNotifier(BarkNotifierProperties config, Validator validator) {
         return new BarkMessageNotifier(config, validator);
     }
 
     @Bean
-    @ConditionalOnBean(DingtalkNotifyProperties.class)
-    public DingtalkMessageNotifier dingtalkMessageNotifier(DingtalkNotifyProperties config, Validator validator) {
+    @ConditionalOnBean(DingtalkNotifierProperties.class)
+    public DingtalkMessageNotifier dingtalkMessageNotifier(DingtalkNotifierProperties config, Validator validator) {
         return new DingtalkMessageNotifier(config, validator);
     }
 
     @Bean
-    @ConditionalOnBean(FacebookNotifyProperties.class)
-    public FacebookMessageNotifier facebookMessageNotifier(FacebookNotifyProperties config, Validator validator) {
+    @ConditionalOnBean(FacebookNotifierProperties.class)
+    public FacebookMessageNotifier facebookMessageNotifier(FacebookNotifierProperties config, Validator validator) {
         return new FacebookMessageNotifier(config, validator);
     }
 
     @Bean
-    @ConditionalOnBean(EmailNotifyProperties.class)
-    public EmailMessageNotifier emailMessageNotifier(EmailNotifyProperties config, Validator validator) {
+    @ConditionalOnBean(EmailNotifierProperties.class)
+    public EmailMessageNotifier emailMessageNotifier(EmailNotifierProperties config, Validator validator) {
         return new EmailMessageNotifier(config, validator);
     }
 
     @Bean
-    @ConditionalOnBean(QqNotifyProperties.class)
-    public QqMessageNotifier qqMessageNotifier(QqNotifyProperties config, Validator validator) {
+    @ConditionalOnBean(QqNotifierProperties.class)
+    public QqMessageNotifier qqMessageNotifier(QqNotifierProperties config, Validator validator) {
         return new QqMessageNotifier(config, validator);
     }
 
     @Bean
-    @ConditionalOnBean(SmsNotifyProperties.class)
-    public AliyunSmsMessageNotifier aliyunSmsMessageNotifier(SmsNotifyProperties config, Validator validator) {
+    @ConditionalOnBean(SmsNotifierProperties.class)
+    public AliyunSmsMessageNotifier aliyunSmsMessageNotifier(SmsNotifierProperties config, Validator validator) {
         return new AliyunSmsMessageNotifier(config, validator);
     }
 
     @Bean
-    @ConditionalOnBean(VmsNotifyProperties.class)
-    public AliyunVmsMessageNotifier aliyunVmsMessageNotifier(VmsNotifyProperties config, Validator validator) {
+    @ConditionalOnBean(VmsNotifierProperties.class)
+    public AliyunVmsMessageNotifier aliyunVmsMessageNotifier(VmsNotifierProperties config, Validator validator) {
         return new AliyunVmsMessageNotifier(config, validator);
     }
 
     @Bean
-    @ConditionalOnBean(WechatNotifyProperties.class)
-    public WechatMessageNotifier wechatMessageNotifier(WechatNotifyProperties config, Validator validator) {
+    @ConditionalOnBean(WechatNotifierProperties.class)
+    public WechatMessageNotifier wechatMessageNotifier(WechatNotifierProperties config, Validator validator) {
         return new WechatMessageNotifier(config, validator);
     }
 
     @Bean
-    @ConditionalOnBean(TwitterNotifyProperties.class)
-    public TwitterMessageNotifier twitterMessageNotifier(TwitterNotifyProperties config, Validator validator) {
+    @ConditionalOnBean(TwitterNotifierProperties.class)
+    public TwitterMessageNotifier twitterMessageNotifier(TwitterNotifierProperties config, Validator validator) {
         return new TwitterMessageNotifier(config, validator);
     }
 
@@ -205,7 +205,7 @@ public class NotificationAutoConfiguration {
      * 
      * <pre>
      * &#64;Bean
-     * public CompositeMessageNotifier compositeMessageNotifier(List&lt;MessageNotifier&lt;NotifyMessage&gt;&gt; notifiers) {
+     * public CompositeMessageNotifier compositeMessageNotifier(List&lt;MessageNotifier&lt;NotifierParam&gt;&gt; notifiers) {
      *   ...
      * }
      * </pre>
@@ -214,7 +214,7 @@ public class NotificationAutoConfiguration {
      * 
      * <pre>
      * &#64;Bean
-     * public CompositeMessageNotifier compositeMessageNotifier(List&lt;MessageNotifier&lt;? extends NotifyMessage&gt;&gt; notifiers) {
+     * public CompositeMessageNotifier compositeMessageNotifier(List&lt;MessageNotifier&lt;? extends NotifierParam&gt;&gt; notifiers) {
      *   ...
      * }
      * </pre>

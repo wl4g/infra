@@ -30,8 +30,8 @@ import com.wl4g.infra.common.notification.email.EmailMessageNotifier;
  * GenericOperatorAdapter&lt;{@link NotifierKind}, {@link MessageNotifier}&gt;
  * notifierAdapter;
  * 
- * public void doNotify() { {@link GenericNotifyMessage} msg = new
- * {@link GenericNotifyMessage}("wanglsir@gmail.com", "alaramTpl1");
+ * public void doNotify() { {@link GenericNotifierParam} msg = new
+ * {@link GenericNotifierParam}("wanglsir@gmail.com", "alaramTpl1");
  *
  * // Sets common parameters. <font color=red><b>(Required)</b></font>
  * msg.addParameter("appName", "bizService1"); msg.addParameter("status",
@@ -70,7 +70,7 @@ public interface MessageNotifier extends Operator<NotifierKind> {
      * 
      * @param msg
      */
-    Object send(final @NotNull GenericNotifyMessage msg);
+    Object send(final @NotNull GenericNotifierParam msg);
 
     /**
      * Notification privoder kind.
@@ -81,26 +81,11 @@ public interface MessageNotifier extends Operator<NotifierKind> {
      */
     public static enum NotifierKind {
 
-        /**
-         * MessageNotifier that must be instantiated. The default implementation
-         * when all other message notifiers are not available solves the spring
-         * bean injection problem.
-         * 
-         * @see {@link com.wl4g.infra.common.notification.NoneMessageNotifier}
-         */
-        NONE,
-
-        APNS,
-
-        BARK,
+        EMAIL,
 
         DINGTALK,
 
         FACEBOOK,
-
-        EMAIL,
-
-        QQ,
 
         ALIYUN_SMS,
 
@@ -108,13 +93,23 @@ public interface MessageNotifier extends Operator<NotifierKind> {
 
         WECHAT_MP,
 
-        TWITTER;
+        QQ,
+
+        TWITTER,
+
+        APNS,
+
+        BARK,
+
+        /**
+         * MessageNotifier that must be instantiated. The default implementation
+         * when all other message notifiers are not available solves the spring
+         * bean injection problem.
+         * 
+         * @see {@link com.wl4g.infra.common.notification.NoneMessageNotifier}
+         */
+        NONE;
 
     }
-
-    /**
-     * Notification message sendDate keyname.
-     */
-    public static final String KEY_MSG_SENDDATE = "msgSendDate";
 
 }

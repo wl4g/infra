@@ -15,27 +15,14 @@
  */
 package com.wl4g.infra.common.notification.email;
 
-import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
-import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static java.lang.String.format;
-import static java.util.Objects.isNull;
-import static java.util.stream.Collectors.toList;
-
-import java.util.Date;
-import java.util.Properties;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.annotation.Stable;
 import com.wl4g.infra.common.notification.AbstractMessageNotifier;
-import com.wl4g.infra.common.notification.GenericNotifyMessage;
-import com.wl4g.infra.common.notification.email.internal.JavaMailSenderImpl;
-import com.wl4g.infra.common.notification.email.internal.MimeMailMessage;
-import com.wl4g.infra.common.notification.email.internal.MimeMessageHelper;
-import com.wl4g.infra.common.notification.email.internal.SimpleMailMessage;
+import com.wl4g.infra.common.notification.GenericNotifierParam;
+import com.wl4g.infra.common.notification.email.internal.EmailSenderAPI;
+import com.wl4g.infra.common.notification.email.internal.JavaMailSender;
 
 /**
  * {@link EmailMessageNotifier}, Full compatibility with native spring mail!
@@ -45,27 +32,16 @@ import com.wl4g.infra.common.notification.email.internal.SimpleMailMessage;
  * @see
  */
 @Stable
-public class EmailMessageNotifier extends AbstractMessageNotifier<EmailNotifyProperties> {
+public class EmailMessageNotifier extends AbstractMessageNotifier<EmailNotifierProperties> {
 
     /**
      * Java mail sender.
      */
-    protected final JavaMailSenderImpl mailSender;
+    protected final JavaMailSender mailSender;
 
-    public EmailMessageNotifier(EmailNotifyProperties config, Validator validator) {
+    public EmailMessageNotifier(EmailNotifierProperties config, Validator validator) {
         super(config, validator);
-        this.mailSender = new JavaMailSenderImpl();
-        if (!isNull(config.getProperties())) {
-            final Properties settings = new Properties(DEFAULT_PROPERTIES);
-            settings.putAll(config.getProperties());
-            this.mailSender.setJavaMailProperties(settings);
-        }
-        this.mailSender.setDefaultEncoding(config.getDefaultEncoding().name());
-        this.mailSender.setProtocol(config.getProtocol());
-        this.mailSender.setHost(config.getHost());
-        this.mailSender.setPort(config.getPort());
-        this.mailSender.setUsername(config.getUsername());
-        this.mailSender.setPassword(config.getPassword());
+        this.mailSender = EmailSenderAPI.buildSender(config);
     }
 
     @Override
@@ -74,90 +50,8 @@ public class EmailMessageNotifier extends AbstractMessageNotifier<EmailNotifyPro
     }
 
     @Override
-    public Object send(final @NotNull GenericNotifyMessage msg) {
-        notNullOf(msg, "msg");
-
-        final String mailMsgType = msg.getParameterAsString(KEY_MAILMSG_TYPE, "simple");
-        Object sendMsg = null;
-        switch (mailMsgType) {
-        case VALUE_MAILMSG_SIMPLE:
-            final SimpleMailMessage simpleMsg = new SimpleMailMessage();
-            // Add "<>" symbol to send out?
-            /*
-             * Preset from account, otherwise it would be wrong: 501 mail from
-             * address must be same as authorization user.
-             */
-            simpleMsg.setFrom(config.getUsername() + "<" + config.getUsername() + ">");
-            simpleMsg.setTo(
-                    msg.getToObjects().stream().map(to -> to = to + "<" + to + ">").collect(toList()).toArray(new String[] {}));
-            simpleMsg.setSubject(msg.getParameterAsString(KEY_MAILMSG_SUBJECT, "Unnamed Subject Message"));
-            simpleMsg.setSentDate(msg.getParameter(KEY_MSG_SENDDATE, new Date()));
-            simpleMsg.setBcc(safeList(msg.getParameter(KEY_MAILMSG_BCC)).toArray(new String[] {}));
-            simpleMsg.setCc(safeList(msg.getParameter(KEY_MAILMSG_CC)).toArray(new String[] {}));
-            simpleMsg.setReplyTo(msg.getParameter(KEY_MAILMSG_REPLYTO));
-            simpleMsg.setText(config.resolveMessage(msg.getTemplateKey(), msg.getParameters()));
-            sendMsg = simpleMsg;
-
-            mailSender.send(simpleMsg);
-            break;
-        case VALUE_MAILMSG_MIME:
-            try {
-                final MimeMessage mimeMsg = mailSender.createMimeMessage();
-                final MimeMessageHelper helper = new MimeMessageHelper(mimeMsg, "utf-8");
-                helper.setFrom(config.getUsername() + "<" + config.getUsername() + ">");
-                helper.setTo(msg.getToObjects()
-                        .stream()
-                        .map(to -> to = to + "<" + to + ">")
-                        .collect(toList())
-                        .toArray(new String[] {}));
-                helper.setSubject(msg.getParameterAsString(KEY_MAILMSG_SUBJECT, "Unnamed Subject Message"));
-                // Use this or below line
-                // mimeMessage.setContent(htmlMsg, "text/html");
-                // Use this or above line.
-                helper.setText(config.resolveMessage(msg.getTemplateKey(), msg.getParameters()), true);
-                sendMsg = helper;
-
-                mailSender.send(mimeMsg);
-            } catch (MessagingException e) {
-                throw new IllegalStateException(e);
-            }
-            break;
-        default:
-            throw new UnsupportedOperationException(format("No supported email message type of %s", mailMsgType));
-        }
-        return sendMsg;
+    public Object send(final @NotNull GenericNotifierParam msg) {
+        return EmailSenderAPI.send(mailSender, config, msg);
     }
-
-    /**
-     * <pre>
-     * <b>simple</b> => {@link SimpleMailMessage}
-     * <b>mime</b> => {@link MimeMailMessage}
-     * </pre>
-     */
-    public static final String KEY_MAILMSG_TYPE = "emailMsgType";
-    public static final String VALUE_MAILMSG_SIMPLE = "SIMPLE";
-    public static final String VALUE_MAILMSG_MIME = "MIME";
-
-    public static final String KEY_MAILMSG_SUBJECT = "emailMsgSubject";
-    public static final String KEY_MAILMSG_REPLYTO = "emailMsgReplyTo";
-    public static final String KEY_MAILMSG_CC = "emailMsgCc";
-    public static final String KEY_MAILMSG_BCC = "emailMsgBcc";
-
-    public static final Properties DEFAULT_PROPERTIES = new Properties() {
-        private static final long serialVersionUID = 1L;
-        {
-            put("mail.transport.portocol", "smtp");
-            put("mail.smtp.host", "smtp.exmail.qq.com");
-            put("mail.smtp.port", "465");
-            put("mail.smtp.auth", "true");
-            put("mail.smtp.timeout", "10000");
-            put("mail.smtp.ssl.enable", "true");
-            put("mail.imap.ssl.socketFactory.fallback", "false");
-            put("mail.imap.ssl.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-            put("mail.smtp.starttls.enable", "true");
-            put("mail.smtp.starttls.required", "true");
-            put("mail.smtp.ssl.portocols", "TLSv1.2");
-        }
-    };
 
 }

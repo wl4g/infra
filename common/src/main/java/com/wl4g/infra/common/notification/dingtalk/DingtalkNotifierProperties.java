@@ -31,7 +31,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link DingtalkNotifyProperties}
+ * {@link DingtalkNotifierProperties}
  * 
  * @author James Wong
  * @version 2022-09-15
@@ -42,7 +42,7 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
-public class DingtalkNotifyProperties implements NotifyProperties {
+public class DingtalkNotifierProperties implements NotifyProperties {
 
     private String agentId;
     private @NotBlank String appKey;

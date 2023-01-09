@@ -33,7 +33,7 @@ import com.aliyuncs.IAcsClient;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.wl4g.infra.common.notification.AbstractMessageNotifier;
-import com.wl4g.infra.common.notification.GenericNotifyMessage;
+import com.wl4g.infra.common.notification.GenericNotifierParam;
 import com.wl4g.infra.common.notification.NotificationException;
 
 /**
@@ -43,11 +43,11 @@ import com.wl4g.infra.common.notification.NotificationException;
  * @version 2020-01-05
  * @since v1.0.0
  */
-public class AliyunVmsMessageNotifier extends AbstractMessageNotifier<VmsNotifyProperties> {
+public class AliyunVmsMessageNotifier extends AbstractMessageNotifier<VmsNotifierProperties> {
 
     protected IAcsClient acsClient;
 
-    public AliyunVmsMessageNotifier(VmsNotifyProperties config, Validator validator) {
+    public AliyunVmsMessageNotifier(VmsNotifierProperties config, Validator validator) {
         super(config, validator);
     }
 
@@ -66,7 +66,7 @@ public class AliyunVmsMessageNotifier extends AbstractMessageNotifier<VmsNotifyP
 
     @SuppressWarnings("unchecked")
     @Override
-    public Object send(GenericNotifyMessage msg) {
+    public Object send(GenericNotifierParam msg) {
         CommonRequest req = new CommonRequest();
         req.setSysMethod(MethodType.POST);
         req.setSysDomain("dyvmsapi.aliyuncs.com");

@@ -20,7 +20,8 @@ import static com.wl4g.infra.common.lang.EnvironmentUtil.getStringProperty;
 
 import org.junit.Test;
 
-import com.wl4g.infra.common.notification.GenericNotifyMessage;
+import com.wl4g.infra.common.notification.GenericNotifierParam;
+import com.wl4g.infra.common.notification.email.internal.EmailSenderAPI;
 
 /**
  * {@link EmailMessageNotifierTests}
@@ -39,7 +40,7 @@ public class EmailMessageNotifierTests {
 
     @Test
     public void testEmailSendSimpleMessage() {
-        final EmailNotifyProperties config = new EmailNotifyProperties();
+        final EmailNotifierProperties config = new EmailNotifierProperties();
         config.setProtocol("smtp");
         config.setHost(test_serveHost);
         config.setPort(test_servePort);
@@ -50,9 +51,9 @@ public class EmailMessageNotifierTests {
 
         final EmailMessageNotifier notifier = new EmailMessageNotifier(config, null);
 
-        final GenericNotifyMessage msg = new GenericNotifyMessage(test_toUser, testTemplateKey)
-                .addParameter(EmailMessageNotifier.KEY_MAILMSG_TYPE, EmailMessageNotifier.VALUE_MAILMSG_SIMPLE)
-                .addParameter(EmailMessageNotifier.KEY_MAILMSG_SUBJECT, "Testing Sender with Simple Msg");
+        final GenericNotifierParam msg = new GenericNotifierParam(test_toUser, testTemplateKey)
+                .addParameter(EmailSenderAPI.KEY_MAILMSG_TYPE, EmailSenderAPI.VALUE_MAILMSG_SIMPLE)
+                .addParameter(EmailSenderAPI.KEY_MAILMSG_SUBJECT, "Testing Sender with Simple Msg");
 
         System.out.println("Sending ...");
         final Object result = notifier.send(msg);
@@ -61,7 +62,7 @@ public class EmailMessageNotifierTests {
 
     @Test
     public void testEmailSendMimeMessage() {
-        final EmailNotifyProperties config = new EmailNotifyProperties();
+        final EmailNotifierProperties config = new EmailNotifierProperties();
         config.setProtocol("smtp");
         config.setHost(test_serveHost);
         config.setPort(test_servePort);
@@ -74,9 +75,9 @@ public class EmailMessageNotifierTests {
 
         final EmailMessageNotifier notifier = new EmailMessageNotifier(config, null);
 
-        final GenericNotifyMessage msg = new GenericNotifyMessage(test_toUser, testTemplateKey)
-                .addParameter(EmailMessageNotifier.KEY_MAILMSG_TYPE, EmailMessageNotifier.VALUE_MAILMSG_MIME)
-                .addParameter(EmailMessageNotifier.KEY_MAILMSG_SUBJECT, "Testing Sender with Mime Msg");
+        final GenericNotifierParam msg = new GenericNotifierParam(test_toUser, testTemplateKey)
+                .addParameter(EmailSenderAPI.KEY_MAILMSG_TYPE, EmailSenderAPI.VALUE_MAILMSG_MIME)
+                .addParameter(EmailSenderAPI.KEY_MAILMSG_SUBJECT, "Testing Sender with Mime Msg");
 
         System.out.println("Sending ...");
         final Object result = notifier.send(msg);

@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.common.notification.bark;
+package com.wl4g.infra.common.notification.apns;
 
 import com.wl4g.infra.common.notification.NotifyProperties;
 
-public class BarkNotifyProperties implements NotifyProperties {
+public class ApnsNotifierProperties implements NotifyProperties {
 
     @Override
     public void validate() {

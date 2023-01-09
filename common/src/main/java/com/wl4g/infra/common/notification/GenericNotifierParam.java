@@ -38,7 +38,7 @@ import com.wl4g.infra.common.web.rest.RespBase.DataMap;
 import lombok.Getter;
 
 /**
- * {@link GenericNotifyMessage}
+ * {@link GenericNotifierParam}
  * 
  * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version 2020年3月14日 v1.0.0
@@ -46,7 +46,7 @@ import lombok.Getter;
  */
 @Getter
 @ValidateOnExecution
-public class GenericNotifyMessage implements NotifyMessage {
+public class GenericNotifierParam implements NotifierParam {
     private static final long serialVersionUID = 7422435702403504747L;
 
     /**
@@ -79,14 +79,14 @@ public class GenericNotifyMessage implements NotifyMessage {
      */
     private @Nullable String callbackId;
 
-    public GenericNotifyMessage() {
+    public GenericNotifierParam() {
     }
 
-    public GenericNotifyMessage(@NotBlank String singleToObject) {
+    public GenericNotifierParam(@NotBlank String singleToObject) {
         addToObjects(singleToObject);
     }
 
-    public GenericNotifyMessage(@NotBlank String singleToObject, @NotBlank String templateKey) {
+    public GenericNotifierParam(@NotBlank String singleToObject, @NotBlank String templateKey) {
         addToObjects(singleToObject);
         withTemplateKey(hasTextOf(templateKey, "templateKey"));
     }
@@ -102,7 +102,7 @@ public class GenericNotifyMessage implements NotifyMessage {
      * @param toObjects
      * @return
      */
-    public GenericNotifyMessage setToObjects(@NotEmpty List<String> toObjects) {
+    public GenericNotifierParam setToObjects(@NotEmpty List<String> toObjects) {
         this.toObjects = toObjects;
         return this;
     }
@@ -113,7 +113,7 @@ public class GenericNotifyMessage implements NotifyMessage {
      * @param toObjects
      * @return
      */
-    public GenericNotifyMessage addToObjects(@NotEmpty String... toObjects) {
+    public GenericNotifierParam addToObjects(@NotEmpty String... toObjects) {
         if (!isNull(toObjects) && toObjects.length > 0) {
             for (String s : toObjects) {
                 hasText(s, "Notification to target object element must not be null.");
@@ -129,7 +129,7 @@ public class GenericNotifyMessage implements NotifyMessage {
      * @param templateKey
      * @return
      */
-    public GenericNotifyMessage withTemplateKey(@Nullable String templateKey) {
+    public GenericNotifierParam withTemplateKey(@Nullable String templateKey) {
         // this.templateKey = hasTextOf(templateKey, "templateKey");
         this.templateKey = templateKey;
         return this;
@@ -157,7 +157,7 @@ public class GenericNotifyMessage implements NotifyMessage {
      * @param value
      * @return
      */
-    public GenericNotifyMessage addParameter(@NotBlank String key, Object value) {
+    public GenericNotifierParam addParameter(@NotBlank String key, Object value) {
         hasTextOf(key, "parameterKey");
         // notNullOf(value, "parameterValue");
         parameters.put(key, value);
@@ -171,7 +171,7 @@ public class GenericNotifyMessage implements NotifyMessage {
      * @param parameters
      * @return
      */
-    public GenericNotifyMessage addParameters(Map<String, Object> parameters) {
+    public GenericNotifierParam addParameters(Map<String, Object> parameters) {
         if (!isNull(parameters) && !parameters.isEmpty()) {
             parameters.putAll(parameters.entrySet()
                     .stream()
@@ -189,7 +189,7 @@ public class GenericNotifyMessage implements NotifyMessage {
      * @param callbackId
      * @return
      */
-    public GenericNotifyMessage withCallbackId(@NotBlank String callbackId) {
+    public GenericNotifierParam withCallbackId(@NotBlank String callbackId) {
         this.callbackId = callbackId;
         return this;
     }

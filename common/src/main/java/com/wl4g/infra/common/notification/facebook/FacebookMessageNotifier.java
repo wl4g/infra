@@ -19,7 +19,7 @@ import javax.validation.Validator;
 
 import com.wl4g.infra.common.annotation.Todo;
 import com.wl4g.infra.common.notification.AbstractMessageNotifier;
-import com.wl4g.infra.common.notification.GenericNotifyMessage;
+import com.wl4g.infra.common.notification.GenericNotifierParam;
 
 /**
  * {@link FacebookMessageNotifier}
@@ -29,9 +29,9 @@ import com.wl4g.infra.common.notification.GenericNotifyMessage;
  * @see
  */
 @Todo
-public class FacebookMessageNotifier extends AbstractMessageNotifier<FacebookNotifyProperties> {
+public class FacebookMessageNotifier extends AbstractMessageNotifier<FacebookNotifierProperties> {
 
-    public FacebookMessageNotifier(FacebookNotifyProperties config, Validator validator) {
+    public FacebookMessageNotifier(FacebookNotifierProperties config, Validator validator) {
         super(config, validator);
     }
 
@@ -41,7 +41,7 @@ public class FacebookMessageNotifier extends AbstractMessageNotifier<FacebookNot
     }
 
     @Override
-    public Object send(GenericNotifyMessage message) {
+    public Object send(GenericNotifierParam message) {
         throw new UnsupportedOperationException();
     }
 

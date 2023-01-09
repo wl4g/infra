@@ -1343,7 +1343,7 @@
   "queryAllDeclaredMethods":true
 },
 {
-  "name":"com.wl4g.infra.common.notification.GenericNotifyMessage",
+  "name":"com.wl4g.infra.common.notification.GenericNotifierParam",
   "allDeclaredFields":true,
   "allDeclaredMethods":true,
   "allDeclaredConstructors":true,
@@ -1354,6 +1354,58 @@
     {"name":"<init>","parameterTypes":["java.lang.String"] }, 
     {"name":"<init>","parameterTypes":["java.lang.String","java.lang.String"] }, 
     {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name": "com.wl4g.infra.common.notification.email.EmailNotifierProperties",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>","parameterTypes": []},
+    {"name": "<init>","parameterTypes": ["com.wl4g.infra.common.notification.email.EmailNotifierProperties$EmailNotifierPropertiesBuilder"]},
+    {"name": "getUsername","parameterTypes": []},
+    {"name": "getPassword","parameterTypes": []},
+    {"name": "getDefaultEncoding","parameterTypes": []},
+    {"name": "getJndiName","parameterTypes": []},
+    {"name": "setProtocol","parameterTypes": ["java.lang.String"]},
+    {"name": "setHost","parameterTypes": ["java.lang.String"]},
+    {"name": "setPort","parameterTypes": ["java.lang.Integer"]},
+    {"name": "setUsername","parameterTypes": ["java.lang.String"]},
+    {"name": "setPassword","parameterTypes": ["java.lang.String"]},
+    {"name": "setDefaultEncoding","parameterTypes": ["java.lang.String"]},
+    {"name": "setJndiName","parameterTypes": ["java.lang.String"]},
+    {"name": "toString","parameterTypes": []},
+    {"name": "validate","parameterTypes": []},
+    {"name": "getProperties","parameterTypes": []},
+    {"name": "setProperties","parameterTypes": ["java.util.Map"]},
+    {"name": "getPort","parameterTypes": []},
+    {"name": "getProtocol","parameterTypes": []},
+    {"name": "getHost","parameterTypes": []},
+    {"name": "$default$protocol","parameterTypes": []},
+    {"name": "$default$host","parameterTypes": []},
+    {"name": "$default$port","parameterTypes": []},
+    {"name": "$default$defaultEncoding","parameterTypes": []},
+    {"name": "$default$properties","parameterTypes": []},
+    {"name": "builder","parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.infra.common.notification.email.internal.EmailSenderAPI",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>","parameterTypes": []},
+    {"name": "send","parameterTypes": ["com.wl4g.infra.common.notification.email.internal.JavaMailSender","com.wl4g.infra.common.notification.email.EmailNotifierProperties","com.wl4g.infra.common.notification.GenericNotifierParam","java.lang.String"]},
+    {"name": "send","parameterTypes": ["com.wl4g.infra.common.notification.email.internal.JavaMailSender","com.wl4g.infra.common.notification.email.EmailNotifierProperties","com.wl4g.infra.common.notification.GenericNotifierParam"]},
+    {"name": "lambda$0","parameterTypes": ["java.lang.String"]},
+    {"name": "lambda$1","parameterTypes": ["java.lang.String"]},
+    {"name": "buildSender","parameterTypes": ["com.wl4g.infra.common.notification.email.EmailNotifierProperties"]}
   ]
 },
 {

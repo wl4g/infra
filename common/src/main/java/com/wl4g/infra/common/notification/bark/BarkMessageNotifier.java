@@ -19,12 +19,12 @@ import javax.validation.Validator;
 
 import com.wl4g.infra.common.annotation.Todo;
 import com.wl4g.infra.common.notification.AbstractMessageNotifier;
-import com.wl4g.infra.common.notification.GenericNotifyMessage;
+import com.wl4g.infra.common.notification.GenericNotifierParam;
 
 @Todo
-public class BarkMessageNotifier extends AbstractMessageNotifier<BarkNotifyProperties> {
+public class BarkMessageNotifier extends AbstractMessageNotifier<BarkNotifierProperties> {
 
-    public BarkMessageNotifier(BarkNotifyProperties config, Validator validator) {
+    public BarkMessageNotifier(BarkNotifierProperties config, Validator validator) {
         super(config, validator);
     }
 
@@ -34,7 +34,7 @@ public class BarkMessageNotifier extends AbstractMessageNotifier<BarkNotifyPrope
     }
 
     @Override
-    public Object send(GenericNotifyMessage message) {
+    public Object send(GenericNotifierParam message) {
         throw new UnsupportedOperationException();
     }
 

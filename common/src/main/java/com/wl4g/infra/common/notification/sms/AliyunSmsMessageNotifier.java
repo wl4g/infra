@@ -32,14 +32,14 @@ import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
 import com.wl4g.infra.common.notification.AbstractMessageNotifier;
-import com.wl4g.infra.common.notification.GenericNotifyMessage;
+import com.wl4g.infra.common.notification.GenericNotifierParam;
 import com.wl4g.infra.common.notification.NotificationException;
-import com.wl4g.infra.common.notification.sms.SmsNotifyProperties.AliyunSmsNotifyProperties;
+import com.wl4g.infra.common.notification.sms.SmsNotifierProperties.AliyunSmsNotifyProperties;
 
-public class AliyunSmsMessageNotifier extends AbstractMessageNotifier<SmsNotifyProperties> {
+public class AliyunSmsMessageNotifier extends AbstractMessageNotifier<SmsNotifierProperties> {
     private IAcsClient acsClient;
 
-    public AliyunSmsMessageNotifier(SmsNotifyProperties config, Validator validator) {
+    public AliyunSmsMessageNotifier(SmsNotifierProperties config, Validator validator) {
         super(config, validator);
     }
 
@@ -64,7 +64,7 @@ public class AliyunSmsMessageNotifier extends AbstractMessageNotifier<SmsNotifyP
     }
 
     @Override
-    public Object send(GenericNotifyMessage msg) {
+    public Object send(GenericNotifierParam msg) {
         try {
             isTrue(msg.getToObjects().size() < 1000, "Group numbers exceeds the limit (<1000)");
 

@@ -19,12 +19,12 @@ import javax.validation.Validator;
 
 import com.wl4g.infra.common.annotation.Todo;
 import com.wl4g.infra.common.notification.AbstractMessageNotifier;
-import com.wl4g.infra.common.notification.GenericNotifyMessage;
+import com.wl4g.infra.common.notification.GenericNotifierParam;
 
 @Todo
-public class TwitterMessageNotifier extends AbstractMessageNotifier<TwitterNotifyProperties> {
+public class TwitterMessageNotifier extends AbstractMessageNotifier<TwitterNotifierProperties> {
 
-    public TwitterMessageNotifier(TwitterNotifyProperties config, Validator validator) {
+    public TwitterMessageNotifier(TwitterNotifierProperties config, Validator validator) {
         super(config, validator);
     }
 
@@ -34,7 +34,7 @@ public class TwitterMessageNotifier extends AbstractMessageNotifier<TwitterNotif
     }
 
     @Override
-    public Object send(GenericNotifyMessage message) {
+    public Object send(GenericNotifierParam message) {
         throw new UnsupportedOperationException();
     }
 

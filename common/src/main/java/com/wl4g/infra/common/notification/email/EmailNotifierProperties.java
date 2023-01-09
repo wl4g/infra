@@ -19,17 +19,23 @@ import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.lang.Assert2.stateOf;
 
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotBlank;
+
 import com.wl4g.infra.common.notification.AbstractNotifyProperties;
 
+import lombok.Builder.Default;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 /**
- * {@link EmailNotifyProperties}, Full compatibility with native spring mail!
+ * {@link EmailNotifierProperties}, Full compatibility with native spring mail!
  * 
  * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version 2020年1月9日 v1.0.0
@@ -37,50 +43,50 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class EmailNotifyProperties extends AbstractNotifyProperties {
-    private static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
+@SuperBuilder
+@ToString
+@NoArgsConstructor
+public class EmailNotifierProperties extends AbstractNotifyProperties {
 
     /**
-     * SMTP server host.
+     * Protocol used by the Email(SMTP) server.
      */
-    private String host;
+    private @NotBlank @Default String protocol = "smtp";
 
     /**
-     * SMTP server port.
+     * Email(SMTP) server host.
      */
-    private Integer port;
+    private @NotBlank @Default String host = "smtp.exmail.qq.com";
 
     /**
-     * Login user of the SMTP server.
+     * Email(SMTP) server port.
      */
-    private String username;
+    private @NotBlank @Default Integer port = 465;
 
     /**
-     * Login password of the SMTP server.
+     * Login user of the Email(SMTP) server.
      */
-    private String password;
+    private @NotBlank String username;
 
     /**
-     * Protocol used by the SMTP server.
+     * Login password of the Email(SMTP) server.
      */
-    private String protocol = "smtp";
+    private @NotBlank String password;
 
     /**
      * Default MimeMessage encoding.
      */
-    private Charset defaultEncoding = DEFAULT_CHARSET;
+    private @NotBlank @Default String defaultEncoding = "UTF-8";
 
     /**
      * Additional JavaMail session properties.
      */
-    private Map<String, String> properties = new HashMap<String, String>();
+    private @Nullable @Default Map<String, String> properties = new HashMap<>();
 
     /**
      * Session JNDI name. When set, takes precedence to others mail settings.
      */
     private String jndiName;
-
-    private boolean useSSL;
 
     @Override
     public void validate() {
@@ -92,5 +98,4 @@ public class EmailNotifyProperties extends AbstractNotifyProperties {
         hasTextOf(getProtocol(), "protocol");
         notNullOf(getDefaultEncoding(), "defaultEncoding");
     }
-
 }

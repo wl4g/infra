@@ -25,7 +25,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.notification.AbstractMessageNotifier;
-import com.wl4g.infra.common.notification.GenericNotifyMessage;
+import com.wl4g.infra.common.notification.GenericNotifierParam;
 import com.wl4g.infra.common.notification.dingtalk.internal.DingCallbackCrypto;
 import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI;
 import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.CreateSceneGroupV2;
@@ -170,9 +170,9 @@ import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.RobotGro
  * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version 2020年1月9日 v3.0.0
  */
-public class DingtalkMessageNotifier extends AbstractMessageNotifier<DingtalkNotifyProperties> {
+public class DingtalkMessageNotifier extends AbstractMessageNotifier<DingtalkNotifierProperties> {
 
-    public DingtalkMessageNotifier(DingtalkNotifyProperties config, Validator validator) {
+    public DingtalkMessageNotifier(DingtalkNotifierProperties config, Validator validator) {
         super(config, validator);
     }
 
@@ -182,7 +182,7 @@ public class DingtalkMessageNotifier extends AbstractMessageNotifier<DingtalkNot
     }
 
     @Override
-    public Object send(GenericNotifyMessage msg) {
+    public Object send(GenericNotifierParam msg) {
         final String accessToken = msg.getParameterAsString(KEY_ACCESS_TOKEN, "");
         final String msgKey = msg.getParameterAsString(KEY_MSG_KEY, MsgKeyType.sampleMarkdown.name());
         final String msgParam = msg.getParameterAsString(KEY_MSG_PARAM, "");

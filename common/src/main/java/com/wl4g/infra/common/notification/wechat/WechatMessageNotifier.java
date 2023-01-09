@@ -19,12 +19,12 @@ import javax.validation.Validator;
 
 import com.wl4g.infra.common.annotation.Todo;
 import com.wl4g.infra.common.notification.AbstractMessageNotifier;
-import com.wl4g.infra.common.notification.GenericNotifyMessage;
+import com.wl4g.infra.common.notification.GenericNotifierParam;
 
 @Todo
-public class WechatMessageNotifier extends AbstractMessageNotifier<WechatNotifyProperties> {
+public class WechatMessageNotifier extends AbstractMessageNotifier<WechatNotifierProperties> {
 
-    public WechatMessageNotifier(WechatNotifyProperties config, Validator validator) {
+    public WechatMessageNotifier(WechatNotifierProperties config, Validator validator) {
         super(config, validator);
     }
 
@@ -34,7 +34,7 @@ public class WechatMessageNotifier extends AbstractMessageNotifier<WechatNotifyP
     }
 
     @Override
-    public Object send(GenericNotifyMessage message) {
+    public Object send(GenericNotifierParam message) {
         throw new UnsupportedOperationException();
     }
 

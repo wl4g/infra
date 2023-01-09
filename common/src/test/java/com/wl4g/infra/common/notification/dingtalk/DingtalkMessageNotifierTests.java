@@ -19,7 +19,7 @@ import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 
 import org.junit.Test;
 
-import com.wl4g.infra.common.notification.GenericNotifyMessage;
+import com.wl4g.infra.common.notification.GenericNotifierParam;
 import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.MsgKeyType;
 import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.SampleActionCard5Param;
 
@@ -64,13 +64,13 @@ public class DingtalkMessageNotifierTests extends DingtalkAPITests {
                 .build();
         // @formatter:on
 
-        final DingtalkNotifyProperties config = new DingtalkNotifyProperties();
+        final DingtalkNotifierProperties config = new DingtalkNotifierProperties();
         config.setAppKey(test_appKey);
         config.setAppSecret(test_appSecret);
 
         final DingtalkMessageNotifier notifier = new DingtalkMessageNotifier(config, null);
 
-        final GenericNotifyMessage msg = new GenericNotifyMessage(test_openConversationId)
+        final GenericNotifierParam msg = new GenericNotifierParam(test_openConversationId)
                 .addParameter(DingtalkMessageNotifier.KEY_ACCESS_TOKEN, test_accessToken)
                 .addParameter(DingtalkMessageNotifier.KEY_MSG_KEY, msgKey.name())
                 .addParameter(DingtalkMessageNotifier.KEY_MSG_PARAM, toJSONString(param))

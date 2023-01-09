@@ -19,12 +19,12 @@ import javax.validation.Validator;
 
 import com.wl4g.infra.common.annotation.Todo;
 import com.wl4g.infra.common.notification.AbstractMessageNotifier;
-import com.wl4g.infra.common.notification.GenericNotifyMessage;
+import com.wl4g.infra.common.notification.GenericNotifierParam;
 
 @Todo
-public class ApnsMessageNotifier extends AbstractMessageNotifier<ApnsNotifyProperties> {
+public class ApnsMessageNotifier extends AbstractMessageNotifier<ApnsNotifierProperties> {
 
-    public ApnsMessageNotifier(ApnsNotifyProperties config, Validator validator) {
+    public ApnsMessageNotifier(ApnsNotifierProperties config, Validator validator) {
         super(config, validator);
     }
 
@@ -34,7 +34,7 @@ public class ApnsMessageNotifier extends AbstractMessageNotifier<ApnsNotifyPrope
     }
 
     @Override
-    public Object send(GenericNotifyMessage message) {
+    public Object send(GenericNotifierParam message) {
         throw new UnsupportedOperationException();
     }
 

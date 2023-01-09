@@ -17,7 +17,7 @@ package com.wl4g.infra.common.notification.wechat;
 
 import com.wl4g.infra.common.notification.NotifyProperties;
 
-public class WechatNotifyProperties implements NotifyProperties {
+public class WechatNotifierProperties implements NotifyProperties {
 
 	@Override
 	public void validate() {
