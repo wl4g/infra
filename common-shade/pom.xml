@@ -53,8 +53,8 @@
 	</developers>
 	<parent>
 		<groupId>com.wl4g</groupId>
-		<artifactId>infra</artifactId>
-		<version>3.0.0</version>
+		<artifactId>infra-parent</artifactId>
+		<version>3.1.0</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<properties>
