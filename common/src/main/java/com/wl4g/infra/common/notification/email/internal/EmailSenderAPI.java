@@ -76,7 +76,19 @@ public class EmailSenderAPI {
         notNullOf(msg, "msg");
 
         final String mailMsgType = msg.getParameterAsString(KEY_MAIL_TYPE, VALUE_MAIL_SIMPLE);
+        final String fromUser = config.getUsername() + "<" + config.getUsername() + ">";
+        final String subject = msg.getParameterAsString(KEY_MAIL_SUBJECT, "Unnamed Mail");
+        final Date sentDate = msg.getParameter(KEY_MAIL_SENDDATE, new Date());
+        final String[] toObjects = msg.getToObjects()
+                .stream()
+                .map(to -> to = to + "<" + to + ">")
+                .collect(toList())
+                .toArray(new String[] {});
+        final String[] bcc = safeList(msg.getParameter(KEY_MAIL_BCC)).toArray(new String[] {});
+        final String[] cc = safeList(msg.getParameter(KEY_MAIL_CC)).toArray(new String[] {});
         final String content = isBlank(message) ? config.resolveMessage(msg.getTemplateKey(), msg.getParameters()) : message;
+        final String replyTo = msg.getParameter(KEY_MAIL_REPLYTO);
+
         Object sendMsg = null;
         switch (mailMsgType) {
         case VALUE_MAIL_SIMPLE:
@@ -86,36 +98,33 @@ public class EmailSenderAPI {
              * Preset from account, otherwise it would be wrong: 501 mail from
              * address must be same as authorization user.
              */
-            simpleMsg.setFrom(config.getUsername() + "<" + config.getUsername() + ">");
-            simpleMsg.setTo(
-                    msg.getToObjects().stream().map(to -> to = to + "<" + to + ">").collect(toList()).toArray(new String[] {}));
-            simpleMsg.setSubject(msg.getParameterAsString(KEY_MAIL_SUBJECT, "Unnamed Subject Message"));
-            simpleMsg.setSentDate(msg.getParameter(KEY_MAIL_SENDDATE, new Date()));
-            simpleMsg.setBcc(safeList(msg.getParameter(KEY_MAIL_BCC)).toArray(new String[] {}));
-            simpleMsg.setCc(safeList(msg.getParameter(KEY_MAIL_CC)).toArray(new String[] {}));
-            simpleMsg.setReplyTo(msg.getParameter(KEY_MAIL_REPLYTO));
+            simpleMsg.setFrom(fromUser);
+            simpleMsg.setTo(toObjects);
+            simpleMsg.setSubject(subject);
+            simpleMsg.setSentDate(sentDate);
+            simpleMsg.setBcc(bcc);
+            simpleMsg.setCc(cc);
+            simpleMsg.setReplyTo(replyTo);
             simpleMsg.setText(content);
             sendMsg = simpleMsg;
-
             sender.send(simpleMsg);
             break;
         case VALUE_MAIL_MIME:
             try {
                 final MimeMessage mimeMsg = sender.createMimeMessage();
                 final MimeMessageHelper helper = new MimeMessageHelper(mimeMsg, "utf-8");
-                helper.setFrom(config.getUsername() + "<" + config.getUsername() + ">");
-                helper.setTo(msg.getToObjects()
-                        .stream()
-                        .map(to -> to = to + "<" + to + ">")
-                        .collect(toList())
-                        .toArray(new String[] {}));
-                helper.setSubject(msg.getParameterAsString(KEY_MAIL_SUBJECT, "Unnamed Subject Message"));
+                helper.setFrom(fromUser);
+                helper.setTo(toObjects);
+                helper.setSubject(subject);
+                helper.setSentDate(sentDate);
+                helper.setBcc(bcc);
+                helper.setCc(cc);
+                helper.setReplyTo(replyTo);
                 // Use this or below line
                 // mimeMessage.setContent(htmlMsg, "text/html");
                 // Use this or above line.
                 helper.setText(content);
                 sendMsg = helper;
-
                 sender.send(mimeMsg);
             } catch (MessagingException e) {
                 throw new IllegalStateException(e);
