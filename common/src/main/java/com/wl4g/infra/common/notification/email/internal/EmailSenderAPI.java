@@ -25,9 +25,9 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import java.util.Date;
 import java.util.Properties;
 
+import javax.annotation.Nullable;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.notification.GenericNotifierParam;
@@ -70,12 +70,13 @@ public class EmailSenderAPI {
             final @NotNull JavaMailSender sender,
             final @NotNull EmailNotifierProperties config,
             final @NotNull GenericNotifierParam msg,
-            final @NotBlank String message) {
+            final @Nullable String message) {
         notNullOf(sender, "sender");
         notNullOf(config, "config");
         notNullOf(msg, "msg");
 
         final String mailMsgType = msg.getParameterAsString(KEY_MAIL_TYPE, VALUE_MAIL_SIMPLE);
+        final String content = isBlank(message) ? config.resolveMessage(msg.getTemplateKey(), msg.getParameters()) : message;
         Object sendMsg = null;
         switch (mailMsgType) {
         case VALUE_MAIL_SIMPLE:
@@ -93,7 +94,7 @@ public class EmailSenderAPI {
             simpleMsg.setBcc(safeList(msg.getParameter(KEY_MAIL_BCC)).toArray(new String[] {}));
             simpleMsg.setCc(safeList(msg.getParameter(KEY_MAIL_CC)).toArray(new String[] {}));
             simpleMsg.setReplyTo(msg.getParameter(KEY_MAIL_REPLYTO));
-            simpleMsg.setText(isBlank(message) ? config.resolveMessage(msg.getTemplateKey(), msg.getParameters()) : message);
+            simpleMsg.setText(content);
             sendMsg = simpleMsg;
 
             sender.send(simpleMsg);
@@ -112,7 +113,7 @@ public class EmailSenderAPI {
                 // Use this or below line
                 // mimeMessage.setContent(htmlMsg, "text/html");
                 // Use this or above line.
-                helper.setText(config.resolveMessage(msg.getTemplateKey(), msg.getParameters()), true);
+                helper.setText(content);
                 sendMsg = helper;
 
                 sender.send(mimeMsg);
