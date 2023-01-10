@@ -16,6 +16,8 @@
 package com.wl4g.infra.common.notification.email.internal;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static com.wl4g.infra.common.lang.Assert2.notEmptyOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
@@ -76,6 +78,8 @@ public class EmailSenderAPI {
         notNullOf(msg, "msg");
 
         final String mailMsgType = msg.getParameterAsString(KEY_MAIL_TYPE, VALUE_MAIL_SIMPLE);
+        hasTextOf(mailMsgType, "mailMsgType");
+        hasTextOf(config.getUsername(), "fromUser");
         final String fromUser = config.getUsername() + "<" + config.getUsername() + ">";
         final String subject = msg.getParameterAsString(KEY_MAIL_SUBJECT, "Unnamed Mail");
         final Date sentDate = msg.getParameter(KEY_MAIL_SENDDATE, new Date());
@@ -84,6 +88,7 @@ public class EmailSenderAPI {
                 .map(to -> to = to + "<" + to + ">")
                 .collect(toList())
                 .toArray(new String[] {});
+        notEmptyOf(toObjects, "toObjects");
         final String[] bcc = safeList(msg.getParameter(KEY_MAIL_BCC)).toArray(new String[] {});
         final String[] cc = safeList(msg.getParameter(KEY_MAIL_CC)).toArray(new String[] {});
         final String content = isBlank(message) ? config.resolveMessage(msg.getTemplateKey(), msg.getParameters()) : message;
@@ -92,40 +97,44 @@ public class EmailSenderAPI {
         Object sendMsg = null;
         switch (mailMsgType) {
         case VALUE_MAIL_SIMPLE:
-            final SimpleMailMessage simpleMsg = new SimpleMailMessage();
+            final SimpleMailMessage simple = new SimpleMailMessage();
             // Add "<>" symbol to send out?
             /*
              * Preset from account, otherwise it would be wrong: 501 mail from
              * address must be same as authorization user.
              */
-            simpleMsg.setFrom(fromUser);
-            simpleMsg.setTo(toObjects);
-            simpleMsg.setSubject(subject);
-            simpleMsg.setSentDate(sentDate);
-            simpleMsg.setBcc(bcc);
-            simpleMsg.setCc(cc);
-            simpleMsg.setReplyTo(replyTo);
-            simpleMsg.setText(content);
-            sendMsg = simpleMsg;
-            sender.send(simpleMsg);
+            simple.setFrom(fromUser);
+            simple.setTo(toObjects);
+            simple.setSubject(subject);
+            simple.setSentDate(sentDate);
+            simple.setBcc(bcc);
+            simple.setCc(cc);
+            if (isBlank(replyTo)) {
+                simple.setReplyTo(replyTo);
+            }
+            simple.setText(content);
+            sendMsg = simple;
+            sender.send(simple);
             break;
         case VALUE_MAIL_MIME:
             try {
-                final MimeMessage mimeMsg = sender.createMimeMessage();
-                final MimeMessageHelper helper = new MimeMessageHelper(mimeMsg, "utf-8");
+                final MimeMessage mime = sender.createMimeMessage();
+                final MimeMessageHelper helper = new MimeMessageHelper(mime, "utf-8");
                 helper.setFrom(fromUser);
                 helper.setTo(toObjects);
                 helper.setSubject(subject);
                 helper.setSentDate(sentDate);
                 helper.setBcc(bcc);
                 helper.setCc(cc);
-                helper.setReplyTo(replyTo);
+                if (isBlank(replyTo)) {
+                    helper.setReplyTo(replyTo);
+                }
                 // Use this or below line
                 // mimeMessage.setContent(htmlMsg, "text/html");
                 // Use this or above line.
                 helper.setText(content);
                 sendMsg = helper;
-                sender.send(mimeMsg);
+                sender.send(mime);
             } catch (MessagingException e) {
                 throw new IllegalStateException(e);
             }
