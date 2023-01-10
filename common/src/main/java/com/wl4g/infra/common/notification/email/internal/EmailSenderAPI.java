@@ -109,7 +109,7 @@ public class EmailSenderAPI {
             simple.setSentDate(sentDate);
             simple.setBcc(bcc);
             simple.setCc(cc);
-            if (isBlank(replyTo)) {
+            if (!isBlank(replyTo)) {
                 simple.setReplyTo(replyTo);
             }
             simple.setText(content);
@@ -126,7 +126,7 @@ public class EmailSenderAPI {
                 helper.setSentDate(sentDate);
                 helper.setBcc(bcc);
                 helper.setCc(cc);
-                if (isBlank(replyTo)) {
+                if (!isBlank(replyTo)) {
                     helper.setReplyTo(replyTo);
                 }
                 // Use this or below line
