@@ -368,6 +368,22 @@
   "allPublicMethods" : true
 },
 {
+  "name": "com.wl4g.infra.common.io.FileIOUtils$ReadTailFrame",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>","parameterTypes": ["long","long","long","java.util.List","boolean"]},
+    {"name": "toString","parameterTypes": []},
+    {"name": "getLength","parameterTypes": []},
+    {"name": "getStartPos","parameterTypes": []},
+    {"name": "getEndPos","parameterTypes": []},
+    {"name": "getLines","parameterTypes": []}
+  ]
+},
+{
   "name":"com.wl4g.infra.common.task.QuartzUtils2$CustomPropertySettingJobFactory",
   "allPublicConstructors" : true,
   "allPublicMethods" : true
