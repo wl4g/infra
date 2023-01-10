@@ -87,6 +87,9 @@
   "name":"java.util.function.Supplier"
 },
 {
+  "name":"java.io.File"
+},
+{
   "name":"com.google.common.base.Function"
 },
 {
@@ -904,6 +907,16 @@
 },
 {
   "name":"io.minio.PutObjectArgs",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"io.minio.UploadObjectArgs",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
