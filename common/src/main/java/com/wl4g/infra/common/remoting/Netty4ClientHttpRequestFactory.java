@@ -86,7 +86,7 @@ public class Netty4ClientHttpRequestFactory implements ClientHttpRequestFactory,
      * {@link NioEventLoopGroup}.
      */
     public Netty4ClientHttpRequestFactory() {
-        this(false, -1, -1, DEFAULT_MAX_RESPONSE_SIZE);
+        this(false, DEFAULT_CONNECT_TIMEOUT, DEFAULT_READ_TIMEOUT, DEFAULT_MAX_RESPONSE_SIZE);
     }
 
     /**
@@ -94,7 +94,8 @@ public class Netty4ClientHttpRequestFactory implements ClientHttpRequestFactory,
      * {@link NioEventLoopGroup}.
      */
     public Netty4ClientHttpRequestFactory(boolean debug) {
-        this(debug, -1, -1, DEFAULT_MAX_RESPONSE_SIZE);
+        // see:io.netty.channel.DefaultChannelConfig#DEFAULT_CONNECT_TIMEOUT
+        this(debug, DEFAULT_CONNECT_TIMEOUT, DEFAULT_READ_TIMEOUT, DEFAULT_MAX_RESPONSE_SIZE);
     }
 
     /**
@@ -102,12 +103,15 @@ public class Netty4ClientHttpRequestFactory implements ClientHttpRequestFactory,
      * {@link NioEventLoopGroup}.
      * 
      * @param debug
+     * @param connectTimeoutMs
+     * @param readTimeoutMs
+     * @param maxResponseSize
      */
-    public Netty4ClientHttpRequestFactory(boolean debug, int connectTimeout, int readTimeout, int maxResponseSize) {
+    public Netty4ClientHttpRequestFactory(boolean debug, int connectTimeoutMs, int readTimeoutMs, int maxResponseSize) {
         this(new NioEventLoopGroup(getRuntime().availableProcessors() * 2), debug);
-        setConnectTimeout(connectTimeout);
-        setReadTimeout(readTimeout);
-        setMaxResponseSize(maxResponseSize);
+        setConnectTimeout(connectTimeoutMs <= 0 ? DEFAULT_CONNECT_TIMEOUT : connectTimeoutMs);
+        setReadTimeout(readTimeoutMs <= 0 ? DEFAULT_READ_TIMEOUT : readTimeoutMs);
+        setMaxResponseSize(maxResponseSize <= 0 ? DEFAULT_MAX_RESPONSE_SIZE : maxResponseSize);
     }
 
     /**
@@ -289,11 +293,9 @@ public class Netty4ClientHttpRequestFactory implements ClientHttpRequestFactory,
 
     }
 
-    /**
-     * The default maximum response size.
-     * 
-     * @see #setMaxResponseSize(int)
-     */
     public static final int DEFAULT_MAX_RESPONSE_SIZE = 1024 * 1024 * 10;
+    // see:io.netty.channel.DefaultChannelConfig#DEFAULT_CONNECT_TIMEOUT
+    public static final int DEFAULT_CONNECT_TIMEOUT = 10_000;
+    public static final int DEFAULT_READ_TIMEOUT = 30_000;
 
 }

@@ -18,7 +18,6 @@ package com.wl4g.infra.common.notification.dingtalk;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notEmptyOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.sendRobotGroupMessages;
 
 import javax.validation.Validator;
 import javax.validation.constraints.NotBlank;
@@ -202,7 +201,7 @@ public class DingtalkMessageNotifier extends AbstractMessageNotifier<DingtalkNot
                 .openConversationId(openConversationId)
                 .robotCode(robotCode)
                 .build();
-        return sendRobotGroupMessages(accessToken, request);
+        return DingtalkAPI.getInstance().sendRobotGroupMessages(accessToken, request);
     }
 
     public CreateSceneGroupV2Result createSceneGroupV2(
@@ -210,7 +209,7 @@ public class DingtalkMessageNotifier extends AbstractMessageNotifier<DingtalkNot
             final @NotNull CreateSceneGroupV2 request) {
         hasTextOf(accessToken, "accessToken");
         notNullOf(request, "request");
-        return DingtalkAPI.createSceneGroupV2(accessToken, request);
+        return DingtalkAPI.getInstance().createSceneGroupV2(accessToken, request);
     }
 
     public static final String KEY_ACCESS_TOKEN = "accessToken";

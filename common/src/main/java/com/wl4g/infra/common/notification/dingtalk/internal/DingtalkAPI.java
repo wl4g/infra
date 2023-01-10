@@ -17,9 +17,12 @@ package com.wl4g.infra.common.notification.dingtalk.internal;
 
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.infra.common.lang.EnvironmentUtil.getBooleanProperty;
+import static com.wl4g.infra.common.lang.EnvironmentUtil.getIntProperty;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseToNode;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
+import static java.util.Objects.isNull;
 
 import java.net.URI;
 import java.util.Map;
@@ -33,6 +36,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.wl4g.infra.common.remoting.HttpRequestEntity;
 import com.wl4g.infra.common.remoting.HttpResponseEntity;
+import com.wl4g.infra.common.remoting.Netty4ClientHttpRequestFactory;
 import com.wl4g.infra.common.remoting.RestClient;
 import com.wl4g.infra.common.remoting.standard.HttpHeaders;
 
@@ -54,24 +58,39 @@ import lombok.experimental.SuperBuilder;
  */
 @CustomLog
 public class DingtalkAPI {
+    private final RestClient restClient;
 
-    public static AccessTokenResult getAccessToken(final @NotNull AccessToken request) {
+    public DingtalkAPI() {
+        final String configPrefix = DingtalkAPI.class.getSimpleName().toLowerCase();
+        final boolean debug = getBooleanProperty(configPrefix + ".debug", false);
+        final int connectTimeoutMs = getIntProperty(configPrefix + ".connectTimeout", 0);
+        final int readTimeoutMs = getIntProperty(configPrefix + ".readTimeout", 0);
+        final int maxResponseSize = getIntProperty(configPrefix + ".maxResponseSize", 0);
+        this.restClient = new RestClient(
+                new Netty4ClientHttpRequestFactory(debug, connectTimeoutMs, readTimeoutMs, maxResponseSize));
+    }
+
+    public DingtalkAPI(final @NotNull RestClient restClient) {
+        this.restClient = notNullOf(restClient, "restClient");
+    }
+
+    public AccessTokenResult getAccessToken(final @NotNull AccessToken request) {
         return doRequest(ACCESS_TOKEN_URI, HttpMethod.POST, null, request, AccessTokenResult.class, true, false);
     }
 
-    public static GetUserIdByMobileResult getUserIdByMobile(final @NotBlank String accessToken, final @NotNull String mobile) {
+    public GetUserIdByMobileResult getUserIdByMobile(final @NotBlank String accessToken, final @NotNull String mobile) {
         return doRequest(format(GET_USERID_BY_MOBILE_URI, accessToken, mobile), HttpMethod.GET, null, null,
                 GetUserIdByMobileResult.class, false, false);
     }
 
-    public static CreateSceneGroupV2Result createSceneGroupV2(
+    public CreateSceneGroupV2Result createSceneGroupV2(
             final @NotBlank String accessToken,
             final @NotNull CreateSceneGroupV2 request) {
         return doRequest(format(CREATE_GROUP_V2_URI, accessToken), HttpMethod.POST, null, request, CreateSceneGroupV2Result.class,
                 true, false);
     }
 
-    public static RobotGroupMessagesSendResult sendRobotGroupMessages(
+    public RobotGroupMessagesSendResult sendRobotGroupMessages(
             final @NotBlank String accessToken,
             final @NotNull RobotGroupMessagesSend request) {
         return doRequest(SEND_GROUP_MESSAGE_URI, HttpMethod.POST, accessToken, request, RobotGroupMessagesSendResult.class, true,
@@ -95,7 +114,7 @@ public class DingtalkAPI {
      * @see https://open.dingtalk.com/document/orgapp-server/configure-event-subcription
      * @see https://github.com/open-dingtalk/dingtalk-callback-Crypto?spm=ding_open_doc.document.0.0.6ecd7008UVMrZc
      */
-    public static Map<String, String> processCallback(
+    public Map<String, String> processCallback(
             final @NotBlank String aesToken,
             final @NotBlank String aesKey,
             final @NotBlank String corpId,
@@ -133,7 +152,7 @@ public class DingtalkAPI {
         }
     }
 
-    static <T, R> R doRequest(
+    <T, R> R doRequest(
             final @NotBlank String url,
             final @NotNull HttpMethod method,
             final @Nullable String accessToken,
@@ -151,8 +170,19 @@ public class DingtalkAPI {
             headers.add("x-acs-dingtalk-access-token", accessToken);
         }
         final HttpRequestEntity<Object> entity = new HttpRequestEntity<>(request, headers, method, URI.create(url));
-        final HttpResponseEntity<R> result = new RestClient().exchange(entity, resultClass);
+        final HttpResponseEntity<R> result = restClient.exchange(entity, resultClass);
         return result.getBody();
+    }
+
+    public static DingtalkAPI getInstance() {
+        if (isNull(DEFAULT)) {
+            synchronized (DingtalkAPI.class) {
+                if (isNull(DEFAULT)) {
+                    DEFAULT = new DingtalkAPI();
+                }
+            }
+        }
+        return DEFAULT;
     }
 
     @Getter
@@ -557,6 +587,7 @@ public class DingtalkAPI {
         String buttonUrl2;
     }
 
+    private static DingtalkAPI DEFAULT;
     static final String ACCESS_TOKEN_URI = "https://api.dingtalk.com/v1.0/oauth2/accessToken";
     static final String GET_USERID_BY_MOBILE_URI = "https://oapi.dingtalk.com/user/get_by_mobile?access_token=%s&mobile=%s";
     static final String CREATE_GROUP_V2_URI = "https://oapi.dingtalk.com/topapi/im/chat/scenegroup/create?access_token=%s";

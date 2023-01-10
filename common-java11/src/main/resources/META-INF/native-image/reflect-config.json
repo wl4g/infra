@@ -1979,6 +1979,8 @@
   "queryAllDeclaredConstructors": true,
   "methods": [
     {"name": "<init>","parameterTypes": []},
+    {"name": "<init>","parameterTypes": ["com.wl4g.infra.common.remoting.RestClient"]},
+    {"name": "getInstance","parameterTypes": []},
     {"name": "getAccessToken","parameterTypes": ["com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$AccessToken"]},
     {"name": "getUserIdByMobile","parameterTypes": ["java.lang.String","java.lang.String"]},
     {"name": "createSceneGroupV2","parameterTypes": ["java.lang.String","com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$CreateSceneGroupV2"]},

@@ -78,7 +78,7 @@ public class DingtalkAPITests {
 
     @Test
     public void testGetAccessToken() {
-        final AccessTokenResult result = DingtalkAPI
+        final AccessTokenResult result = DingtalkAPI.getInstance()
                 .getAccessToken(AccessToken.builder().appKey(test_appKey).appSecret(test_appSecret).build());
         System.out.println(result);
         test_accessToken = result.getAccessToken();
@@ -86,14 +86,14 @@ public class DingtalkAPITests {
 
     @Test
     public void testGetUserIdByMobile() {
-        final GetUserIdByMobileResult result = DingtalkAPI.getUserIdByMobile(test_accessToken, test_mobile);
+        final GetUserIdByMobileResult result = DingtalkAPI.getInstance().getUserIdByMobile(test_accessToken, test_mobile);
         System.out.println(result);
         test_userId = result.getUserid();
     }
 
     @Test
     public void testCreateSceneGroupV2() {
-        final CreateSceneGroupV2Result result = DingtalkAPI.createSceneGroupV2(test_accessToken,
+        final CreateSceneGroupV2Result result = DingtalkAPI.getInstance().createSceneGroupV2(test_accessToken,
                 CreateSceneGroupV2.builder()
                         .title("测试群-01")
                         .template_id(test_templateId)
@@ -116,7 +116,7 @@ public class DingtalkAPITests {
                 .buttonUrl2("https://qq.com")
                 .build();
 
-        final RobotGroupMessagesSendResult result = DingtalkAPI.sendRobotGroupMessages(test_accessToken,
+        final RobotGroupMessagesSendResult result = DingtalkAPI.getInstance().sendRobotGroupMessages(test_accessToken,
                 RobotGroupMessagesSend.builder()
                         .msgKey(MsgKeyType.sampleActionCard6)
                         .msgParam(toJSONString(param))
@@ -185,7 +185,7 @@ public class DingtalkAPITests {
                 String nonce = req.getParams().get("nonce");
                 String bodyJson = ByteStreamUtils.readFullyToString(req.getBody(), "UTF-8");
 
-                final Map<String, String> result = DingtalkAPI.processCallback(test_aesToken, test_aesKey, test_corpId, signature,
+                final Map<String, String> result = DingtalkAPI.getInstance().processCallback(test_aesToken, test_aesKey, test_corpId, signature,
                         timestamp, nonce, bodyJson, eventJson -> {
                             System.out.println("eventJson: " + eventJson);
                         });
