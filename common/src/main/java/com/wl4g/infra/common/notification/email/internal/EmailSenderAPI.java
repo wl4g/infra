@@ -75,10 +75,10 @@ public class EmailSenderAPI {
         notNullOf(config, "config");
         notNullOf(msg, "msg");
 
-        final String mailMsgType = msg.getParameterAsString(KEY_MAILMSG_TYPE, VALUE_MAILMSG_SIMPLE);
+        final String mailMsgType = msg.getParameterAsString(KEY_MAIL_TYPE, VALUE_MAIL_SIMPLE);
         Object sendMsg = null;
         switch (mailMsgType) {
-        case VALUE_MAILMSG_SIMPLE:
+        case VALUE_MAIL_SIMPLE:
             final SimpleMailMessage simpleMsg = new SimpleMailMessage();
             // Add "<>" symbol to send out?
             /*
@@ -88,17 +88,17 @@ public class EmailSenderAPI {
             simpleMsg.setFrom(config.getUsername() + "<" + config.getUsername() + ">");
             simpleMsg.setTo(
                     msg.getToObjects().stream().map(to -> to = to + "<" + to + ">").collect(toList()).toArray(new String[] {}));
-            simpleMsg.setSubject(msg.getParameterAsString(KEY_MAILMSG_SUBJECT, "Unnamed Subject Message"));
-            simpleMsg.setSentDate(msg.getParameter(KEY_MAILMSG_SENDDATE, new Date()));
-            simpleMsg.setBcc(safeList(msg.getParameter(KEY_MAILMSG_BCC)).toArray(new String[] {}));
-            simpleMsg.setCc(safeList(msg.getParameter(KEY_MAILMSG_CC)).toArray(new String[] {}));
-            simpleMsg.setReplyTo(msg.getParameter(KEY_MAILMSG_REPLYTO));
+            simpleMsg.setSubject(msg.getParameterAsString(KEY_MAIL_SUBJECT, "Unnamed Subject Message"));
+            simpleMsg.setSentDate(msg.getParameter(KEY_MAIL_SENDDATE, new Date()));
+            simpleMsg.setBcc(safeList(msg.getParameter(KEY_MAIL_BCC)).toArray(new String[] {}));
+            simpleMsg.setCc(safeList(msg.getParameter(KEY_MAIL_CC)).toArray(new String[] {}));
+            simpleMsg.setReplyTo(msg.getParameter(KEY_MAIL_REPLYTO));
             simpleMsg.setText(isBlank(message) ? config.resolveMessage(msg.getTemplateKey(), msg.getParameters()) : message);
             sendMsg = simpleMsg;
 
             sender.send(simpleMsg);
             break;
-        case VALUE_MAILMSG_MIME:
+        case VALUE_MAIL_MIME:
             try {
                 final MimeMessage mimeMsg = sender.createMimeMessage();
                 final MimeMessageHelper helper = new MimeMessageHelper(mimeMsg, "utf-8");
@@ -108,7 +108,7 @@ public class EmailSenderAPI {
                         .map(to -> to = to + "<" + to + ">")
                         .collect(toList())
                         .toArray(new String[] {}));
-                helper.setSubject(msg.getParameterAsString(KEY_MAILMSG_SUBJECT, "Unnamed Subject Message"));
+                helper.setSubject(msg.getParameterAsString(KEY_MAIL_SUBJECT, "Unnamed Subject Message"));
                 // Use this or below line
                 // mimeMessage.setContent(htmlMsg, "text/html");
                 // Use this or above line.
@@ -132,15 +132,15 @@ public class EmailSenderAPI {
      * <b>mime</b> => {@link MimeMailMessage}
      * </pre>
      */
-    public static final String KEY_MAILMSG_TYPE = "emailMsgType";
-    public static final String VALUE_MAILMSG_SIMPLE = "SIMPLE";
-    public static final String VALUE_MAILMSG_MIME = "MIME";
+    public static final String KEY_MAIL_TYPE = "msgType";
+    public static final String VALUE_MAIL_SIMPLE = "SIMPLE";
+    public static final String VALUE_MAIL_MIME = "MIME";
 
-    public static final String KEY_MAILMSG_SUBJECT = "emailMsgSubject";
-    public static final String KEY_MAILMSG_SENDDATE = "msgSendDate";
-    public static final String KEY_MAILMSG_REPLYTO = "emailMsgReplyTo";
-    public static final String KEY_MAILMSG_CC = "emailMsgCc";
-    public static final String KEY_MAILMSG_BCC = "emailMsgBcc";
+    public static final String KEY_MAIL_SUBJECT = "subject";
+    public static final String KEY_MAIL_SENDDATE = "sendDate";
+    public static final String KEY_MAIL_REPLYTO = "replyTo";
+    public static final String KEY_MAIL_CC = "cc";
+    public static final String KEY_MAIL_BCC = "bcc";
 
     public static final Properties DEFAULT_PROPERTIES = new Properties() {
         private static final long serialVersionUID = 1L;

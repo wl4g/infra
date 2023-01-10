@@ -39,13 +39,13 @@ import com.wl4g.infra.common.notification.email.EmailMessageNotifier;
  * customize variables(Note: just match the template) ...
  *
  * // Sets mail special parameters. <font color= red><b>(Optional)</b></font>
- * //msg.addParameter({@link EmailMessageNotifier#KEY_MAILMSG_SUBJECT}, "This is
+ * //msg.addParameter({@link EmailMessageNotifier#KEY_MAIL_SUBJECT}, "This is
  * a test message");
- * //msg.addParameter({@link EmailMessageNotifier#KEY_MAILMSG_CC},
+ * //msg.addParameter({@link EmailMessageNotifier#KEY_MAIL_CC},
  * "test1@gmail.com");
- * //msg.addParameter({@link EmailMessageNotifier#KEY_MAILMSG_BCC},
+ * //msg.addParameter({@link EmailMessageNotifier#KEY_MAIL_BCC},
  * "test2@qq.com");
- * //msg.addParameter({@link EmailMessageNotifier#KEY_MAILMSG_REPLYTO},
+ * //msg.addParameter({@link EmailMessageNotifier#KEY_MAIL_REPLYTO},
  * "test3@163.com");
  *
  * // Do sent

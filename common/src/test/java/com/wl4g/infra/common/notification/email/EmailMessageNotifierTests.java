@@ -52,8 +52,8 @@ public class EmailMessageNotifierTests {
         final EmailMessageNotifier notifier = new EmailMessageNotifier(config, null);
 
         final GenericNotifierParam msg = new GenericNotifierParam(test_toUser, testTemplateKey)
-                .addParameter(EmailSenderAPI.KEY_MAILMSG_TYPE, EmailSenderAPI.VALUE_MAILMSG_SIMPLE)
-                .addParameter(EmailSenderAPI.KEY_MAILMSG_SUBJECT, "Testing Sender(simple)");
+                .addParameter(EmailSenderAPI.KEY_MAIL_TYPE, EmailSenderAPI.VALUE_MAIL_SIMPLE)
+                .addParameter(EmailSenderAPI.KEY_MAIL_SUBJECT, "Testing Sender(simple)");
 
         System.out.println("Sending ...");
         final Object result = notifier.send(msg);
@@ -76,8 +76,8 @@ public class EmailMessageNotifierTests {
         final EmailMessageNotifier notifier = new EmailMessageNotifier(config, null);
 
         final GenericNotifierParam msg = new GenericNotifierParam(test_toUser, testTemplateKey)
-                .addParameter(EmailSenderAPI.KEY_MAILMSG_TYPE, EmailSenderAPI.VALUE_MAILMSG_MIME)
-                .addParameter(EmailSenderAPI.KEY_MAILMSG_SUBJECT, "Testing Sender(mime)");
+                .addParameter(EmailSenderAPI.KEY_MAIL_TYPE, EmailSenderAPI.VALUE_MAIL_MIME)
+                .addParameter(EmailSenderAPI.KEY_MAIL_SUBJECT, "Testing Sender(mime)");
 
         System.out.println("Sending ...");
         final Object result = notifier.send(msg);
