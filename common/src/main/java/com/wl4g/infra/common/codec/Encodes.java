@@ -16,11 +16,14 @@
 package com.wl4g.infra.common.codec;
 
 import static com.google.common.base.Charsets.UTF_8;
+import static java.util.Objects.isNull;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Objects;
+
+import javax.annotation.Nullable;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
@@ -46,7 +49,10 @@ public abstract class Encodes {
     /**
      * Gets string bytes.
      */
-    public static byte[] toBytes(String input) {
+    public static byte[] toBytes(@Nullable String input) {
+        if (isNull(input)) {
+            return null;
+        }
         if (Objects.isNull(input)) {
             return null;
         }
@@ -56,14 +62,20 @@ public abstract class Encodes {
     /**
      * Hex编码.
      */
-    public static String encodeHex(byte[] input) {
+    public static String encodeHex(@Nullable byte[] input) {
+        if (isNull(input)) {
+            return null;
+        }
         return new String(Hex.encodeHex(input));
     }
 
     /**
      * Hex解码.
      */
-    public static byte[] decodeHex(String input) {
+    public static byte[] decodeHex(@Nullable String input) {
+        if (isNull(input)) {
+            return null;
+        }
         try {
             return Hex.decodeHex(input.toCharArray());
         } catch (DecoderException e) {
@@ -74,14 +86,20 @@ public abstract class Encodes {
     /**
      * Base64编码.
      */
-    public static String encodeBase64(byte[] input) {
+    public static String encodeBase64(@Nullable byte[] input) {
+        if (isNull(input)) {
+            return null;
+        }
         return new String(Base64.encodeBase64(input));
     }
 
     /**
      * Base64编码.
      */
-    public static String encodeBase64(String input) {
+    public static String encodeBase64(@Nullable String input) {
+        if (isNull(input)) {
+            return null;
+        }
         try {
             return new String(Base64.encodeBase64(input.getBytes(DEFAULT_URL_ENCODING)));
         } catch (UnsupportedEncodingException e) {
@@ -92,21 +110,30 @@ public abstract class Encodes {
     /**
      * Base64编码, URL安全(将Base64中的URL非法字符'+'和'/'转为'-'和'_', 见RFC3548).
      */
-    public static byte[] encodeUrlSafeBase64(byte[] input) {
+    public static byte[] encodeUrlSafeBase64(@Nullable byte[] input) {
+        if (isNull(input)) {
+            return null;
+        }
         return Base64.encodeBase64URLSafe(input);
     }
 
     /**
      * Base64解码.
      */
-    public static byte[] decodeBase64(String input) {
+    public static byte[] decodeBase64(@Nullable String input) {
+        if (isNull(input)) {
+            return null;
+        }
         return Base64.decodeBase64(input.getBytes());
     }
 
     /**
      * Base64解码.
      */
-    public static String decodeBase64String(String input) {
+    public static String decodeBase64String(@Nullable String input) {
+        if (isNull(input)) {
+            return null;
+        }
         try {
             return new String(Base64.decodeBase64(input.getBytes()), DEFAULT_URL_ENCODING);
         } catch (UnsupportedEncodingException e) {
@@ -117,7 +144,10 @@ public abstract class Encodes {
     /**
      * Base62编码。
      */
-    public static String encodeBase62(byte[] input) {
+    public static String encodeBase62(@Nullable byte[] input) {
+        if (isNull(input)) {
+            return null;
+        }
         char[] chars = new char[input.length];
         for (int i = 0; i < input.length; i++) {
             chars[i] = BASE62[((input[i] & 0xFF) % BASE62.length)];
@@ -128,35 +158,50 @@ public abstract class Encodes {
     /**
      * Html 转码.
      */
-    public static String escapeHtml(String html) {
+    public static String escapeHtml(@Nullable String html) {
+        if (isNull(html)) {
+            return null;
+        }
         return StringEscapeUtils.escapeHtml4(html);
     }
 
     /**
      * Html 解码.
      */
-    public static String unescapeHtml(String htmlEscaped) {
+    public static String unescapeHtml(@Nullable String htmlEscaped) {
+        if (isNull(htmlEscaped)) {
+            return null;
+        }
         return StringEscapeUtils.unescapeHtml4(htmlEscaped);
     }
 
     /**
      * Xml 转码.
      */
-    public static String escapeXml(String xml) {
+    public static String escapeXml(@Nullable String xml) {
+        if (isNull(xml)) {
+            return null;
+        }
         return StringEscapeUtils.escapeXml10(xml);
     }
 
     /**
      * Xml 解码.
      */
-    public static String unescapeXml(String xmlEscaped) {
+    public static String unescapeXml(@Nullable String xmlEscaped) {
+        if (isNull(xmlEscaped)) {
+            return null;
+        }
         return StringEscapeUtils.unescapeXml(xmlEscaped);
     }
 
     /**
      * URL 编码, Encode默认为UTF-8.
      */
-    public static String urlEncode(String part) {
+    public static String urlEncode(@Nullable String part) {
+        if (isNull(part)) {
+            return null;
+        }
         try {
             return URLEncoder.encode(part, DEFAULT_URL_ENCODING);
         } catch (UnsupportedEncodingException e) {
@@ -167,8 +212,10 @@ public abstract class Encodes {
     /**
      * URL 解码, Encode默认为UTF-8.
      */
-    public static String urlDecode(String part) {
-
+    public static String urlDecode(@Nullable String part) {
+        if (isNull(part)) {
+            return null;
+        }
         try {
             return URLDecoder.decode(part, DEFAULT_URL_ENCODING);
         } catch (UnsupportedEncodingException e) {
