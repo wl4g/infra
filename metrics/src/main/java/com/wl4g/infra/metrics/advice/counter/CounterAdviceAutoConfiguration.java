@@ -39,7 +39,7 @@ public class CounterAdviceAutoConfiguration {
     public AspectJExpressionPointcutAdvisor counterAspectJExpressionPointcutAdvisor(
             CounterAdviceProperties props,
             CounterAdvice advice) {
-        notNull(props.getExpression(), "Expression of the counter AOP pointcut is null.");
+        notNull(props.getExpression(), "SimpleMathExpressions of the counter AOP pointcut is null.");
         log.info("Initial counter aspectJExpressionPointcutAdvisor. {}", props);
         AspectJExpressionPointcutAdvisor advisor = new AspectJExpressionPointcutAdvisor();
         advisor.setExpression(props.getExpression());

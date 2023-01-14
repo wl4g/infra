@@ -16,11 +16,11 @@
 package com.wl4g.infra.common.lang;
 
 import static com.google.common.base.Charsets.UTF_8;
-import static org.apache.commons.lang3.RandomUtils.nextInt;
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static java.util.Objects.isNull;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,22 +31,32 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import com.google.common.collect.Lists;
 import com.wl4g.infra.common.collection.CollectionUtils2;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
+
 /**
- * String tool class, inheriting the org.apache.commons.lang3.StringUtils class
+ * String Tools.
  * 
- * @author wangl.sir
- * @version v1.0 2017年5月28日
- * @since
+ * @author James Wong
+ * @version 2017-05-28
+ * @since v3.0.0
  */
 public abstract class StringUtils2 extends org.apache.commons.lang3.StringUtils {
     private static final String FOLDER_SEPARATOR = "/";
@@ -54,63 +64,38 @@ public abstract class StringUtils2 extends org.apache.commons.lang3.StringUtils 
     private static final String TOP_PATH = "..";
     private static final String CURRENT_PATH = ".";
     private static final char EXTENSION_SEPARATOR = '.';
+    private static final char SEPARATOR = '_';
 
-    private final static char SEPARATOR = '_';
-
-    /**
-     * EMAIL regular expression
-     */
-    private final static String REGEX_IS_MAIL = "\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*";
-    /**
-     * Number regular expression
-     */
-    private final static String REGEX_IS_NUMBER = "^[0-9]*$";
-    /**
-     * Decimals regular expression
-     */
-    private final static String REGEX_IS_DECIMALS = "([1-9]+[0-9]*|0)(\\.[\\d]+)?";
-    /**
-     * IP regular expression
-     */
-    private final static String REGEX_IS_IP = "\\b((?!\\d\\d\\d)\\d+|1\\d\\d|2[0-4]\\d|25[0-5])"
+    private static final String REGEX_IS_MAIL = "\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*";
+    private static final String REGEX_IS_NUMBER = "^[0-9]*$";
+    private static final String REGEX_IS_DECIMALS = "([1-9]+[0-9]*|0)(\\.[\\d]+)?";
+    private static final String REGEX_IS_IP = "\\b((?!\\d\\d\\d)\\d+|1\\d\\d|2[0-4]\\d|25[0-5])"
             + "\\.((?!\\d\\d\\d)\\d+|1\\d\\d|2[0-4]\\d|25[0-5])\\.((?!\\d\\d\\d)\\d+|1\\d"
             + "\\d|2[0-4]\\d|25[0-5])\\.((?!\\d\\d\\d)\\d+|1\\d\\d|2[0-4]\\d|25[0-5])\\b";
-    /**
-     * Domain regular expression.
-     * DNS规定，域名中的标号都由英文字母和数字组成，每一个标号不超过63个字符，也不区分大小写字母。标号中除连字符（-）外不能使用其他的标点符号。级别最低的域名写在最左边，而级别最高的域名写在最右边。由多个标号组成的完整域名总共不超过255个字符。
-     */
-    final public static String REGEX_DOMAIN = "^(?=^.{3,255}$)[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$";
-    /**
-     * URL regular expression
-     */
-    final public static String REGEX_URL = "^((http|ftp|https)://)(([a-zA-Z0-9\\._-]+\\.[a-zA-Z]{2,6})|([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}))(:[0-9]{1,4})*(/[a-zA-Z0-9\\&amp;%_\\./-~-]*)?$";
+    /// DNS规定，域名中的标号都由英文字母和数字组成，每一个标号不超过63个字符，也不区分大小写字母。标号中除连字符（-）外不能使用其他的标点符号。级别最低的域名写在最左边，而级别最高的域名写在最右边。由多个标号组成的完整域名总共不超过255个字符。
+    private static final String REGEX_DOMAIN = "^(?=^.{3,255}$)[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$";
+    private static final String REGEX_URL = "^((http|ftp|https)://)(([a-zA-Z0-9\\._-]+\\.[a-zA-Z]{2,6})|([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}))(:[0-9]{1,4})*(/[a-zA-Z0-9\\&amp;%_\\./-~-]*)?$";
 
-    final private static String CHINESE_REGEX = "[\u4e00-\u9fa5]+";
-    final private static Pattern patternChinese = Pattern.compile(CHINESE_REGEX);
-    final private static Pattern patternLetter = Pattern.compile("[A-Za-z]");
+    private static final String CHINESE_REGEX = "[\u4e00-\u9fa5]+";
+    private static final Pattern patternChinese = Pattern.compile(CHINESE_REGEX);
+    private static final Pattern patternLetter = Pattern.compile("[A-Za-z]");
 
-    /**
-     * 转换为字节数组
-     * 
-     * @param str
-     * @return
-     */
-    public static byte[] getBytes(String str) {
+    public static byte[] getBytes(@Nullable String str) {
+        if (isBlank(str)) {
+            return null;
+        }
         return !isBlank(str) ? str.getBytes(UTF_8) : null;
     }
 
-    /**
-     * 转换为字节数组
-     * 
-     * @param str
-     * @return
-     */
-    public static String toString(byte[] bytes) {
+    public static String toString(@Nullable byte[] bytes) {
+        if (isNull(bytes)) {
+            return null;
+        }
         return new String(bytes, UTF_8);
     }
 
     /**
-     * 是否包含字符串
+     * whether to contain a string
      * 
      * @param str
      *            验证字符串
@@ -118,7 +103,7 @@ public abstract class StringUtils2 extends org.apache.commons.lang3.StringUtils 
      *            字符串组
      * @return 包含返回true
      */
-    public static boolean inString(String str, String... strs) {
+    public static boolean inString(@Nullable String str, String... strs) {
         if (str != null) {
             for (String s : strs) {
                 if (str.equals(trim(s))) {
@@ -130,9 +115,9 @@ public abstract class StringUtils2 extends org.apache.commons.lang3.StringUtils 
     }
 
     /**
-     * 替换掉HTML标签方法
+     * Replace the HTML tag method
      */
-    public static String replaceHtml(String html) {
+    public static String replaceHtml(@Nullable String html) {
         if (isBlank(html)) {
             return "";
         }
@@ -569,24 +554,21 @@ public abstract class StringUtils2 extends org.apache.commons.lang3.StringUtils 
     }
 
     /**
-     * 根据字符串表达式计算出对应数字结果<br/>
-     * 例: System.out.println(StringUtil.calculate("3 * (10 % 3 + 2) / 2")); ==>
-     * 4
+     * Calculate the corresponding numerical result according to the string
+     * expression </br>
+     * e.: StringUtil.calculate("3 * (10 % 3 + 2) / 2") => 4
      * 
-     * @param expStr
-     *            字符串表达式
-     * @return 返回此表达式的数学整数运行的结果
+     * @param expr
      * @throws RuntimeException
-     *             在执行表达式计算时有可能会发生异常，例：表达式不合法、除数为0
      */
-    public static String calculate(String expStr) throws RuntimeException {
+    public static String calculate(String expr) throws RuntimeException {
 
-        if (isEmpty(expStr)) {
+        if (isEmpty(expr)) {
             throw new NullPointerException("表达式expStr不能为空.");
         }
         Object result = null;
         try {
-            result = Expression.getExpresser().calculate(expStr);
+            result = SimpleMathExpressions.calculate(expr);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -594,7 +576,8 @@ public abstract class StringUtils2 extends org.apache.commons.lang3.StringUtils 
     }
 
     /**
-     * 根据字符串表达式计算出对应数字结果<br/>
+     * Computes the corresponding numeric result based on a string expression
+     * </br>
      * 例: System.out.println(StringUtil.calculate("3 > (10 % 3 + 2) / 2")); ==>
      * false<br/>
      * 例: System.out.println(StringUtil.calculate("3 <= (10 % 3 + 2) / 2")); ==>
@@ -605,46 +588,31 @@ public abstract class StringUtils2 extends org.apache.commons.lang3.StringUtils 
      * @return 返回检测结果
      * @throws RuntimeException
      */
-    public static Boolean test(String expStr) throws RuntimeException {
-
-        if (isEmpty(expStr)) {
-            throw new NullPointerException("表达式expStr不能为空.");
-        }
+    public static Boolean test(@NotBlank String expStr) throws RuntimeException {
+        hasTextOf(expStr, "expStr");
         Boolean result = null;
         try {
-            result = Expression.getExpresser().test(expStr);
+            result = SimpleMathExpressions.test(expStr);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new IllegalStateException(e);
         }
         return result == null ? null : result;
     }
 
-    /**
-     * 执行正则匹配
-     * 
-     * @param regex
-     * @param str
-     * @return
-     */
-    static boolean matchesAll(String regex, String str) {
-
+    public static boolean matchesAll(@Nullable String str, @NotBlank String regex) {
+        hasTextOf(regex, "regex");
+        if (isBlank(str)) {
+            return false;
+        }
         try {
             str = new String(str.getBytes(), "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            throw new IllegalArgumentException(e);
         }
         return str.matches(regex);
     }
 
-    /**
-     * 执行正则匹配
-     * 
-     * @param pattern
-     * @param str
-     * @return
-     */
-    static boolean matcheAny(Pattern pattern, String str) {
-
+    public static boolean matcheAny(Pattern pattern, String str) {
         try {
             str = new String(str.getBytes(), "UTF-8");
         } catch (UnsupportedEncodingException e) {
@@ -654,111 +622,19 @@ public abstract class StringUtils2 extends org.apache.commons.lang3.StringUtils 
     }
 
     /**
-     * 获取自定区间(参数数组中最大和最小, 包括两端)的两个随机自然数的随机“+”、“-”、“*”、“/” 的表达式及结果(结果仍然为自然数)；
-     * 
-     * @param digit
-     *            区间数(包含两端)
-     * @return 表达式及结果组成的对象
-     */
-    public static ExpressVo createRandomExpres(int min, int max) {
-        // 获取两个分别被指定范围的随机自然数
-        Integer num1 = null;
-        Integer num2 = null;
-        // 随机运算表达式
-        String expression = null;
-        // 表达式结果
-        Integer result = null;
-        boolean flag = true;
-        while (flag) {
-            num1 = nextInt(min, max);
-            num2 = nextInt(min, max);
-            if (num1 < num2) {
-                num1 += num2;
-                num2 = num1 - num2;
-                num1 = num1 - num2;
-            }
-            switch (nextInt(0, 3)) {
-            case 0:
-                result = (num1 + num2);
-                expression = new StringBuffer().append(num1.intValue())
-                        .append(" + ")
-                        .append(num2.intValue())
-                        .append(" = ?")
-                        .toString();
-                flag = false;
-                break;
-            case 1:
-                result = (num1 - num2);
-                expression = new StringBuffer().append(num1.intValue())
-                        .append(" - ")
-                        .append(num2.intValue())
-                        .append(" = ?")
-                        .toString();
-                flag = false;
-                break;
-            case 2:
-                result = (num1 * num2);
-                expression = new StringBuffer().append(num1.intValue())
-                        .append(" * ")
-                        .append(num2.intValue())
-                        .append(" = ?")
-                        .toString();
-                flag = false;
-                break;
-            case 3:
-                // 1.除数为0 继续
-                if (num2 == 0) {
-                    continue;
-                }
-                // 2.除不尽继续,(那么除不尽就四舍五入了)
-                BigDecimal big1 = new BigDecimal(num1);
-                BigDecimal bigRes = big1.divide(new BigDecimal(num2), 0, BigDecimal.ROUND_HALF_UP);
-                result = Integer.valueOf(bigRes.intValue());
-                expression = new StringBuffer().append(num1.intValue())
-                        .append(" / ")
-                        .append(num2.intValue())
-                        .append(" ≈ ?")
-                        .toString();
-                flag = false;
-            }
-        }
-
-        // 封装结果数据
-        ExpressVo vo = new ExpressVo();
-        vo.setExpression(expression.replaceAll("\\*", "×"));
-        vo.setResult(result.intValue() + "");
-        return vo;
-    }
-
-    /**
-     * 校验是否非数字
+     * Check if it is not a number
      * 
      * @param str
-     *            待验证字符串
-     * @return 是否数字
+     * @return
      */
     public static boolean isNaN(String str) {
         return str.matches(REGEX_IS_NUMBER);
     }
 
-    /**
-     * 校验是否为小数
-     * 
-     * @param str
-     *            待验证字符串
-     * @return 是否是小数
-     */
     public static boolean isDecimal(String str) {
         return str.matches(REGEX_IS_DECIMALS);
     }
 
-    /**
-     * 校验是否合法邮箱
-     * 
-     * @param str
-     *            待验证字符串
-     * @return 是否是合法邮箱格式
-     */
     public static boolean isMail(String str) {
         return str.matches(REGEX_IS_MAIL);
     }
@@ -798,43 +674,6 @@ public abstract class StringUtils2 extends org.apache.commons.lang3.StringUtils 
             return false;
         }
         return domain.matches(REGEX_DOMAIN) || domain.equalsIgnoreCase("localhost");
-    }
-
-    /**
-     * 用于传输随机表达式及运算结果的值封装对象
-     * 
-     * @author wangl.sir
-     * @version v1.0 2016年1月16日
-     * @since
-     */
-    public static class ExpressVo {
-
-        /** 随机表达式 */
-        private String expression;
-        /** 随机表达式的运算结果 */
-        private String result;
-
-        /**
-         * @return 随机表达式
-         */
-        public String getExpression() {
-            return expression;
-        }
-
-        /**
-         * @return 随机表达式的运算结果
-         */
-        public String getResult() {
-            return result;
-        }
-
-        public void setExpression(String expression) {
-            this.expression = expression;
-        }
-
-        public void setResult(String result) {
-            this.result = result;
-        }
     }
 
     /**
@@ -1816,65 +1655,96 @@ public abstract class StringUtils2 extends org.apache.commons.lang3.StringUtils 
     }
 
     /**
-     * 根据数字表达式计算出对应表达式的值
+     * Searches the given pattern in the given src string and applies the txr to
+     * the matches
      * 
-     * @author His father is wangl.sir
-     * @version v1.0 2014年7月29日
+     * @param src
+     *            The string to be converted
+     * @param pattern
+     *            the pattern for which the transformers to be applied.
+     * @param process
+     *            The transformers for the mathed patterns.
+     * @return The result after applying the transformation.
+     * @see https://www.regular-expressions.info/refreplacecase.html
+     */
+    public static String replaceGroups(
+            final @NotBlank String src,
+            final @NotBlank String pattern,
+            final @NotNull Function<GroupSubString, String> process) {
+        hasTextOf(src, "src");
+        hasTextOf(pattern, "pattern");
+
+        final Matcher matcher = Pattern.compile(pattern).matcher(src);
+        final StringBuilder newStr = new StringBuilder();
+        int index = 0;
+        while (matcher.find()) {
+            // sb.append(src.substring(last, m.start()));
+            for (int start = index++, i = start; i < start + matcher.groupCount(); i++) {
+                newStr.append(process.apply(new GroupSubString(i, matcher.group(i + 1), newStr)));
+            }
+        }
+        // sb.append(src.substring(last));
+
+        return newStr.toString();
+    }
+
+    @Getter
+    @ToString
+    @AllArgsConstructor
+    public static class GroupSubString {
+        private int index;
+        private String groupStr;
+        private StringBuilder newStr;
+    }
+
+    /**
+     * Calculates the value of the corresponding expression based on a numeric
+     * expression
+     * 
+     * @author His father is james wong
+     * @version v1.0 2014-07-29
      * @sine
      */
-    static class Expression {
-        private final static String CHAE_L = "(";
-        private final static String CHAE_R = ")";
-        private final static String ADD = "+";
-        private final static String MIN = "-";
-        private final static String MUL = "*";
-        private final static String DIV = "/";
-        private final static String MOD = "%";
-
+    @Getter
+    @SuperBuilder
+    @ToString
+    @NoArgsConstructor
+    public static class SimpleMathExpressions {
+        private static final String CHAE_L = "(";
+        private static final String CHAE_R = ")";
+        private static final String ADD = "+";
+        private static final String MIN = "-";
+        private static final String MUL = "*";
+        private static final String DIV = "/";
+        private static final String MOD = "%";
         // test
-        private final static String BT = ">";
-        private final static String LT = "<";
-        private final static String EQ = "=";
-        private final static String NOT_EQ = "N";// !=
-        private final static String AND = "&";
-        private final static String OR = "|";
-        private final static String NOT = "!";
-        private final static String BT_EQ = "B";// >=
-        private final static String LT_EQ = "X";// <=
+        private static final String BT = ">";
+        private static final String LT = "<";
+        private static final String EQ = "=";
+        private static final String NOT_EQ = "N"; // !=
+        private static final String AND = "&";
+        private static final String OR = "|";
+        private static final String NOT = "!";
+        private static final String BT_EQ = "B"; // >=
+        private static final String LT_EQ = "X"; // <=
 
-        private final static Expression exper = new Expression();
+        public static Object calculate(@NotBlank String expStr) throws Exception {
+            hasTextOf(expStr, expStr);
 
-        private Expression() {
-        }
+            // init and check expression str
+            expStr = init(expStr);
 
-        public final static synchronized Expression getExpresser() {
-            return exper;
-        }
-
-        /**
-         * calculate result
-         * 
-         * @param expStr
-         * @return
-         * @throws Exception
-         */
-        public Object calculate(String expStr) throws Exception {
-            // System.out.println("old, expStr : "+expStr);
-
-            // 1. init and check expression str
-            expStr = initAndCheck(expStr);
-
-            // 2. get calculate item
+            // get calculate item
             ItemCalculate item = new ItemCalculate(null, expStr);
             item.genCalculateItem();
 
-            // 3. calculate
+            // calculate
             item.calculate();
             return item.getResult();
         }
 
-        public boolean test(String expStr) throws Exception {
-            Object obj = this.calculate(expStr);
+        public static boolean test(String expStr) throws Exception {
+            Object obj = calculate(expStr);
             if (obj instanceof Boolean) {
                 return (Boolean) obj;
             } else {
@@ -1882,16 +1752,16 @@ public abstract class StringUtils2 extends org.apache.commons.lang3.StringUtils 
             }
         }
 
-        private class ItemCalculate {
-            public ItemCalculate(String sign, String expStr) {
-                this.sign = sign;
-                this.expStr = expStr;
-            }
-
+        public static class ItemCalculate {
             private String sign;
             private String expStr;
             private List<ItemCalculate> sonItemList = null;
             private Object result = null;
+
+            public ItemCalculate(String sign, String expStr) {
+                this.sign = sign;
+                this.expStr = expStr;
+            }
 
             private boolean isBoolean() {
                 if (result != null) {
@@ -2366,7 +2236,6 @@ public abstract class StringUtils2 extends org.apache.commons.lang3.StringUtils 
                 return expStr;
             }
 
-            @SuppressWarnings("unused")
             public void setExpStr(String expStr) {
                 this.expStr = expStr;
             }
@@ -2379,7 +2248,6 @@ public abstract class StringUtils2 extends org.apache.commons.lang3.StringUtils 
                 this.sign = sign;
             }
 
-            @SuppressWarnings("unused")
             public List<ItemCalculate> getSonItemList() {
                 return sonItemList;
             }
@@ -2393,7 +2261,7 @@ public abstract class StringUtils2 extends org.apache.commons.lang3.StringUtils 
             }
         }
 
-        private String replaceAll(String strVal, String o, String n) {
+        private static String replaceAll(String strVal, String o, String n) {
             if (strVal == null || o == null || n == null || "".equals(o))
                 return strVal;
 
@@ -2418,7 +2286,7 @@ public abstract class StringUtils2 extends org.apache.commons.lang3.StringUtils 
          * @param expStr
          * @return
          */
-        private String updateExpStr(String expStr) {
+        private static String updateExpStr(String expStr) {
             String lastSign = null;
             StringBuffer buf = new StringBuffer();
             int index = 0;
@@ -2442,7 +2310,7 @@ public abstract class StringUtils2 extends org.apache.commons.lang3.StringUtils 
             return buf.toString();
         }
 
-        private String[] getItemExpStr(String expStr, int signInd) {
+        private static String[] getItemExpStr(String expStr, int signInd) {
             int endInd = expStr.length();
             for (int i = signInd + 1; i < expStr.length(); i++) {
                 String one = expStr.substring(i, i + 1);
@@ -2465,7 +2333,7 @@ public abstract class StringUtils2 extends org.apache.commons.lang3.StringUtils 
          * @return
          * @throws Exception
          */
-        private String initAndCheck(String expStr) throws Exception {
+        private static String init(String expStr) throws Exception {
             if (expStr == null || expStr.trim().equals(""))
                 throw new Exception("expression str error, is empty.");
 
@@ -2495,13 +2363,16 @@ public abstract class StringUtils2 extends org.apache.commons.lang3.StringUtils 
             String lastSign = null;
             for (int i = 0; i < expStr.length(); i++) {
                 String one = expStr.substring(i, i + 1);
-                if (CHAE_L.equals(one))
+                if (CHAE_L.equals(one)) {
                     lnum++;
-                if (CHAE_R.equals(one))
+                }
+                if (CHAE_R.equals(one)) {
                     rnum++;
+                }
                 if (isSign(one) || isTestSign(one)) {
-                    if (lastIsSign)
+                    if (lastIsSign) {
                         throw new Exception("expression str error, sign together (" + lastSign + one + ").");
+                    }
                     lastIsSign = true;
                     lastSign = one;
                 } else {
@@ -2509,13 +2380,14 @@ public abstract class StringUtils2 extends org.apache.commons.lang3.StringUtils 
                     lastSign = "";
                 }
             }
-            if (rnum != lnum)
+            if (rnum != lnum) {
                 throw new Exception("expression str error, '(',')' not matching.");
+            }
 
             return expStr;
         }
 
-        private int getOtherKuohaoIndex(String expStr, int lkuoHaoIndex) {
+        private static int getOtherKuohaoIndex(String expStr, int lkuoHaoIndex) {
             int rnum = 0;
             int lnum = 0;
             for (int i = lkuoHaoIndex + 1; i < expStr.length(); i++) {
@@ -2531,39 +2403,39 @@ public abstract class StringUtils2 extends org.apache.commons.lang3.StringUtils 
             return -1;
         }
 
-        private Double getDouble(Object val) throws Exception {
+        private static Double getDouble(Object val) throws Exception {
             if (val == null)
                 throw new Exception("expression str error, Double null.");
             return new Double(val.toString());
         }
 
-        private Boolean getBoolean(Object val) throws Exception {
+        private static Boolean getBoolean(Object val) throws Exception {
             if (val == null)
                 throw new Exception("expression str error, Boolean null.");
             return new Boolean(val.toString());
         }
 
-        private Integer getInteger(Object val) throws Exception {
+        private static Integer getInteger(Object val) throws Exception {
             if (val == null)
                 throw new Exception("expression str error, Double null.");
             return new Integer(val.toString());
         }
 
-        private boolean isHightLeavl(String val) {
+        private static boolean isHightLeavl(String val) {
             if (MUL.equals(val) || DIV.equals(val) || MOD.equals(val)) {
                 return true;
             }
             return false;
         }
 
-        private boolean isSign(String val) {
+        private static boolean isSign(String val) {
             if (ADD.equals(val) || MIN.equals(val) || MUL.equals(val) || DIV.equals(val) || MOD.equals(val)) {
                 return true;
             }
             return false;
         }
 
-        private boolean isTestHightLeavl(String val) {
+        private static boolean isTestHightLeavl(String val) {
             if (BT.equals(val) || LT.equals(val) || EQ.equals(val) || NOT_EQ.equals(val) || NOT.equals(val) || BT_EQ.equals(val)
                     || LT_EQ.equals(val)) {
                 return true;
@@ -2571,7 +2443,7 @@ public abstract class StringUtils2 extends org.apache.commons.lang3.StringUtils 
             return false;
         }
 
-        private boolean isTestSign(String val) {
+        private static boolean isTestSign(String val) {
             if (BT.equals(val) || LT.equals(val) || EQ.equals(val) || NOT_EQ.equals(val) || AND.equals(val) || OR.equals(val)
                     || NOT.equals(val) || BT_EQ.equals(val) || LT_EQ.equals(val)) {
                 return true;
@@ -2579,14 +2451,14 @@ public abstract class StringUtils2 extends org.apache.commons.lang3.StringUtils 
             return false;
         }
 
-        private boolean isLkuohao(String val) {
+        private static boolean isLkuohao(String val) {
             if (CHAE_L.equals(val)) {
                 return true;
             }
             return false;
         }
 
-        private boolean isRkuohao(String val) {
+        private static boolean isRkuohao(String val) {
             if (CHAE_R.equals(val)) {
                 return true;
             }

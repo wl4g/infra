@@ -15,7 +15,6 @@
  */
 package com.wl4g.infra.common.lang;
 
-import static com.wl4g.infra.common.lang.StringUtils2.createRandomExpres;
 import static com.wl4g.infra.common.lang.StringUtils2.eqIgnCase;
 import static com.wl4g.infra.common.lang.StringUtils2.isDomain;
 import static com.wl4g.infra.common.lang.StringUtils2.isURL;
@@ -26,17 +25,14 @@ import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 
 import java.util.regex.Pattern;
 
-import com.wl4g.infra.common.lang.StringUtils2.ExpressVo;
+import org.junit.Test;
 
 public class StringUtils2Tests {
 
-    public static void main(String[] args) {
+    @Test
+    public void testRandomAndIsXXX() {
         String r = randomAlphanumeric(59).toUpperCase(US);
         System.out.println(r);
-
-        ExpressVo vo = createRandomExpres(1, 10);
-        System.out.println(vo.getExpression());
-        System.out.println(vo.getResult());
 
         Object o = 1.0d;
         System.out.println(String.valueOf(o.toString()));
@@ -59,6 +55,26 @@ public class StringUtils2Tests {
         System.out.println(isDomain("www..mp.domain.com"));
         System.out.println(isDomain("www.123-est.domain.com"));
         System.out.println(isDomain("www.123_est.domain.com"));
+    }
+
+    @Test
+    public void testReplaceGroups() {
+        final String appName = "my-apiserver";
+        // final String appName = "apiserver";
+
+        final String regex = "([a-zA-Z0-9])([a-zA-Z0-9]+)([-_]*)([a-zA-Z0-9]?)([a-zA-Z0-9]*)";
+        String replaced1 = appName.replaceAll(regex, "$1 $2 $3 $4 $5");
+        System.out.println("=> " + replaced1);
+        assert replaced1.equals("m y - a piserver");
+
+        final String replaced2 = StringUtils2.replaceGroups(appName, regex, gs -> {
+            if (gs.getIndex() == 0 || gs.getIndex() == 3) {
+                return gs.getGroupStr().toUpperCase();
+            }
+            return gs.getGroupStr();
+        });
+        System.out.println("=> " + replaced2);
+        assert replaced2.equals("My-Apiserver");
     }
 
 }
