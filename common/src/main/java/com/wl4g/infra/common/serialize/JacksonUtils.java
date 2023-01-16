@@ -1064,10 +1064,11 @@ public abstract class JacksonUtils {
     public static class DefaultDeserialzePropertyTransformer implements PropertyTransformer {
         private final @Nullable Map<Class<?>, Map<String, String>> transformProperties = synchronizedMap(new HashMap<>());
 
-        public DefaultDeserialzePropertyTransformer(@NotNull Class<?> beanClass, @NotEmpty Map<String, String> transformProps) {
-            notNullOf(beanClass, "beanClass");
+        public DefaultDeserialzePropertyTransformer(@NotNull Class<?> superBeanClass,
+                @NotEmpty Map<String, String> transformProps) {
+            notNullOf(superBeanClass, "superBeanClass");
             notEmptyOf(transformProps, "transformProps");
-            this.transformProperties.put(beanClass, transformProps);
+            this.transformProperties.put(superBeanClass, transformProps);
         }
 
         public DefaultDeserialzePropertyTransformer(@Nullable Map<Class<?>, Map<String, String>> transformProperties) {
@@ -1082,12 +1083,25 @@ public abstract class JacksonUtils {
             if (CollectionUtils2.isEmpty(transformProperties)) {
                 return property;
             }
+
+            //
+            // Gets directly according to beanClass (superclass matches is not
+            // supported).
+            // final Map<String, String> transformProps =
+            // transformProperties.get(beanDesc.getBeanClass());
+            //
+            // Support to get by superclass matches.
+            final Map<String, String> transformProps = transformProperties.entrySet()
+                    .parallelStream()
+                    .filter(e -> e.getKey().isAssignableFrom(beanDesc.getBeanClass()))
+                    .flatMap(e -> e.getValue().entrySet().stream())
+                    .collect(toMap(e -> e.getKey(), e -> e.getValue()));
             // Do nothing when the beanClass does not match the conversion
             // configuration.
-            final Map<String, String> transformProps = transformProperties.get(beanDesc.getBeanClass());
             if (isNull(transformProps)) {
                 return property;
             }
+
             // Notice: It needs to be reversed here, that is, from
             // key->value to value->key, because the java bean property
             // name is modified here, that is, the modification of the

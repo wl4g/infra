@@ -95,7 +95,8 @@ public class JacksonUtilsTests {
         System.out.println(json);
 
         final TestUserBean user = parseJSON(DEFAULT_MODIFIER_MAPPER, json, TestUserBean.class,
-                new DefaultDeserialzePropertyTransformer(TestUserBean.class, singletonMap("_id", "id")), (beanDesc, property) -> {
+                new DefaultDeserialzePropertyTransformer(TestUserBeanParent.class, singletonMap("_id", "id")),
+                (beanDesc, property) -> {
                     if (TestUserBean.class.isAssignableFrom(beanDesc.getBeanClass())) {
                         return property.equals("name");
                     }
@@ -140,12 +141,15 @@ public class JacksonUtilsTests {
     public static interface IgnoreFieldView {
     }
 
+    public static interface TestUserBeanParent {
+    }
+
     @Getter
     @Setter
     @ToString
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class TestUserBean {
+    public static class TestUserBean implements TestUserBeanParent {
         private long id;
         private String name;
         private Map<String, String> attributes = new HashMap<>();
