@@ -16,31 +16,31 @@
 package com.wl4g.infra.common.serialize;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
-import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
-import static com.wl4g.infra.common.collection.CollectionUtils2.safeSet;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static com.wl4g.infra.common.lang.Assert2.notEmptyOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.synchronizedMap;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.core.FormatSchema;
@@ -81,6 +81,8 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.fasterxml.jackson.databind.util.NameTransformer;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.wl4g.infra.common.collection.CollectionUtils2;
+import com.wl4g.infra.common.lang.Assert2;
 import com.wl4g.infra.common.reflect.ResolvableType;
 import com.wl4g.infra.common.reflect.TypeUtils2;
 
@@ -119,7 +121,7 @@ public abstract class JacksonUtils {
      * @return
      */
     public static String toJSONString(final @Nullable Object object, final boolean isPretty) {
-        return toJSONString(DEFAULT_OBJECT_MAPPER, object, isPretty, null, DEFAULT_IGNORES);
+        return toJSONString(DEFAULT_OBJECT_MAPPER, object, isPretty, null, DEFAULT_EXCLUDER);
     }
 
     /**
@@ -135,14 +137,14 @@ public abstract class JacksonUtils {
      *            {@link com.fasterxml.jackson.databind.ser.impl.ReadOnlyClassToSerializerMap#typedValueSerializer(com.fasterxml.jackson.databind.JavaType)}
      * @param object
      * @param isPretty
-     * @param ignores
+     * @param excluder
      * @return
      */
     public static String toJSONString(
             final @NotNull ObjectMapper mapper,
             final @Nullable Object object,
-            final @Nullable Set<TransformPropertySpec> ignores) {
-        return toJSONString(mapper, object, false, null, ignores);
+            final @Nullable PropertyExcluder excluder) {
+        return toJSONString(mapper, object, false, null, excluder);
     }
 
     /**
@@ -157,16 +159,16 @@ public abstract class JacksonUtils {
      *            {@link com.fasterxml.jackson.databind.SerializerProvider#_knownSerializers}
      *            {@link com.fasterxml.jackson.databind.ser.impl.ReadOnlyClassToSerializerMap#typedValueSerializer(com.fasterxml.jackson.databind.JavaType)}
      * @param object
-     * @param transforms
-     * @param ignores
+     * @param transformer
+     * @param excluder
      * @return
      */
     public static String toJSONString(
             final @NotNull ObjectMapper mapper,
             final @Nullable Object object,
-            final @Nullable Map<String, TransformPropertySpec> transforms,
-            final @Nullable Set<TransformPropertySpec> ignores) {
-        return toJSONString(mapper, object, false, transforms, ignores);
+            final @Nullable PropertyTransformer transformer,
+            final @Nullable PropertyExcluder excluder) {
+        return toJSONString(mapper, object, false, transformer, excluder);
     }
 
     /**
@@ -183,17 +185,17 @@ public abstract class JacksonUtils {
      *            {@link com.fasterxml.jackson.databind.ser.impl.ReadOnlyClassToSerializerMap#typedValueSerializer(com.fasterxml.jackson.databind.JavaType)}
      * @param object
      * @param isPretty
-     * @param transforms
-     * @param ignores
+     * @param transformer
+     * @param excluder
      * @return
      */
     public static String toJSONString(
             final @NotNull ObjectMapper mapper,
             final @Nullable Object object,
             final boolean isPretty,
-            final @Nullable Map<String, TransformPropertySpec> transforms,
-            final @Nullable Set<TransformPropertySpec> ignores) {
-        return _toJSONString(mapper, null, object, isPretty, transforms, ignores);
+            final @Nullable PropertyTransformer transformer,
+            final @Nullable PropertyExcluder excluder) {
+        return _toJSONString(mapper, null, object, isPretty, transformer, excluder);
     }
 
     /**
@@ -201,17 +203,17 @@ public abstract class JacksonUtils {
      * 
      * @param view
      * @param isPretty
-     * @param transforms
-     * @param ignores
+     * @param transformer
+     * @param excluder
      * @return
      */
     public static String toJSONString(
             final @Nullable Class<?> view,
             final @Nullable Object object,
             final boolean isPretty,
-            final @Nullable Map<String, TransformPropertySpec> transforms,
-            final @Nullable Set<TransformPropertySpec> ignores) {
-        return _toJSONString(DEFAULT_OBJECT_MAPPER, view, object, isPretty, transforms, ignores);
+            final @Nullable PropertyTransformer transformer,
+            final @Nullable PropertyExcluder excluder) {
+        return _toJSONString(DEFAULT_OBJECT_MAPPER, view, object, isPretty, transformer, excluder);
     }
 
     /**
@@ -229,8 +231,8 @@ public abstract class JacksonUtils {
      * @param object
      * @param view
      * @param isPretty
-     * @param transforms
-     * @param ignores
+     * @param transformer
+     * @param excluder
      * @return
      */
     public static String _toJSONString(
@@ -238,8 +240,8 @@ public abstract class JacksonUtils {
             final @Nullable Class<?> view,
             final @Nullable Object object,
             final boolean isPretty,
-            final @Nullable Map<String, TransformPropertySpec> transforms,
-            final @Nullable Set<TransformPropertySpec> ignores) {
+            final @Nullable PropertyTransformer transformer,
+            final @Nullable PropertyExcluder excluder) {
         notNullOf(mapper, "mapper");
         if (isNull(object)) {
             return null;
@@ -247,7 +249,7 @@ public abstract class JacksonUtils {
         try {
             final SerializationConfig config = mapper.getSerializationConfig()
                     .withFilters(new SimpleFilterProvider().addFilter(TransformPropertyFilter.FILTER_ID,
-                            new TransformPropertyFilter(safeMap(transforms), safeSet(ignores))))
+                            new TransformPropertyFilter(transformer, excluder)))
                     .withView(view);
 
             final PrettyPrinter pp = isPretty ? config.getDefaultPrettyPrinter() : null;
@@ -439,16 +441,16 @@ public abstract class JacksonUtils {
      * @param view
      * @param json
      * @param valueType
-     * @param transforms
-     * @param ignores
+     * @param transformer
+     * @param excluder
      * @return
      */
     public static <T> T parseJSON(
             final @NotNull ObjectMapper mapper,
             final @Nullable String jsonString,
             final @NotNull Class<T> valueType,
-            final @Nullable Map<String, TransformPropertySpec> transforms,
-            final @Nullable Set<TransformPropertySpec> ignores) {
+            final @Nullable PropertyTransformer transformer,
+            final @Nullable PropertyExcluder excluder) {
         if (isBlank(jsonString)) {
             return null;
         }
@@ -458,7 +460,7 @@ public abstract class JacksonUtils {
             } catch (IOException e) {
                 throw new IllegalStateException(e);
             }
-        }, () -> mapper.getTypeFactory().constructType(valueType), transforms, ignores);
+        }, () -> mapper.getTypeFactory().constructType(valueType), transformer, excluder);
     }
 
     /**
@@ -493,17 +495,17 @@ public abstract class JacksonUtils {
      * @param mapper
      * @param json
      * @param valueTypeRef
-     * @param transforms
-     * @param ignores
+     * @param transformer
+     * @param excluder
      * @return
      */
     public static <T> T parseJSON(
             final @NotNull ObjectMapper mapper,
             final @Nullable String jsonString,
             final @NotNull TypeReference<T> valueTypeRef,
-            final @Nullable Map<String, TransformPropertySpec> transforms,
-            final @Nullable Set<TransformPropertySpec> ignores) {
-        return parseJSON(mapper, null, jsonString, valueTypeRef, transforms, ignores);
+            final @Nullable PropertyTransformer transformer,
+            final @Nullable PropertyExcluder excluder) {
+        return parseJSON(mapper, null, jsonString, valueTypeRef, transformer, excluder);
     }
 
     /**
@@ -513,8 +515,8 @@ public abstract class JacksonUtils {
      * @param view
      * @param json
      * @param valueTypeRef
-     * @param transforms
-     * @param ignores
+     * @param transformer
+     * @param excluder
      * @return
      */
     public static <T> T parseJSON(
@@ -522,15 +524,15 @@ public abstract class JacksonUtils {
             final @Nullable Class<?> view,
             final @Nullable String jsonString,
             final @NotNull TypeReference<T> valueTypeRef,
-            final @Nullable Map<String, TransformPropertySpec> transforms,
-            final @Nullable Set<TransformPropertySpec> ignores) {
+            final @Nullable PropertyTransformer transformer,
+            final @Nullable PropertyExcluder excluder) {
         return _parseJSON(mapper, view, () -> {
             try {
                 return isNull(jsonString) ? null : mapper.getFactory().createParser(jsonString);
             } catch (IOException e) {
                 throw new IllegalStateException(e);
             }
-        }, () -> mapper.getTypeFactory().constructType(valueTypeRef), transforms, ignores);
+        }, () -> mapper.getTypeFactory().constructType(valueTypeRef), transformer, excluder);
     }
 
     /**
@@ -540,8 +542,8 @@ public abstract class JacksonUtils {
      * @param view
      * @param jsonParserSupplier
      * @param valueJavaTypeSupplier
-     * @param transforms
-     * @param ignores
+     * @param transformer
+     * @param excluder
      * @return
      */
     public static <T> T _parseJSON(
@@ -549,8 +551,8 @@ public abstract class JacksonUtils {
             final @Nullable Class<?> view,
             final @NotNull Supplier<JsonParser> jsonParserSupplier,
             final @NotNull Supplier<JavaType> valueJavaTypeSupplier,
-            final @Nullable Map<String, TransformPropertySpec> transforms,
-            final @Nullable Set<TransformPropertySpec> ignores) {
+            final @Nullable PropertyTransformer transformer,
+            final @Nullable PropertyExcluder excluder) {
         notNullOf(mapper, "mapper");
         notNullOf(jsonParserSupplier, "jsonParserSupplier");
         notNullOf(valueJavaTypeSupplier, "valueJavaTypeSupplier");
@@ -560,7 +562,7 @@ public abstract class JacksonUtils {
         }
         try {
             final DeserializationConfig config = mapper.getDeserializationConfig()
-                    .with(new TransformContextAttributes(safeMap(transforms), safeSet(ignores)));
+                    .with(new TransformContextAttributes(transformer, excluder));
             return new CustomObjectReader(mapper, config).withView(view).readValue(jsonParser, valueJavaTypeSupplier.get());
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
@@ -898,46 +900,39 @@ public abstract class JacksonUtils {
     public static class TransformPropertyFilter extends SimpleBeanPropertyFilter {
         static final String FILTER_ID = TransformPropertyFilter.class.getSimpleName();
 
-        final @NotNull Map<String, TransformPropertySpec> transforms;
-        final @NotNull Set<TransformPropertySpec> ignores;
-        final @NotNull Set<String> ignoreNames;
+        final @NotNull PropertyTransformer transformer;
+        final @NotNull PropertyExcluder excluder;
 
-        public TransformPropertyFilter(Map<String, TransformPropertySpec> transforms, Set<TransformPropertySpec> ignores) {
-            this.transforms = notNullOf(transforms, "transforms");
-            this.ignores = notNullOf(ignores, "ignores");
-            this.ignoreNames = ignores.stream().map(ignore -> ignore.getProperty()).collect(toSet());
-            // Validate for spec elements.
-            this.transforms.entrySet().stream().forEach(e -> e.getValue().validate());
-            this.ignores.stream().forEach(ignore -> ignore.validate());
+        public TransformPropertyFilter(@Nullable PropertyTransformer transformer, @Nullable PropertyExcluder excluder) {
+            this.transformer = isNull(transformer) ? DEFAULT_TRANSFORMER : transformer;
+            this.excluder = isNull(excluder) ? DEFAULT_EXCLUDER : excluder;
+            // Check the doesn't deserialze transformer.
+            Assert2.notInstanceOf(DefaultDeserialzePropertyTransformer.class, transformer,
+                    "Serializing Json should not use deserializing transformer.");
         }
 
         @Override
         protected boolean include(BeanPropertyWriter writer) {
-            return !ignoreNames.contains(writer.getName());
+            // throw new UnsupportedOperationException();
+            return true;
         }
 
         @Override
         protected boolean include(PropertyWriter writer) {
-            return !ignoreNames.contains(writer.getName());
+            // throw new UnsupportedOperationException();
+            return true;
         }
 
-        public String transform(@NotNull Class<?> beanClass, @NotBlank String property) {
+        public String transform(@NotNull BeanDescription beanClass, @NotBlank String property) {
             notNullOf(beanClass, "superBeanClass");
             hasTextOf(property, "property");
-            return transforms.entrySet()
-                    .stream()
-                    .filter(e -> e.getValue().getSuperBeanClass().isAssignableFrom(beanClass) && e.getKey().equals(property))
-                    .map(e -> e.getValue().getProperty())
-                    .findFirst()
-                    .orElse(property);
+            return transformer.transform(beanClass, property);
         }
 
-        public boolean exclude(@NotNull Class<?> beanClass, @NotBlank String property) {
+        public boolean exclude(@NotNull BeanDescription beanClass, @NotBlank String property) {
             notNullOf(beanClass, "superBeanClass");
             hasTextOf(property, "property");
-            return ignores.stream()
-                    .anyMatch(ignore -> ignore.getSuperBeanClass().isAssignableFrom(beanClass)
-                            && ignore.getProperty().equals(property));
+            return excluder.filter(beanClass, property);
         }
     }
 
@@ -959,11 +954,11 @@ public abstract class JacksonUtils {
                 // Transform properties.
                 return safeList(beanProperties).stream()
                         // The field type => bp.getType().getRawClass()
-                        .filter(bp -> !filter.exclude(beanDesc.getBeanClass(), bp.getName()))
+                        .filter(bp -> !filter.exclude(beanDesc, bp.getName()))
                         .map(bp -> bp.rename(new NameTransformer() {
                             @Override
                             public String transform(String name) {
-                                return filter.transform(beanDesc.getBeanClass(), name);
+                                return filter.transform(beanDesc, name);
                             }
 
                             @Override
@@ -984,44 +979,25 @@ public abstract class JacksonUtils {
     public static class TransformContextAttributes extends ContextAttributes.Impl {
         private static final long serialVersionUID = 1L;
 
-        final @NotNull Map<String, TransformPropertySpec> transforms;
-        final @NotNull Set<TransformPropertySpec> ignores;
-        final @NotNull Set<String> ignoreNames;
+        final @NotNull PropertyTransformer transformer;
+        final @NotNull PropertyExcluder excluder;
 
-        public TransformContextAttributes(Map<String, TransformPropertySpec> transforms, Set<TransformPropertySpec> ignores) {
+        public TransformContextAttributes(@Nullable PropertyTransformer transformer, @Nullable PropertyExcluder excluder) {
             super(emptyMap()); // Nothing shared
-            this.transforms = notNullOf(transforms, "transforms");
-            this.ignores = notNullOf(ignores, "ignores");
-            this.ignoreNames = ignores.stream().map(ignore -> ignore.getProperty()).collect(toSet());
-            // Validate for spec elements.
-            this.transforms.entrySet().stream().forEach(e -> e.getValue().validate());
-            this.ignores.stream().forEach(ignore -> ignore.validate());
+            this.transformer = isNull(transformer) ? DEFAULT_TRANSFORMER : transformer;
+            this.excluder = isNull(excluder) ? DEFAULT_EXCLUDER : excluder;
         }
 
-        public String transform(@NotNull Class<?> beanClass, @NotBlank String property) {
+        public String transform(@NotNull BeanDescription beanClass, @NotBlank String property) {
             notNullOf(beanClass, "superBeanClass");
             hasTextOf(property, "property");
-            // Notice: It needs to be reversed here, that is, from
-            // key->value to value->key, because the java bean property
-            // name is modified here, that is, the modification of the
-            // java bean property name to be consistent with the key in
-            // the json string will take effect.
-            return transforms.entrySet()
-                    .stream()
-                    .filter(e -> e.getValue().getSuperBeanClass().isAssignableFrom(beanClass)
-                            // to reverse
-                            && e.getValue().getProperty().equals(property))
-                    .map(e -> e.getKey())
-                    .findFirst()
-                    .orElse(property);
+            return transformer.transform(beanClass, property);
         }
 
-        public boolean exclude(@NotNull Class<?> beanClass, @NotBlank String property) {
+        public boolean exclude(@NotNull BeanDescription beanClass, @NotBlank String property) {
             notNullOf(beanClass, "superBeanClass");
             hasTextOf(property, "property");
-            return ignores.stream()
-                    .anyMatch(ignore -> ignore.getSuperBeanClass().isAssignableFrom(beanClass)
-                            && ignore.getProperty().equals(property));
+            return excluder.filter(beanClass, property);
         }
     }
 
@@ -1049,7 +1025,7 @@ public abstract class JacksonUtils {
                     return new TransformBeanDeserializer((BeanDeserializerBase) deserializer, new NameTransformer() {
                         @Override
                         public String transform(String name) {
-                            return attributes.transform(beanDesc.getBeanClass(), name);
+                            return attributes.transform(beanDesc, name);
                         }
 
                         @Override
@@ -1074,7 +1050,7 @@ public abstract class JacksonUtils {
                 while (it.hasNext()) {
                     final BeanPropertyDefinition definition = it.next();
                     // The field type => definition.getField().getRawType()
-                    if (attributes.exclude(beanDesc.getBeanClass(), definition.getName())) {
+                    if (attributes.exclude(beanDesc, definition.getName())) {
                         it.remove();
                     }
                 }
@@ -1084,28 +1060,62 @@ public abstract class JacksonUtils {
     }
 
     @Getter
-    @ToString(callSuper = true)
-    public static class TransformPropertySpec {
-        private final Class<?> superBeanClass;
-        private final String property;
+    @ToString
+    public static class DefaultDeserialzePropertyTransformer implements PropertyTransformer {
+        private final @Nullable Map<Class<?>, Map<String, String>> transformProperties = synchronizedMap(new HashMap<>());
 
-        public TransformPropertySpec(@NotNull Class<?> beanClass, @NotNull String property) {
-            this.superBeanClass = notNullOf(beanClass, "superBeanClass");
-            this.property = hasTextOf(property, "property");
+        public DefaultDeserialzePropertyTransformer(@NotNull Class<?> beanClass, @NotEmpty Map<String, String> transformProps) {
+            notNullOf(beanClass, "beanClass");
+            notEmptyOf(transformProps, "transformProps");
+            this.transformProperties.put(beanClass, transformProps);
         }
 
-        private TransformPropertySpec validate() {
-            notNullOf(superBeanClass, "superBeanClass");
-            hasTextOf(property, "property");
-            return this;
+        public DefaultDeserialzePropertyTransformer(@Nullable Map<Class<?>, Map<String, String>> transformProperties) {
+            if (!CollectionUtils2.isEmpty(transformProperties)) {
+                this.transformProperties.putAll(transformProperties);
+            }
         }
+
+        @Override
+        public String transform(@NotNull BeanDescription beanDesc, @NotBlank String property) {
+            // Empty transform configuration does nothing
+            if (CollectionUtils2.isEmpty(transformProperties)) {
+                return property;
+            }
+            // Do nothing when the beanClass does not match the conversion
+            // configuration.
+            final Map<String, String> transformProps = transformProperties.get(beanDesc.getBeanClass());
+            if (isNull(transformProps)) {
+                return property;
+            }
+            // Notice: It needs to be reversed here, that is, from
+            // key->value to value->key, because the java bean property
+            // name is modified here, that is, the modification of the
+            // java bean property name to be consistent with the key in
+            // the json string will take effect.
+            return transformProps.entrySet()
+                    .stream()
+                    // to reverse mapped.
+                    .collect(toMap(e -> e.getValue(), e -> e.getKey()))
+                    .getOrDefault(property, property);
+        }
+    }
+
+    public static interface PropertyTransformer {
+        String transform(final @NotNull BeanDescription beanDesc, @NotBlank String property);
+    }
+
+    public static interface PropertyExcluder {
+        boolean filter(final @NotNull BeanDescription beanDesc, @NotBlank String property);
     }
 
     /**
      * Default {@link ObjectMapper} instance.
      */
     public static final ObjectMapper DEFAULT_OBJECT_MAPPER = newDefaultObjectMapper();
-    private static final Set<TransformPropertySpec> DEFAULT_IGNORES = new HashSet<>(0);
+
+    private static final PropertyTransformer DEFAULT_TRANSFORMER = (beanDesc, property) -> property;
+    private static final PropertyExcluder DEFAULT_EXCLUDER = (beanDesc, property) -> false;
 
     private static final TypeReference<List<String>> LIST_STRING_TYPE_REF = new TypeReference<List<String>>() {
     };

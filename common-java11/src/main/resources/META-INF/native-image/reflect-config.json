@@ -500,15 +500,25 @@
   ]
 },
 {
-  "name":"com.wl4g.infra.common.serialize.JacksonUtils$TransformPropertySpec",
+  "name":"com.wl4g.infra.common.serialize.JacksonUtils$DefaultDeserialzePropertyTransformer",
   "allPublicConstructors": true,
   "allPublicMethods": true,
   "methods":[
-    {"name":"<init>","parameterTypes":["java.lang.Class","java.lang.String"] }, 
-    {"name":"getBeanClass","parameterTypes":[] }, 
-    {"name":"getProperty","parameterTypes":[] }, 
+    {"name":"<init>","parameterTypes":["java.util.Map"] }, 
     {"name":"toString","parameterTypes":[] }
   ]
+},
+{
+  "name":"com.wl4g.infra.common.serialize.JacksonUtils$PropertyTransformer",
+  "allPublicConstructors": true,
+  "allPublicMethods": true,
+  "methods":[]
+},
+{
+  "name":"com.wl4g.infra.common.serialize.JacksonUtils$PropertyExcluder",
+  "allPublicConstructors": true,
+  "allPublicMethods": true,
+  "methods":[]
 },
 {
   "name":"com.wl4g.infra.common.cli.ssh.SshHelperBase$SSHExecResult",

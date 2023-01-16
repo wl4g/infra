@@ -22,7 +22,6 @@ import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseToNode;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.lang.System.out;
-import static java.util.Collections.singleton;
 import static java.util.Collections.singletonMap;
 
 import java.util.ArrayList;
@@ -41,7 +40,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wl4g.infra.common.serialize.JacksonUtils.TransformPropertySpec;
+import com.wl4g.infra.common.serialize.JacksonUtils.DefaultDeserialzePropertyTransformer;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -75,9 +74,14 @@ public class JacksonUtilsTests {
     public void testToJSONString_with_ignore_transform_properties() {
         final TestUserBean user = new TestUserBean(66574534868992L, "jack", singletonMap("foo", "bar"));
 
-        final String json = toJSONString(DEFAULT_MODIFIER_MAPPER, user, true,
-                singletonMap("id", new TransformPropertySpec(TestUserBean.class, "_id")),
-                singleton(new TransformPropertySpec(TestUserBean.class, "name")));
+        final String json = toJSONString(DEFAULT_MODIFIER_MAPPER, user, true, (beanDesc, property) -> {
+            if (TestUserBean.class.isAssignableFrom(beanDesc.getBeanClass()) && property.equals("id")) {
+                return "_id";
+            }
+            return property;
+        }, (beanDesc, property) -> {
+            return TestUserBean.class.isAssignableFrom(beanDesc.getBeanClass()) && property.equals("name");
+        });
         System.out.println(json);
 
         assert !json.contains("\"id\"");
@@ -91,8 +95,12 @@ public class JacksonUtilsTests {
         System.out.println(json);
 
         final TestUserBean user = parseJSON(DEFAULT_MODIFIER_MAPPER, json, TestUserBean.class,
-                singletonMap("_id", new TransformPropertySpec(TestUserBean.class, "id")),
-                singleton(new TransformPropertySpec(TestUserBean.class, "name")));
+                new DefaultDeserialzePropertyTransformer(TestUserBean.class, singletonMap("_id", "id")), (beanDesc, property) -> {
+                    if (TestUserBean.class.isAssignableFrom(beanDesc.getBeanClass())) {
+                        return property.equals("name");
+                    }
+                    return false;
+                });
         System.out.println(user);
 
         assert user.getId() == 66574534868992L;
