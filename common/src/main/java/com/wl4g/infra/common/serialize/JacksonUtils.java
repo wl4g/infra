@@ -24,7 +24,6 @@ import static java.util.Collections.emptyMap;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -922,11 +921,23 @@ public abstract class JacksonUtils {
             return !ignoreNames.contains(writer.getName());
         }
 
+        public String transform(@NotNull Class<?> beanClass, @NotBlank String property) {
+            notNullOf(beanClass, "superBeanClass");
+            hasTextOf(property, "property");
+            return transforms.entrySet()
+                    .stream()
+                    .filter(e -> e.getValue().getSuperBeanClass().isAssignableFrom(beanClass) && e.getKey().equals(property))
+                    .map(e -> e.getValue().getProperty())
+                    .findFirst()
+                    .orElse(property);
+        }
+
         public boolean exclude(@NotNull Class<?> beanClass, @NotBlank String property) {
-            notNullOf(beanClass, "beanClass");
+            notNullOf(beanClass, "superBeanClass");
             hasTextOf(property, "property");
             return ignores.stream()
-                    .anyMatch(ignore -> ignore.getBeanClass() == beanClass && ignore.getProperty().equals(property));
+                    .anyMatch(
+                            ignore -> ignore.getSuperBeanClass().isAssignableFrom(beanClass) && ignore.getProperty().equals(property));
         }
     }
 
@@ -952,8 +963,7 @@ public abstract class JacksonUtils {
                         .map(bp -> bp.rename(new NameTransformer() {
                             @Override
                             public String transform(String name) {
-                                final TransformPropertySpec transformed = filter.getTransforms().get(name);
-                                return isNull(transformed) ? name : transformed.getProperty();
+                                return filter.transform(beanDesc.getBeanClass(), name);
                             }
 
                             @Override
@@ -988,11 +998,30 @@ public abstract class JacksonUtils {
             this.ignores.stream().forEach(ignore -> ignore.validate());
         }
 
+        public String transform(@NotNull Class<?> beanClass, @NotBlank String property) {
+            notNullOf(beanClass, "superBeanClass");
+            hasTextOf(property, "property");
+            // Notice: It needs to be reversed here, that is, from
+            // key->value to value->key, because the java bean property
+            // name is modified here, that is, the modification of the
+            // java bean property name to be consistent with the key in
+            // the json string will take effect.
+            return transforms.entrySet()
+                    .stream()
+                    .filter(e -> e.getValue().getSuperBeanClass().isAssignableFrom(beanClass)
+                            // to reverse
+                            && e.getValue().getProperty().equals(property))
+                    .map(e -> e.getKey())
+                    .findFirst()
+                    .orElse(property);
+        }
+
         public boolean exclude(@NotNull Class<?> beanClass, @NotBlank String property) {
-            notNullOf(beanClass, "beanClass");
+            notNullOf(beanClass, "superBeanClass");
             hasTextOf(property, "property");
             return ignores.stream()
-                    .anyMatch(ignore -> ignore.getBeanClass() == beanClass && ignore.getProperty().equals(property));
+                    .anyMatch(
+                            ignore -> ignore.getSuperBeanClass().isAssignableFrom(beanClass) && ignore.getProperty().equals(property));
         }
     }
 
@@ -1016,22 +1045,11 @@ public abstract class JacksonUtils {
                 notNullOf(attr, "attributes");
                 if (attr instanceof TransformContextAttributes) {
                     final TransformContextAttributes attributes = (TransformContextAttributes) attr;
-                    // Notice: It needs to be reversed here, that is, from
-                    // key->value to value->key, because the java bean property
-                    // name is modified here, that is, the modification of the
-                    // java bean property name to be consistent with the key in
-                    // the json string will take effect.
-                    final Map<String, String> reverseTransformProperties = attributes.getTransforms()
-                            .entrySet()
-                            .stream()
-                            .collect(toMap(e -> e.getValue().getProperty(), e -> e.getKey()));
-
                     // Transform properties.
                     return new TransformBeanDeserializer((BeanDeserializerBase) deserializer, new NameTransformer() {
                         @Override
                         public String transform(String name) {
-                            final String transformed = reverseTransformProperties.getOrDefault(name, name);
-                            return transformed;
+                            return attributes.transform(beanDesc.getBeanClass(), name);
                         }
 
                         @Override
@@ -1065,19 +1083,19 @@ public abstract class JacksonUtils {
         }
     }
 
-    @Getter
+    @getSuperBeanClass
     @ToString(callSuper = true)
     public static class TransformPropertySpec {
-        private final Class<?> beanClass;
+        private final Class<?> superBeanClass;
         private final String property;
 
         public TransformPropertySpec(@NotNull Class<?> beanClass, @NotNull String property) {
-            this.beanClass = notNullOf(beanClass, "beanClass");
+            this.superBeanClass = notNullOf(beanClass, "superBeanClass");
             this.property = hasTextOf(property, "property");
         }
 
         private TransformPropertySpec validate() {
-            notNullOf(beanClass, "beanClass");
+            notNullOf(superBeanClass, "superBeanClass");
             hasTextOf(property, "property");
             return this;
         }
