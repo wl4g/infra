@@ -22,6 +22,7 @@ import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseToNode;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.lang.System.out;
+import static java.util.Collections.singleton;
 import static java.util.Collections.singletonMap;
 
 import java.util.ArrayList;
@@ -40,6 +41,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wl4g.infra.common.serialize.JacksonUtils.TransformPropertySpec;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -71,9 +73,13 @@ public class JacksonUtilsTests {
 
     @Test
     public void testToJSONString_with_ignore_transform_properties() {
-        TestUserBean user = new TestUserBean(66574534868992L, "jack", singletonMap("foo", "bar"));
-        String json = toJSONString(DEFAULT_MODIFIER_MAPPER, user, true, singletonMap("id", "_id"), "name");
+        final TestUserBean user = new TestUserBean(66574534868992L, "jack", singletonMap("foo", "bar"));
+
+        final String json = toJSONString(DEFAULT_MODIFIER_MAPPER, user, true,
+                singletonMap("id", new TransformPropertySpec(TestUserBean.class, "_id")),
+                singleton(new TransformPropertySpec(TestUserBean.class, "name")));
         System.out.println(json);
+
         assert !json.contains("\"id\"");
         assert json.contains("\"_id\"");
         assert !json.contains("\"name\"");
@@ -81,10 +87,14 @@ public class JacksonUtilsTests {
 
     @Test
     public void testParseJSON_with_ignore_transform_properties() {
-        String json = "{\"_id\":66574534868992,\"name\":\"jack\",\"attributes\":{\"foo\":\"bar\"}}";
+        final String json = "{\"_id\":66574534868992,\"name\":\"jack\",\"attributes\":{\"foo\":\"bar\"}}";
         System.out.println(json);
-        TestUserBean user = parseJSON(DEFAULT_MODIFIER_MAPPER, json, TestUserBean.class, singletonMap("_id", "id"), "name");
+
+        final TestUserBean user = parseJSON(DEFAULT_MODIFIER_MAPPER, json, TestUserBean.class,
+                singletonMap("_id", new TransformPropertySpec(TestUserBean.class, "id")),
+                singleton(new TransformPropertySpec(TestUserBean.class, "name")));
         System.out.println(user);
+
         assert user.getId() == 66574534868992L;
         assert user.getName() == null;
     }
@@ -92,11 +102,11 @@ public class JacksonUtilsTests {
     @Test
     public void testJSONView_with_custom_include_exclude_properties() {
         TestUserInfo user = new TestUserInfo(1313466574534868992L, 36, "james", "wong", singletonMap("foo", "bar"));
-        String json1 = toJSONString(IgnoreFieldView.class, user, false, null);
+        String json1 = toJSONString(IgnoreFieldView.class, user, false, null, null);
         System.out.println("json1 : " + json1);
         assert !json1.contains("\"id\"");
 
-        String json2 = toJSONString(AllView.class, user, false, null);
+        String json2 = toJSONString(AllView.class, user, false, null, null);
         System.out.println("json2 : " + json2);
         final TestUserInfo user1 = parseJSON(IgnoreFieldView.class, json2, TestUserInfo.class);
         System.out.println(user1);

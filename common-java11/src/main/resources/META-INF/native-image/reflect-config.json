@@ -500,6 +500,17 @@
   ]
 },
 {
+  "name":"com.wl4g.infra.common.serialize.JacksonUtils$TransformPropertySpec",
+  "allPublicConstructors": true,
+  "allPublicMethods": true,
+  "methods":[
+    {"name":"<init>","parameterTypes":["java.lang.Class","java.lang.String"] }, 
+    {"name":"getBeanClass","parameterTypes":[] }, 
+    {"name":"getProperty","parameterTypes":[] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
   "name":"com.wl4g.infra.common.cli.ssh.SshHelperBase$SSHExecResult",
   "allPublicConstructors": true,
   "allPublicMethods": true,
