@@ -936,8 +936,8 @@ public abstract class JacksonUtils {
             notNullOf(beanClass, "superBeanClass");
             hasTextOf(property, "property");
             return ignores.stream()
-                    .anyMatch(
-                            ignore -> ignore.getSuperBeanClass().isAssignableFrom(beanClass) && ignore.getProperty().equals(property));
+                    .anyMatch(ignore -> ignore.getSuperBeanClass().isAssignableFrom(beanClass)
+                            && ignore.getProperty().equals(property));
         }
     }
 
@@ -1020,8 +1020,8 @@ public abstract class JacksonUtils {
             notNullOf(beanClass, "superBeanClass");
             hasTextOf(property, "property");
             return ignores.stream()
-                    .anyMatch(
-                            ignore -> ignore.getSuperBeanClass().isAssignableFrom(beanClass) && ignore.getProperty().equals(property));
+                    .anyMatch(ignore -> ignore.getSuperBeanClass().isAssignableFrom(beanClass)
+                            && ignore.getProperty().equals(property));
         }
     }
 
@@ -1083,7 +1083,7 @@ public abstract class JacksonUtils {
         }
     }
 
-    @getSuperBeanClass
+    @Getter
     @ToString(callSuper = true)
     public static class TransformPropertySpec {
         private final Class<?> superBeanClass;
