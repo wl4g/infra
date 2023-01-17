@@ -213,9 +213,6 @@ public class DingtalkMessageNotifier extends AbstractMessageNotifier<DingtalkNot
     }
 
     public static final String KEY_ACCESS_TOKEN = "accessToken";
-    public static final String KEY_SCENES_GROUP_V2_TEMPLATE_ID = "scenesGroupV2TemplateId";
-    public static final String KEY_SCENES_GROUP_V2_ADMIN_USER_IDS = "scenesGroupV2AdminUserIds";
-    public static final String KEY_SCENES_GROUP_V2_USER_IDS = "scenesGroupV2UserIds";
     public static final String KEY_MSG_KEY = "msgKey";
     public static final String KEY_MSG_PARAM = "msgParam";
     public static final String KEY_OPEN_CONVERSATION_ID = "openConversationId";
