@@ -1128,16 +1128,15 @@ public abstract class JacksonUtils {
      */
     public static final ObjectMapper DEFAULT_OBJECT_MAPPER = newDefaultObjectMapper();
 
-    private static final PropertyTransformer DEFAULT_TRANSFORMER = (beanDesc, property) -> property;
-    private static final PropertyExcluder DEFAULT_EXCLUDER = (beanDesc, property) -> false;
+    public static final PropertyTransformer DEFAULT_TRANSFORMER = (beanDesc, property) -> property;
+    public static final PropertyExcluder DEFAULT_EXCLUDER = (beanDesc, property) -> false;
 
-    private static final TypeReference<List<String>> LIST_STRING_TYPE_REF = new TypeReference<List<String>>() {
+    public static final TypeReference<List<String>> LIST_STRING_TYPE_REF = new TypeReference<List<String>>() {
     };
-    private static final TypeReference<List<Map<String, String>>> LIST_MAP_STRING_TYPE_REF = new TypeReference<List<Map<String, String>>>() {
+    public static final TypeReference<List<Map<String, String>>> LIST_MAP_STRING_TYPE_REF = new TypeReference<List<Map<String, String>>>() {
     };
-    private static final TypeReference<List<Map<String, Object>>> LIST_MAP_OBJECT_TYPE_REF = new TypeReference<List<Map<String, Object>>>() {
+    public static final TypeReference<List<Map<String, Object>>> LIST_MAP_OBJECT_TYPE_REF = new TypeReference<List<Map<String, Object>>>() {
     };
-    private static final TypeReference<Map<String, Object>> MAP_OBJECT_TYPE_REF = new TypeReference<Map<String, Object>>() {
+    public static final TypeReference<Map<String, Object>> MAP_OBJECT_TYPE_REF = new TypeReference<Map<String, Object>>() {
     };
-
 }
