@@ -93,15 +93,17 @@ public class DingtalkAPITests {
 
     @Test
     public void testCreateSceneGroupV2() {
-        final CreateSceneGroupV2Result result = DingtalkAPI.getInstance().createSceneGroupV2(test_accessToken,
-                CreateSceneGroupV2.builder()
-                        .title("测试群-01")
-                        .template_id(test_templateId)
-                        .owner_user_id(test_userId)
-                        .user_ids(test_userId)
-                        .subadmin_ids(test_userId)
-                        .build());
-        System.out.println(result);
+        final CreateSceneGroupV2 createGroup = CreateSceneGroupV2.builder()
+                .title("测试群-01")
+                .templateId(test_templateId)
+                .ownerUserId(test_userId)
+                .userIds(test_userId)
+                .subadminIds(test_userId)
+                .build();
+        System.out.println("request : " + toJSONString(createGroup));
+
+        final CreateSceneGroupV2Result result = DingtalkAPI.getInstance().createSceneGroupV2(test_accessToken, createGroup);
+        System.out.println("result : " + result);
         test_openConversationId = result.getResult().getOpenConversationId();
     }
 
@@ -116,13 +118,14 @@ public class DingtalkAPITests {
                 .buttonUrl2("https://qq.com")
                 .build();
 
-        final RobotGroupMessagesSendResult result = DingtalkAPI.getInstance().sendRobotGroupMessages(test_accessToken,
-                RobotGroupMessagesSend.builder()
-                        .msgKey(MsgKeyType.sampleActionCard6)
-                        .msgParam(toJSONString(param))
-                        .openConversationId(test_openConversationId)
-                        .robotCode(test_robotCode)
-                        .build());
+        final RobotGroupMessagesSendResult result = DingtalkAPI.getInstance()
+                .sendRobotGroupMessages(test_accessToken,
+                        RobotGroupMessagesSend.builder()
+                                .msgKey(MsgKeyType.sampleActionCard6)
+                                .msgParam(toJSONString(param))
+                                .openConversationId(test_openConversationId)
+                                .robotCode(test_robotCode)
+                                .build());
 
         System.out.println(result);
     }
@@ -185,10 +188,11 @@ public class DingtalkAPITests {
                 String nonce = req.getParams().get("nonce");
                 String bodyJson = ByteStreamUtils.readFullyToString(req.getBody(), "UTF-8");
 
-                final Map<String, String> result = DingtalkAPI.getInstance().processCallback(test_aesToken, test_aesKey, test_corpId, signature,
-                        timestamp, nonce, bodyJson, eventJson -> {
-                            System.out.println("eventJson: " + eventJson);
-                        });
+                final Map<String, String> result = DingtalkAPI.getInstance()
+                        .processCallback(test_aesToken, test_aesKey, test_corpId, signature, timestamp, nonce, bodyJson,
+                                eventJson -> {
+                                    System.out.println("eventJson: " + eventJson);
+                                });
 
                 System.out.println("Reply message: " + result);
                 resp.send(200, toJSONString(result));

@@ -251,44 +251,81 @@ public class DingtalkAPI {
         @NotBlank
         @Default
         String title = "测试群-" + currentTimeMillis();
+
         @NotBlank
-        String template_id;
+        @JsonProperty("template_id")
+        String templateId;
+
         @NotBlank
-        String owner_user_id;
+        @JsonProperty("owner_user_id")
+        String ownerUserId;
+
         @NotBlank
-        String user_ids;
+        @JsonProperty("user_ids")
+        String userIds;
+
+        @JsonProperty("subadmin_ids")
         @NotBlank
-        String subadmin_ids;
+        String subadminIds;
+
         String uuid;
+
         String icon;
+
+        @JsonProperty("mention_all_authority")
         @Default
-        String mention_all_authority = "0";
+        String mentionAllAuthority = "0";
+
+        @JsonProperty("show_history_type")
         @Default
-        String show_history_type = "0";
+        String showHistoryType = "0";
+
+        @JsonProperty("validation_type")
         @Default
-        String validation_type = "0";
+        String validationType = "0";
+
         @Default
         String searchable = "0";
+
+        @JsonProperty("chat_banned_type")
         @Default
-        String chat_banned_type = "0";
+        String chatVannedType = "0";
+
+        @JsonProperty("management_type")
         @Default
-        String management_type = "0";
+        String managementType = "0";
+
+        @JsonProperty("only_admin_can_ding")
         @Default
-        String only_admin_can_ding = "0";
+        String onlyAdminCanDing = "0";
+
+        @JsonProperty("all_members_can_create_mcs_conf")
         @Default
-        String all_members_can_create_mcs_conf = "1";
+        String allMembersCanCreateMcsConf = "1";
+
+        @JsonProperty("all_members_can_create_calendar")
         @Default
-        String all_members_can_create_calendar = "0";
+        String allMembersCanCreateCalendar = "0";
+
+        @JsonProperty("group_email_disabled")
         @Default
-        String group_email_disabled = "0";
+        String groupEmailDisabled = "0";
+
+        @JsonProperty("only_admin_can_set_msg_top")
         @Default
-        String only_admin_can_set_msg_top = "0";
+        String onlyAdminCanSetMsgTop = "0";
+
+        @JsonProperty("add_friend_forbidden")
         @Default
-        String add_friend_forbidden = "0";
+        String addFriendForbidden = "0";
+
+        @JsonProperty("group_live_switch")
         @Default
-        String group_live_switch = "1";
+        String groupLiveSwitch = "1";
+
+        @JsonProperty("members_to_admin_chat")
         @Default
-        String members_to_admin_chat = "0";
+        String membersToAdminChat = "0";
     }
 
     @Getter

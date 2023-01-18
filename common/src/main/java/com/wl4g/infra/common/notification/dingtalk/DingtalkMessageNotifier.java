@@ -109,9 +109,9 @@ import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.RobotGro
  *    -H "Content-Type: application/json" \
  *    -d '{
  *         "title":"测试群01",
- *         "template_id":"4ba6847f-b9b0-42ca-96ea-22c4ed8a3fbd",
- *         "owner_user_id":"6165471647114842627",
- *         "user_ids":"6165471647114842627",
+ *         "templateId":"4ba6847f-b9b0-42ca-96ea-22c4ed8a3fbd",
+ *         "ownerUserId":"6165471647114842627",
+ *         "userIds":"6165471647114842627",
  *         "subadmin_ids":"6165471647114842627",
  *         "uuid":"axcf*-*****-*****-23da*",
  *         "icon":"@lADOADma*****QKA",
