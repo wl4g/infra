@@ -728,7 +728,7 @@ public abstract class JacksonUtils {
             return null;
         }
 
-        ResolvableType resolver = ResolvableType.forClass(obj.getClass());
+        final ResolvableType resolver = ResolvableType.forClass(obj.getClass());
         if (Collection.class.isAssignableFrom(obj.getClass())) {
             ObjectReader reader = null;
             ResolvableType[] generics = resolver.getGenerics();
@@ -785,7 +785,7 @@ public abstract class JacksonUtils {
             return null;
         }
         try {
-            ObjectReader reader = DEFAULT_OBJECT_MAPPER.readerForUpdating(obj);
+            final ObjectReader reader = DEFAULT_OBJECT_MAPPER.readerForUpdating(obj);
             return reader.readValue(toJSONString(overrideObj));
         } catch (JsonProcessingException e) {
             throw new IllegalStateException(e);

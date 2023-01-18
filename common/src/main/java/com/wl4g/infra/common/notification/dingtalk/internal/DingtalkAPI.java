@@ -211,6 +211,12 @@ public class DingtalkAPI {
         String appKey;
         @NotBlank
         String appSecret;
+
+        public AccessToken validate() {
+            hasTextOf(getAppKey(), "appKey");
+            hasTextOf(getAppSecret(), "appSecret");
+            return this;
+        }
     }
 
     @Getter
@@ -326,6 +332,15 @@ public class DingtalkAPI {
         @JsonProperty("members_to_admin_chat")
         @Default
         String membersToAdminChat = "0";
+
+        public CreateSceneGroupV2 validate() {
+            hasTextOf(getTitle(), "title");
+            hasTextOf(getTemplateId(), "templateId");
+            hasTextOf(getOwnerUserId(), "ownerUserId");
+            hasTextOf(getUserIds(), "userIds");
+            hasTextOf(getSubadminIds(), "subadminIds");
+            return this;
+        }
     }
 
     @Getter
@@ -371,6 +386,14 @@ public class DingtalkAPI {
         String openConversationId;
         @NotBlank
         String robotCode;
+
+        public RobotGroupMessagesSend validate() {
+            notNullOf(getMsgKey(), "msgKey");
+            hasTextOf(getMsgParam(), "msgParam");
+            hasTextOf(getOpenConversationId(), "openConversationId");
+            hasTextOf(getRobotCode(), "robotCode");
+            return this;
+        }
     }
 
     @Getter
@@ -444,6 +467,11 @@ public class DingtalkAPI {
     public static class SimpleTextMsgParam extends MsgParamBase {
         @NotBlank
         String content;
+
+        public SimpleTextMsgParam validate() {
+            hasTextOf(getContent(), "content");
+            return this;
+        }
     }
 
     @Getter
@@ -456,6 +484,12 @@ public class DingtalkAPI {
         String title;
         @NotBlank
         String text;
+
+        public SimpleMarkdownMsgParam validate() {
+            hasTextOf(getTitle(), "title");
+            hasTextOf(getText(), "text");
+            return this;
+        }
     }
 
     @Getter
@@ -466,6 +500,11 @@ public class DingtalkAPI {
     public static class SimpleImageMsgParam extends MsgParamBase {
         @NotBlank
         String photoURL;
+
+        public SimpleImageMsgParam validate() {
+            hasTextOf(getPhotoURL(), "photoURL");
+            return this;
+        }
     }
 
     @Getter
@@ -482,6 +521,14 @@ public class DingtalkAPI {
         String picUrl;
         @NotBlank
         String messageUrl;
+
+        public SimpleLinkMsgParam validate() {
+            hasTextOf(getTitle(), "title");
+            hasTextOf(getText(), "text");
+            hasTextOf(getPicUrl(), "picUrl");
+            hasTextOf(getMessageUrl(), "messageUrl");
+            return this;
+        }
     }
 
     @Getter
@@ -498,6 +545,14 @@ public class DingtalkAPI {
         String singleTitle;
         @NotBlank
         String singleURL;
+
+        public SampleActionCardParam validate() {
+            hasTextOf(getTitle(), "title");
+            hasTextOf(getText(), "text");
+            hasTextOf(getSingleTitle(), "singleTitle");
+            hasTextOf(getSingleURL(), "singleURL");
+            return this;
+        }
     }
 
     @Getter
@@ -518,6 +573,16 @@ public class DingtalkAPI {
         String actionTitle2;
         @NotBlank
         String actionURL2;
+
+        public SampleActionCard2Param validate() {
+            hasTextOf(getTitle(), "title");
+            hasTextOf(getText(), "text");
+            hasTextOf(getActionTitle1(), "actionTitle1");
+            hasTextOf(getActionURL1(), "actionURL1");
+            hasTextOf(getActionTitle2(), "actionTitle2");
+            hasTextOf(getActionURL2(), "actionURL2");
+            return this;
+        }
     }
 
     @Getter
@@ -542,6 +607,18 @@ public class DingtalkAPI {
         String actionTitle3;
         @NotBlank
         String actionURL3;
+
+        public SampleActionCard3Param validate() {
+            hasTextOf(getTitle(), "title");
+            hasTextOf(getText(), "text");
+            hasTextOf(getActionTitle1(), "actionTitle1");
+            hasTextOf(getActionURL1(), "actionURL1");
+            hasTextOf(getActionTitle2(), "actionTitle2");
+            hasTextOf(getActionURL2(), "actionURL2");
+            hasTextOf(getActionTitle3(), "actionTitle3");
+            hasTextOf(getActionURL3(), "actionURL3");
+            return this;
+        }
     }
 
     @Getter
@@ -570,6 +647,20 @@ public class DingtalkAPI {
         String actionTitle4;
         @NotBlank
         String actionURL4;
+
+        public SampleActionCard4Param validate() {
+            hasTextOf(getTitle(), "title");
+            hasTextOf(getText(), "text");
+            hasTextOf(getActionTitle1(), "actionTitle1");
+            hasTextOf(getActionURL1(), "actionURL1");
+            hasTextOf(getActionTitle2(), "actionTitle2");
+            hasTextOf(getActionURL2(), "actionURL2");
+            hasTextOf(getActionTitle3(), "actionTitle3");
+            hasTextOf(getActionURL3(), "actionURL3");
+            hasTextOf(getActionTitle4(), "actionTitle4");
+            hasTextOf(getActionURL4(), "actionURL4");
+            return this;
+        }
     }
 
     @Getter
@@ -602,6 +693,22 @@ public class DingtalkAPI {
         String actionTitle5;
         @NotBlank
         String actionURL5;
+
+        public SampleActionCard5Param validate() {
+            hasTextOf(getTitle(), "title");
+            hasTextOf(getText(), "text");
+            hasTextOf(getActionTitle1(), "actionTitle1");
+            hasTextOf(getActionURL1(), "actionURL1");
+            hasTextOf(getActionTitle2(), "actionTitle2");
+            hasTextOf(getActionURL2(), "actionURL2");
+            hasTextOf(getActionTitle3(), "actionTitle3");
+            hasTextOf(getActionURL3(), "actionURL3");
+            hasTextOf(getActionTitle4(), "actionTitle4");
+            hasTextOf(getActionURL4(), "actionURL4");
+            hasTextOf(getActionTitle5(), "actionTitle5");
+            hasTextOf(getActionURL5(), "actionURL5");
+            return this;
+        }
     }
 
     @Getter
@@ -622,6 +729,16 @@ public class DingtalkAPI {
         String buttonTitle2;
         @NotBlank
         String buttonUrl2;
+
+        public SampleActionCard6Param validate() {
+            hasTextOf(getTitle(), "title");
+            hasTextOf(getText(), "text");
+            hasTextOf(getButtonTitle1(), "buttonTitle1");
+            hasTextOf(getButtonUrl1(), "buttonUrl1");
+            hasTextOf(getButtonTitle2(), "buttonTitle2");
+            hasTextOf(getButtonUrl2(), "buttonUrl2");
+            return this;
+        }
     }
 
     private static DingtalkAPI DEFAULT;
