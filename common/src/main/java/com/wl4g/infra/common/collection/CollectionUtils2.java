@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -578,7 +579,7 @@ public abstract class CollectionUtils2 extends CollectionUtils {
      * @return
      */
     public static <T> Set<T> safeArrayToSet(T[] array) {
-        return isNull(array) ? new HashSet<>(2) : new HashSet<>(asList(array));
+        return isNull(array) ? new LinkedHashSet<>(2) : new LinkedHashSet<>(asList(array));
     }
 
     /**

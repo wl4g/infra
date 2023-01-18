@@ -16,7 +16,9 @@
 package com.wl4g.infra.common.graalvm;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToList;
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToSet;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
+import static com.wl4g.infra.common.collection.Collectors2.toLinkedHashSet;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.lang.String.format;
 import static java.lang.System.err;
@@ -36,9 +38,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -70,15 +73,17 @@ public class NativeReflectionConfigGenerateTool {
                         "The target classes base directorys. eg: $PROJECT1/target/classes,$PROJECT2/target/classes")
                 .mustLongOption("classPackages",
                         "The find class packages filter. eg: com.myproject.module1.service,com.myproject.module2.service")
+                .longOption("onlyPublicMethods", "true", "The generate only public methods.")
                 .longOption("includeLombokTypeMethods", "false",
                         "The whether to includes lombok-generated classes and methods. eg: MyServiceBuilderImpl, MyServiceBuilder.access$4000(MyServiceBuilder), MyService(MyServiceBuilder)")
                 .build(args);
 
         final String classDirs = line.get("classDirs");
         final String classPackages = line.get("classPackages");
+        final boolean onlyPublicMethods = line.getBoolean("onlyPublicMethods");
         final boolean includeLombokTypeMethods = line.getBoolean("includeLombokTypeMethods");
 
-        final Set<URL> findUrls = safeArrayToList(split(classDirs, ",")).stream().map(baseDir -> {
+        final Set<URL> findUrls = safeArrayToSet(split(classDirs, ",")).stream().map(baseDir -> {
             try {
                 return new File(replace(baseDir, "/", File.separator)).toURL();
             } catch (MalformedURLException e) {
@@ -87,14 +92,14 @@ public class NativeReflectionConfigGenerateTool {
         }).collect(toSet());
         out.println("finding of URLs: " + findUrls);
 
-        final Set<String> findClassPackages = safeArrayToList(split(classPackages, ",")).stream().collect(toSet());
+        final Set<String> findClassPackages = safeArrayToSet(split(classPackages, ",")).stream().collect(toSet());
         out.println("finding of classPackages: " + findClassPackages);
 
         final Collection<Class<?>> classes = ReflectionUtils3.findClassesAll(findClassPackages, findUrls);
         final String classesString = classes.stream().map(cls -> cls.getName()).collect(joining("\n"));
         out.println("\n----- Found All candidate classes -----\n\n" + classesString);
 
-        final List<ReflectionConfigItem> items = buildReflectionConfigItems(includeLombokTypeMethods, classes);
+        final List<ReflectionConfigItem> items = buildReflectionConfigItems(onlyPublicMethods, includeLombokTypeMethods, classes);
         out.println("\n\n----- Generated determined reflect-config.json -----\n\n");
         String reflectConfigJson = toJSONString(items, true);
 
@@ -115,18 +120,22 @@ public class NativeReflectionConfigGenerateTool {
     }
 
     public static List<ReflectionConfigItem> buildReflectionConfigItems(
+            final boolean onlyPublicMethods,
             final boolean includeLombokTypeMethods,
             final Collection<Class<?>> classes) {
 
+        final var publicConstructorPredicate = new PublicConstructorPredicate(onlyPublicMethods, classes);
+        final var publicMethodPredicate = new PublicMethodPredicate(onlyPublicMethods, classes);
         final var lombokTypePredicate = new LombokTypePredicate(includeLombokTypeMethods, classes);
         final var lombokConstructorPredicate = new LombokConstructorPredicate(includeLombokTypeMethods, classes);
         final var lombokMethodPredicate = new LombokMethodPredicate(includeLombokTypeMethods, classes);
 
         return safeList(classes).stream().filter(lombokTypePredicate).map(cls -> {
-            final List<ReflectionConfigItemMethod> allItem = new ArrayList<>(classes.size());
+            final Set<ReflectionConfigItemMethod> allItem = new LinkedHashSet<>(classes.size());
             try {
-                final List<ReflectionConfigItemMethod> constructorMethodItems = safeArrayToList(cls.getDeclaredConstructors())
+                final Set<ReflectionConfigItemMethod> constructorMethodItems = safeArrayToList(cls.getDeclaredConstructors())
                         .stream()
+                        .filter(publicConstructorPredicate)
                         .filter(lombokConstructorPredicate)
                         .map(m -> {
                             try {
@@ -143,7 +152,7 @@ public class NativeReflectionConfigGenerateTool {
                             }
                         })
                         .filter(m -> nonNull(m))
-                        .collect(toList());
+                        .collect(toLinkedHashSet());
                 allItem.addAll(constructorMethodItems);
             } catch (Throwable e) {
                 err.println(
@@ -151,8 +160,9 @@ public class NativeReflectionConfigGenerateTool {
             }
 
             try {
-                final List<ReflectionConfigItemMethod> memberMethodItems = safeArrayToList(cls.getDeclaredMethods()).stream()
-                        .filter(m -> !Modifier.isStatic(m.getModifiers()))
+                final Set<ReflectionConfigItemMethod> memberMethodItems = safeArrayToList(cls.getDeclaredMethods()).stream()
+                        // .filter(m -> !Modifier.isStatic(m.getModifiers()))
+                        .filter(publicMethodPredicate)
                         .filter(lombokMethodPredicate)
                         .map(m -> {
                             try {
@@ -169,15 +179,16 @@ public class NativeReflectionConfigGenerateTool {
                             }
                         })
                         .filter(m -> nonNull(m))
-                        .collect(toList());
+                        .collect(toLinkedHashSet());
                 allItem.addAll(memberMethodItems);
             } catch (Throwable e) {
                 err.println(format("[WARNING] Unable to load member methods of %s. reason: %s", cls.getName(), e.getMessage()));
             }
 
             try {
-                final List<ReflectionConfigItemMethod> staticMethodItems = safeArrayToList(cls.getDeclaredMethods()).stream()
-                        .filter(m -> Modifier.isStatic(m.getModifiers()))
+                final Set<ReflectionConfigItemMethod> staticMethodItems = safeArrayToList(cls.getDeclaredMethods()).stream()
+                        // .filter(m -> Modifier.isStatic(m.getModifiers()))
+                        .filter(publicMethodPredicate)
                         .filter(lombokMethodPredicate)
                         .map(m -> {
                             try {
@@ -194,7 +205,7 @@ public class NativeReflectionConfigGenerateTool {
                             }
                         })
                         .filter(m -> nonNull(m))
-                        .collect(toList());
+                        .collect(toLinkedHashSet());
                 allItem.addAll(staticMethodItems);
             } catch (Throwable e) {
                 err.println(format("[WARNING] Unable to load static methods of %s. reason: %s", cls.getName(), e.getMessage()));
@@ -216,18 +227,63 @@ public class NativeReflectionConfigGenerateTool {
         private @Default boolean allDeclaredConstructors = true;
         private @Default boolean queryAllDeclaredMethods = true;
         private @Default boolean queryAllDeclaredConstructors = true;
-        private List<ReflectionConfigItemMethod> methods;
+        private Set<ReflectionConfigItemMethod> methods;
     }
 
     @Getter
     @Setter
-    @ToString
     @SuperBuilder
+    @ToString
     @NoArgsConstructor
     public static class ReflectionConfigItemMethod {
         private String name;
         private List<String> parameterTypes;
 
+        @Override
+        public int hashCode() {
+            return Objects.hash(name, parameterTypes);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            ReflectionConfigItemMethod other = (ReflectionConfigItemMethod) obj;
+            return Objects.equals(name, other.name) && Objects.equals(parameterTypes, other.parameterTypes);
+        }
+
+    }
+
+    @AllArgsConstructor
+    public static class PublicConstructorPredicate implements Predicate<Constructor<?>> {
+        final boolean onlyPublicMethods;
+        final Collection<Class<?>> classes;
+
+        @Override
+        public boolean test(Constructor<?> c) {
+            if (Modifier.isPublic(c.getModifiers())) {
+                return onlyPublicMethods;
+            }
+            return false;
+        }
+    }
+
+    @AllArgsConstructor
+    public static class PublicMethodPredicate implements Predicate<Method> {
+        final boolean onlyPublicMethods;
+        final Collection<Class<?>> classes;
+
+        @Override
+        public boolean test(Method m) {
+            if (Modifier.isPublic(m.getModifiers())) {
+                return onlyPublicMethods;
+            }
+            return false;
+        }
     }
 
     @AllArgsConstructor
@@ -247,7 +303,7 @@ public class NativeReflectionConfigGenerateTool {
             final String className = cls.getSimpleName();
             // Check the inner class and specification suffix.
             if (cls.isMemberClass() && endsWithAny(className, "Builder", "BuilderImpl")) {
-                // final List<String> parts = safeArrayToList(split(className,
+                // final List<String> parts = safeArrayToSet(split(className,
                 // "$"));
                 // if (parts.stream().filter(p -> "$".equals(p)).count() >= 1) {
                 // return true;

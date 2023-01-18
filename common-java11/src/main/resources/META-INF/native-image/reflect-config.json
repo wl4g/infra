@@ -1472,6 +1472,173 @@
   ]
 },
 {
+  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$CreateSceneGroupV2Result",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "setResult", "parameterTypes": ["com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$CreateSceneGroupV2ResultContent"]},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "getResult", "parameterTypes": []},
+    {"name": "getRequestId", "parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$SampleActionCard3Param",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "validate", "parameterTypes": []},
+    {"name": "setText", "parameterTypes": ["java.lang.String"]},
+    {"name": "getText", "parameterTypes": []},
+    {"name": "getTitle", "parameterTypes": []},
+    {"name": "setTitle", "parameterTypes": ["java.lang.String"]},
+    {"name": "getActionTitle1", "parameterTypes": []},
+    {"name": "getActionURL1", "parameterTypes": []},
+    {"name": "getActionTitle2", "parameterTypes": []},
+    {"name": "getActionURL2", "parameterTypes": []},
+    {"name": "getActionTitle3", "parameterTypes": []},
+    {"name": "getActionURL3", "parameterTypes": []},
+    {"name": "setActionTitle1", "parameterTypes": ["java.lang.String"]},
+    {"name": "setActionURL1", "parameterTypes": ["java.lang.String"]},
+    {"name": "setActionTitle2", "parameterTypes": ["java.lang.String"]},
+    {"name": "setActionURL2", "parameterTypes": ["java.lang.String"]},
+    {"name": "setActionTitle3", "parameterTypes": ["java.lang.String"]},
+    {"name": "setActionURL3", "parameterTypes": ["java.lang.String"]}
+  ]
+},
+{
+  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$MsgKeyType",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "values", "parameterTypes": []},
+    {"name": "valueOf", "parameterTypes": ["java.lang.String"]}
+  ]
+},
+{
+  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$MsgParamBase",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$RobotGroupMessagesSend",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "validate", "parameterTypes": []},
+    {"name": "getMsgKey", "parameterTypes": []},
+    {"name": "getMsgParam", "parameterTypes": []},
+    {"name": "getOpenConversationId", "parameterTypes": []},
+    {"name": "getRobotCode", "parameterTypes": []},
+    {"name": "setMsgKey", "parameterTypes": ["com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$MsgKeyType"]},
+    {"name": "setMsgParam", "parameterTypes": ["java.lang.String"]},
+    {"name": "setOpenConversationId", "parameterTypes": ["java.lang.String"]},
+    {"name": "setRobotCode", "parameterTypes": ["java.lang.String"]}
+  ]
+},
+{
+  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$AccessToken",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "validate", "parameterTypes": []},
+    {"name": "getAppKey", "parameterTypes": []},
+    {"name": "getAppSecret", "parameterTypes": []},
+    {"name": "setAppKey", "parameterTypes": ["java.lang.String"]},
+    {"name": "setAppSecret", "parameterTypes": ["java.lang.String"]}
+  ]
+},
+{
+  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$AccessTokenResult",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "getAccessToken", "parameterTypes": []},
+    {"name": "getExpireIn", "parameterTypes": []},
+    {"name": "setExpireIn", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "setAccessToken", "parameterTypes": ["java.lang.String"]}
+  ]
+},
+{
+  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$CreateSceneGroupV2ResultContent",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "getOpenConversationId", "parameterTypes": []},
+    {"name": "getChatId", "parameterTypes": []},
+    {"name": "setChatId", "parameterTypes": ["java.lang.String"]},
+    {"name": "setOpenConversationId", "parameterTypes": ["java.lang.String"]}
+  ]
+},
+{
+  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingCallbackCrypto",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": ["java.lang.String","java.lang.String","java.lang.String"]},
+    {"name": "getSignature", "parameterTypes": ["java.lang.String","java.lang.String","java.lang.String","java.lang.String"]},
+    {"name": "getEncryptedMap", "parameterTypes": ["java.lang.String"]},
+    {"name": "getEncryptedMap", "parameterTypes": ["java.lang.String","java.lang.Long","java.lang.String"]},
+    {"name": "getDecryptMsg", "parameterTypes": ["java.lang.String","java.lang.String","java.lang.String","java.lang.String"]}
+  ]
+},
+{
+  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$GetUserIdByMobileResult",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "getUserid", "parameterTypes": []},
+    {"name": "setUserid", "parameterTypes": ["java.lang.String"]}
+  ]
+},
+{
   "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$SampleActionCardParam",
   "allDeclaredFields": true,
   "allDeclaredMethods": true,
@@ -1493,7 +1660,7 @@
   ]
 },
 {
-  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$SimpleTextMsgParam",
+  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$SimpleImageMsgParam",
   "allDeclaredFields": true,
   "allDeclaredMethods": true,
   "allDeclaredConstructors": true,
@@ -1503,86 +1670,8 @@
     {"name": "<init>", "parameterTypes": []},
     {"name": "toString", "parameterTypes": []},
     {"name": "validate", "parameterTypes": []},
-    {"name": "getContent", "parameterTypes": []},
-    {"name": "setContent", "parameterTypes": ["java.lang.String"]}
-  ]
-},
-{
-  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$AccessToken",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "validate", "parameterTypes": []},
-    {"name": "getAppKey", "parameterTypes": []},
-    {"name": "getAppSecret", "parameterTypes": []},
-    {"name": "setAppKey", "parameterTypes": ["java.lang.String"]},
-    {"name": "setAppSecret", "parameterTypes": ["java.lang.String"]}
-  ]
-},
-{
-  "name": "com.wl4g.infra.common.notification.dingtalk.DingtalkNotifierProperties",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "validate", "parameterTypes": []},
-    {"name": "getAppKey", "parameterTypes": []},
-    {"name": "getAppSecret", "parameterTypes": []},
-    {"name": "setAppKey", "parameterTypes": ["java.lang.String"]},
-    {"name": "setAppSecret", "parameterTypes": ["java.lang.String"]},
-    {"name": "getAgentId", "parameterTypes": []},
-    {"name": "getTemplates", "parameterTypes": []},
-    {"name": "setAgentId", "parameterTypes": ["java.lang.String"]},
-    {"name": "setTemplates", "parameterTypes": ["java.util.Properties"]}
-  ]
-},
-{
-  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$MsgParamBase",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []}
-  ]
-},
-{
-  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$RobotGroupMessagesSendResult",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "getProcessQueryKey", "parameterTypes": []},
-    {"name": "setProcessQueryKey", "parameterTypes": ["java.lang.String"]}
-  ]
-},
-{
-  "name": "com.wl4g.infra.common.notification.dingtalk.DingtalkMessageNotifier",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": ["com.wl4g.infra.common.notification.dingtalk.DingtalkNotifierProperties","javax.validation.Validator"]},
-    {"name": "kind", "parameterTypes": []},
-    {"name": "kind", "parameterTypes": []},
-    {"name": "createSceneGroupV2", "parameterTypes": ["java.lang.String","com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$CreateSceneGroupV2"]},
-    {"name": "send", "parameterTypes": ["com.wl4g.infra.common.notification.GenericNotifierParam"]}
+    {"name": "getPhotoURL", "parameterTypes": []},
+    {"name": "setPhotoURL", "parameterTypes": ["java.lang.String"]}
   ]
 },
 {
@@ -1600,15 +1689,23 @@
   ]
 },
 {
-  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingCallbackCrypto$DingTalkEncryptException",
+  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$BaseResult",
   "allDeclaredFields": true,
   "allDeclaredMethods": true,
   "allDeclaredConstructors": true,
   "queryAllDeclaredMethods": true,
   "queryAllDeclaredConstructors": true,
   "methods": [
-    {"name": "<init>", "parameterTypes": ["java.lang.Integer"]},
-    {"name": "getCode", "parameterTypes": []}
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "getRequestId", "parameterTypes": []},
+    {"name": "getErrcode", "parameterTypes": []},
+    {"name": "getErrmsg", "parameterTypes": []},
+    {"name": "getSuccess", "parameterTypes": []},
+    {"name": "setRequestId", "parameterTypes": ["java.lang.String"]},
+    {"name": "setErrcode", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "setErrmsg", "parameterTypes": ["java.lang.String"]},
+    {"name": "setSuccess", "parameterTypes": ["java.lang.Boolean"]}
   ]
 },
 {
@@ -1645,7 +1742,7 @@
   ]
 },
 {
-  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$SimpleImageMsgParam",
+  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$RobotGroupMessagesSendResult",
   "allDeclaredFields": true,
   "allDeclaredMethods": true,
   "allDeclaredConstructors": true,
@@ -1654,49 +1751,22 @@
   "methods": [
     {"name": "<init>", "parameterTypes": []},
     {"name": "toString", "parameterTypes": []},
-    {"name": "validate", "parameterTypes": []},
-    {"name": "getPhotoURL", "parameterTypes": []},
-    {"name": "setPhotoURL", "parameterTypes": ["java.lang.String"]}
+    {"name": "getProcessQueryKey", "parameterTypes": []},
+    {"name": "setProcessQueryKey", "parameterTypes": ["java.lang.String"]}
   ]
 },
 {
-  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$SimpleLinkMsgParam",
+  "name": "com.wl4g.infra.common.notification.dingtalk.DingtalkMessageNotifier",
   "allDeclaredFields": true,
   "allDeclaredMethods": true,
   "allDeclaredConstructors": true,
   "queryAllDeclaredMethods": true,
   "queryAllDeclaredConstructors": true,
   "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "validate", "parameterTypes": []},
-    {"name": "setText", "parameterTypes": ["java.lang.String"]},
-    {"name": "getText", "parameterTypes": []},
-    {"name": "getTitle", "parameterTypes": []},
-    {"name": "setTitle", "parameterTypes": ["java.lang.String"]},
-    {"name": "getPicUrl", "parameterTypes": []},
-    {"name": "getMessageUrl", "parameterTypes": []},
-    {"name": "setPicUrl", "parameterTypes": ["java.lang.String"]},
-    {"name": "setMessageUrl", "parameterTypes": ["java.lang.String"]}
-  ]
-},
-{
-  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": ["com.wl4g.infra.common.remoting.RestClient"]},
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "getAccessToken", "parameterTypes": ["com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$AccessToken"]},
-    {"name": "doRequest", "parameterTypes": ["java.lang.String","io.netty.handler.codec.http.HttpMethod","java.lang.String","java.lang.Object","java.lang.Class","boolean","boolean"]},
-    {"name": "getUserIdByMobile", "parameterTypes": ["java.lang.String","java.lang.String"]},
+    {"name": "<init>", "parameterTypes": ["com.wl4g.infra.common.notification.dingtalk.DingtalkNotifierProperties","javax.validation.Validator"]},
+    {"name": "kind", "parameterTypes": []},
     {"name": "createSceneGroupV2", "parameterTypes": ["java.lang.String","com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$CreateSceneGroupV2"]},
-    {"name": "sendRobotGroupMessages", "parameterTypes": ["java.lang.String","com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$RobotGroupMessagesSend"]},
-    {"name": "processCallback", "parameterTypes": ["java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.util.function.Consumer"]},
-    {"name": "getInstance", "parameterTypes": []}
+    {"name": "send", "parameterTypes": ["com.wl4g.infra.common.notification.GenericNotifierParam"]}
   ]
 },
 {
@@ -1725,28 +1795,7 @@
   ]
 },
 {
-  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$RobotGroupMessagesSend",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "validate", "parameterTypes": []},
-    {"name": "getMsgKey", "parameterTypes": []},
-    {"name": "getMsgParam", "parameterTypes": []},
-    {"name": "getOpenConversationId", "parameterTypes": []},
-    {"name": "getRobotCode", "parameterTypes": []},
-    {"name": "setMsgKey", "parameterTypes": ["com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$MsgKeyType"]},
-    {"name": "setMsgParam", "parameterTypes": ["java.lang.String"]},
-    {"name": "setOpenConversationId", "parameterTypes": ["java.lang.String"]},
-    {"name": "setRobotCode", "parameterTypes": ["java.lang.String"]}
-  ]
-},
-{
-  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$SampleActionCard3Param",
+  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$SampleActionCard6Param",
   "allDeclaredFields": true,
   "allDeclaredMethods": true,
   "allDeclaredConstructors": true,
@@ -1760,22 +1809,38 @@
     {"name": "getText", "parameterTypes": []},
     {"name": "getTitle", "parameterTypes": []},
     {"name": "setTitle", "parameterTypes": ["java.lang.String"]},
-    {"name": "getActionTitle1", "parameterTypes": []},
-    {"name": "getActionURL1", "parameterTypes": []},
-    {"name": "getActionTitle2", "parameterTypes": []},
-    {"name": "getActionURL2", "parameterTypes": []},
-    {"name": "getActionTitle3", "parameterTypes": []},
-    {"name": "getActionURL3", "parameterTypes": []},
-    {"name": "setActionTitle1", "parameterTypes": ["java.lang.String"]},
-    {"name": "setActionURL1", "parameterTypes": ["java.lang.String"]},
-    {"name": "setActionTitle2", "parameterTypes": ["java.lang.String"]},
-    {"name": "setActionURL2", "parameterTypes": ["java.lang.String"]},
-    {"name": "setActionTitle3", "parameterTypes": ["java.lang.String"]},
-    {"name": "setActionURL3", "parameterTypes": ["java.lang.String"]}
+    {"name": "getButtonTitle1", "parameterTypes": []},
+    {"name": "getButtonUrl1", "parameterTypes": []},
+    {"name": "getButtonTitle2", "parameterTypes": []},
+    {"name": "getButtonUrl2", "parameterTypes": []},
+    {"name": "setButtonTitle1", "parameterTypes": ["java.lang.String"]},
+    {"name": "setButtonUrl1", "parameterTypes": ["java.lang.String"]},
+    {"name": "setButtonTitle2", "parameterTypes": ["java.lang.String"]},
+    {"name": "setButtonUrl2", "parameterTypes": ["java.lang.String"]}
   ]
 },
 {
-  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$CreateSceneGroupV2ResultContent",
+  "name": "com.wl4g.infra.common.notification.dingtalk.DingtalkNotifierProperties",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "validate", "parameterTypes": []},
+    {"name": "getAppKey", "parameterTypes": []},
+    {"name": "getAppSecret", "parameterTypes": []},
+    {"name": "setAppKey", "parameterTypes": ["java.lang.String"]},
+    {"name": "setAppSecret", "parameterTypes": ["java.lang.String"]},
+    {"name": "getAgentId", "parameterTypes": []},
+    {"name": "getTemplates", "parameterTypes": []},
+    {"name": "setAgentId", "parameterTypes": ["java.lang.String"]},
+    {"name": "setTemplates", "parameterTypes": ["java.util.Properties"]}
+  ]
+},
+{
+  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$SimpleMarkdownMsgParam",
   "allDeclaredFields": true,
   "allDeclaredMethods": true,
   "allDeclaredConstructors": true,
@@ -1784,10 +1849,11 @@
   "methods": [
     {"name": "<init>", "parameterTypes": []},
     {"name": "toString", "parameterTypes": []},
-    {"name": "getOpenConversationId", "parameterTypes": []},
-    {"name": "getChatId", "parameterTypes": []},
-    {"name": "setChatId", "parameterTypes": ["java.lang.String"]},
-    {"name": "setOpenConversationId", "parameterTypes": ["java.lang.String"]}
+    {"name": "validate", "parameterTypes": []},
+    {"name": "setText", "parameterTypes": ["java.lang.String"]},
+    {"name": "getText", "parameterTypes": []},
+    {"name": "getTitle", "parameterTypes": []},
+    {"name": "setTitle", "parameterTypes": ["java.lang.String"]}
   ]
 },
 {
@@ -1828,36 +1894,7 @@
   ]
 },
 {
-  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$MsgKeyType",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": ["java.lang.String","int"]},
-    {"name": "values", "parameterTypes": []},
-    {"name": "valueOf", "parameterTypes": ["java.lang.String"]}
-  ]
-},
-{
-  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$AccessTokenResult",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "getAccessToken", "parameterTypes": []},
-    {"name": "getExpireIn", "parameterTypes": []},
-    {"name": "setExpireIn", "parameterTypes": ["java.lang.Integer"]},
-    {"name": "setAccessToken", "parameterTypes": ["java.lang.String"]}
-  ]
-},
-{
-  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$SimpleMarkdownMsgParam",
+  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$SimpleLinkMsgParam",
   "allDeclaredFields": true,
   "allDeclaredMethods": true,
   "allDeclaredConstructors": true,
@@ -1870,7 +1907,24 @@
     {"name": "setText", "parameterTypes": ["java.lang.String"]},
     {"name": "getText", "parameterTypes": []},
     {"name": "getTitle", "parameterTypes": []},
-    {"name": "setTitle", "parameterTypes": ["java.lang.String"]}
+    {"name": "setTitle", "parameterTypes": ["java.lang.String"]},
+    {"name": "getPicUrl", "parameterTypes": []},
+    {"name": "getMessageUrl", "parameterTypes": []},
+    {"name": "setPicUrl", "parameterTypes": ["java.lang.String"]},
+    {"name": "setMessageUrl", "parameterTypes": ["java.lang.String"]}
+  ]
+},
+{
+  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingCallbackCrypto$PKCS7Padding",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "getPaddingBytes", "parameterTypes": ["int"]},
+    {"name": "removePaddingBytes", "parameterTypes": ["byte[]"]}
   ]
 },
 {
@@ -1898,12 +1952,12 @@
     {"name": "getChatVannedType", "parameterTypes": []},
     {"name": "getManagementType", "parameterTypes": []},
     {"name": "getOnlyAdminCanDing", "parameterTypes": []},
-    {"name": "getGroupLiveSwitch", "parameterTypes": []},
     {"name": "getAllMembersCanCreateMcsConf", "parameterTypes": []},
     {"name": "getAllMembersCanCreateCalendar", "parameterTypes": []},
     {"name": "getGroupEmailDisabled", "parameterTypes": []},
     {"name": "getOnlyAdminCanSetMsgTop", "parameterTypes": []},
     {"name": "getAddFriendForbidden", "parameterTypes": []},
+    {"name": "getGroupLiveSwitch", "parameterTypes": []},
     {"name": "getMembersToAdminChat", "parameterTypes": []},
     {"name": "setTitle", "parameterTypes": ["java.lang.String"]},
     {"name": "setTemplateId", "parameterTypes": ["java.lang.String"]},
@@ -1929,28 +1983,7 @@
   ]
 },
 {
-  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingCallbackCrypto",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": ["java.lang.String","java.lang.String","java.lang.String"]},
-    {"name": "getSignature", "parameterTypes": ["java.lang.String","java.lang.String","java.lang.String","java.lang.String"]},
-    {"name": "getEncryptedMap", "parameterTypes": ["java.lang.String"]},
-    {"name": "getEncryptedMap", "parameterTypes": ["java.lang.String","java.lang.Long","java.lang.String"]},
-    {"name": "encrypt", "parameterTypes": ["java.lang.String","java.lang.String"]},
-    {"name": "getDecryptMsg", "parameterTypes": ["java.lang.String","java.lang.String","java.lang.String","java.lang.String"]},
-    {"name": "decrypt", "parameterTypes": ["java.lang.String"]},
-    {"name": "RemoveCryptographyRestrictions", "parameterTypes": []},
-    {"name": "getClazz", "parameterTypes": ["java.lang.String"]},
-    {"name": "setFinalStaticValue", "parameterTypes": ["java.lang.Class","java.lang.String","java.lang.Object"]},
-    {"name": "getFieldValue", "parameterTypes": ["java.lang.Class","java.lang.String","java.lang.Object","java.lang.Class"]}
-  ]
-},
-{
-  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$SampleActionCard6Param",
+  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$SimpleTextMsgParam",
   "allDeclaredFields": true,
   "allDeclaredMethods": true,
   "allDeclaredConstructors": true,
@@ -1960,81 +1993,38 @@
     {"name": "<init>", "parameterTypes": []},
     {"name": "toString", "parameterTypes": []},
     {"name": "validate", "parameterTypes": []},
-    {"name": "setText", "parameterTypes": ["java.lang.String"]},
-    {"name": "getText", "parameterTypes": []},
-    {"name": "getTitle", "parameterTypes": []},
-    {"name": "setTitle", "parameterTypes": ["java.lang.String"]},
-    {"name": "getButtonTitle1", "parameterTypes": []},
-    {"name": "getButtonUrl1", "parameterTypes": []},
-    {"name": "getButtonTitle2", "parameterTypes": []},
-    {"name": "getButtonUrl2", "parameterTypes": []},
-    {"name": "setButtonTitle1", "parameterTypes": ["java.lang.String"]},
-    {"name": "setButtonUrl1", "parameterTypes": ["java.lang.String"]},
-    {"name": "setButtonTitle2", "parameterTypes": ["java.lang.String"]},
-    {"name": "setButtonUrl2", "parameterTypes": ["java.lang.String"]}
+    {"name": "getContent", "parameterTypes": []},
+    {"name": "setContent", "parameterTypes": ["java.lang.String"]}
   ]
 },
 {
-  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$CreateSceneGroupV2Result",
+  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI",
   "allDeclaredFields": true,
   "allDeclaredMethods": true,
   "allDeclaredConstructors": true,
   "queryAllDeclaredMethods": true,
   "queryAllDeclaredConstructors": true,
   "methods": [
+    {"name": "<init>", "parameterTypes": ["com.wl4g.infra.common.remoting.RestClient"]},
     {"name": "<init>", "parameterTypes": []},
-    {"name": "getResult", "parameterTypes": []},
-    {"name": "setResult", "parameterTypes": ["com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$CreateSceneGroupV2ResultContent"]},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "getRequestId", "parameterTypes": []}
+    {"name": "getInstance", "parameterTypes": []},
+    {"name": "getAccessToken", "parameterTypes": ["com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$AccessToken"]},
+    {"name": "getUserIdByMobile", "parameterTypes": ["java.lang.String","java.lang.String"]},
+    {"name": "createSceneGroupV2", "parameterTypes": ["java.lang.String","com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$CreateSceneGroupV2"]},
+    {"name": "sendRobotGroupMessages", "parameterTypes": ["java.lang.String","com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$RobotGroupMessagesSend"]},
+    {"name": "processCallback", "parameterTypes": ["java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.util.function.Consumer"]}
   ]
 },
 {
-  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$BaseResult",
+  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingCallbackCrypto$DingTalkEncryptException",
   "allDeclaredFields": true,
   "allDeclaredMethods": true,
   "allDeclaredConstructors": true,
   "queryAllDeclaredMethods": true,
   "queryAllDeclaredConstructors": true,
   "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "getRequestId", "parameterTypes": []},
-    {"name": "getErrcode", "parameterTypes": []},
-    {"name": "getErrmsg", "parameterTypes": []},
-    {"name": "getSuccess", "parameterTypes": []},
-    {"name": "setRequestId", "parameterTypes": ["java.lang.String"]},
-    {"name": "setErrcode", "parameterTypes": ["java.lang.Integer"]},
-    {"name": "setErrmsg", "parameterTypes": ["java.lang.String"]},
-    {"name": "setSuccess", "parameterTypes": ["java.lang.Boolean"]}
-  ]
-},
-{
-  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingCallbackCrypto$PKCS7Padding",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "getPaddingBytes", "parameterTypes": ["int"]},
-    {"name": "chr", "parameterTypes": ["int"]},
-    {"name": "removePaddingBytes", "parameterTypes": ["byte[]"]}
-  ]
-},
-{
-  "name": "com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$GetUserIdByMobileResult",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "getUserid", "parameterTypes": []},
-    {"name": "setUserid", "parameterTypes": ["java.lang.String"]}
+    {"name": "<init>", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "getCode", "parameterTypes": []}
   ]
 }
 ]
