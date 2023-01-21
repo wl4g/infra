@@ -1092,7 +1092,7 @@ public abstract class JacksonUtils {
             //
             // Support to get by superclass matches.
             final Map<String, String> transformProps = transformProperties.entrySet()
-                    .parallelStream()
+                    .stream()
                     .filter(e -> e.getKey().isAssignableFrom(beanDesc.getBeanClass()))
                     .flatMap(e -> e.getValue().entrySet().stream())
                     .collect(toMap(e -> e.getKey(), e -> e.getValue()));

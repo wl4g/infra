@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.common.lang;
+package com.wl4g.infra.common.net;
 
 import static com.wl4g.infra.common.lang.StringUtils2.eqIgnCase;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;

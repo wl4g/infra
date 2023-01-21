@@ -13,63 +13,54 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.common.bean;
+package com.wl4g.infra.common.lang;
 
 import java.io.Serializable;
 
 /**
- * A generic and simple key value object storage bean.</br>
- * {@link KeyValue}
+ * {@link Tuple2}
  * 
- * @author James Wong &lt;jameswong1376@gmail.com&gt;
- * @version 2020年3月28日 v1.0.0
- * @see
+ * @author James Wong
+ * @version 2023-01-21
+ * @since v3.1.0
  */
-public class KeyValue implements Serializable {
-
+public class Tuple2 implements Serializable {
     private static final long serialVersionUID = -6651344183217701756L;
 
-    /**
-     * Object key.
-     */
-    private Object key;
+    private Object item1;
+    private Object item2;
 
-    /**
-     * Object value.
-     */
-    private Object value;
-
-    public KeyValue() {
+    public Tuple2() {
     }
 
-    public KeyValue(Object key, Object value) {
-        setKey(key);
-        setValue(value);
+    public Tuple2(Object item1, Object item2) {
+        setItem1(item1);
+        setItem2(item2);
     }
 
     @SuppressWarnings("unchecked")
-    public <K> K getKey() {
-        return (K) key;
+    public <K> K getItem1() {
+        return (K) item1;
     }
 
-    public <K> KeyValue setKey(K key) {
-        this.key = key;
+    public <K> Tuple2 setItem1(K item1) {
+        this.item1 = item1;
         return this;
     }
 
     @SuppressWarnings("unchecked")
-    public <V> V getValue() {
-        return (V) value;
+    public <V> V getItem2() {
+        return (V) item2;
     }
 
-    public <V> KeyValue setValue(V value) {
-        this.value = value;
+    public <V> Tuple2 setItem2(V item2) {
+        this.item2 = item2;
         return this;
     }
 
     @Override
     public String toString() {
-        return "KeyValue [key=" + key + ", value=" + value + "]";
+        return "Tuple2 [item1=" + getItem1() + ", item2=" + getItem2() + "]";
     }
 
 }
