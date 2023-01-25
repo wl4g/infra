@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.common.lang;
+package com.wl4g.infra.common.lang.tuples;
 
-import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * {@link Tuple2}
@@ -24,7 +25,7 @@ import java.io.Serializable;
  * @version 2023-01-21
  * @since v3.1.0
  */
-public class Tuple2 implements Serializable {
+public class Tuple2 implements Tuple {
     private static final long serialVersionUID = -6651344183217701756L;
 
     private Object item1;
@@ -53,9 +54,38 @@ public class Tuple2 implements Serializable {
         return (V) item2;
     }
 
-    public <V> Tuple2 setItem2(V item2) {
+    public <V> void setItem2(V item2) {
         this.item2 = item2;
+    }
+
+    public <V> Tuple2 withItem2(V item2) {
+        setItem2(item2);
         return this;
+    }
+
+    @Override
+    public Object nth(int index) {
+        assertIndexInBounds(index);
+        if (index == 0) {
+            return item1;
+        }
+        return item2;
+    }
+
+    @Override
+    public List<Object> asList() {
+        return Arrays.asList(getItem1(), getItem2());
+    }
+
+    @Override
+    public int size() {
+        return 2;
+    }
+
+    protected void assertIndexInBounds(int index) {
+        if (index < 0 || index >= size()) {
+            throw new IndexOutOfBoundsException("Cannot retrieve item at position " + index + ", size is " + size());
+        }
     }
 
     @Override

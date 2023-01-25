@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.common.lang;
+package com.wl4g.infra.common.lang.tuples;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * {@link Tuple8}
@@ -23,7 +26,7 @@ package com.wl4g.infra.common.lang;
  * @since v3.1.0
  */
 public class Tuple8 extends Tuple7 {
-    private static final long serialVersionUID = -6651344183217701756L;
+    private static final long serialVersionUID = -6651344183217701762L;
 
     private Object item8;
 
@@ -65,9 +68,33 @@ public class Tuple8 extends Tuple7 {
         return (V) item8;
     }
 
-    public <V> Tuple8 setItem8(V item8) {
+    public <V> void setItem8(V item8) {
         this.item8 = item8;
+    }
+
+    public <V> Tuple8 withItem8(V item8) {
+        setItem8(item8);
         return this;
+    }
+
+    @Override
+    public Object nth(int index) {
+        assertIndexInBounds(index);
+        if (index == 7) {
+            return item8;
+        } else {
+            return super.nth(index);
+        }
+    }
+
+    @Override
+    public List<Object> asList() {
+        return Arrays.asList(getItem1(), getItem2(), getItem3(), getItem4(), getItem5(), getItem6(), getItem7(), getItem8());
+    }
+
+    @Override
+    public int size() {
+        return 8;
     }
 
     @Override
