@@ -141,9 +141,7 @@ public class NativeReflectionConfigGenerateTool {
                             try {
                                 return ReflectionConfigItemMethod.builder()
                                         .name("<init>")
-                                        .parameterTypes(safeArrayToList(m.getParameterTypes()).stream()
-                                                .map(p -> p.getTypeName())
-                                                .collect(toList()))
+                                        .parameterTypes(resolveParameterTypes(m.getParameterTypes()))
                                         .build();
                             } catch (Exception e) {
                                 err.println(format("[WARNING] Unable to load constructor methods of %s#%s. reason: %s",
@@ -168,9 +166,7 @@ public class NativeReflectionConfigGenerateTool {
                             try {
                                 return ReflectionConfigItemMethod.builder()
                                         .name(m.getName())
-                                        .parameterTypes(safeArrayToList(m.getParameterTypes()).stream()
-                                                .map(p -> p.getTypeName())
-                                                .collect(toList()))
+                                        .parameterTypes(resolveParameterTypes(m.getParameterTypes()))
                                         .build();
                             } catch (Exception e) {
                                 err.println(format("[WARNING] Unable to load member methods of %s#%s. reason: %s", cls.getName(),
@@ -194,9 +190,7 @@ public class NativeReflectionConfigGenerateTool {
                             try {
                                 return ReflectionConfigItemMethod.builder()
                                         .name(m.getName())
-                                        .parameterTypes(safeArrayToList(m.getParameterTypes()).stream()
-                                                .map(p -> p.getTypeName())
-                                                .collect(toList()))
+                                        .parameterTypes(resolveParameterTypes(m.getParameterTypes()))
                                         .build();
                             } catch (Exception e) {
                                 err.println(format("[WARNING] Unable to load static methods of %s#%s. reason: %s", cls.getName(),
@@ -212,6 +206,15 @@ public class NativeReflectionConfigGenerateTool {
             }
 
             return ReflectionConfigItem.builder().name(cls.getName()).methods(allItem).build();
+        }).collect(toList());
+    }
+
+    private static List<String> resolveParameterTypes(final Class<?>[] parameterTypes) {
+        return safeArrayToList(parameterTypes).stream().map(p -> {
+            // Notice: If the parameter type is an array.
+            // getTypeName() => java.lang.Object[]
+            // getName() => [Ljava.lang.Object;
+            return p.getName();
         }).collect(toList());
     }
 
