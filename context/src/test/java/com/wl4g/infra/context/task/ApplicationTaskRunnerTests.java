@@ -19,6 +19,7 @@ import static java.lang.System.currentTimeMillis;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import com.wl4g.infra.common.task.RunnerProperties;
@@ -42,21 +43,22 @@ public class ApplicationTaskRunnerTests {
     @SuppressWarnings({ "rawtypes" })
     public static void submitForCompleteTest1() throws Exception {
         // Add testing jobs.
-        List<Runnable> jobs = new ArrayList<>();
+        List<Callable<String>> jobs = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             final String idStr = "testjob-" + i;
-            jobs.add(new Runnable() {
+            jobs.add(new Callable<String>() {
                 private String id = idStr;
 
                 @Override
-                public void run() {
+                public String call() {
                     try {
-                        System.out.println("Starting... testjob-" + id);
+                        System.out.println("Starting... " + id);
                         Thread.sleep(3000L);
-                        System.out.println("Completed. testjob-" + id);
+                        System.out.println("Completed. " + id);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                    return id;
                 }
             });
         }
@@ -66,10 +68,7 @@ public class ApplicationTaskRunnerTests {
         System.out.println(runner);
 
         // Submit jobs & listen job timeout.
-        runner.getWorker().submitForComplete(jobs, (ex, completed, uncompleted) -> {
-            ex.printStackTrace();
-            System.out.println(String.format("Completed: %s, uncompleted sets: %s", completed, uncompleted));
-        }, 4 * 1000l); // > 3*3000
+        runner.getWorker().submitForComplete(jobs, 4_000L); // > 3*3000
 
         // runner.close();
     }
