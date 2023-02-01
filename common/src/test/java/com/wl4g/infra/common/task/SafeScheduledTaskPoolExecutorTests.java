@@ -17,6 +17,9 @@ package com.wl4g.infra.common.task;
 
 import static java.lang.System.currentTimeMillis;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionHandler;
@@ -25,7 +28,13 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-public class SafeEnhancedScheduledTaskExecutorTests {
+import com.wl4g.infra.common.lang.ThreadUtils2;
+import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor.CompleteResult;
+
+import lombok.AllArgsConstructor;
+import lombok.ToString;
+
+public class SafeScheduledTaskPoolExecutorTests {
 
     @Test
     public void testScheduleQueueRejected() throws Exception {
@@ -41,9 +50,9 @@ public class SafeEnhancedScheduledTaskExecutorTests {
                 @Override
                 public void run() {
                     try {
-                        System.out.println("Starting... testjob-" + id);
+                        System.out.println("Starting... " + id);
                         Thread.sleep(3000L);
-                        System.out.println("Completed. testjob-" + id);
+                        System.out.println("Completed. " + id);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -114,7 +123,29 @@ public class SafeEnhancedScheduledTaskExecutorTests {
         executor.shutdown();
     }
 
-    private static SafeScheduledTaskPoolExecutor createSafeEnhancedScheduledExecutor(int concurrencyPoolSize) throws Exception {
+    @Test
+    public void testSubmitForComplete() throws Exception {
+        long begin = currentTimeMillis();
+
+        SafeScheduledTaskPoolExecutor executor = createSafeEnhancedScheduledExecutor(2);
+
+        List<Callable<String>> jobs = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            final String idStr = "testjob-" + i;
+            jobs.add(new TestJob(idStr));
+        }
+
+        final CompleteResult<String> result = executor.submitForComplete(jobs, 10_000);
+        System.out.println("result => " + result);
+        long cost = currentTimeMillis() - begin;
+        System.out.println("cost: " + cost + "ms");
+
+        executor.shutdown();
+
+        assert jobs.size() == result.getCompleteds().size() + result.getUncompleted().size();
+    }
+
+    static SafeScheduledTaskPoolExecutor createSafeEnhancedScheduledExecutor(int concurrencyPoolSize) throws Exception {
         return new SafeScheduledTaskPoolExecutor(concurrencyPoolSize, 0L, Executors.defaultThreadFactory(), 2,
                 new RejectedExecutionHandler() {
                     @Override
@@ -124,4 +155,17 @@ public class SafeEnhancedScheduledTaskExecutorTests {
                 });
     }
 
+    @ToString
+    @AllArgsConstructor
+    static class TestJob implements Callable<String> {
+        String id;
+
+        @Override
+        public String call() {
+            System.out.println("Starting... " + id);
+            ThreadUtils2.sleepRandom(1_000L, 2_000L);
+            System.out.println("Completed. " + id);
+            return id;
+        }
+    }
 }

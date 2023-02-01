@@ -16,28 +16,30 @@
 package com.wl4g.infra.common.task;
 
 import static com.wl4g.infra.common.lang.Assert2.isTrue;
-import static com.wl4g.infra.common.lang.Assert2.notNull;
+import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
+import static com.wl4g.infra.common.lang.Assert2.notEmptyOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.findField;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.makeAccessible;
 import static java.lang.Integer.MAX_VALUE;
-import static java.lang.String.format;
 import static java.lang.System.nanoTime;
-import static java.util.Collections.emptyList;
-import static java.util.Objects.nonNull;
 import static java.util.concurrent.ThreadLocalRandom.current;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
+import static java.util.stream.Collectors.toSet;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Delayed;
@@ -53,9 +55,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.validation.constraints.NotEmpty;
+
 import org.slf4j.Logger;
 
-import com.wl4g.infra.common.collection.CollectionUtils2;
+import lombok.AllArgsConstructor;
+import lombok.CustomLog;
+import lombok.Getter;
+import lombok.ToString;
 
 /**
  * An enhanced security and flexible scheduling executor.</br>
@@ -133,57 +140,74 @@ public class SafeScheduledTaskPoolExecutor extends ScheduledThreadPoolExecutor {
      * 
      * @param jobs
      * @param timeoutMs
+     * @return
      * @throws IllegalStateException
      */
-    public void submitForComplete(List<Runnable> jobs, long timeoutMs) throws IllegalStateException {
-        submitForComplete(jobs, (ex, completed, uncompleted) -> {
-            if (nonNull(ex)) {
-                throw ex;
-            }
-        }, timeoutMs);
+    public <R> CompleteResult<R> submitForComplete(final @NotEmpty List<Callable<R>> jobs, long timeoutMs)
+            throws IllegalStateException {
+        return submitForComplete(jobs, timeoutMs, 50L);
     }
 
     /**
      * Submitted job wait for completed.
      * 
      * @param jobs
-     * @param listener
      * @param timeoutMs
+     * @param await
+     * @return
      * @throws IllegalStateException
      */
-    public void submitForComplete(List<Runnable> jobs, CompleteTaskListener listener, long timeoutMs)
+    public <R> CompleteResult<R> submitForComplete(final @NotEmpty List<Callable<R>> jobs, long timeoutMs, long await)
             throws IllegalStateException {
-        if (!CollectionUtils2.isEmpty(jobs)) {
-            int total = jobs.size();
-            // Future jobs.
-            Map<Future<?>, Runnable> futures = new HashMap<Future<?>, Runnable>(total);
-            try {
-                CountDownLatch latch = new CountDownLatch(total);
-                // Submit job.
-                jobs.stream().forEach(job -> futures.put(submit(new FutureDoneTask(latch, job)), job));
+        notEmptyOf(jobs, "jobs");
+        isTrueOf(await < timeoutMs, "await < timeoutMs");
 
-                if (!latch.await(timeoutMs, MILLISECONDS)) { // Timeout?
-                    Iterator<Entry<Future<?>, Runnable>> it = futures.entrySet().iterator();
+        final int allJobs = jobs.size();
+        final Map<Callable<R>, Future<R>> futures = new LinkedHashMap<>(allJobs);
+
+        // Completed results.
+        final Map<Callable<R>, R> completed = new HashMap<>(futures.size());
+        // Uncompleted results.
+        final Set<Callable<R>> uncompleted = new HashSet<>();
+
+        try {
+            final CountDownLatch latch = new CountDownLatch(allJobs);
+            jobs.stream().forEach(job -> futures.put(job, submit(new FutureDoneTask<>(latch, job))));
+
+            for (long count = 0, total = timeoutMs / await; count < total; count++) {
+                if (!futures.isEmpty() && !latch.await(await, MILLISECONDS)) {
+                    final Iterator<Entry<Callable<R>, Future<R>>> it = futures.entrySet().iterator();
                     while (it.hasNext()) {
-                        Entry<Future<?>, Runnable> entry = it.next();
-                        if (!entry.getKey().isCancelled() && !entry.getKey().isDone()) {
-                            entry.getKey().cancel(true);
-                        } else {
-                            it.remove(); // Cleanup cancelled or isDone
+                        final Entry<Callable<R>, Future<R>> entry = it.next();
+                        final Callable<R> job = entry.getKey();
+                        final Future<R> future = entry.getValue();
+                        // out.printf("debug: job=%s, done=%s, cancelled=%s\n",
+                        // job, future.isDone(), future.isCancelled());
+                        //
+                        // Notice: isCancelled a true when the submitted task is
+                        // rejected, see: #EMPTY_FUTURE_CANCELLED
+                        //
+                        if (future.isDone() || future.isCancelled()) {
+                            // Not need to execution continue.
+                            it.remove();
+                            if (future.isDone()) {
+                                // Collect for completed results.
+                                completed.putIfAbsent(job, future.get());
+                            }
+                            if (future.isCancelled()) {
+                                uncompleted.add(job);
+                            }
                         }
                     }
-
-                    TimeoutException ex = new TimeoutException(
-                            format("Failed to job execution timeout, %s -> completed(%s)/total(%s)",
-                                    jobs.get(0).getClass().getName(), (total - latch.getCount()), total));
-                    listener.onComplete(ex, (total - latch.getCount()), futures.values());
-                } else {
-                    listener.onComplete(null, total, emptyList());
                 }
-            } catch (Exception e) {
-                throw new IllegalStateException(e);
             }
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
         }
+
+        // Collect for uncompleted results.
+        uncompleted.addAll(futures.entrySet().stream().map(e -> e.getKey()).collect(toSet()));
+        return new CompleteResult<>(completed.values().stream().collect(toSet()), uncompleted);
     }
 
     @Override
@@ -328,8 +352,6 @@ public class SafeScheduledTaskPoolExecutor extends ScheduledThreadPoolExecutor {
     }
 
     /**
-     * @see {@link ScheduledFutureTask}
-     * 
      * @see {@link ScheduledThreadPoolExecutor.ScheduledFutureTask}
      * @param <V>
      * @author James Wong &lt;jameswong1376@gmail.com&gt;
@@ -491,38 +513,49 @@ public class SafeScheduledTaskPoolExecutor extends ScheduledThreadPoolExecutor {
     }
 
     /**
-     * Future done runnable wrapper.
+     * {@link FutureDoneTask}
      * 
-     * @author James Wong <jameswong1376@gmail.com>>
-     * @version v1.0 2019年10月17日
-     * @since
+     * @author James Wong &lt;jameswong1376@gmail.com&gt;
+     * @version 2019年12月20日 v1.0.0
+     * @see
      */
-    private class FutureDoneTask implements Runnable {
+    @CustomLog
+    private static class FutureDoneTask<R> implements Callable<R> {
+        private final CountDownLatch latch;
+        private final Callable<R> job;
 
-        /** {@link CountDownLatch} */
-        final private CountDownLatch latch;
-
-        /** Real runner job. */
-        final private Runnable job;
-
-        public FutureDoneTask(CountDownLatch latch, Runnable job) {
-            notNull(latch, "Job runable latch must not be null.");
-            notNull(job, "Job runable must not be null.");
-            this.latch = latch;
-            this.job = job;
+        public FutureDoneTask(CountDownLatch latch, Callable<R> job) {
+            this.latch = notNullOf(latch, "latch");
+            this.job = notNullOf(job, "job");
         }
 
         @Override
-        public void run() {
+        public R call() {
             try {
-                job.run();
+                return job.call();
             } catch (Exception e) {
-                log.error("Execution failure task", e);
+                log.error("Failed to execution task", e);
             } finally {
                 latch.countDown();
             }
+            return null;
         }
+    }
 
+    /**
+     * {@link CompleteResult}
+     * 
+     * @author James Wong
+     * @version 2023-02-01
+     * @since v3.0.0
+     */
+    @Getter
+    @ToString
+    @AllArgsConstructor
+    public static class CompleteResult<R> {
+        private final Collection<R> completeds;
+        private final Collection<Callable<R>> uncompleted;
+        // private final java.util.concurrent.TimeoutException ex;
     }
 
     /**
@@ -572,6 +605,8 @@ public class SafeScheduledTaskPoolExecutor extends ScheduledThreadPoolExecutor {
     private static final Runnable EMPTY_RUNNABLE = () -> {
     };
 
+    // Corresponds to the submitForComplete method to check the task state.
+    private static final boolean EMPTY_FUTURE_CANCELLED = true;
     private static final ScheduledFuture<Object> EMPTY_FUTURE = new ScheduledFuture<Object>() {
 
         @Override
@@ -581,7 +616,7 @@ public class SafeScheduledTaskPoolExecutor extends ScheduledThreadPoolExecutor {
 
         @Override
         public boolean isCancelled() {
-            return false;
+            return EMPTY_FUTURE_CANCELLED; // [MARK1]
         }
 
         @Override
