@@ -142,7 +142,7 @@ public class SafeScheduledTaskPoolExecutorTests {
 
         executor.shutdown();
 
-        assert jobs.size() == result.getCompleteds().size() + result.getUncompleted().size();
+        assert jobs.size() == result.getCompleted().size() + result.getUncompleted().size();
     }
 
     static SafeScheduledTaskPoolExecutor createSafeEnhancedScheduledExecutor(int concurrencyPoolSize) throws Exception {

@@ -552,9 +552,8 @@ public class SafeScheduledTaskPoolExecutor extends ScheduledThreadPoolExecutor {
     @ToString
     @AllArgsConstructor
     public static class CompleteResult<R> {
-        private final Collection<R> completeds;
+        private final Collection<R> completed;
         private final Collection<Callable<R>> uncompleted;
-        // private final java.util.concurrent.TimeoutException ex;
     }
 
     /**
