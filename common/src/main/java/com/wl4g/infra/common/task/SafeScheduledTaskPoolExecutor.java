@@ -26,7 +26,6 @@ import static java.lang.System.nanoTime;
 import static java.util.concurrent.ThreadLocalRandom.current;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
-import static java.util.stream.Collectors.toSet;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -143,7 +142,7 @@ public class SafeScheduledTaskPoolExecutor extends ScheduledThreadPoolExecutor {
      * @return
      * @throws IllegalStateException
      */
-    public <R> CompleteResult<R> submitForComplete(final @NotNull List<Callable<R>> jobs, long timeoutMs)
+    public <R> CompleteResult<R> submitForComplete(final @NotNull List<? extends Callable<R>> jobs, long timeoutMs)
             throws IllegalStateException {
         notNullOf(jobs, "jobs");
         isTrueOf(timeoutMs > 0, "timeoutMs > 0");
@@ -191,7 +190,7 @@ public class SafeScheduledTaskPoolExecutor extends ScheduledThreadPoolExecutor {
             throw new IllegalStateException(e);
         }
 
-        return new CompleteResult<>(completed.values().stream().collect(toSet()), uncompleted);
+        return new CompleteResult<>(completed.values(), uncompleted);
     }
 
     @Override
