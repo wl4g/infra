@@ -139,27 +139,14 @@ public class SafeScheduledTaskPoolExecutor extends ScheduledThreadPoolExecutor {
      * 
      * @param jobs
      * @param timeoutMs
+     * @param await
      * @return
      * @throws IllegalStateException
      */
     public <R> CompleteResult<R> submitForComplete(final @NotNull List<Callable<R>> jobs, long timeoutMs)
             throws IllegalStateException {
-        return submitForComplete(jobs, timeoutMs, 50L);
-    }
-
-    /**
-     * Submitted job wait for completed.
-     * 
-     * @param jobs
-     * @param timeoutMs
-     * @param await
-     * @return
-     * @throws IllegalStateException
-     */
-    public <R> CompleteResult<R> submitForComplete(final @NotNull List<Callable<R>> jobs, long timeoutMs, long await)
-            throws IllegalStateException {
         notNullOf(jobs, "jobs");
-        isTrueOf(await < timeoutMs, "await < timeoutMs");
+        isTrueOf(timeoutMs > 0, "timeoutMs > 0");
 
         final int allJobs = jobs.size();
         final Map<Callable<R>, Future<R>> futures = new LinkedHashMap<>(allJobs);
@@ -173,39 +160,37 @@ public class SafeScheduledTaskPoolExecutor extends ScheduledThreadPoolExecutor {
             final CountDownLatch latch = new CountDownLatch(allJobs);
             jobs.stream().forEach(job -> futures.put(job, submit(new FutureDoneTask<>(latch, job))));
 
-            for (long count = 0, total = timeoutMs / await; count < total; count++) {
-                if (!futures.isEmpty() && !latch.await(await, MILLISECONDS)) {
-                    final Iterator<Entry<Callable<R>, Future<R>>> it = futures.entrySet().iterator();
-                    while (it.hasNext()) {
-                        final Entry<Callable<R>, Future<R>> entry = it.next();
-                        final Callable<R> job = entry.getKey();
-                        final Future<R> future = entry.getValue();
-                        // out.printf("debug: job=%s, done=%s, cancelled=%s\n",
-                        // job, future.isDone(), future.isCancelled());
-                        //
-                        // Notice: isCancelled a true when the submitted task is
-                        // rejected, see: #EMPTY_FUTURE_CANCELLED
-                        //
-                        if (future.isDone() || future.isCancelled()) {
-                            // Not need to execution continue.
-                            it.remove();
-                            if (future.isDone()) {
-                                // Collect for completed results.
-                                completed.putIfAbsent(job, future.get());
-                            }
-                            if (future.isCancelled()) {
-                                uncompleted.add(job);
-                            }
-                        }
+            final Iterator<Entry<Callable<R>, Future<R>>> it = futures.entrySet().iterator();
+            if (!latch.await(timeoutMs, MILLISECONDS)) { // Timeout(part-done)
+                while (it.hasNext()) {
+                    final Entry<Callable<R>, Future<R>> entry = it.next();
+                    final Callable<R> job = entry.getKey();
+                    final Future<R> future = entry.getValue();
+                    // @formatter:off
+                    // System.out.printf("debug: job=%s, done=%s, cancelled=%s\n", job, future.isDone(), future.isCancelled());
+                    // @formatter:on
+                    // Notice: future.isCancelled() a true when the submitted
+                    // task is rejected, see: #EMPTY_FUTURE_CANCELLED
+                    if (future.isDone()) {
+                        // Collect for completed results.
+                        completed.putIfAbsent(job, future.get());
+                    } else { // Collect for uncompleted results.
+                        uncompleted.add(job);
                     }
+                    // Not need to execution continue.
+                    it.remove();
+                }
+            } else { // All done
+                while (it.hasNext()) {
+                    // Collect for completed results.
+                    final Entry<Callable<R>, Future<R>> entry = it.next();
+                    completed.putIfAbsent(entry.getKey(), entry.getValue().get());
                 }
             }
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
 
-        // Collect for uncompleted results.
-        uncompleted.addAll(futures.entrySet().stream().map(e -> e.getKey()).collect(toSet()));
         return new CompleteResult<>(completed.values().stream().collect(toSet()), uncompleted);
     }
 
@@ -532,12 +517,12 @@ public class SafeScheduledTaskPoolExecutor extends ScheduledThreadPoolExecutor {
         public R call() {
             try {
                 return job.call();
-            } catch (Exception e) {
-                log.error("Failed to execution task", e);
+            } catch (Throwable ex) {
+                log.error("Failed to execution task.", ex);
+                throw new IllegalStateException(ex);
             } finally {
                 latch.countDown();
             }
-            return null;
         }
     }
 

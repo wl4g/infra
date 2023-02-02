@@ -15,6 +15,7 @@
  */
 package com.wl4g.infra.common.task;
 
+import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 
 import java.util.ArrayList;
@@ -124,13 +125,36 @@ public class SafeScheduledTaskPoolExecutorTests {
     }
 
     @Test
+    public void testCountDownLatch() throws Exception {
+        long begin = currentTimeMillis();
+        int total = 3;
+        CountDownLatch latch = new CountDownLatch(total);
+        for (int i = 0; i < total; i++) {
+            final int index = i;
+            new Thread(() -> {
+                System.out.println(System.nanoTime() + " starting testjob-" + index + ", latch: " + latch.getCount());
+                ThreadUtils2.sleep((index + 1) * 1000L);
+                latch.countDown();
+                System.out.println(System.nanoTime() + " finished testjob-" + index + ", latch: " + latch.getCount());
+            }).start();
+        }
+
+        // latch.await();
+        // assert !latch.await(2000L, TimeUnit.MILLISECONDS);
+        assert latch.await(4000L, TimeUnit.MILLISECONDS);
+
+        long now = currentTimeMillis();
+        System.out.println(format("%s completed cost: %sms, latch: %s", System.nanoTime(), (now - begin), latch.getCount()));
+    }
+
+    @Test
     public void testSubmitForComplete() throws Exception {
         long begin = currentTimeMillis();
 
-        SafeScheduledTaskPoolExecutor executor = createSafeEnhancedScheduledExecutor(2);
+        SafeScheduledTaskPoolExecutor executor = createSafeEnhancedScheduledExecutor(3);
 
         List<Callable<String>> jobs = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 3; i++) {
             final String idStr = "testjob-" + i;
             jobs.add(new TestJob(idStr));
         }
