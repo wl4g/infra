@@ -17,7 +17,6 @@ package com.wl4g.infra.common.task;
 
 import static com.wl4g.infra.common.lang.Assert2.isTrue;
 import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
-import static com.wl4g.infra.common.lang.Assert2.notEmptyOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.findField;
@@ -55,7 +54,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
 
@@ -143,7 +142,7 @@ public class SafeScheduledTaskPoolExecutor extends ScheduledThreadPoolExecutor {
      * @return
      * @throws IllegalStateException
      */
-    public <R> CompleteResult<R> submitForComplete(final @NotEmpty List<Callable<R>> jobs, long timeoutMs)
+    public <R> CompleteResult<R> submitForComplete(final @NotNull List<Callable<R>> jobs, long timeoutMs)
             throws IllegalStateException {
         return submitForComplete(jobs, timeoutMs, 50L);
     }
@@ -157,9 +156,9 @@ public class SafeScheduledTaskPoolExecutor extends ScheduledThreadPoolExecutor {
      * @return
      * @throws IllegalStateException
      */
-    public <R> CompleteResult<R> submitForComplete(final @NotEmpty List<Callable<R>> jobs, long timeoutMs, long await)
+    public <R> CompleteResult<R> submitForComplete(final @NotNull List<Callable<R>> jobs, long timeoutMs, long await)
             throws IllegalStateException {
-        notEmptyOf(jobs, "jobs");
+        notNullOf(jobs, "jobs");
         isTrueOf(await < timeoutMs, "await < timeoutMs");
 
         final int allJobs = jobs.size();
