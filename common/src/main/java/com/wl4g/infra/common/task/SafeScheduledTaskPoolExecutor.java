@@ -176,8 +176,6 @@ public class SafeScheduledTaskPoolExecutor extends ScheduledThreadPoolExecutor {
                     } else { // Collect for uncompleted results.
                         uncompleted.add(job);
                     }
-                    // Not need to execution continue.
-                    it.remove();
                 }
             } else { // All done
                 while (it.hasNext()) {
