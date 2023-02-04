@@ -34,7 +34,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 
 import com.google.common.annotations.Beta;
-import com.wl4g.infra.common.jedis.JedisClient;
+import com.wl4g.infra.common.jedis.BasicJedisClient;
 
 import lombok.CustomLog;
 import lombok.ToString;
@@ -54,9 +54,9 @@ public class JedisLockManager {
     protected static final String EXPX = "PX";
     protected static final long FRAME_INTERVAL_MS = 30L;
     protected static final String UNLOCK_LUA = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
-    protected final JedisClient jedisClient;
+    protected final BasicJedisClient jedisClient;
 
-    public JedisLockManager(JedisClient jedisClient) {
+    public JedisLockManager(BasicJedisClient jedisClient) {
         this.jedisClient = notNullOf(jedisClient, "jedisClient");
     }
 
@@ -118,7 +118,7 @@ public class JedisLockManager {
     public static class FastReentrantUnfairDistributedRedLock extends AbstractDistributedLock {
         private static final long serialVersionUID = -1909894475263151824L;
 
-        final JedisClient jedisClient;
+        final BasicJedisClient jedisClient;
 
         /**
          * Current locker reentrant counter.</br>
@@ -127,17 +127,17 @@ public class JedisLockManager {
          */
         final AtomicLong counter;
 
-        public FastReentrantUnfairDistributedRedLock(final JedisClient jedisClient, String lockName, long expiredMs) {
+        public FastReentrantUnfairDistributedRedLock(final BasicJedisClient jedisClient, String lockName, long expiredMs) {
             this(jedisClient, lockName, expiredMs, 0L);
         }
 
-        public FastReentrantUnfairDistributedRedLock(final JedisClient jedisClient, String lockName, long expiredMs,
+        public FastReentrantUnfairDistributedRedLock(final BasicJedisClient jedisClient, String lockName, long expiredMs,
                 long counterValue) {
             this(jedisClient, lockName, expiredMs, new AtomicLong(counterValue));
         }
 
-        public FastReentrantUnfairDistributedRedLock(final JedisClient jedisClient, final String lockName, final long expiredMs,
-                final AtomicLong counter) {
+        public FastReentrantUnfairDistributedRedLock(final BasicJedisClient jedisClient, final String lockName,
+                final long expiredMs, final AtomicLong counter) {
             super((NAMESPACE.concat(lockName)), getThreadCurrentProcessId(), expiredMs);
             this.jedisClient = notNullOf(jedisClient, "jedisClient");
             isTrueOf(counter.get() >= 0, "counter >= 0");

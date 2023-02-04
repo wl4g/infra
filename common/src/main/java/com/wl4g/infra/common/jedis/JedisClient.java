@@ -91,7 +91,7 @@ import redis.clients.jedis.util.Slowlog;
  * @see jedis-3.6.1
  */
 @SuppressWarnings("unchecked")
-public interface JedisClient extends Closeable {
+public interface JedisClient extends BasicJedisClient, Closeable {
 
     // JedisCommands
 
@@ -228,10 +228,6 @@ public interface JedisClient extends Closeable {
     }
 
     default byte[] echo(byte[] arg) {
-        throw new UnsupportedOperationException();
-    }
-
-    default byte[] get(byte[] key) {
         throw new UnsupportedOperationException();
     }
 
@@ -1131,66 +1127,6 @@ public interface JedisClient extends Closeable {
         throw new UnsupportedOperationException();
     }
 
-    default Long decrBy(byte[] key, long decrement) {
-        throw new UnsupportedOperationException();
-    }
-
-    default Long decrBy(String key, long decrement) {
-        throw new UnsupportedOperationException();
-    }
-
-    default Long decr(byte[] key) {
-        throw new UnsupportedOperationException();
-    }
-
-    default Long decr(String key) {
-        throw new UnsupportedOperationException();
-    }
-
-    default Long del(byte[] key) {
-        throw new UnsupportedOperationException();
-    }
-
-    default Long del(byte[]... keys) {
-        throw new UnsupportedOperationException();
-    }
-
-    default Long del(String key) {
-        throw new UnsupportedOperationException();
-    }
-
-    default Long del(String... keys) {
-        throw new UnsupportedOperationException();
-    }
-
-    default Long exists(byte[]... keys) {
-        throw new UnsupportedOperationException();
-    }
-
-    default Long exists(String... keys) {
-        throw new UnsupportedOperationException();
-    }
-
-    default Long expireAt(byte[] key, long unixTime) {
-        throw new UnsupportedOperationException();
-    }
-
-    default Long expireAt(String key, long unixTime) {
-        throw new UnsupportedOperationException();
-    }
-
-    default Long expire(byte[] key, int seconds) {
-        throw new UnsupportedOperationException();
-    }
-
-    default Long expire(byte[] key, long seconds) {
-        throw new UnsupportedOperationException();
-    }
-
-    default Long expire(String key, long seconds) {
-        throw new UnsupportedOperationException();
-    }
-
     default Long geoadd(byte[] key, double longitude, double latitude, byte[] member) {
         throw new UnsupportedOperationException();
     }
@@ -1941,25 +1877,7 @@ public interface JedisClient extends Closeable {
         throw new UnsupportedOperationException();
     }
 
-    default Object eval(byte[] script) {
-        throw new UnsupportedOperationException();
-    }
-
-    default Object eval(byte[] script, byte[] keyCount, byte[]... params) {
-        throw new UnsupportedOperationException();
-    }
-
-    default Object eval(byte[] script, byte[] sampleKey) {
-        throw new UnsupportedOperationException();
-    }
-
-    default Object eval(byte[] script, int keyCount, byte[]... params) {
-        throw new UnsupportedOperationException();
-    }
-
-    default Object eval(byte[] script, List<byte[]> keys, List<byte[]> args) {
-        throw new UnsupportedOperationException();
-    }
+    // Moved to BasicJedisClient for other eval() methods.
 
     default Object evalsha(byte[] sha1) {
         throw new UnsupportedOperationException();
@@ -1990,22 +1908,6 @@ public interface JedisClient extends Closeable {
     }
 
     default Object evalsha(String sha1, String sampleKey) {
-        throw new UnsupportedOperationException();
-    }
-
-    default Object eval(String script) {
-        throw new UnsupportedOperationException();
-    }
-
-    default Object eval(String script, int keyCount, String... params) {
-        throw new UnsupportedOperationException();
-    }
-
-    default Object eval(String script, List<String> keys, List<String> args) {
-        throw new UnsupportedOperationException();
-    }
-
-    default Object eval(String script, String sampleKey) {
         throw new UnsupportedOperationException();
     }
 
@@ -2637,14 +2539,6 @@ public interface JedisClient extends Closeable {
         throw new UnsupportedOperationException();
     }
 
-    default String get(String key) {
-        throw new UnsupportedOperationException();
-    }
-
-    default String hget(String key, String field) {
-        throw new UnsupportedOperationException();
-    }
-
     default String hmset(byte[] key, Map<byte[], byte[]> hash) {
         throw new UnsupportedOperationException();
     }
@@ -2869,23 +2763,9 @@ public interface JedisClient extends Closeable {
         throw new UnsupportedOperationException();
     }
 
-    default String set(byte[] key, byte[] value) {
-        throw new UnsupportedOperationException();
-    }
+    // Moved to BasicJedisClient for other set() methods.
 
     default String set(byte[] key, byte[] value, SetParams params) {
-        throw new UnsupportedOperationException();
-    }
-
-    default String setex(byte[] key, long seconds, byte[] value) {
-        throw new UnsupportedOperationException();
-    }
-
-    default String setex(String key, long seconds, String value) {
-        throw new UnsupportedOperationException();
-    }
-
-    default String set(String key, String value) {
         throw new UnsupportedOperationException();
     }
 
@@ -2893,22 +2773,7 @@ public interface JedisClient extends Closeable {
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * Set {@code key} to hold the string {@code value} and expiration
-     * {@code timeout} if {@code key} is absent.
-     *
-     * @param key
-     *            must not be {@literal null}.
-     * @param value
-     *            must not be {@literal null}.
-     * @param timeout
-     *            the key expiration timeout.
-     * @param unit
-     *            must not be {@literal null}.
-     * @return {@literal null} when used in pipeline / transaction.
-     * @since 2.1
-     * @see <a href="https://redis.io/commands/set">Redis Documentation: SET</a>
-     */
+    @Override
     default String setIfAbsent(String key, String value, long expireMs) {
         final SetParams params = SetParams.setParams().nx().px(expireMs);
         return set(key, value, params);
