@@ -2893,6 +2893,27 @@ public interface JedisClient extends Closeable {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Set {@code key} to hold the string {@code value} and expiration
+     * {@code timeout} if {@code key} is absent.
+     *
+     * @param key
+     *            must not be {@literal null}.
+     * @param value
+     *            must not be {@literal null}.
+     * @param timeout
+     *            the key expiration timeout.
+     * @param unit
+     *            must not be {@literal null}.
+     * @return {@literal null} when used in pipeline / transaction.
+     * @since 2.1
+     * @see <a href="https://redis.io/commands/set">Redis Documentation: SET</a>
+     */
+    default String setIfAbsent(String key, String value, long expireMs) {
+        final SetParams params = SetParams.setParams().nx().px(expireMs);
+        return set(key, value, params);
+    }
+
     default String shutdown() {
         throw new UnsupportedOperationException();
     }

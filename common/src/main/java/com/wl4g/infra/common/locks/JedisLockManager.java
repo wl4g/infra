@@ -38,7 +38,6 @@ import com.wl4g.infra.common.jedis.JedisClient;
 
 import lombok.CustomLog;
 import lombok.ToString;
-import redis.clients.jedis.params.SetParams;
 
 /**
  * JEDIS locks manager.
@@ -233,8 +232,7 @@ public class JedisLockManager {
             }
 
             // Try to acquire a new lock from the server.
-            SetParams params = SetParams.setParams().nx().px(expiredMs);
-            if (assertValidity(jedisClient.set(getLockName(), requestId, params))) {
+            if (assertValidity(jedisClient.setIfAbsent(getLockName(), requestId, expiredMs))) {
                 // Obtain lock record once cumulatively.
                 counter.incrementAndGet();
                 return true;
