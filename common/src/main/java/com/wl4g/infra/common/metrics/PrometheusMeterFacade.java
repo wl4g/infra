@@ -17,6 +17,7 @@ package com.wl4g.infra.common.metrics;
 
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.util.Arrays.asList;
 import static java.util.Objects.isNull;
@@ -24,7 +25,9 @@ import static java.util.Objects.isNull;
 import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 import com.google.common.collect.Lists;
@@ -39,6 +42,7 @@ import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.distribution.DistributionStatisticConfig;
+import io.micrometer.core.instrument.distribution.HistogramSnapshot;
 import io.micrometer.prometheus.PrometheusCounter;
 import io.micrometer.prometheus.PrometheusDistributionSummary;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
@@ -48,6 +52,7 @@ import io.prometheus.client.CounterMetricFamily;
 import io.prometheus.client.GaugeMetricFamily;
 import io.prometheus.client.SummaryMetricFamily;
 import lombok.AllArgsConstructor;
+import lombok.CustomLog;
 import lombok.Getter;
 
 /**
@@ -62,8 +67,8 @@ import lombok.Getter;
  * @since v1.0.0
  */
 @Getter
+@CustomLog
 public class PrometheusMeterFacade {
-
     private final String serviceId;
     private final boolean secure;
     private final int port;
@@ -102,28 +107,48 @@ public class PrometheusMeterFacade {
     // --- Counter. ---
 
     public Counter counter(String name, String help, String... tags) {
-        return Counter.builder(name).description(help).tags(applyDefaultTags(tags)).register(meterRegistry);
+        try {
+            return Counter.builder(name).description(help).tags(applyDefaultTags(tags)).register(meterRegistry);
+        } catch (Throwable e) {
+            log.error(format("Unable to counter meter for metrics: '%s', help: '%s', tags: %s", name, help, asList(tags)), e);
+            return EMPTY_COUNTER;
+        }
     }
 
     // --- Gauge. ---
 
     public Gauge gauge(String name, String help, double number, String... tags) {
-        return gauge(name, help, () -> number, tags);
+        try {
+            return gauge(name, help, () -> number, tags);
+        } catch (Throwable e) {
+            log.error(format("Unable to gauge meter for metrics: '%s', help: '%s', tags: %s", name, help, asList(tags)), e);
+            return EMPTY_GAUGE;
+        }
     }
 
     public Gauge gauge(String name, String help, Supplier<Number> supplier, String... tags) {
-        return Gauge.builder(name, supplier).description(help).tags(applyDefaultTags(tags)).register(meterRegistry);
+        try {
+            return Gauge.builder(name, supplier).description(help).tags(applyDefaultTags(tags)).register(meterRegistry);
+        } catch (Throwable e) {
+            log.error(format("Unable to gauge meter for metrics: '%s', help: '%s', tags: %s", name, help, asList(tags)), e);
+            return EMPTY_GAUGE;
+        }
     }
 
     // --- Timer. ---
 
     public Timer timer(String name, String help, double[] percentiles, String... tags) {
-        return Timer.builder(name)
-                .description(help)
-                .tags(applyDefaultTags(tags))
-                .publishPercentiles(percentiles)
-                .publishPercentileHistogram()
-                .register(meterRegistry);
+        try {
+            return Timer.builder(name)
+                    .description(help)
+                    .tags(applyDefaultTags(tags))
+                    .publishPercentiles(percentiles)
+                    .publishPercentileHistogram()
+                    .register(meterRegistry);
+        } catch (Throwable e) {
+            log.error(format("Unable to timer meter for metrics: '%s', help: '%s', tags: %s", name, help, asList(tags)), e);
+            return EMPTY_TIMER;
+        }
     }
 
     // --- Summary. ---
@@ -272,5 +297,84 @@ public class PrometheusMeterFacade {
     }
 
     public static final String TAG_SELF_ID = "self";
+
+    public static final Counter EMPTY_COUNTER = new Counter() {
+        @Override
+        public Id getId() {
+            return null;
+        }
+
+        @Override
+        public void increment(double amount) {
+        }
+
+        @Override
+        public double count() {
+            return 0;
+        }
+    };
+
+    public static final Gauge EMPTY_GAUGE = new Gauge() {
+        @Override
+        public Id getId() {
+            return null;
+        }
+
+        @Override
+        public double value() {
+            return 0;
+        }
+    };
+
+    public static final Timer EMPTY_TIMER = new Timer() {
+
+        @Override
+        public Id getId() {
+            return null;
+        }
+
+        @Override
+        public HistogramSnapshot takeSnapshot() {
+            return null;
+        }
+
+        @Override
+        public void record(long amount, TimeUnit unit) {
+        }
+
+        @Override
+        public <T> T record(Supplier<T> f) {
+            return null;
+        }
+
+        @Override
+        public <T> T recordCallable(Callable<T> f) throws Exception {
+            return null;
+        }
+
+        @Override
+        public void record(Runnable f) {
+        }
+
+        @Override
+        public long count() {
+            return 0;
+        }
+
+        @Override
+        public double totalTime(TimeUnit unit) {
+            return 0;
+        }
+
+        @Override
+        public double max(TimeUnit unit) {
+            return 0;
+        }
+
+        @Override
+        public TimeUnit baseTimeUnit() {
+            return null;
+        }
+    };
 
 }
