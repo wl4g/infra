@@ -39,14 +39,12 @@ public class EnumValidator implements ConstraintValidator<EnumValue, Object> {
     private Class<?>[] enumClass;
     private String fieldName;
     private boolean caseSensitive;
-    private boolean hasText;
 
     @Override
     public void initialize(EnumValue constraintAnnotation) {
         this.enumClass = constraintAnnotation.enumCls();
         this.fieldName = constraintAnnotation.enumField();
         this.caseSensitive = constraintAnnotation.caseSensitive();
-        this.hasText = constraintAnnotation.hasText();
     }
 
     @SuppressWarnings("rawtypes")
@@ -57,7 +55,7 @@ public class EnumValidator implements ConstraintValidator<EnumValue, Object> {
                 for (Class<?> cl : enumClass) {
                     if (cl.isEnum()) {
                         try {
-                            // 匹配枚举常量名
+                            // Match enum constant name.
                             Enum[] constants = (Enum[]) cl.getEnumConstants();
                             for (Enum constant : constants) {
                                 String constantName = constant.name();
@@ -66,7 +64,7 @@ public class EnumValidator implements ConstraintValidator<EnumValue, Object> {
                                     return true;
                                 }
                             }
-                            // 匹配枚举常量的属性值
+                            // Matches property values of enum constants.
                             if (!isBlank(fieldName)) {
                                 Field field = findField(cl, fieldName);
                                 if (nonNull(field)) {
@@ -92,7 +90,10 @@ public class EnumValidator implements ConstraintValidator<EnumValue, Object> {
                 return true;
             }
         }
-        return !hasText;
+        // When the value is null, the assertion check is ignored. If you need
+        // to assert that it is not empty, you should add annotations such as
+        // @NotNull
+        return true;
     }
 
 }

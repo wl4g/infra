@@ -37,15 +37,13 @@ import javax.validation.Payload;
 @Documented
 public @interface EnumValue {
 
-    String message() default "Incorrect enum type";
+    String message() default "invalid enum type";
 
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
 
     boolean caseSensitive() default false;
-
-    boolean hasText() default true;
 
     Class<?>[] enumCls() default {};
 
