@@ -22,7 +22,6 @@ import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static redis.clients.jedis.HostAndPort.parseString;
 
 import java.io.Serializable;
 import java.time.Duration;
@@ -199,21 +198,21 @@ public class JedisClientBuilder {
              * time-out for acquiring resources, which will lead to deadlock.
              */
             this.poolConfig = new JedisPoolConfig();
-            this.poolConfig.setMaxWait(Duration.ofMillis(10000));
-            this.poolConfig.setMinIdle(10);
-            this.poolConfig.setMaxIdle(100);
-            this.poolConfig.setMaxTotal(60000);
+            this.poolConfig.setMaxWait(Duration.ofSeconds(10));
+            this.poolConfig.setMaxTotal(100);
+            this.poolConfig.setMaxIdle(10);
+            this.poolConfig.setMinIdle(1);
         }
 
         public final Set<HostAndPort> parseHostAndPort() throws Exception {
             try {
-                Set<HostAndPort> haps = new HashSet<HostAndPort>();
+                final Set<HostAndPort> haps = new HashSet<HostAndPort>();
                 for (String node : getNodes()) {
                     boolean matched = defaultNodePattern.matcher(node).matches();
                     if (!matched) {
                         throw new IllegalArgumentException("illegal ip or port");
                     }
-                    haps.add(parseString(node));
+                    haps.add(HostAndPort.from(node));
                 }
                 return haps;
             } catch (Exception e) {
