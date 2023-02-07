@@ -442,7 +442,7 @@
   "allPublicConstructors": true,
   "allPublicMethods": true,
   "methods":[
-    {"name":"<init>","parameterTypes":["com.wl4g.infra.common.jedis.JedisClient"] }, 
+    {"name":"<init>","parameterTypes":["com.wl4g.infra.common.jedis.BasicJedisClient"] }, 
     {"name":"getLock","parameterTypes":["java.lang.String"] }, 
     {"name":"getLock","parameterTypes":["java.lang.String","long","java.util.concurrent.TimeUnit"] }, 
     {"name":"toString","parameterTypes":[] }
@@ -453,9 +453,9 @@
   "allPublicConstructors": true,
   "allPublicMethods": true,
   "methods":[
-    {"name":"<init>","parameterTypes":["com.wl4g.infra.common.jedis.JedisClient","java.lang.String","long"] }, 
-    {"name":"<init>","parameterTypes":["com.wl4g.infra.common.jedis.JedisClient","java.lang.String","long","long"] }, 
-    {"name":"<init>","parameterTypes":["com.wl4g.infra.common.jedis.JedisClient","java.lang.String","long","java.util.concurrent.atomic.AtomicLong"] }, 
+    {"name":"<init>","parameterTypes":["com.wl4g.infra.common.jedis.BasicJedisClient","java.lang.String","long"] }, 
+    {"name":"<init>","parameterTypes":["com.wl4g.infra.common.jedis.BasicJedisClient","java.lang.String","long","long"] }, 
+    {"name":"<init>","parameterTypes":["com.wl4g.infra.common.jedis.BasicJedisClient","java.lang.String","long","java.util.concurrent.atomic.AtomicLong"] }, 
     {"name":"lock","parameterTypes":[] },
     {"name":"lockInterruptibly","parameterTypes":[] },
     {"name":"tryLock","parameterTypes":[] },
@@ -464,92 +464,6 @@
     {"name":"newCondition","parameterTypes":[] },
     {"name":"toString","parameterTypes":[] }
   ]
-},
-{
-  "name":"com.wl4g.infra.common.serialize.JacksonUtils$CustomObjectWriter",
-  "allPublicConstructors": true,
-  "allPublicMethods": true,
-  "methods":[
-    {"name":"<init>","parameterTypes":["com.fasterxml.jackson.databind.ObjectMapper","com.fasterxml.jackson.databind.DeserializationConfig"] }, 
-    {"name":"<init>","parameterTypes":["com.fasterxml.jackson.databind.ObjectMapper","com.fasterxml.jackson.databind.DeserializationConfig","com.fasterxml.jackson.databind.JavaType","java.lang.Object","com.fasterxml.jackson.core.FormatSchema","com.fasterxml.jackson.databind.InjectableValues"] }, 
-    {"name":"<init>","parameterTypes":["com.fasterxml.jackson.databind.ObjectReader","com.fasterxml.jackson.databind.DeserializationConfig","com.fasterxml.jackson.databind.JavaType","com.fasterxml.jackson.databind.JsonDeserializer","java.lang.Object","com.fasterxml.jackson.core.FormatSchema","com.fasterxml.jackson.databind.InjectableValues","com.fasterxml.jackson.databind.deser.DataFormatReaders"] }, 
-    {"name":"<init>","parameterTypes":["com.fasterxml.jackson.databind.ObjectReader","com.fasterxml.jackson.databind.DeserializationConfig"] }, 
-    {"name":"<init>","parameterTypes":["com.fasterxml.jackson.databind.ObjectReader","com.fasterxml.jackson.core.JsonFactory"] }, 
-    {"name":"<init>","parameterTypes":["com.fasterxml.jackson.databind.ObjectReader","com.fasterxml.jackson.core.filter.TokenFilter"] }, 
-    {"name":"toString","parameterTypes":[] }
-  ]
-},
-{
-  "name":"com.wl4g.infra.common.serialize.JacksonUtils$CustomObjectReader",
-  "allPublicConstructors": true,
-  "allPublicMethods": true,
-  "methods":[
-    {"name":"<init>","parameterTypes":["com.fasterxml.jackson.databind.ObjectMapper","com.fasterxml.jackson.databind.SerializationConfig","com.fasterxml.jackson.databind.JavaType","com.fasterxml.jackson.core.PrettyPrinter"] }, 
-    {"name":"<init>","parameterTypes":["com.fasterxml.jackson.databind.ObjectMapper","com.fasterxml.jackson.databind.SerializationConfig"] }, 
-    {"name":"<init>","parameterTypes":["com.fasterxml.jackson.databind.ObjectMapper","com.fasterxml.jackson.databind.SerializationConfig","com.fasterxml.jackson.core.FormatSchema"] }, 
-    {"name":"<init>","parameterTypes":["com.fasterxml.jackson.databind.ObjectMapper","com.fasterxml.jackson.databind.SerializationConfig","com.fasterxml.jackson.databind.ObjectWriter$GeneratorSettings","com.fasterxml.jackson.databind.ObjectWriter$Prefetch"] }, 
-    {"name":"<init>","parameterTypes":["com.fasterxml.jackson.databind.ObjectWriter","com.fasterxml.jackson.databind.SerializationConfig"] }, 
-    {"name":"<init>","parameterTypes":["com.fasterxml.jackson.databind.ObjectWriter","com.fasterxml.jackson.core.JsonFactory"] }, 
-    {"name":"toString","parameterTypes":[] }
-  ]
-},
-{
-  "name":"com.wl4g.infra.common.serialize.JacksonUtils$TransformPropertyFilter",
-  "allPublicConstructors": true,
-  "allPublicMethods": true,
-  "methods":[
-    {"name":"<init>","parameterTypes":["java.util.Map","java.util.Set"] }, 
-    {"name":"getExcludeProperties","parameterTypes":[] }, 
-    {"name":"toString","parameterTypes":[] }
-  ]
-},
-{
-  "name":"com.wl4g.infra.common.serialize.JacksonUtils$TransformPropertiesSerializerModifier",
-  "allPublicConstructors": true,
-  "allPublicMethods": true,
-  "methods":[
-    {"name":"<init>","parameterTypes":[] }, 
-    {"name":"toString","parameterTypes":[] }
-  ]
-},
-{
-  "name":"com.wl4g.infra.common.serialize.JacksonUtils$TransformContextAttributes",
-  "allPublicConstructors": true,
-  "allPublicMethods": true,
-  "methods":[
-    {"name":"<init>","parameterTypes":["java.util.Map","java.util.Set"] }, 
-    {"name":"toString","parameterTypes":[] }
-  ]
-},
-{
-  "name":"com.wl4g.infra.common.serialize.JacksonUtils$TransformPropertiesDeserializerModifier",
-  "allPublicConstructors": true,
-  "allPublicMethods": true,
-  "methods":[
-    {"name":"<init>","parameterTypes":[] }, 
-    {"name":"toString","parameterTypes":[] }
-  ]
-},
-{
-  "name":"com.wl4g.infra.common.serialize.JacksonUtils$DefaultDeserialzePropertyTransformer",
-  "allPublicConstructors": true,
-  "allPublicMethods": true,
-  "methods":[
-    {"name":"<init>","parameterTypes":["java.util.Map"] }, 
-    {"name":"toString","parameterTypes":[] }
-  ]
-},
-{
-  "name":"com.wl4g.infra.common.serialize.JacksonUtils$PropertyTransformer",
-  "allPublicConstructors": true,
-  "allPublicMethods": true,
-  "methods":[]
-},
-{
-  "name":"com.wl4g.infra.common.serialize.JacksonUtils$PropertyExcluder",
-  "allPublicConstructors": true,
-  "allPublicMethods": true,
-  "methods":[]
 },
 {
   "name":"com.wl4g.infra.common.cli.ssh.SshHelperBase$SSHExecResult",
@@ -1481,7 +1395,6 @@
   "queryAllDeclaredMethods": true,
   "queryAllDeclaredConstructors": true,
   "methods": [
-    {"name": "<init>","parameterTypes": []},
     {"name": "send","parameterTypes": ["com.wl4g.infra.common.notification.email.internal.JavaMailSender","com.wl4g.infra.common.notification.email.EmailNotifierProperties","com.wl4g.infra.common.notification.GenericNotifierParam","java.lang.String"]},
     {"name": "send","parameterTypes": ["com.wl4g.infra.common.notification.email.internal.JavaMailSender","com.wl4g.infra.common.notification.email.EmailNotifierProperties","com.wl4g.infra.common.notification.GenericNotifierParam"]},
     {"name": "lambda$0","parameterTypes": ["java.lang.String"]},
