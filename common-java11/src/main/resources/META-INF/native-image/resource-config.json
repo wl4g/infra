@@ -189,6 +189,9 @@
     }, 
     {
       "pattern":"\\Qorg/slf4j/impl/StaticLoggerBinder.class\\E"
+    }, 
+    {
+      "pattern":"\\Qcom/wl4g/infra/common/notification/email/internal/mime.types\\E"
     }
   ]},
   "bundles":[]

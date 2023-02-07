@@ -420,6 +420,24 @@
   ]
 },
 {
+  "name":"com.wl4g.infra.common.graalvm.RandomDefault",
+  "allPublicConstructors": true,
+  "allPublicMethods": true,
+  "methods":[
+    {"name":"getDefault","parameterTypes":[] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.infra.common.graalvm.SecureRandomDefault",
+  "allPublicConstructors": true,
+  "allPublicMethods": true,
+  "methods":[
+    {"name":"getDefault","parameterTypes":[] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
   "name":"com.wl4g.infra.common.locks.JedisLockManager",
   "allPublicConstructors": true,
   "allPublicMethods": true,
