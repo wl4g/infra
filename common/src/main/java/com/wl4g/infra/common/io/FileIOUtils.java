@@ -20,6 +20,7 @@ import static com.google.common.base.Charsets.UTF_8;
 import static com.wl4g.infra.common.lang.Assert2.hasText;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.isTrue;
+import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.state;
 import static java.lang.Math.min;
@@ -77,16 +78,6 @@ import com.google.common.io.Resources;
  * @since
  */
 public abstract class FileIOUtils extends FileUtils {
-
-    /**
-     * Default read safety loop count.
-     */
-    final public static long DEFAULT_SAFE_READ_COUNT = 100_0000L;
-
-    /**
-     * Default read/write buffer size.
-     */
-    final public static int DEFAULT_RW_BUF_SIZE = 4096;
 
     // -- Files. ---
 
@@ -275,11 +266,11 @@ public abstract class FileIOUtils extends FileUtils {
      * @return
      */
     public static ReadTailFrame seekReadLines(String filename, long startPos, int aboutLimit, Function<String, Boolean> stopper) {
-        hasText(filename, "Read seek filename must not be empty.");
-        isTrue(startPos >= 0, "Read start position must be greater than or equal to 0");
-        isTrue(aboutLimit > 0, "Read about limit must be greater than to 0");
+        hasTextOf(filename, "filename");
+        isTrueOf(startPos >= 0, "startPos >= 0");
+        isTrueOf(aboutLimit > 0, "aboutLimit > 0");
 
-        List<String> lines = new ArrayList<>();
+        final List<String> lines = new ArrayList<>(32);
         try (RandomAccessFile raf = new RandomAccessFile(filename, "r")) {
             raf.seek(startPos);
             boolean hasNext = true; // Has next line?
@@ -462,4 +453,13 @@ public abstract class FileIOUtils extends FileUtils {
 
     }
 
+    /**
+     * Default read safety loop count.
+     */
+    public static final long DEFAULT_SAFE_READ_COUNT = 100_000L;
+
+    /**
+     * Default read/write buffer size.
+     */
+    public static final int DEFAULT_RW_BUF_SIZE = 4096;
 }
