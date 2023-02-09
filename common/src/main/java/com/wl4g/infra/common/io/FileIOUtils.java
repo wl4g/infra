@@ -24,7 +24,6 @@ import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.state;
 import static java.lang.Math.min;
-import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
 
@@ -277,14 +276,15 @@ public abstract class FileIOUtils extends FileUtils {
             long c = 0, lastPos = -1, endPos = (startPos + aboutLimit);
             while (raf.getFilePointer() > lastPos && (lastPos = raf.getFilePointer()) < endPos && ++c < DEFAULT_SAFE_READ_COUNT) {
                 String line = raf.readLine();
-                if (nonNull(line)) {
+                if (stopper.apply(line)) {
+                    hasNext = false;
+                    break;
+                }
+                if (!isBlank(line)) {
                     line = new String(line.getBytes(ISO_8859_1), UTF_8);
                     lines.add(line);
-                    if (stopper.apply(line)) {
-                        hasNext = false;
-                        break;
-                    }
                 } else {
+                    hasNext = false;
                     break;
                 }
             }
