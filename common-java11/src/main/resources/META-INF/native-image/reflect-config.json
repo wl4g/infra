@@ -438,6 +438,13 @@
   ]
 },
 {
+  "name":"com.wl4g.infra.common.graalvm.GraalPolyglotManager$NoPolyglotContextException",
+  "allPublicConstructors": true,
+  "allPublicMethods": true,
+  "methods":[
+  ]
+},
+{
   "name":"com.wl4g.infra.common.locks.JedisLockManager",
   "allPublicConstructors": true,
   "allPublicMethods": true,

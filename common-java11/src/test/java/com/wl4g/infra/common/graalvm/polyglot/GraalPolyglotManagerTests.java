@@ -15,8 +15,11 @@
  */
 package com.wl4g.infra.common.graalvm.polyglot;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToList;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
+import static java.util.Collections.singletonMap;
+import static java.util.Objects.isNull;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -32,7 +35,8 @@ import org.junit.Test;
 
 import com.google.common.base.Charsets;
 import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager.ContextWrapper;
-import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager.SimpleFastContextPool;
+import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager.NoPolyglotContextException;
+import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager.SimpleSyncContextPool;
 import com.wl4g.infra.common.io.FileIOUtils;
 
 /**
@@ -46,7 +50,7 @@ public class GraalPolyglotManagerTests {
 
     @Test
     public void testTakeNoOverflow() throws Exception {
-        try (SimpleFastContextPool pool = new SimpleFastContextPool(10, metadata -> Context.create());) {
+        try (SimpleSyncContextPool pool = new SimpleSyncContextPool(10, metadata -> Context.create());) {
             try {
                 for (int i = 0; i < 10; i++) {
                     ContextWrapper context = pool.take(true, null);
@@ -62,7 +66,7 @@ public class GraalPolyglotManagerTests {
 
     @Test(expected = IllegalStateException.class)
     public void testTakeOverflow() throws Exception {
-        try (SimpleFastContextPool pool = new SimpleFastContextPool(10, metadata -> Context.create());) {
+        try (SimpleSyncContextPool pool = new SimpleSyncContextPool(10, metadata -> Context.create());) {
             try {
                 for (int i = 0; i < 11; i++) {
                     ContextWrapper context = pool.take(true, null);
@@ -78,7 +82,7 @@ public class GraalPolyglotManagerTests {
 
     @Test
     public void testTakeNoOverflowWithRelease() throws Exception {
-        try (SimpleFastContextPool pool = new SimpleFastContextPool(10, metadata -> Context.create());) {
+        try (SimpleSyncContextPool pool = new SimpleSyncContextPool(10, metadata -> Context.create());) {
             try {
                 for (int i = 0; i < 20; i++) {
                     try (ContextWrapper context = pool.take(true, null);) {
@@ -93,57 +97,64 @@ public class GraalPolyglotManagerTests {
         }
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void testMultiThreadExecutionWithOverflow() throws Exception {
+    @Test(expected = NoPolyglotContextException.class)
+    public void testCouldNotGetPool() throws Exception {
         System.setProperty("polyglot.engine.WarnInterpreterOnly", "false"); // disabled-warning
+        System.out.println(org.graalvm.polyglot.Engine.class);
 
-        int threadCount = 100;
-        int poolMaxSize = 20;
+        int maxPoolSize = 20;
+        int concurrency = maxPoolSize * 2;
 
         String script = format("function process(name) { console.log('[  js] - The name is:', name); return 'Hello ' + name; }");
         File localFile = new File("/tmp/test-graaljs-" + currentTimeMillis() + ".js");
         FileIOUtils.writeFile(localFile, script, Charsets.UTF_8, false);
 
-        List<Exception> exceptions = new ArrayList<>();
-        CountDownLatch latch = new CountDownLatch(threadCount);
+        List<Throwable> exceptions = new ArrayList<>();
+        CountDownLatch latch = new CountDownLatch(concurrency);
 
-        try (SimpleFastContextPool pool = new SimpleFastContextPool(poolMaxSize,
-                metadata -> Context.newBuilder("js").allowIO(true).build());) {
-            for (int i = 0; i < threadCount; i++) {
-                new Thread(() -> {
-                    long begin = currentTimeMillis();
+        System.setProperty("graaljs.context.pool.max", maxPoolSize + "");
+        GraalPolyglotManager manager = GraalPolyglotManager
+                .newDefaultGraalJS("/tmp/" + GraalPolyglotManagerTests.class.getSimpleName(), metadata -> null, metadata -> null);
 
-                    try (ContextWrapper context = pool.take(true, null);) {
-                        context.leave();
-                        System.out.println(format("[java] [%s] - running ...", Thread.currentThread().getName()));
+        for (int i = 0; i < concurrency; i++) {
+            new Thread(() -> {
+                long begin = currentTimeMillis();
 
-                        context.eval(Source.newBuilder("js", localFile).build());
-                        Value bindings = context.getBindings("js");
-                        Value processFunction = bindings.getMember("process");
+                try (ContextWrapper context = manager.getContext(true, singletonMap("MY_ID", 10101112));) {
+                    System.out.println(format("[java] [%s] - running ...", Thread.currentThread().getName()));
 
-                        String helloName = format("jack from %s", Thread.currentThread().getName());
-                        Value result = processFunction.execute(helloName);
+                    context.eval(Source.newBuilder("js", localFile).build());
+                    Value bindings = context.getBindings("js");
+                    Value processFunction = bindings.getMember("process");
 
-                        System.out.println(format("[java] [%s] - finished, cost(execute): %sms, result: %s",
-                                Thread.currentThread().getName(), (currentTimeMillis() - begin), result));
+                    String helloName = format("jack from %s", Thread.currentThread().getName());
+                    Value result = processFunction.execute(helloName);
 
-                    } catch (Exception e) {
-                        System.err.println(format("[java] [%s] - %s", Thread.currentThread().getName(), e));
-                        exceptions.add(e);
-                    } finally {
-                        latch.countDown();
-                    }
-                }, "test-thread-" + i).start();
-                Thread.sleep(10L);
-            }
-            latch.await();
+                    System.out.println(format("[java] [%s] - finished, cost(execute): %sms, result: %s",
+                            Thread.currentThread().getName(), (currentTimeMillis() - begin), result));
 
-            if (exceptions.isEmpty()) {
-                System.out.println("Assertion success");
-            } else {
-                throw new IllegalStateException(format("Assertion failed - %s", exceptions.get(0).getMessage()),
-                        exceptions.get(0));
-            }
+                    Thread.sleep(200L);
+                } catch (NoPolyglotContextException e2) {
+                    System.err.println(format("[java] [%s] - %s", Thread.currentThread().getName(), e2));
+                    exceptions.add(e2);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    latch.countDown();
+                }
+            }, "test-thread-" + i).start();
+        }
+        latch.await();
+
+        if (safeArrayToList(manager.getContextPool().getContextCached()).stream().filter(cc -> isNull(cc)).count() > 0) {
+            throw new RuntimeException("Concurrency process has bug???");
+        }
+
+        if (exceptions.isEmpty()) {
+            System.out.println("Assertion success");
+        } else {
+            throw new NoPolyglotContextException(format("Assertion failed - %s", exceptions.get(0).getMessage()),
+                    exceptions.get(0));
         }
     }
 
