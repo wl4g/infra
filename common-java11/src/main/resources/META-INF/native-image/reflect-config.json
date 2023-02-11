@@ -18,6 +18,9 @@
   "name":"java.lang.Byte"
 },
 {
+  "name":"java.lang.Runnable"
+},
+{
   "name":"java.lang.reflect.Field"
 },
 {
@@ -25,6 +28,25 @@
 },
 {
   "name":"java.math.BigInteger"
+},
+{
+  "name":"java.util.UUID",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":["long","long"] },
+    {"name":"fromString","parameterTypes":["java.lang.String"] },
+    {"name":"getLeastSignificantBits","parameterTypes":[] },
+    {"name":"getMostSignificantBits","parameterTypes":[] },
+    {"name":"version","parameterTypes":[] },
+    {"name":"variant","parameterTypes":[] },
+    {"name":"timestamp","parameterTypes":[] },
+    {"name":"clockSequence","parameterTypes":[] },
+    {"name":"node","parameterTypes":[] },
+    {"name":"equals","parameterTypes":["java.lang.Object"] },
+    {"name":"compareTo","parameterTypes":["java.util.UUID"] },
+    {"name":"toString","parameterTypes":[] }
+  ]
 },
 {
   "name":"java.util.List"
@@ -54,9 +76,6 @@
   "name":"java.util.logging.Level"
 },
 {
-  "name":"java.sql.Date"
-},
-{
   "name":"java.concurrent.ConcurrentHashMap"
 },
 {
@@ -78,13 +97,13 @@
   "name":"java.util.concurrent.ScheduledThreadPoolExecutor"
 },
 {
-  "name":"java.lang.Runnable"
-},
-{
   "name":"java.util.function.Function"
 },
 {
   "name":"java.util.function.Supplier"
+},
+{
+  "name":"java.sql.Date"
 },
 {
   "name":"java.io.File"

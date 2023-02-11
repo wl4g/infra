@@ -45,7 +45,6 @@ final class RandomUtilsSubstitute {
     @Substitute
     public static byte[] nextBytes(final int count) {
         Validate.isTrue(count >= 0, "Count cannot be negative.");
-
         final byte[] result = new byte[count];
         RandomDefault.getDefault().nextBytes(result);
         return result;
@@ -55,11 +54,9 @@ final class RandomUtilsSubstitute {
     public static int nextInt(final int startInclusive, final int endExclusive) {
         Validate.isTrue(endExclusive >= startInclusive, "Start value must be smaller or equal to end value.");
         Validate.isTrue(startInclusive >= 0, "Both range values must be non-negative.");
-
         if (startInclusive == endExclusive) {
             return startInclusive;
         }
-
         return startInclusive + RandomDefault.getDefault().nextInt(endExclusive - startInclusive);
     }
 
@@ -68,19 +65,17 @@ final class RandomUtilsSubstitute {
         return nextInt(0, Integer.MAX_VALUE);
     }
 
-    @Alias // 打上标记，让当前(代替类)能够直接访问(原始类)对应的此方法.
+    @Substitute
     public static long nextLong(final long startInclusive, final long endExclusive) {
         Validate.isTrue(endExclusive >= startInclusive, "Start value must be smaller or equal to end value.");
         Validate.isTrue(startInclusive >= 0, "Both range values must be non-negative.");
-
         if (startInclusive == endExclusive) {
             return startInclusive;
         }
-
         return (long) nextDouble(startInclusive, endExclusive);
     }
 
-    @Alias // 打上标记，让当前(代替类)能够直接访问(原始类)对应的此方法.
+    @Substitute
     public static long nextLong() {
         return nextLong(0, Long.MAX_VALUE);
     }
@@ -89,11 +84,9 @@ final class RandomUtilsSubstitute {
     public static double nextDouble(final double startInclusive, final double endInclusive) {
         Validate.isTrue(endInclusive >= startInclusive, "Start value must be smaller or equal to end value.");
         Validate.isTrue(startInclusive >= 0, "Both range values must be non-negative.");
-
         if (startInclusive == endInclusive) {
             return startInclusive;
         }
-
         return startInclusive + ((endInclusive - startInclusive) * RandomDefault.getDefault().nextDouble());
     }
 
@@ -106,11 +99,9 @@ final class RandomUtilsSubstitute {
     public static float nextFloat(final float startInclusive, final float endInclusive) {
         Validate.isTrue(endInclusive >= startInclusive, "Start value must be smaller or equal to end value.");
         Validate.isTrue(startInclusive >= 0, "Both range values must be non-negative.");
-
         if (startInclusive == endInclusive) {
             return startInclusive;
         }
-
         return startInclusive + ((endInclusive - startInclusive) * RandomDefault.getDefault().nextFloat());
     }
 
