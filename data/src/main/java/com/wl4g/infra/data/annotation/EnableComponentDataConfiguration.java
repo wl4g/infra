@@ -33,9 +33,9 @@ import com.wl4g.infra.data.config.HikariAutoConfiguration;
 import com.wl4g.infra.data.config.MybatisAutoConfiguration;
 
 /**
- * Enable xcloud components datasource auto configuration.
+ * Enable infra components datasource auto configuration.
  *
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2020-08-05
  * @see {@link MapperScan}
  */

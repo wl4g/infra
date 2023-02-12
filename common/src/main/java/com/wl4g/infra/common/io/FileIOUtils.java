@@ -72,7 +72,7 @@ import com.google.common.io.Resources;
  * new file locations.
  * </p>
  * 
- * @author Wangl.sir &lt;James Wong@gmail.com, 983708408@qq.com&gt;
+ * @author &lt;James Wong@gmail.com, 983708408@qq.com&gt;
  * @version v1.0.0 2019-10-13
  * @since
  */
@@ -381,7 +381,7 @@ public abstract class FileIOUtils extends FileUtils {
     /**
      * Seek reading processor.
      * 
-     * @author Wangl.sir &lt;James Wong@gmail.com, 983708408@qq.com&gt;
+     * @author &lt;James Wong@gmail.com, 983708408@qq.com&gt;
      * @version v1.0.0 2019-10-13
      * @since
      */

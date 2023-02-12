@@ -37,7 +37,7 @@ import com.wl4g.infra.core.web.error.AbstractErrorAutoConfiguration.ErrorHandler
 /**
  * Default smart error handler.
  * 
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2019-11-01
  * @since
  */

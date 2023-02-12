@@ -112,7 +112,7 @@ The purpose is to be compatible with the migration from `Spring Cloud + Feign` t
 
 ```yaml
 spring:
-  xcloud:
+  infra:
     rpc:
       feign:
         core:

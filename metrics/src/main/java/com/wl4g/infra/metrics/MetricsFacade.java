@@ -30,7 +30,7 @@ import lombok.Getter;
  * 
  * {@link PrometheusMeterRegistry}
  * 
- * @author Wangl.sir &lt;James Wong <jameswong1376@gmail.com>&gt;
+ * @author &lt;James Wong <jameswong1376@gmail.com>&gt;
  * @version 2021-11-16 v1.0.0
  * @since v1.0.0
  */

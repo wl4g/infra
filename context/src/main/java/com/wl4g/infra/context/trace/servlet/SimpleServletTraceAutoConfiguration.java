@@ -32,7 +32,7 @@ import org.springframework.core.env.Environment;
 /**
  * Servlet logging trace MDC auto configuration.
  * 
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2022-03-20
  * @since
  * @see https://github.com/spring-projects-experimental/spring-cloud-sleuth-otel

@@ -136,7 +136,7 @@ import io.netty.util.internal.SystemPropertyUtil;
 /**
  * {@link RestClientStreamingTests}
  *
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2020年7月10日
  * @since
  */

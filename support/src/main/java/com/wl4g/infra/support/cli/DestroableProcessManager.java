@@ -25,7 +25,7 @@ import java.util.concurrent.Executor;
 /**
  * Supports destroable(Interruptible) execution command line process manager.
  * 
- * @author Wangl.sir &lt;James Wong@gmail.com, 983708408@qq.com&gt;
+ * @author &lt;James Wong@gmail.com, 983708408@qq.com&gt;
  * @version v1.0.0 2019-10-20
  * @since
  */
@@ -80,7 +80,7 @@ public interface DestroableProcessManager {
     /**
      * Async execution command process callback.
      * 
-     * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+     * @author James Wong <jameswong1376@gmail.com>>
      * @version v1.0 2019年11月21日
      * @since
      */

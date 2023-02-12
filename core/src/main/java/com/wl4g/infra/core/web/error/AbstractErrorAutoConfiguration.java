@@ -74,7 +74,7 @@ public abstract class AbstractErrorAutoConfiguration extends PrefixHandlerMappin
      * <font color=red>Note: When {@link ConfigurationProperties} is used, the
      * field name cannot contain numbers, otherwise</font>
      * 
-     * @author Wangl.sir &lt;James Wong@gmail.com, 983708408@qq.com&gt;
+     * @author &lt;James Wong@gmail.com, 983708408@qq.com&gt;
      * @version v1.0.0 2019-11-02
      * @since
      */
@@ -175,7 +175,7 @@ public abstract class AbstractErrorAutoConfiguration extends PrefixHandlerMappin
     /**
      * {@link ErrorController}
      *
-     * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+     * @author James Wong <jameswong1376@gmail.com>>
      * @version v1.0 2020-09-09
      * @since
      */

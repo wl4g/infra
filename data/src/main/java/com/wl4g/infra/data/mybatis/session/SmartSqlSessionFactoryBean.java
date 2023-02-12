@@ -37,7 +37,7 @@ import com.wl4g.infra.data.mybatis.logging.LogbackImpl;
  * Smart multi composite sqlSessionFactory, supported for multi datasources and
  * mybatis logback, etc.
  * 
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2020年2月24日
  * @since
  */

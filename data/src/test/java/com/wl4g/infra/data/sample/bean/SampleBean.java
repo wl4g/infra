@@ -23,7 +23,7 @@ import lombok.Setter;
 /**
  * {@link SampleBean}
  *
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2020-09-07
  * @since
  */

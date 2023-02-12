@@ -20,7 +20,7 @@ import com.wl4g.infra.common.id.SnowflakeIdGenerator;
 /**
  * {@link IdGenerator}
  *
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2020-11-19
  * @since
  */

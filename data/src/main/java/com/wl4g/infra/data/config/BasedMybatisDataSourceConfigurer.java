@@ -46,7 +46,7 @@ import com.wl4g.infra.data.mybatis.session.SmartSqlSessionFactoryBean;
 /**
  * {@link BasedMybatisDataSourceConfigurer}
  *
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2020-08-05
  * @since
  */

@@ -31,7 +31,7 @@ import java.util.Properties;
 /**
  * Embedded webapps site configuration.
  * 
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2020年2月20日
  * @since
  */
@@ -63,7 +63,7 @@ public class EmbedWebappAutoConfiguration extends PrefixHandlerMappingSupport {
     /**
      * {@link SimpleEmbedWebappProperties}
      * 
-     * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+     * @author James Wong <jameswong1376@gmail.com>>
      * @version v1.0 2020年2月20日
      * @since
      */

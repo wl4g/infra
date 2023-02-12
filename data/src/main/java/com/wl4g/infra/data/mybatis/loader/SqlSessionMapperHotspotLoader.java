@@ -55,7 +55,7 @@ import com.wl4g.infra.common.log.SmartLogger;
 /**
  * Mybatis {@link SqlSessionFactory} developments hotspot mapper re-loader.
  * 
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2019年11月14日
  * @since
  */
@@ -297,7 +297,7 @@ public final class SqlSessionMapperHotspotLoader implements ApplicationRunner {
     /**
      * Mybatis mappers hotspot loader properties configuration.
      * 
-     * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+     * @author James Wong <jameswong1376@gmail.com>>
      * @version v1.0 2019年11月14日
      * @since
      */

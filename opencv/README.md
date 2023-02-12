@@ -8,10 +8,10 @@ Authors:
 Relevant open source project reference:</br>
 &nbsp;&nbsp;&nbsp;&nbsp;[https://github.com/wl4g/dopass-infra](https://github.com/wl4g/dopass-infra)</br>
 &nbsp;&nbsp;&nbsp;&nbsp;[https://gitee.com/wl4g/dopass-infra](https://gitee.com/wl4g/dopass-infra)</br>
-&nbsp;&nbsp;&nbsp;&nbsp;[https://github.com/wl4g/xcloud-iam](https://github.com/wl4g/xcloud-iam)</br>
-&nbsp;&nbsp;&nbsp;&nbsp;[https://gitee.com/wl4g/xcloud-iam](https://gitee.com/wl4g/xcloud-iam)</br>
-&nbsp;&nbsp;&nbsp;&nbsp;[https://github.com/wl4g/xcloud-dopaas](https://github.com/wl4g/xcloud-dopaas)</br>
-&nbsp;&nbsp;&nbsp;&nbsp;[https://gitee.com/wl4g/xcloud-dopaas](https://gitee.com/wl4g/xcloud-dopaas)</br>
+&nbsp;&nbsp;&nbsp;&nbsp;[https://github.com/wl4g/iam](https://github.com/wl4g/iam)</br>
+&nbsp;&nbsp;&nbsp;&nbsp;[https://gitee.com/wl4g/iam](https://gitee.com/wl4g/iam)</br>
+&nbsp;&nbsp;&nbsp;&nbsp;[https://github.com/wl4g/infra-dopaas](https://github.com/wl4g/infra-dopaas)</br>
+&nbsp;&nbsp;&nbsp;&nbsp;[https://gitee.com/wl4g/infra-dopaas](https://gitee.com/wl4g/infra-dopaas)</br>
 &nbsp;&nbsp;&nbsp;&nbsp;[https://github.com/opencv/opencv](https://github.com/opencv/opencv)</br>
 
 More compiled opencv native libraries references:</br>

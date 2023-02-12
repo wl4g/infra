@@ -26,7 +26,7 @@ import com.wl4g.infra.support.cli.repository.ProcessRepository;
 /**
  * Command-line support auto configuration.
  * 
- * @author Wangl.sir &lt;James Wong@gmail.com, 983708408@qq.com&gt;
+ * @author &lt;James Wong@gmail.com, 983708408@qq.com&gt;
  * @version v1.0.0 2019-10-20
  * @since
  */

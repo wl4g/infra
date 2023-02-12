@@ -28,7 +28,7 @@ import static com.wl4g.infra.support.cli.GenericProcessManager.*;
 /**
  * Command-line process signal model.
  * 
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2019年10月21日
  * @since
  */

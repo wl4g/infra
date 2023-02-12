@@ -42,7 +42,7 @@ import com.wl4g.infra.data.mybatis.mapper.PreparedBeanMapperInterceptor;
 /**
  * {@link SqlSessionMapperHotspotLoader} auto configuration.
  * 
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2019年11月14日
  * @since
  */
@@ -78,8 +78,8 @@ public class MybatisAutoConfiguration {
      * A better recommendation is to use a dedicated ID generation
      * services.</br>
      * <p>
-     * for example: <a href='https://github.com/wl4g/xcloud-dguid'>Dguid -
-     * https://github.com/wl4g/xcloud-dguid</a>
+     * for example: <a href='https://github.com/wl4g/infra-dguid'>Dguid -
+     * https://github.com/wl4g/infra-dguid</a>
      * </p>
      * 
      * @return

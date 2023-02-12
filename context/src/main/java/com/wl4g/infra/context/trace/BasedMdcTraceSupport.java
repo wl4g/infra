@@ -71,7 +71,7 @@ import com.wl4g.infra.context.constant.ContextInfraConstants;
 red>[%-32.32X{H:X-Request-ID}] [%-16.16X{H:X-Request-Seq}]</font> - %-40.40logger{39} : %m%n${LOG_EXCEPTION_CONVERSION_WORD:%wEx}'
  * </pre>
  * 
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2020-02-26
  * @since
  */

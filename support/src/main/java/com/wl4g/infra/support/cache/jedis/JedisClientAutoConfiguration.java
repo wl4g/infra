@@ -37,7 +37,7 @@ import redis.clients.jedis.JedisPool;
  * environment, use jedis singleton, jedis cluster, and then create
  * {@link JedisClientBuilder} and {@link JedisClient}
  * 
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2018年9月16日
  * @since
  */
@@ -71,7 +71,7 @@ public class JedisClientAutoConfiguration {
     /**
      * Jedis properties.
      * 
-     * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+     * @author James Wong <jameswong1376@gmail.com>>
      * @version v1.0 2018年9月16日
      * @since
      */

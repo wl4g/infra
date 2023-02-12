@@ -27,7 +27,7 @@ import org.springframework.context.annotation.Conditional;
  * Check whether the current JVM process is started in the debugging mode of
  * jdwp, otherwise the condition is not tenable.
  * 
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2019年12月26日
  * @since
  */

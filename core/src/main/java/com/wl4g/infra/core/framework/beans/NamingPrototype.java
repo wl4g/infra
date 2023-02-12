@@ -74,7 +74,7 @@ import org.springframework.context.annotation.Scope;
  * </pre>
  * </p>
  * 
- * @author Wangl.sir &lt;James Wong@gmail.com, 983708408@qq.com&gt;
+ * @author &lt;James Wong@gmail.com, 983708408@qq.com&gt;
  * @version v1.0.0 2019-10-09
  * @since
  */

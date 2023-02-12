@@ -28,7 +28,7 @@ import com.wl4g.infra.support.cli.command.DestroableCommand;
 /**
  * Destroable command process wrapper adapter.
  * 
- * @author Wangl.sir &lt;James Wong@gmail.com, 983708408@qq.com&gt;
+ * @author &lt;James Wong@gmail.com, 983708408@qq.com&gt;
  * @version v1.0.0 2019-11-20
  * @since
  */

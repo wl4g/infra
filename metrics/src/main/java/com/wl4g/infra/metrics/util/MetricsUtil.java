@@ -28,7 +28,7 @@ import io.micrometer.core.instrument.ImmutableTag;
 /**
  * {@link MetricsUtil}
  * 
- * @author Wangl.sir &lt;James Wong <jameswong1376@gmail.com>&gt;
+ * @author &lt;James Wong <jameswong1376@gmail.com>&gt;
  * @version 2021-11-30 v1.0.0
  * @since v1.0.0
  */

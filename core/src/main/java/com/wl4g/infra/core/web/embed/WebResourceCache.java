@@ -24,7 +24,7 @@ import org.springframework.cache.concurrent.ConcurrentMapCache;
 /**
  * Webapps cache.
  * 
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2020年3月31日
  * @since
  */
@@ -70,7 +70,7 @@ public interface WebResourceCache {
     /**
      * Default webapps cache.
      * 
-     * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+     * @author James Wong <jameswong1376@gmail.com>>
      * @version v1.0 2020年3月31日
      * @since
      */

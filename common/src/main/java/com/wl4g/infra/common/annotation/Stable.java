@@ -30,7 +30,7 @@ import com.google.common.annotations.Beta;
  * does not imply the quality or performance of the API, only the fact that it
  * is an "API identity."
  * 
- * @author Wangl.sir &lt;James Wong@gmail.com, 983708408@qq.com&gt;
+ * @author &lt;James Wong@gmail.com, 983708408@qq.com&gt;
  * @version v1.0.0 2019-10-27
  * @since
  * @see {@link Beta}

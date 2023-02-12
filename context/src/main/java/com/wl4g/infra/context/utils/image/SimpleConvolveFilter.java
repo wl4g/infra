@@ -23,7 +23,7 @@ import java.awt.geom.*;
  * A filter which applies a convolution kernel to an image.
  * 
  * @author Jerry Huxtable
- * @author Wangl.sir &lt;James Wong@gmail.com, 983708408@qq.com&gt;
+ * @author &lt;James Wong@gmail.com, 983708408@qq.com&gt;
  * @version v1.0.0 2019-12-01
  * @since
  */

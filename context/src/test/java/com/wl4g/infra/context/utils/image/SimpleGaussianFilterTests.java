@@ -24,7 +24,7 @@ import javax.imageio.ImageIO;
 /**
  * 高斯模糊Tests
  * 
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2019年11月28日
  * @since
  */

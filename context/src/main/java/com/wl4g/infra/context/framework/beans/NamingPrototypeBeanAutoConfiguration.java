@@ -49,7 +49,7 @@ import org.springframework.util.MultiValueMap;
 /**
  * Delegate alias prototype bean auto configuration.
  * 
- * @author Wangl.sir <James Wong@gmail.com, 983708408@qq.com>
+ * @author <James Wong@gmail.com, 983708408@qq.com>
  * @version v1.0.0 2019-10-09
  * @since
  */
@@ -69,7 +69,7 @@ public class NamingPrototypeBeanAutoConfiguration {
 	/**
 	 * Delegate alias prototype bean importing auto registrar.
 	 * 
-	 * @author Wangl.sir <James Wong@gmail.com, 983708408@qq.com>
+	 * @author <James Wong@gmail.com, 983708408@qq.com>
 	 * @version v1.0.0 2019-10-09
 	 * @since
 	 * @see {@link MapperScannerRegistrar} struct implements.

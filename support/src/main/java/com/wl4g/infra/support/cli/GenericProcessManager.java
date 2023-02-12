@@ -64,7 +64,7 @@ import ch.ethz.ssh2.Session;
 /**
  * Abstract generic command-line process management implements.
  * 
- * @author Wangl.sir &lt;James Wong@gmail.com, 983708408@qq.com&gt;
+ * @author &lt;James Wong@gmail.com, 983708408@qq.com&gt;
  * @version v1.0.0 2019-10-20
  * @since
  */

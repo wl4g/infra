@@ -31,7 +31,7 @@ import lombok.Setter;
 /**
  * {@link TreeConvertorTests}
  *
- * @author Wangl.sir James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2017-09-08
  * @since
  */
