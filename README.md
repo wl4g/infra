@@ -1,6 +1,13 @@
 # Infra
 
-> An enterprise-grade microservice infrastructure framework, The following frameworks have been integrated, support seamless in switching between :
+A enterprise-grade microservice infrastructure framework, The following frameworks have been integrated, support seamless in switching between :
+
+[![Build on Push](https://github.com/wl4g/infra/actions/workflows/build_on_push.yaml/badge.svg)](https://github.com/wl4g/infra/actions/workflows/build_on_push.yaml)
+[![Build on Daily](https://github.com/wl4g/infra/actions/workflows/build_on_daily.yaml/badge.svg)](https://github.com/wl4g/infra/actions/workflows/build_on_daily.yaml)
+[![License](https://img.shields.io/badge/license-Apache2.0+-green.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+[![GraalVM](https://img.shields.io/badge/GraalVM-22.1-green)](https://github.com/wl4g/infra)
+[![JVM](https://img.shields.io/badge/JVM-8%20and%2011%2B-green)](https://github.com/wl4g/infra)
+[![GithubStars](https://img.shields.io/github/stars/wl4g/infra)](https://github.com/wl4g/infra)
 
 - [**`feign+springboot`**](./integration/integration-feign-core)
 - [**`feign+springcloud`**](./integration/integration-feign-springcloud)
