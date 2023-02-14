@@ -154,7 +154,7 @@ public abstract class AbstractErrorAutoConfiguration extends PrefixHandlerMappin
             return this.asMap;
         }
 
-        public static final String DEFAULT_ERROR_VIEW_PATH = "/default-error-view/";
+        public static final String DEFAULT_ERROR_VIEW_PATH = "classpath:/default-error-view/";
 
         /**
          * {@link HttpStatus#NOT_FOUND}

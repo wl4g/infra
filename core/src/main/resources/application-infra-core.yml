@@ -29,10 +29,10 @@ spring:
   #      embedded-webapps:
   #        enabled: false ## Default by false
   #        base-uri: /default-view
-  #        webapp-location: classpath*:/default-webapps
+  #        webapp-location: classpath:/default-webapps
   #      global-error:
   #        enabled: true ## Default by true
-  #        base-path: /default-error-view/
+  #        base-path: classpath:/default-error-view/
   #        ## Default for empty, The default is to intercept the domain name of the browser address bar.
   #        home-uri: 'javascript:location.href=location.origin'
   #        ## Rendering template path or redirect URI on exception,

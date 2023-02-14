@@ -35,11 +35,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import javax.annotation.Nullable;
 import com.wl4g.infra.common.collection.CollectionUtils2;
 import com.wl4g.infra.common.log.SmartLogger;
 import com.wl4g.infra.common.resource.StreamResource;
@@ -276,17 +276,17 @@ public abstract class Freemarkers {
         // ResourceTemplateLoader
         // (for hot detection of template changes, if possible).
         try {
-            StreamResource path = defaultResourceLoader.getResource(templateLoaderPath);
-            File file = path.getFile(); // will fail if not resolvable in
-                                        // the file system
-            log.debug("Template loader path [" + path + "] resolved to file path [" + file.getAbsolutePath() + "]");
+            final StreamResource resource = defaultResourceLoader.getResource(templateLoaderPath);
+            // will fail if not resolvable in the file system
+            File file = resource.getFile();
+            log.debug("Template loader path [" + file + "] resolved to file path [" + file.getAbsolutePath() + "]");
             return new FileTemplateLoader(file);
         } catch (Exception ex) {
-            log.debug("Cannot resolve template loader path [" + templateLoaderPath
-                    + "] to [java.io.File]: using ResourceTemplateLoader as fallback", ex);
+            log.debug(
+                    "Cannot resolve template loader path [{}] to [java.io.File]: using ResourceTemplateLoader as fallback. reason: {}",
+                    templateLoaderPath, ex.getMessage());
             return new ResourceTemplateLoader(defaultResourceLoader, templateLoaderPath);
         }
-
     }
 
     /**
