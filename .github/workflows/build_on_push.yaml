@@ -25,5 +25,8 @@ jobs:
       packages: write
     name: Run
     uses: './.github/workflows/build_and_test.yaml' ## This the calling to workflow.
+    if: github.repository == 'wl4g/infra'
+    with:
+      branch: ${{ github.event.ref }} ## see:https://docs.github.com/en/developers/webhooks-and-events/events/github-event-types#pushevent
     secrets: ## see:https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-of-jobsjob_idsecrets
       personal-access-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
