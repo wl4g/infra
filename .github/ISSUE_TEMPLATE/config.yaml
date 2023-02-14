@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Question
+    url: https://stackoverflow.com/questions/ask?tags=infra
+    about: I have a question about how to use Infra.
+  - name: Discussions
+    url: https://github.com/wl4g/infra/discussions
+    about: Open Community discussions related to Infra. 
+  - name: Infra Development mailing list 
+    url: https://groups.google.com/forum/#!forum/infra-dev
+    about: You can also ask questions on our mailing list.

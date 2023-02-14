@@ -1,0 +1,16 @@
+name: Feature request / Enhancement
+description: Request or propose a new feature/enhancement
+labels: kind/enhancement
+body:
+  - type: textarea
+    validations:
+      required: true
+    attributes:
+      label: Description
+      description: >-
+        Describe the feature here.
+  - type: textarea
+    attributes:
+      label: Implementation ideas
+      description: >-
+        If you have any implementation ideas, they can go here, however please note that all design change proposals should be posted to [the Infra developer mailing list](mailto:jameswong1376@gmail.com) (or [the corresponding Google Group](https://groups.google.com/group/infra-dev)
