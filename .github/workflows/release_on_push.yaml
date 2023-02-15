@@ -10,27 +10,18 @@
 ## see:https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
 ## see:https://github.com/apache/spark/blob/master/.github/workflows/build_main.yml
 
-name: "Build on Push"
+name: "Release on Push"
 
 on:
   push:
     branches:
-      #- '**'
-      - master
-      - main
-      - feature*
-      - dev*
-      - hotfix*
-      #- 'releases/**'
+      - '**' # for testing
 
 jobs:
-  call-build-and-test:
+  call-release-images:
     permissions:
       packages: write
     name: Run
-    uses: './.github/workflows/build_and_test.yaml' ## This the calling to workflow.
-    if: github.repository == 'wl4g/infra'
-    with:
-      branch: ${{ github.event.ref }} ## see:https://docs.github.com/en/developers/webhooks-and-events/events/github-event-types#pushevent
+    uses: './.github/workflows/release_images.yaml' ## This the calling to workflow.
     secrets: ## see:https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-of-jobsjob_idsecrets
       PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}

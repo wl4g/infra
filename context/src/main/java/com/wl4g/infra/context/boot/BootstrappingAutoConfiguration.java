@@ -56,18 +56,9 @@ public class BootstrappingAutoConfiguration implements InitializingBean {
      */
     protected void initGlobalErrorPrompt(Environment environment) {
         String appName = environment.getRequiredProperty("spring.application.name");
-        if (appName.length() < DEFAULT_PROMPT_MAX_LENGTH) {
-            ErrorPromptMessageBuilder.setPrompt(appName);
-        } else {
-            ErrorPromptMessageBuilder.setPrompt(appName.substring(0, 4));
-        }
+        ErrorPromptMessageBuilder.setPromptDefault(appName);
     }
 
     // --- C U S T O M A T I O N _ S E R V L E T _ C O N T A I N E R. ---
-
-    /**
-     * API prompt max length.
-     */
-    final private static int DEFAULT_PROMPT_MAX_LENGTH = 4;
 
 }

@@ -792,11 +792,35 @@ public class RespBase<D> implements Serializable {
          * @param errorPrompt
          */
         public static final void setPrompt(String errorPrompt) {
-            // hasText(errorPrompt, "Global error prompt can't be empty.");
             if (!isBlank(errorPrompt)) {
                 ErrorPromptMessageBuilder.errorPrompt = errorPrompt.replaceAll("-", "").toUpperCase(US);
             }
         }
+
+        /**
+         * Setup global error message prefix with default normalize.
+         * 
+         * @param errorPrompt
+         */
+        public static final void setPromptDefault(String errorPrompt) {
+            if (!isBlank(errorPrompt)) {
+                if (errorPrompt.length() < DEFAULT_PROMPT_MAX_LENGTH) {
+                    setPrompt(errorPrompt);
+                } else {
+                    for (String delimiter : DEFAULT_PROMPT_DELIMITERS) {
+                        if (errorPrompt.contains(delimiter)) {
+                            setPrompt(errorPrompt.substring(Math.max(errorPrompt.lastIndexOf(delimiter) + 1, 0)));
+                            return;
+                        }
+                    }
+                    setPrompt(errorPrompt.substring(0, DEFAULT_PROMPT_MAX_LENGTH));
+                }
+            }
+        }
+
+        public static final int DEFAULT_PROMPT_MAX_LENGTH = 4;
+        public static final String[] DEFAULT_PROMPT_DELIMITERS = new String[] { "-", "_" };
+
     }
 
     /**

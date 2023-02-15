@@ -43,7 +43,7 @@ on:
         type: string
         default: ''
     secrets: ## see:https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-of-onworkflow_callsecrets
-      personal-access-token:
+      PERSONAL_ACCESS_TOKEN:
         description: 'A developer personal token passed from the caller workflow'
         required: false
 
@@ -59,7 +59,7 @@ jobs:
           fetch-depth: 1
           repository: wl4g/infra
           ref: ${{ inputs.branch }}
-          token: ${{ secrets.personal-access-token }}
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
       #- name: Sync the current branch with the latest in Infra
       #  if: github.repository != 'wl4g/infra'
