@@ -308,7 +308,7 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <!-- https://help.sonatype.com/repomanager2/staging-releases/configuring-your-project-for-deployment -->
+                    <!-- see:https://help.sonatype.com/repomanager2/staging-releases/configuring-your-project-for-deployment -->
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
@@ -318,6 +318,8 @@
                             <nexusUrl>https://oss.sonatype.org/</nexusUrl>
                             <autoReleaseAfterClose>true</autoReleaseAfterClose>
                             <stagingProgressTimeoutMinutes>15</stagingProgressTimeoutMinutes>
+                            <!-- see:https://issues.sonatype.org/browse/NEXUS-19853 -->
+                            <skipNexusStagingDeployMojo>false</skipNexusStagingDeployMojo>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -327,17 +329,11 @@
                     <id>sonatype-nexus-snapshots</id>
                     <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
                 </snapshotRepository>
-                <!-- Manual publishing release to Maven central.  -->
                 <!-- see:https://blogs.wl4g.com/archives/56 -->
-                <!-- <repository>-->
-                <!--     <id>sonatype-nexus-staging</id>-->
-                <!--     <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>-->
-                <!-- </repository>-->
                 <!-- Using github workflow auto publishing to Maven central. -->
                 <!-- see:https://docs.github.com/en/actions/publishing-packages/publishing-java-packages-with-maven#publishing-packages-to-the-maven-central-repository -->
                 <repository>
-                    <id>ossrh</id>
-                    <name>Central Repository OSSRH</name>
+                    <id>sonatype-nexus-staging</id>
                     <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
                 </repository>
             </distributionManagement>

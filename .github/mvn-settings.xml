@@ -1,46 +1,57 @@
-<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
-  <servers>
-    <!-- Rengine-->
-    <server>
-      <id>sonatype-nexus-snapshots</id>
-      <username>${env.MAVEN_USERNAME}</username>
-      <password>${env.MAVEN_PASSWORD}</password>
-    </server>
-    <!-- END OF Rengine-->
-  </servers>
-  <profiles>
-    <profile>
-      <id>google-mirror</id>
-      <repositories>
-        <repository>
-          <id>google-maven-central</id>
-          <name>GCS Maven Central mirror EU</name>
-          <url>https://maven-central.storage-download.googleapis.com/maven2/</url>
-          <releases>
-            <enabled>true</enabled>
-          </releases>
-          <snapshots>
-            <enabled>false</enabled>
-          </snapshots>
-        </repository>
-      </repositories>
-      <pluginRepositories>
-        <pluginRepository>
-          <id>google-maven-central</id>
-          <name>GCS Maven Central mirror EU</name>
-          <url>https://maven-central.storage-download.googleapis.com/maven2/</url>
-          <releases>
-            <enabled>true</enabled>
-          </releases>
-          <snapshots>
-            <enabled>false</enabled>
-          </snapshots>
-        </pluginRepository>
-      </pluginRepositories>
-    </profile>
-  </profiles>
-  <activeProfiles>
-    <activeProfile>google-mirror</activeProfile>
-  </activeProfiles>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
+    <servers>
+        <!-- Custom-->
+        <server>
+            <id>sonatype-nexus-snapshots</id>
+            <username>${env.MAVEN_USERNAME}</username>
+            <password>${env.MAVEN_PASSWORD}</password>
+        </server>
+        <server>
+            <id>sonatype-nexus-staging</id>
+            <username>${env.MAVEN_USERNAME}</username>
+            <!-- 1. 在多个用户共享同一台构建机器的场景, 应该使用 master password 来加密 repository server password (非明文, 此处用),
+                 官方文档: https://maven.apache.org/guides/mini/guide-encryption.html
+                 2. 其 master password 应加密存储在 ~/.m2/settings-security.xml, 由命令 mvn -encrypt-master-password 生成.
+                 3. 其 repository server password 应加密存储在 ~/.m2/settings.xml, 由命令 mvn -encrypt-password 生成.
+            -->
+            <!-- 密码后的 repository server password: {DW/AUoweegkHOFWqqT4zVv7cQYPfbH8TNbklwiPE5cM=} -->
+            <password>${env.MAVEN_PASSWORD}</password>
+        </server>
+        <!-- END OF Custom-->
+    </servers>
+    <profiles>
+        <profile>
+            <id>google-mirror</id>
+            <repositories>
+                <repository>
+                    <id>google-maven-central</id>
+                    <name>GCS Maven Central mirror EU</name>
+                    <url>https://maven-central.storage-download.googleapis.com/maven2/</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>google-maven-central</id>
+                    <name>GCS Maven Central mirror EU</name>
+                    <url>https://maven-central.storage-download.googleapis.com/maven2/</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                </pluginRepository>
+            </pluginRepositories>
+        </profile>
+    </profiles>
+    <activeProfiles>
+        <activeProfile>google-mirror</activeProfile>
+    </activeProfiles>
 </settings>

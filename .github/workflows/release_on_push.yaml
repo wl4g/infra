@@ -7,21 +7,39 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 ##
-## see:https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
+## see:https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-of-jobsjob_idsecrets
 ## see:https://github.com/apache/spark/blob/master/.github/workflows/build_main.yml
 
 name: "Release on Push"
 
 on:
+  release:
+    types: [ created ]
+  ## see:https://docs.github.com/en/actions/using-workflows/triggering-a-workflow#example-including-branches-and-tags
   push:
     branches:
       - '**' # for testing
+      - 'releases*'
+      - 'releases/**'
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - v*
+      - V*
 
 jobs:
-  call-release-images:
+  build-and-release:
     permissions:
       packages: write
-    name: Run
-    uses: './.github/workflows/release_images.yaml' ## This the calling to workflow.
-    secrets: ## see:https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-of-jobsjob_idsecrets
+    name: Build and release
+    uses: './.github/workflows/run.yaml'
+    if: github.repository == 'wl4g/infra'
+    secrets:
       PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+      OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+      OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
+      MAVEN_GPG_PRIVATE_KEY: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+      MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+      #DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      #DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+    with:
+      enable-deploy: true

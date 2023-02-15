@@ -1,0 +1,322 @@
+## Copyright (c) 2017 ~ 2025, the original authors individual Inc,
+## All rights reserved. Contact us James Wong <jameswong1376@gmail.com>
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+## See the License for the specific language governing permissions and
+## limitations under the License.
+##
+## see:https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
+## see:https://github.com/apache/spark/blob/master/.github/workflows/build_and_test.yml
+## see:https://github.com/quarkusio/quarkus/blob/main/.github/workflows/release-build.yml
+
+name: Build deploy and release images
+
+on:
+  workflow_call: ## This the definition of the callee.
+    inputs:
+      #timeout:
+      #  required: false
+      #  type: number
+      #  default: 10
+      repository:
+        required: false
+        type: string
+        default: wl4g/infra
+      runs-on:
+        required: false
+        type: string
+        default: ubuntu-20.04
+      java:
+        required: false
+        type: string
+        default: 11
+      branch:
+        required: false
+        type: string
+        default: ""
+      build-mvn-opts:
+        required: false
+        type: string
+        default: ""
+      enable-build:
+        required: false
+        type: boolean
+        default: true
+      enable-deploy:
+        required: false
+        type: boolean
+        default: false
+      #enable-push-image-dockerhub:
+      #  required: false
+      #  type: boolean
+      #  default: true
+      #enable-push-image-ghcr:
+      #  required: false
+      #  type: boolean
+      #  default: true
+    secrets: ## see:https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-of-onworkflow_callsecrets
+      PERSONAL_ACCESS_TOKEN:
+        description: 'A developer personal token from the caller workflow'
+        required: false
+      OSSRH_USERNAME:
+        description: 'A deploy to Maven central(OSSRH) username from the caller workflow'
+        required: false
+      OSSRH_TOKEN:
+        description: 'A deploy to Maven central(OSSRH) token(password) from the caller workflow'
+        required: false
+      MAVEN_GPG_PRIVATE_KEY:
+        description: 'A deploy to Maven central(OSSRH) GPG private key from the caller workflow'
+        required: false
+      MAVEN_GPG_PASSPHRASE:
+        description: 'A deploy to Maven central(OSSRH) GPG private key password from the caller workflow'
+        required: false
+      #DOCKERHUB_USERNAME:
+      #  description: 'A image registry username from the caller workflow'
+      #  required: false
+      #DOCKERHUB_TOKEN:
+      #  description: 'A image registry password from the caller workflow'
+      #  required: false
+
+jobs:
+  prepares:
+    if: github.repository == '${{ inputs.repository }}'
+    runs-on: ${{ inputs.runs-on || 'ubuntu-latest' }}
+    outputs:
+      pom_version: ${{ steps.build-outputs.outputs.pom_version }}
+      cache_suffix: ${{ steps.build-outputs.outputs.cache_suffix }}
+      repo_owner: ${{ steps.basic-outputs.outputs.repo_owner }}
+      repo_name: ${{ steps.basic-outputs.outputs.repo_name }}
+      repo_ref: ${{ steps.basic-outputs.outputs.repo_ref }}
+      run_id_img_tag: ${{ steps.basic-outputs.outputs.run_id_img_tag }}
+      commit_id_img_tag: ${{ steps.basic-outputs.outputs.commit_id_img_tag }}
+      ref_img_tag: ${{ steps.basic-outputs.outputs.ref_img_tag }}
+    steps:
+      - name: Debugging 1
+        run: |
+          echo "---------- DEBUG OUTPUT. ----------"
+          echo "   kernal info: \n$(uname -a)"
+          echo "  memory usage: \n$(free -h)"
+          echo "     cpu cores: \n$(cat /proc/cpuinfo | grep processor | wc -l)"
+          echo "     cpu usage: \n$(top -n 1)"
+          echo "    disk usage: \n$(df -h)"
+          echo "   current dir: \n$(pwd)"
+          echo " current files: \n$(ls -al ./)"
+          echo "  environemnts: \n$(env)"
+
+      - name: Check out repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+          repository: wl4g/infra
+          ref: ${{ inputs.branch || github.event.ref }}
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+      - name: Get Maven POM version
+        id: build-outputs
+        run: |
+          ## see:https://cloud.tencent.com/developer/article/1476991
+          MAVEN_OPTS="-Xss64m -Xms1g -Xmx12g -XX:ReservedCodeCacheSize=1g -Dorg.slf4j.simpleLogger.defaultLogLevel=WARN -Dorg.slf4j.simpleLogger.log.org.apache.maven.plugins.help=INFO"
+          POM_VERSION=$(mvn -Dexec.executable='echo' -Dexec.args='${project.version}' --non-recursive exec:exec -q)
+          unset MAVEN_OPTS
+          echo "DEBUG: pom_version : $POM_VERSION"
+          echo "pom_version=$POM_VERSION" >> $GITHUB_OUTPUT
+
+      ## see:https://docs.github.com/en/actions/learn-github-actions/contexts#github-context
+      - name: Generate basic Variables
+        id: basic-outputs
+        shell: bash
+        run: |
+          echo "cache_suffix=$(/bin/date -u '+%Y-%m')" >> $GITHUB_OUTPUT # Refresh cache every month to avoid unlimited growth.
+          ## Convert to lowercase to meet Docker repo name requirement
+          REPO_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          REPO_NAME=$(echo $REPO_OWNER | awk -F '/' '{print $3}')
+          REPO_REF_NAME=$(echo "${{ github.event.ref_name }}" | tr '[:upper:]' '[:lower:]')
+          REPO_REF_TYPE=$(echo "${{ github.event.ref_type }}" | tr '[:upper:]' '[:lower:]')
+          ## see:https://docs.github.com/en/developers/webhooks-and-events/events/github-event-types#event-payload-object-for-pushevent
+          RUN_ID_IMG_TAG=${{ github.run_id }}-$(date +%Y%m%d%H%M%S)
+          COMMIT_ID_IMG_TAG=$(echo ${{ github.event.before }}|cut -c 1-12)-$(date +%Y%m%d%H%M%S)
+          REF_IMG_TAG=${REPO_REF_NAME}-$(echo ${{ github.event.before }}|cut -c 1-12)
+          echo "DEBUG: repo_owner : $REPO_OWNER"
+          echo "DEBUG: repo_name : $REPO_NAME"
+          echo "DEBUG: repo_ref_name : $REPO_REF_NAME"
+          echo "DEBUG: repo_ref_type : $REPO_REF_TYPE"
+          echo "DEBUG: run_id_img_tag : $RUN_ID_IMG_TAG"
+          echo "DEBUG: commit_id_img_tag : $COMMIT_ID_IMG_TAG"
+          echo "DEBUG: ref_img_tag : $REF_IMG_TAG"
+          echo "repo_owner=$REPO_OWNER" >> $GITHUB_OUTPUT
+          echo "repo_name=$REPO_NAME" >> $GITHUB_OUTPUT
+          echo "repo_ref_name=$REPO_REF_NAME" >> $GITHUB_OUTPUT
+          echo "repo_ref_type=$REPO_REF_TYPE" >> $GITHUB_OUTPUT
+          echo "run_id_img_tag=$RUN_ID_IMG_TAG" >> $GITHUB_OUTPUT
+          echo "commit_id_img_tag=$COMMIT_ID_IMG_TAG" >> $GITHUB_OUTPUT
+          echo "ref_img_tag=$REF_IMG_TAG" >> $GITHUB_OUTPUT
+
+  build-push-image:
+    needs: prepares
+    if: github.repository == 'wl4g/infra'
+    runs-on: ${{ inputs.runs-on || 'ubuntu-latest' }}
+    permissions:
+      packages: write
+    timeout-minutes: 30
+    steps:
+      - name: Debugging 1
+        run: |
+          echo "---------- DEBUG OUTPUT. ----------"
+          echo "   kernal info: \n$(uname -a)"
+          echo "  memory usage: \n$(free -h)"
+          echo "      cpu info: \n$(cat /proc/cpuinfo | grep processor | wc -l)"
+          echo "    disk usage: \n$(df -h)"
+          echo "   current dir: \n$(pwd)"
+          echo " current files: \n$(ls -al ./)"
+          echo "  environemnts: \n$(env)"
+
+      ## Notice: Calling other workflows is not supported here. Different jobs will correspond 
+      ## to different container spaces. For example, checkout project files cannot be shared.
+      #- name: Build and test
+      #  uses: './.github/workflows/build_and_test.yaml'
+      #  if: github.repository == 'wl4g/infra'
+      #  with:
+      #    PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+      - name: Check out repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+          repository: wl4g/infra
+          ref: ${{ inputs.branch || github.event.ref }}
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+      #- name: Sync the current branch with the latest in infra
+      #  if: github.repository != 'wl4g/infra'
+      #  run: |
+      #    git fetch https://github.com/$GITHUB_REPOSITORY.git ${GITHUB_REF#refs/heads/}
+      #    git -c user.name='infra Test Account' -c user.email='infratestacc@gmail.com' merge --no-commit --progress --squash FETCH_HEAD
+      #    git -c user.name='infra Test Account' -c user.email='infratestacc@gmail.com' commit -m "Merged commit" --allow-empty
+
+      - name: Cache Maven local repository
+        uses: actions/cache@v3
+        if: ${{ inputs.enable-build == true }}
+        with:
+          path: ~/.m2/repository
+          key: build-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: build-maven-${{ needs.prepares.outputs.cache_suffix }}-
+
+      - name: Set up JDK ${{ inputs.java }}
+        if: ${{ inputs.enable-build == true }}
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ inputs.java }}
+          distribution: temurin
+
+      - name: Build with Maven
+        if: ${{ inputs.enable-build == true }}
+        run: |
+          export MAVEN_OPTS="-Xss64m -Xmx2g -XX:ReservedCodeCacheSize=1g -Dorg.slf4j.simpleLogger.defaultLogLevel=WARN"
+          #export MAVEN_CLI_OPTS="--no-transfer-progress"
+          export JAVA_VERSION=${{ inputs.java }}
+          ./mvnw $MAVEN_CLI_OPTS --settings .github/mvn-settings.xml \
+            -Dmaven.repo.local=$HOME/.m2/repository \
+            -DskipTests \
+            -DskipITs \
+            -Dgpg.skip \
+            -B \
+            -T4C \
+            clean install \
+            ${{ inputs.build-mvn-opts }}
+
+      - name: Set up Maven Central Repository
+        uses: actions/setup-java@v3
+        if: ${{ inputs.enable-build == true && inputs.enable-deploy == true }}
+        with:
+          java-version: ${{ inputs.java }}
+          distribution: 'adopt'
+          server-id: sonatype-nexus-staging # It is just a common name, as long as it corresponds to pom.xml and settings.xml
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+          gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }} # Value of the GPG private key to import
+          gpg-passphrase: ${{ secrets.MAVEN_GPG_PASSPHRASE }} # env variable for GPG private key passphrase
+
+      - name: Configure GPG Key
+        if: ${{ inputs.enable-build == true && inputs.enable-deploy == true }}
+        env:
+          MAVEN_GPG_PRIVATE_KEY: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+        run: |
+          ## issue-2798:https://github.com/keybase/keybase-issues/issues/2798#issue-205008630
+          #export GPG_TTY=$(tty)
+          if [ -z "$MAVEN_GPG_PRIVATE_KEY" ]; then
+            echo "ERROR: No MAVEN_GPG_PRIVATE_KEY defined"; exit 1
+          fi
+          mkdir -p ~/.gnupg/ # ~/.gnupg/private-keys-v1.d/
+          echo -n "$MAVEN_GPG_PRIVATE_KEY" > ~/.gnupg/private.key
+          chmod -R 700 ~/.gnupg/
+          #cat ~/.gnupg/private.key # for debugging
+          ls -al ~/.gnupg/
+          gpg --version
+          gpg -v --pinentry-mode loopback --no-tty --batch --secret-keyring ~/.gnupg/secring.gpg --import ~/private.key
+          ls -al ~/.gnupg/
+          gpg --list-keys
+          gpg --list-secret-keys
+
+      - name: Debugging 2
+        run: |
+          echo "---------- DEBUG OUTPUT. ----------"
+          echo "    disk usage: \n$(df -h)"
+          echo "  memory usage: \n$(free -h)"
+          echo "     cpu usage: \n$(top -n 1)"
+          echo "       gpg dir: \n$(ls -al ~/.gnupg/)"
+          echo "   gpg secrets: \n$(gpg --list-secret-keys)"
+
+      - name: Deploy to Maven
+        if: ${{ inputs.enable-build == true && inputs.enable-deploy == true }}
+        run: |
+          mkdir -p ~/.m2/; cp ./.github/settings-security.xml ~/.m2/
+          export MAVEN_OPTS="-Xss64m -Xmx2g -XX:ReservedCodeCacheSize=1g -Dorg.slf4j.simpleLogger.defaultLogLevel=WARN"
+          export JAVA_VERSION=${{ inputs.java }}
+          ./mvnw --settings .github/mvn-settings.xml \
+            -Dmaven.repo.local=$HOME/.m2/repository \
+            -Dmaven.test.skip=true \
+            -DskipTests \
+            -DskipITs \
+            -B \
+            -T4C \
+            deploy \
+            -Prelease \
+            -pl '!integration/integration-eureka'
+        env:
+          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+
+      #- name: Login to GitHub Container Registry
+      #  uses: docker/login-action@v2
+      #  if: ${{ inputs.enable-build == true && inputs.enable-push-image-ghcr == true }}
+      #  with:
+      #    registry: ghcr.io
+      #    username: ${{ github.actor }} # github.repository_owner
+      #    ## see:https://docs.github.com/en/actions/security-guides/automatic-token-authentication
+      #    password: ${{ secrets.GITHUB_TOKEN }}
+
+      ### see:https://github.com/docker/build-push-action#inputs
+      #- name: Build image and Push
+      #  id: docker_build
+      #  if: ${{ inputs.enable-build == true && inputs.enable-push-image-ghcr == true }}
+      #  uses: docker/build-push-action@v3
+      #  with:
+      #    context: "{{defaultContext}}:${{ inputs.moduleName }}"
+      #    file: ./build/docker/Dockerfile.springtar
+      #    platforms: linux/amd64 # linux/arm64
+      #    push: true # ${{ github.ref_type == 'tag' }}
+      #    # Use the infra image cache to speed up.
+      #    #cache-from: type=registry,ref=wl4g-rengine-github-action-image-cache:${{ inputs.branch }}
+      #    args: APP_NAME=${{ inputs.moduleName }}
+      #    tags: |
+      #      ghcr.io/${{ needs.prepares.outputs.image_url }}
+
+      - name: Debugging 3
+        run: |
+          echo "---------- DEBUG OUTPUT. ----------"
+          echo "    disk usage: \n$(df -h)"
+          echo "  memory usage: \n$(free -h)"
+          echo "     cpu usage: \n$(top -n 1)"
+          echo "        images: \n$(docker images)"

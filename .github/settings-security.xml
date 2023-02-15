@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 1. 在多个用户共享同一台构建机器的场景, 应该使用 master password  (非明文, 此处用)来加密 repository server password,
+        官方文档: https://maven.apache.org/guides/mini/guide-encryption.html
+        2. 其 master password 应加密存储在 ~/.m2/settings-security.xml, 由命令 mvn -encrypt-master-password 生成.
+        3. 其 repository server password 应加密存储在 ~/.m2/settings.xml, 由命令 mvn -encrypt-password 生成.
+-->
+<settingsSecurity>
+    <!-- Tip: Zzx......... -->
+    <master>{scfmGBKF5eAH1s9lZCfvELLqn2HFvrjEoSzKdKg2o+Q=}</master>
+</settingsSecurity>
