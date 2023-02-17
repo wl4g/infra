@@ -242,31 +242,47 @@ jobs:
         if: ${{ inputs.enable-build == true && inputs.enable-deploy == true }}
         env:
           MAVEN_GPG_PRIVATE_KEY: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
         run: |
-          ## issue-2798:https://github.com/keybase/keybase-issues/issues/2798#issue-205008630
-          #export GPG_TTY=$(tty)
           if [ -z "$MAVEN_GPG_PRIVATE_KEY" ]; then
             echo "ERROR: No MAVEN_GPG_PRIVATE_KEY defined"; exit 1
           fi
-          mkdir -p ~/.gnupg/ # ~/.gnupg/private-keys-v1.d/
-          echo -n "$MAVEN_GPG_PRIVATE_KEY" > ~/.gnupg/private.key
-          chmod -R 700 ~/.gnupg/
-          #cat ~/.gnupg/private.key # for debugging
+          rm -rf ~/.gnupg/; mkdir -p ~/.gnupg/private-keys-v1.d/; chmod -R 700 ~/.gnupg/
+          echo -n "$MAVEN_GPG_PRIVATE_KEY" > ~/private.key
+
+          #cat ~/private.key # for debugging
+
+          ## FIXED:https://github.com/keybase/keybase-issues/issues/2798#issue-205008630
+          #export GPG_TTY=$(tty)
+
+          ## FIXED:https://bbs.archlinux.org/viewtopic.php?pid=1691978#p1691978
+          ## FIXED:https://github.com/nodejs/docker-node/issues/922
+          ## Note that since Version 2.0 this passphrase is only used if the option --batch has also
+          ## been given. Since Version 2.1 the --pinentry-mode also needs to be set to loopback.
+          ## see:https://www.gnupg.org/documentation/manuals/gnupg/GPG-Esoteric-Options.html#index-allow_002dsecret_002dkey_002dimport
+          gpg2 -v --pinentry-mode loopback --batch --secret-keyring ~/.gnupg/secring.gpg --import ~/private.key
+
+          rm -rf ~/private.key
+
           ls -al ~/.gnupg/
-          gpg --version
-          gpg -v --pinentry-mode loopback --no-tty --batch --secret-keyring ~/.gnupg/secring.gpg --import ~/private.key
-          ls -al ~/.gnupg/
-          gpg --list-keys
-          gpg --list-secret-keys
+          gpg2 --list-keys
+          gpg2 --list-secret-keys
+ 
+          ## Notice: Test signing should be performed first to ensure that the gpg-agent service has been 
+          ## pre-started (gpg-agent --homedir /root/.gnupg --use-standard-socket --daemon), otherwise
+          ## an error may be reported : 'gpg: signing failed: Inappropriate ioctl for device'
+          echo "Testing the GPG signing ..."
+          echo "test" | gpg2 -v --pinentry-mode loopback --passphrase $MAVEN_GPG_PASSPHRASE --clear-sign
 
       - name: Debugging 2
         run: |
           echo "---------- DEBUG OUTPUT. ----------"
-          echo "    disk usage: \n$(df -h)"
-          echo "  memory usage: \n$(free -h)"
-          echo "     cpu usage: \n$(top -n 1)"
-          echo "       gpg dir: \n$(ls -al ~/.gnupg/)"
-          echo "   gpg secrets: \n$(gpg --list-secret-keys)"
+          echo "     disk usage: \n$(df -h)"
+          echo "   memory usage: \n$(free -h)"
+          echo "      cpu usage: \n$(top -n 1)"
+          echo "        gpg dir: \n$(ls -al ~/.gnupg/)"
+          echo "       gpg keys: \n$(gpg2 --list-keys)"
+          echo "gpg secret keys: \n$(gpg2 --list-secret-keys)"
 
       - name: Deploy to Maven
         if: ${{ inputs.enable-build == true && inputs.enable-deploy == true }}
