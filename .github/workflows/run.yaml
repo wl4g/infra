@@ -244,13 +244,24 @@ jobs:
           MAVEN_GPG_PRIVATE_KEY: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
         run: |
-          if [ -z "$MAVEN_GPG_PRIVATE_KEY" ]; then
-            echo "ERROR: No MAVEN_GPG_PRIVATE_KEY defined"; exit 1
+          ## Check for gpg keys.
+          if [[ -z "$MAVEN_GPG_PRIVATE_KEY" || -z "$MAVEN_GPG_PASSPHRASE" ]]; then
+            echo "ERROR: No MAVEN_GPG_PRIVATE_KEY or MAVEN_GPG_PASSPHRASE defined"; exit 1
           fi
-          rm -rf ~/.gnupg/; mkdir -p ~/.gnupg/private-keys-v1.d/; chmod -R 700 ~/.gnupg/
-          echo -n "$MAVEN_GPG_PRIVATE_KEY" > ~/private.key
 
-          #cat ~/private.key # for debugging
+          ## Check for supported gpg version.
+          gpg_version=$(gpg --version | head -1 | grep -iEo '(([0-9]+)\.([0-9]+)\.([0-9]+))') # eg: 2.2.19
+          gpg_version_major=$(echo $gpg_version | awk -F '.' '{print $1}')
+          gpg_version_minor=$(echo $gpg_version | awk -F '.' '{print $2}')
+          gpg_version_revision=$(echo $gpg_version | awk -F '.' '{print $3}')
+          if [[ ! ("$gpg_version_major" -ge 2 && "$gpg_version_minor" -ge 1) ]]; then
+            echo "ERROR: The GPG version must >= $gpg_version_major.$gpg_version_minor.x"; exit 1
+          fi
+
+          rm -rf ~/.gnupg/; mkdir -p ~/.gnupg/private-keys-v1.d/; chmod -R 700 ~/.gnupg/
+          echo -n "$MAVEN_GPG_PRIVATE_KEY" > ~/tmp/private.key
+
+          #cat ~/tmp/private.key # for debugging
 
           ## FIXED:https://github.com/keybase/keybase-issues/issues/2798#issue-205008630
           #export GPG_TTY=$(tty)
@@ -260,11 +271,11 @@ jobs:
           ## Note that since Version 2.0 this passphrase is only used if the option --batch has also
           ## been given. Since Version 2.1 the --pinentry-mode also needs to be set to loopback.
           ## see:https://www.gnupg.org/documentation/manuals/gnupg/GPG-Esoteric-Options.html#index-allow_002dsecret_002dkey_002dimport
-          gpg2 -v --pinentry-mode loopback --batch --secret-keyring ~/.gnupg/secring.gpg --import ~/private.key
+          gpg2 -v --pinentry-mode loopback --batch --secret-keyring ~/.gnupg/secring.gpg --import ~/tmp/private.key
 
-          rm -rf ~/private.key
-
+          rm -rf ~/tmp/private.key
           ls -al ~/.gnupg/
+
           gpg2 --list-keys
           gpg2 --list-secret-keys
  
