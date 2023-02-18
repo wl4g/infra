@@ -61,16 +61,16 @@ on:
         description: 'A developer personal token from the caller workflow'
         required: false
       OSSRH_USERNAME:
-        description: 'A deploy to Maven central(OSSRH) username from the caller workflow'
+        description: 'A deploy to Maven central (OSSRH) username from the caller workflow'
         required: false
       OSSRH_TOKEN:
-        description: 'A deploy to Maven central(OSSRH) token(password) from the caller workflow'
+        description: 'A deploy to Maven central (OSSRH) token(password) from the caller workflow'
         required: false
       MAVEN_GPG_PRIVATE_KEY:
-        description: 'A deploy to Maven central(OSSRH) GPG private key from the caller workflow'
+        description: 'A deploy to Maven central (OSSRH) GPG private key from the caller workflow'
         required: false
       MAVEN_GPG_PASSPHRASE:
-        description: 'A deploy to Maven central(OSSRH) GPG private key password from the caller workflow'
+        description: 'A deploy to Maven central (OSSRH) GPG private key password from the caller workflow'
         required: false
       #DOCKERHUB_USERNAME:
       #  description: 'A image registry username from the caller workflow'
@@ -264,7 +264,7 @@ jobs:
           #cat ~/tmp/private.key # for debugging
 
           ## FIXED:https://github.com/keybase/keybase-issues/issues/2798#issue-205008630
-          #export GPG_TTY=$(tty)
+          #export GPG_TTY=$(tty) # Notice: github action the VM instance no tty.
 
           ## FIXED:https://bbs.archlinux.org/viewtopic.php?pid=1691978#p1691978
           ## FIXED:https://github.com/nodejs/docker-node/issues/922
@@ -282,7 +282,7 @@ jobs:
           ## Notice: Test signing should be performed first to ensure that the gpg-agent service has been 
           ## pre-started (gpg-agent --homedir /root/.gnupg --use-standard-socket --daemon), otherwise
           ## an error may be reported : 'gpg: signing failed: Inappropriate ioctl for device'
-          echo "Testing the GPG signing ..."
+          echo "Preparing testing the GPG signing ..."
           echo "test" | gpg2 -v --pinentry-mode loopback --passphrase $MAVEN_GPG_PASSPHRASE --clear-sign
 
       - name: Debugging 2

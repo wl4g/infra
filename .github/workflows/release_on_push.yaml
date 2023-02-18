@@ -18,13 +18,12 @@ on:
   ## see:https://docs.github.com/en/actions/using-workflows/triggering-a-workflow#example-including-branches-and-tags
   push:
     branches:
-      - '**' # for testing
-      - 'releases*'
-      - 'releases/**'
+      - 'releases**'
+      - 'releases/**' # eg: 'releases/**' will match the refs/heads/releases/10 Git ref.
     # Sequence of patterns matched against refs/tags
     tags:
-      - v*
-      - V*
+      - 'v**'
+      - 'V**'
 
 jobs:
   build-and-release:
