@@ -57,7 +57,7 @@ import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 public class RestTemplateAutoConfiguration {
 
     @Bean
-    @ConfigurationProperties(prefix = CoreInfraConstants.CONF_PREFIX_INFRA_CORE_HTTP_REMOTE)
+    @ConfigurationProperties(prefix = CoreInfraConstants.CONF_PREFIX_INFRA_CONTEXT_HTTP_REMOTE)
     public ClientHttpProperties remoteProperties() {
         return new ClientHttpProperties();
     }

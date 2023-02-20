@@ -15,7 +15,7 @@
  */
 package com.wl4g.infra.context.trace.reactive;
 
-import static com.wl4g.infra.context.constant.ContextInfraConstants.CONF_PREFIX_INFRA_CORE_TRACE;
+import static com.wl4g.infra.context.constant.ContextInfraConstants.CONF_PREFIX_INFRA_CONTEXT_TRACE;
 
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -37,7 +37,7 @@ import org.springframework.core.env.Environment;
 @Deprecated
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE + 10)
-@ConditionalOnProperty(name = CONF_PREFIX_INFRA_CORE_TRACE + ".enabled", matchIfMissing = false)
+@ConditionalOnProperty(name = CONF_PREFIX_INFRA_CONTEXT_TRACE + ".enabled", matchIfMissing = false)
 @ConditionalOnWebApplication(type = Type.REACTIVE)
 public class SimpleReactiveTraceAutoConfiguration {
 

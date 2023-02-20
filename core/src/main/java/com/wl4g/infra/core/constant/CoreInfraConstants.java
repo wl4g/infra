@@ -35,4 +35,14 @@ public abstract class CoreInfraConstants extends ContextInfraConstants {
 
     public static final String CONF_PREFIX_INFRA_CORE = CONF_PREFIX_INFRA + ".core";
 
+    public static final String CONF_PREFIX_INFRA_CORE_SMART_PROXY = CONF_PREFIX_INFRA_CORE + ".smart-proxies";
+
+    public static final String CONF_PREFIX_INFRA_CORE_WEB_HUMAN_DATE_CONVERTER = CONF_PREFIX_INFRA_CORE
+            + ".web.human-date-converter";
+
+    public static final String CONF_PREFIX_INFRA_CORE_WEB_GLOBAL_ERROR = CONF_PREFIX_INFRA_CORE + ".web.global-error";
+
+    public static final String CONF_PREFIX_INFRA_CORE_WEB_EMBED_WEBAPP = CONF_PREFIX_INFRA_CORE + ".web.embedded-webapps";
+
+    public static final String CONF_PREFIX_INFRA_CONTEXT_HTTP_REMOTE = CONF_PREFIX_INFRA_CONTEXT + ".http-remote";
 }

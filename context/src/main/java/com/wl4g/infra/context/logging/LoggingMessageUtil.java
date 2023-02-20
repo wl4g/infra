@@ -127,13 +127,13 @@ public abstract class LoggingMessageUtil {
      * @throws IOException
      */
     public static String readToLogString(InputStream in, int expectMaxLen) throws IOException {
-        int moreMaxLen = expectMaxLen + 1;
-        byte[] bs = new byte[moreMaxLen];
-        ByteStreams.read(in, bs, 0, moreMaxLen);
+        final int moreMaxLen = expectMaxLen + 1;
+        final byte[] bs = new byte[moreMaxLen];
+        final int total = ByteStreams.read(in, bs, 0, moreMaxLen);
         // When the readable data length is greater than the maximum read data
         // length, add the log suffix '...'.
-        boolean flag = (bs[expectMaxLen] != 0); // Check-the-last-character-read
-        String logString = new String(bs, 0, expectMaxLen, UTF_8);
+        final boolean flag = (bs[expectMaxLen] != 0); // Check-the-last-character-read
+        final String logString = new String(bs, 0, Math.min(expectMaxLen, total), UTF_8);
         return flag ? logString.concat(" ...") : logString;
     }
 

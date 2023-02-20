@@ -52,7 +52,7 @@ import reactor.netty.tcp.TcpClient;
 public class WebClientAutoConfiguration {
 
     @Bean
-    @ConfigurationProperties(prefix = CoreInfraConstants.CONF_PREFIX_INFRA_CORE_HTTP_REMOTE)
+    @ConfigurationProperties(prefix = CoreInfraConstants.CONF_PREFIX_INFRA_CONTEXT_HTTP_REMOTE)
     public ClientHttpProperties defaultRemoteProperties() {
         return new ClientHttpProperties();
     }

@@ -15,7 +15,7 @@
  */
 package com.wl4g.infra.context.boot;
 
-import static com.wl4g.infra.context.constant.ContextInfraConstants.CONF_PREFIX_INFRA_CORE_BOOTSTRAPPING;
+import static com.wl4g.infra.context.constant.ContextInfraConstants.CONF_PREFIX_INFRA_CONTEXT_BOOTSTRAPPING;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +39,7 @@ import com.wl4g.infra.common.web.rest.RespBase.ErrorPromptMessageBuilder;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE)
 @EnableAspectJAutoProxy(proxyTargetClass = true)
-@ConditionalOnProperty(name = CONF_PREFIX_INFRA_CORE_BOOTSTRAPPING + ".enabled", matchIfMissing = true)
+@ConditionalOnProperty(name = CONF_PREFIX_INFRA_CONTEXT_BOOTSTRAPPING + ".enabled", matchIfMissing = true)
 public class BootstrappingAutoConfiguration implements InitializingBean {
 
     private @Autowired ApplicationContext applicationContext;

@@ -35,28 +35,17 @@ public abstract class ContextInfraConstants extends EnvironmentUtil {
 
     public static final String CONF_PREFIX_INFRA = "spring.infra";
 
-    public static final String CONF_PREFIX_INFRA_CORE = CONF_PREFIX_INFRA + ".core";
+    public static final String CONF_PREFIX_INFRA_CONTEXT = CONF_PREFIX_INFRA + ".context";
 
-    public static final String CONF_PREFIX_INFRA_CORE_HTTP_REMOTE = CONF_PREFIX_INFRA_CORE + ".http-remote";
+    public static final String CONF_PREFIX_INFRA_CONTEXT_BOOTSTRAPPING = CONF_PREFIX_INFRA_CONTEXT + ".bootstrapping";
 
-    public static final String CONF_PREFIX_INFRA_CORE_BOOTSTRAPPING = CONF_PREFIX_INFRA_CORE + ".bootstrapping";
+    public static final String CONF_PREFIX_INFRA_CONTEXT_LOGGING = CONF_PREFIX_INFRA_CONTEXT + ".logging";
 
-    public static final String CONF_PREFIX_INFRA_CORE_LOGGING = CONF_PREFIX_INFRA_CORE + ".logging";
+    public static final String CONF_PREFIX_INFRA_CONTEXT_TRACE = CONF_PREFIX_INFRA_CONTEXT + ".trace";
 
-    public static final String CONF_PREFIX_INFRA_CORE_TRACE = CONF_PREFIX_INFRA_CORE + ".trace";
+    public static final String CONF_PREFIX_INFRA_CORE_NAMING_PROTOYPE = CONF_PREFIX_INFRA_CONTEXT_TRACE + ".naming-beanfactory";
 
-    public static final String CONF_PREFIX_INFRA_CORE_NAMING_PROTOYPE = CONF_PREFIX_INFRA_CORE + ".naming-beanfactory";
-
-    public static final String CONF_PREFIX_INFRA_CORE_OPERATOR = CONF_PREFIX_INFRA_CORE + ".generic-operator";
-
-    public static final String CONF_PREFIX_INFRA_CORE_SMART_PROXY = CONF_PREFIX_INFRA_CORE + ".smart-proxies";
-
-    public static final String CONF_PREFIX_INFRA_CORE_WEB_HUMAN_DATE_CONVERTER = CONF_PREFIX_INFRA_CORE
-            + ".web.human-date-converter";
-
-    public static final String CONF_PREFIX_INFRA_CORE_WEB_GLOBAL_ERROR = CONF_PREFIX_INFRA_CORE + ".web.global-error";
-
-    public static final String CONF_PREFIX_INFRA_CORE_WEB_EMBED_WEBAPP = CONF_PREFIX_INFRA_CORE + ".web.embedded-webapps";
+    public static final String CONF_PREFIX_INFRA_CORE_OPERATOR = CONF_PREFIX_INFRA_CONTEXT_TRACE + ".generic-operator";
 
     /**
      * The alias for OpenTracing 'traceId'.

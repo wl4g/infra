@@ -15,7 +15,7 @@
  */
 package com.wl4g.infra.context.logging.reactive;
 
-import static com.wl4g.infra.context.constant.ContextInfraConstants.CONF_PREFIX_INFRA_CORE_LOGGING;
+import static com.wl4g.infra.context.constant.ContextInfraConstants.CONF_PREFIX_INFRA_CONTEXT_LOGGING;
 
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -38,12 +38,12 @@ import com.wl4g.infra.context.logging.config.LoggingMessageProperties;
  */
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE + 10)
-@ConditionalOnProperty(name = CONF_PREFIX_INFRA_CORE_LOGGING + ".enabled", matchIfMissing = true)
+@ConditionalOnProperty(name = CONF_PREFIX_INFRA_CONTEXT_LOGGING + ".enabled", matchIfMissing = true)
 @ConditionalOnWebApplication(type = Type.REACTIVE)
 public class ReactiveLoggingAutoConfiguration {
 
     @Bean
-    @ConfigurationProperties(prefix = CONF_PREFIX_INFRA_CORE_LOGGING)
+    @ConfigurationProperties(prefix = CONF_PREFIX_INFRA_CONTEXT_LOGGING)
     public LoggingMessageProperties loggingMessageProperties() {
         return new LoggingMessageProperties();
     }

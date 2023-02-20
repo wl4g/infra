@@ -165,10 +165,10 @@ public class LoggingMessageServletFilter extends BaseLoggingServletFilter {
 
     protected void logResponse(HttpServletRequest request, ContentCachingResponseWrapper response, String traceId)
             throws IOException {
-        MediaType contentType = nonNull(response.getContentType()) ? parseMediaType(response.getContentType()) : null;
-        String requestMethod = request.getMethod();
-        URI uri = URI.create(request.getRequestURI());
-        String requestUri = uri.getPath();
+        final MediaType contentType = nonNull(response.getContentType()) ? parseMediaType(response.getContentType()) : null;
+        final String requestMethod = request.getMethod();
+        final URI uri = URI.create(request.getRequestURI());
+        final String requestUri = uri.getPath();
 
         boolean log1_2 = isLoglevelRange(request, 1, 2);
         boolean log3_10 = isLoglevelRange(request, 3, 10);
@@ -180,8 +180,8 @@ public class LoggingMessageServletFilter extends BaseLoggingServletFilter {
         startTime = nonNull(startTime) ? startTime : 0;
         long costTime = nonNull(startTime) ? (FastTimeClock.currentTimeMillis() - startTime) : 0L;
 
-        StringBuilder responseLog = new StringBuilder(300);
-        List<Object> responseLogArgs = new ArrayList<>(16);
+        final StringBuilder responseLog = new StringBuilder(300);
+        final List<Object> responseLogArgs = new ArrayList<>(16);
         if (log1_2) {
             responseLog.append("{} {} {} {}\n");
             responseLogArgs.add(response.getStatus());
@@ -209,7 +209,7 @@ public class LoggingMessageServletFilter extends BaseLoggingServletFilter {
         } else {
             // When the response has no body, print the end flag
             // directly.
-            boolean processBodyIfNeed = log9_10 && isCompatibleWithPlainBody(contentType);
+            final boolean processBodyIfNeed = log9_10 && isCompatibleWithPlainBody(contentType);
             // Print response body.
             if (processBodyIfNeed) {
                 // Full print response body.
@@ -225,7 +225,7 @@ public class LoggingMessageServletFilter extends BaseLoggingServletFilter {
         // If there is a response body, the response header has been added
         // before, no need to add.
         if (log6_10) {
-            HttpHeaders headers = createHttpHeaders(response);
+            final HttpHeaders headers = createHttpHeaders(response);
             headers.forEach((headerName, headerValue) -> {
                 if (log8_10 || LoggingMessageUtil.LOG_GENERIC_HEADERS.stream().anyMatch(h -> containsIgnoreCase(h, headerName))) {
                     responseLog.append(LINE_SEPARATOR + "{}: {}");
