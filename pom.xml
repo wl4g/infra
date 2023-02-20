@@ -317,7 +317,7 @@
                             <serverId>sonatype-nexus-staging</serverId>
                             <nexusUrl>https://oss.sonatype.org/</nexusUrl>
                             <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                            <stagingProgressTimeoutMinutes>15</stagingProgressTimeoutMinutes>
+                            <stagingProgressTimeoutMinutes>30</stagingProgressTimeoutMinutes>
                             <!-- see:https://issues.sonatype.org/browse/NEXUS-19853 -->
                             <skipNexusStagingDeployMojo>false</skipNexusStagingDeployMojo>
                         </configuration>
