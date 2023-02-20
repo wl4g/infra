@@ -16,10 +16,13 @@
 package com.wl4g.infra.core.web.error.handler;
 
 import static com.wl4g.infra.common.lang.Assert2.notNull;
+import static com.wl4g.infra.common.lang.Exceptions.getRootCausesString;
+import static com.wl4g.infra.common.lang.StringUtils2.eqIgnCase;
 import static com.wl4g.infra.common.web.rest.RespBase.getRestfulCode;
 import static com.wl4g.infra.common.web.rest.RespBase.RetCode.BAD_PARAMS;
 import static com.wl4g.infra.common.web.rest.RespBase.RetCode.UNSUPPORTED;
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -51,26 +54,22 @@ public class DefaultSmartErrorHandler extends AbstractSmartErrorHandler {
     @Override
     public Integer getStatus(Map<String, Object> model, Throwable th) {
         Integer statusCode = (Integer) model.get("status");
-        /**
-         * Eliminate meaningless status code: 999
-         * 
-         * @see {@link org.springframework.boot.autoconfigure.web.DefaultErrorAttributes#addStatus()}
-         */
+        // Eliminate meaningless status code: 999
+        // see:org.springframework.boot.autoconfigure.web.DefaultErrorAttributes#addStatus()
         if (isNull(statusCode) || statusCode == 999) {
             RetCodeSpec retCode = getRestfulCode(th);
             if (!isNull(retCode)) {
                 statusCode = retCode.getErrcode();
             } else if (th instanceof IllegalArgumentException) {
-                return BAD_PARAMS.getErrcode();
+                statusCode = BAD_PARAMS.getErrcode();
             } else if (th instanceof UnsupportedOperationException) {
-                return UNSUPPORTED.getErrcode();
+                statusCode = UNSUPPORTED.getErrcode();
             } else { // status=999?
                 // statusCode = (Integer)
                 // equest.getAttribute("javax.servlet.error.status_code");
             }
         }
-        // Fall-back
-        return RetCode.SYS_ERR.getErrcode();
+        return isNull(statusCode) ? RetCode.SYS_ERR.getErrcode() : statusCode;
     }
 
     /**
@@ -81,7 +80,7 @@ public class DefaultSmartErrorHandler extends AbstractSmartErrorHandler {
     public String getRootCause(Map<String, Object> model, Throwable th) {
         notNull(model, "Shouldn't be here");
 
-        StringBuffer errmsg = new StringBuffer();
+        StringBuffer errmsg = new StringBuffer(16);
         // message
         // Object message = model.get("message");
         // if (message != null) {
@@ -106,16 +105,16 @@ public class DefaultSmartErrorHandler extends AbstractSmartErrorHandler {
         // }
         // }
         // error
-        Object error = model.get("error");
-        if (error != null) {
+        final Object error = model.get("error");
+        if (nonNull(error) && !eqIgnCase(error, "None")) {
             if (error instanceof String) {
                 errmsg.append(error);
             } else if (error instanceof Throwable) {
                 errmsg.append(((Throwable) error).getMessage());
             }
         }
-        Object errors = model.get("errors"); // @NotNull?
-        if (errors != null) {
+        final Object errors = model.get("errors"); // @NotNull?
+        if (nonNull(errors)) {
             errmsg.setLength(0); // Print only errors information
             if (errors instanceof Collection) {
                 // Used to remove duplication
@@ -147,6 +146,19 @@ public class DefaultSmartErrorHandler extends AbstractSmartErrorHandler {
                 }
             } else {
                 errmsg.append(errors.toString());
+            }
+        }
+        final Object exception = model.get("exception");
+        if (nonNull(exception) && exception instanceof Throwable) {
+            errmsg.append(getRootCausesString((Throwable) exception, true));
+        }
+        final Object trace = model.get("trace");
+        if (nonNull(trace) && trace instanceof String) {
+            final String[] lines = ((String) trace).split("\n");
+            if (nonNull(lines) && lines.length > 0) {
+                final String first = lines[0];
+                final int lastIndex = first.lastIndexOf(":");
+                errmsg.append(lastIndex <= 0 ? first : first.substring(lastIndex));
             }
         }
 
