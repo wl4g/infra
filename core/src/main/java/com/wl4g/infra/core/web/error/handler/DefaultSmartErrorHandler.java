@@ -51,9 +51,6 @@ public class DefaultSmartErrorHandler extends AbstractSmartErrorHandler {
     @Override
     public Integer getStatus(Map<String, Object> model, Throwable th) {
         Integer statusCode = (Integer) model.get("status");
-        if (!isNull(statusCode)) {
-            return statusCode;
-        }
         /**
          * Eliminate meaningless status code: 999
          * 
