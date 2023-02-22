@@ -3,7 +3,7 @@
 A enterprise-grade microservice infrastructure framework, The following frameworks have been integrated, support seamless in switching between :
 
 [![Build on Push](https://github.com/wl4g/infra/actions/workflows/build_on_push.yaml/badge.svg)](https://github.com/wl4g/infra/actions/workflows/build_on_push.yaml)
-[![Build on Daily](https://github.com/wl4g/infra/actions/workflows/build_on_daily.yaml/badge.svg)](https://github.com/wl4g/infra/actions/workflows/build_on_daily.yaml)
+[![Build on Timing](https://github.com/wl4g/infra/actions/workflows/build_on_timing.yaml/badge.svg)](https://github.com/wl4g/infra/actions/workflows/build_on_timing.yaml)
 [![License](https://img.shields.io/badge/license-Apache2.0+-green.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![GraalVM](https://img.shields.io/badge/GraalVM-22.1-green)](https://github.com/wl4g/infra)
 [![JVM](https://img.shields.io/badge/JVM-8%20and%2011%2B-green)](https://github.com/wl4g/infra)
