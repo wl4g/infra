@@ -209,12 +209,7 @@ public abstract class BaseBean implements Serializable {
      * @return return current preparing insert generated id.
      */
     public void preInsert() {
-        // @see:com.wl4g.infra.data.mybatis.mapper.PreparedBeanMapperInterceptor#preInsert
-        // setCreateBy(UNKNOWN_USER_ID);
-        setCreateDate(isNull(getCreateDate()) ? new Date() : getCreateDate());
-        setUpdateDate(isNull(getUpdateDate()) ? getCreateDate() : getUpdateDate());
-        setDelFlag(isNull(getDelFlag()) ? DEL_FLAG_NORMAL : getDelFlag());
-        setEnable(isNull(getEnable()) ? ENABLED : getEnable());
+        preInsert(null);
     }
 
     /**
@@ -224,18 +219,33 @@ public abstract class BaseBean implements Serializable {
      * @return return current preparing insert generated id.
      */
     public void preInsert(String orgCode) {
-        if (isBlank(getOrgCode())) {
-            setOrgCode(orgCode);
-        }
+        setOrgCode(isBlank(orgCode) ? getOrgCode() : orgCode);
+        setEnable(isNull(getEnable()) ? ENABLED : getEnable());
+        // @see:com.wl4g.infra.data.mybatis.mapper.PreparedBeanMapperInterceptor#preInsert
+        setCreateBy(UNKNOWN_USER_ID);
+        setCreateDate(isNull(getCreateDate()) ? new Date() : getCreateDate());
+        setDelFlag(isNull(getDelFlag()) ? DEL_FLAG_NORMAL : getDelFlag());
     }
 
     /**
      * Execute method before update, need to call manually
      */
     public void preUpdate() {
+        preUpdate(null);
+    }
+
+    /**
+     * Execute method before update, need to call manually
+     * 
+     * @param orgCode
+     */
+    public void preUpdate(String orgCode) {
+        setOrgCode(isBlank(orgCode) ? getOrgCode() : orgCode);
+        setEnable(isNull(getEnable()) ? ENABLED : getEnable());
         // @see:com.wl4g.infra.data.mybatis.mapper.PreparedBeanMapperInterceptor#preUpdate
-        // setUpdateBy(UNKNOWN_USER_ID);
+        setUpdateBy(UNKNOWN_USER_ID);
         setUpdateDate(new Date());
+        setDelFlag(isNull(getDelFlag()) ? DEL_FLAG_NORMAL : getDelFlag());
     }
 
     public BaseBean withId(Long id) {
