@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @see <a href=
  *      "https://github.com/twitter/snowflake">https://github.com/twitter/snowflake</a>
  */
-public final class SnowflakeIdGenerator {
+public class SnowflakeIdGenerator {
 
     /**
      * {@link BitsDefine}

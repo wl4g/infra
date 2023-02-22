@@ -32,6 +32,7 @@ import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.wl4g.infra.common.bridge.RpcContextHolderBridges;
+import com.wl4g.infra.common.id.SnowflakeIdGenerator;
 
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiModelProperty.AccessMode;
@@ -79,17 +80,17 @@ public abstract class BaseBean implements Serializable {
     private @NotBlank String orgCode;
 
     /**
-     * Whether the this object(record) is enabled.
+     * The data record enable state.
      */
     private @NotNull @Min(DISABLED) @Max(ENABLED) Integer enable;
 
     /**
-     * Used to mark whether the this object(record) is enabled or not
+     * The data record labels.
      */
     private @Nullable List<String> labels;
 
     /**
-     * Remark content corresponding to the this object(record).
+     * The data record description.
      */
     private @Nullable String remark;
 
@@ -219,6 +220,7 @@ public abstract class BaseBean implements Serializable {
      * @return return current preparing insert generated id.
      */
     public void preInsert(String orgCode) {
+        setId(SnowflakeIdGenerator.getDefault().nextId());
         setOrgCode(isBlank(orgCode) ? getOrgCode() : orgCode);
         setEnable(isNull(getEnable()) ? ENABLED : getEnable());
         // @see:com.wl4g.infra.data.mybatis.mapper.PreparedBeanMapperInterceptor#preInsert
