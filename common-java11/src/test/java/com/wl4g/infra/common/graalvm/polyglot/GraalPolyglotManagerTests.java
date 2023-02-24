@@ -38,6 +38,7 @@ import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager.ContextWrappe
 import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager.NoPolyglotContextException;
 import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager.SimpleSyncContextPool;
 import com.wl4g.infra.common.io.FileIOUtils;
+import com.wl4g.infra.common.lang.tuples.Tuple3;
 
 /**
  * {@link GraalPolyglotManagerTests}
@@ -50,7 +51,7 @@ public class GraalPolyglotManagerTests {
 
     @Test
     public void testTakeNoOverflow() throws Exception {
-        try (SimpleSyncContextPool pool = new SimpleSyncContextPool(10, metadata -> Context.create());) {
+        try (SimpleSyncContextPool pool = new SimpleSyncContextPool(10, metadata -> new Tuple3(Context.create()));) {
             try {
                 for (int i = 0; i < 10; i++) {
                     ContextWrapper context = pool.take(true, null);
@@ -66,7 +67,7 @@ public class GraalPolyglotManagerTests {
 
     @Test(expected = IllegalStateException.class)
     public void testTakeOverflow() throws Exception {
-        try (SimpleSyncContextPool pool = new SimpleSyncContextPool(10, metadata -> Context.create());) {
+        try (SimpleSyncContextPool pool = new SimpleSyncContextPool(10, metadata -> new Tuple3(Context.create()));) {
             try {
                 for (int i = 0; i < 11; i++) {
                     ContextWrapper context = pool.take(true, null);
@@ -82,7 +83,7 @@ public class GraalPolyglotManagerTests {
 
     @Test
     public void testTakeNoOverflowWithRelease() throws Exception {
-        try (SimpleSyncContextPool pool = new SimpleSyncContextPool(10, metadata -> Context.create());) {
+        try (SimpleSyncContextPool pool = new SimpleSyncContextPool(10, metadata -> new Tuple3(Context.create()));) {
             try {
                 for (int i = 0; i < 20; i++) {
                     try (ContextWrapper context = pool.take(true, null);) {
@@ -175,7 +176,8 @@ public class GraalPolyglotManagerTests {
                 + "'; const foo = new Foo(); console.log(foo.square(64));";
 
         try (GraalPolyglotManager manager = new GraalPolyglotManager(10,
-                metadata -> Context.newBuilder("js").allowIO(true).build()); ContextWrapper context = manager.getContext(null);) {
+                metadata -> new Tuple3(Context.newBuilder("js").allowIO(true).build()));
+                ContextWrapper context = manager.getContext(null);) {
             // Source.newBuilder("js",esmScript1File).mimeType("application/javascript+module").build();
             Value result = context.eval(Source.newBuilder("js", esmScript2, "test.mjs").build());
 
@@ -213,7 +215,8 @@ public class GraalPolyglotManagerTests {
 
         try (GraalPolyglotManager manager = new GraalPolyglotManager(10,
                 // Create context with IO support and experimental options.
-                metadata -> Context.newBuilder("js").allowExperimentalOptions(true).allowIO(true).options(options).build());) {
+                metadata -> new Tuple3(
+                        Context.newBuilder("js").allowExperimentalOptions(true).allowIO(true).options(options).build()));) {
             // Require a module
             Value module = manager.getContext(null).eval("js", "require('Foo');");
             System.out.println(module);

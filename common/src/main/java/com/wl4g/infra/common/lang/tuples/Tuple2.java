@@ -34,6 +34,10 @@ public class Tuple2 implements Tuple {
     public Tuple2() {
     }
 
+    public Tuple2(Object item1) {
+        this(item1, null);
+    }
+
     public Tuple2(Object item1, Object item2) {
         setItem1(item1);
         setItem2(item2);

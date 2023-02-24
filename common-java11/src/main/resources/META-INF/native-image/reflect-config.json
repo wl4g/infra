@@ -457,7 +457,21 @@
   ]
 },
 {
+  "name":"com.wl4g.infra.common.graalvm.GraalPolyglotManager",
+  "allPublicConstructors": true,
+  "allPublicMethods": true,
+  "methods":[
+  ]
+},
+{
   "name":"com.wl4g.infra.common.graalvm.GraalPolyglotManager$NoPolyglotContextException",
+  "allPublicConstructors": true,
+  "allPublicMethods": true,
+  "methods":[
+  ]
+},
+{
+  "name":"com.wl4g.infra.common.graalvm.GraalPolyglotManager$ContextWrapper",
   "allPublicConstructors": true,
   "allPublicMethods": true,
   "methods":[
@@ -1982,6 +1996,210 @@
   "methods": [
     {"name": "<init>", "parameterTypes": ["java.lang.Integer"]},
     {"name": "getCode", "parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.infra.common.lang.tuples.Tuple",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "size", "parameterTypes": []},
+    {"name": "iterator", "parameterTypes": []},
+    {"name": "asList", "parameterTypes": []},
+    {"name": "nth", "parameterTypes": ["int"]}
+  ]
+},
+{
+  "name": "com.wl4g.infra.common.lang.tuples.Tuple5",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object","java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object"]},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "size", "parameterTypes": []},
+    {"name": "asList", "parameterTypes": []},
+    {"name": "nth", "parameterTypes": ["int"]},
+    {"name": "getItem5", "parameterTypes": []},
+    {"name": "setItem5", "parameterTypes": ["java.lang.Object"]},
+    {"name": "withItem5", "parameterTypes": ["java.lang.Object"]}
+  ]
+},
+{
+  "name": "com.wl4g.infra.common.lang.tuples.Tuple4",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object","java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "size", "parameterTypes": []},
+    {"name": "asList", "parameterTypes": []},
+    {"name": "nth", "parameterTypes": ["int"]},
+    {"name": "getItem4", "parameterTypes": []},
+    {"name": "setItem4", "parameterTypes": ["java.lang.Object"]},
+    {"name": "withItem4", "parameterTypes": ["java.lang.Object"]}
+  ]
+},
+{
+  "name": "com.wl4g.infra.common.lang.tuples.Tuple2",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "size", "parameterTypes": []},
+    {"name": "asList", "parameterTypes": []},
+    {"name": "nth", "parameterTypes": ["int"]},
+    {"name": "getItem1", "parameterTypes": []},
+    {"name": "getItem2", "parameterTypes": []},
+    {"name": "setItem1", "parameterTypes": ["java.lang.Object"]},
+    {"name": "setItem2", "parameterTypes": ["java.lang.Object"]},
+    {"name": "withItem2", "parameterTypes": ["java.lang.Object"]}
+  ]
+},
+{
+  "name": "com.wl4g.infra.common.lang.tuples.Tuple7",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object","java.lang.Object"]},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "size", "parameterTypes": []},
+    {"name": "asList", "parameterTypes": []},
+    {"name": "nth", "parameterTypes": ["int"]},
+    {"name": "getItem7", "parameterTypes": []},
+    {"name": "setItem7", "parameterTypes": ["java.lang.Object"]},
+    {"name": "withItem7", "parameterTypes": ["java.lang.Object"]}
+  ]
+},
+{
+  "name": "com.wl4g.infra.common.lang.tuples.Tuple3",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object","java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "size", "parameterTypes": []},
+    {"name": "asList", "parameterTypes": []},
+    {"name": "nth", "parameterTypes": ["int"]},
+    {"name": "getItem3", "parameterTypes": []},
+    {"name": "setItem3", "parameterTypes": ["java.lang.Object"]},
+    {"name": "withItem3", "parameterTypes": ["java.lang.Object"]}
+  ]
+},
+{
+  "name": "com.wl4g.infra.common.lang.tuples.Tuple6",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object","java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object"]},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "size", "parameterTypes": []},
+    {"name": "asList", "parameterTypes": []},
+    {"name": "nth", "parameterTypes": ["int"]},
+    {"name": "setItem6", "parameterTypes": ["java.lang.Object"]},
+    {"name": "getItem6", "parameterTypes": []},
+    {"name": "witbItem6", "parameterTypes": ["java.lang.Object"]}
+  ]
+},
+{
+  "name": "com.wl4g.infra.common.lang.tuples.Tuple8",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object","java.lang.Object"]},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "size", "parameterTypes": []},
+    {"name": "asList", "parameterTypes": []},
+    {"name": "nth", "parameterTypes": ["int"]},
+    {"name": "setItem8", "parameterTypes": ["java.lang.Object"]},
+    {"name": "withItem8", "parameterTypes": ["java.lang.Object"]},
+    {"name": "getItem8", "parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.infra.common.lang.tuples.Tuple9",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object","java.lang.Object"]},
+    {"name": "<init>", "parameterTypes": ["java.lang.Object","java.lang.Object","java.lang.Object","java.lang.Object"]},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "size", "parameterTypes": []},
+    {"name": "asList", "parameterTypes": []},
+    {"name": "nth", "parameterTypes": ["int"]},
+    {"name": "setItem9", "parameterTypes": ["java.lang.Object"]},
+    {"name": "getItem9", "parameterTypes": []},
+    {"name": "withItem9", "parameterTypes": ["java.lang.Object"]}
   ]
 }
 ]

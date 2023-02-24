@@ -33,6 +33,10 @@ public class Tuple6 extends Tuple5 {
     public Tuple6() {
     }
 
+    public Tuple6(Object item1) {
+        this(item1, null);
+    }
+
     public Tuple6(Object item1, Object item2) {
         super(item1, item2);
     }
