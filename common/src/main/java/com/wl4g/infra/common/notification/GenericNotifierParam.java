@@ -24,6 +24,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,8 +33,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.executable.ValidateOnExecution;
-
-import com.wl4g.infra.common.web.rest.RespBase.DataMap;
 
 import lombok.Getter;
 
@@ -62,14 +61,13 @@ public class GenericNotifierParam implements NotifierParam {
     /**
      * The value list of the notification message content placeholder parameter.
      */
-    private @NotNull DataMap<Object> parameters = new DataMap<Object>(4) {
+    private @NotNull Map<String, Object> parameters = new HashMap<String, Object>(4) {
         private static final long serialVersionUID = 1299361493607274200L;
 
         @Override
         public Object get(Object key) {
             return super.get(key);
         }
-
     };
 
     /**
@@ -160,7 +158,7 @@ public class GenericNotifierParam implements NotifierParam {
     public GenericNotifierParam addParameter(@NotBlank String key, Object value) {
         hasTextOf(key, "parameterKey");
         // notNullOf(value, "parameterValue");
-        parameters.put(key, value);
+        this.parameters.put(key, value);
         return this;
     }
 

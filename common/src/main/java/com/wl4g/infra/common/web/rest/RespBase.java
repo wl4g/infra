@@ -16,7 +16,13 @@
 package com.wl4g.infra.common.web.rest;
 
 import static com.wl4g.infra.common.lang.Assert2.hasText;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.infra.common.lang.ClassUtils2.resolveClassNameNullable;
+import static com.wl4g.infra.common.lang.EnvironmentUtil.getStringProperty;
 import static com.wl4g.infra.common.lang.Exceptions.getRootCausesString;
+import static com.wl4g.infra.common.reflect.ReflectionUtils2.findMethodNullable;
+import static com.wl4g.infra.common.reflect.ReflectionUtils2.invokeMethod;
+import static com.wl4g.infra.common.reflect.ReflectionUtils2.makeAccessible;
 import static com.wl4g.infra.common.serialize.JacksonUtils.convertBean;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.lang.String.format;
@@ -31,8 +37,11 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.annotations.Beta;
@@ -56,12 +65,12 @@ public class RespBase<D> implements Serializable {
     private static final long serialVersionUID = 2647155468624590650L;
 
     private RetCodeSpec code = RetCode.OK;
-    private String status = DEFAULT_STATUS; // [Extensible]
-    private String requestId = DEFAULT_REQUESTID; // [Extensible]
+    private String status = DEFAULT_STATUS_VALUE; // [Extensible]
+    private String requestId = DEFAULT_REQUESTID_VALUE; // [Extensible]
     private Long timestamp = currentTimeMillis();
     private String message = EMPTY;
     @SuppressWarnings("unchecked")
-    private D data = (D) DEFAULT_DATA;
+    private D data = (D) DEFAULT_DATA_VALUE;
 
     public RespBase() {
         this(null);
@@ -281,7 +290,7 @@ public class RespBase<D> implements Serializable {
     public void setData(D data) {
         if (isNull(data))
             return;
-        if (checkDataAvailable()) // Data already payLoad ?
+        if (checkDataForAvailable()) // Data already payLoad ?
             throw new IllegalStateException(format(
                     "Already data payload, In order to set it successful the data node must be the initial value or empty. - %s",
                     getData()));
@@ -363,8 +372,8 @@ public class RespBase<D> implements Serializable {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @JsonIgnore
     public synchronized DataMap<Object> forMap() {
-        if (!checkDataAvailable()) { // Data unalready ?
-            data = (D) new DataMap<>(); // Init
+        if (!checkDataForAvailable()) { // Data unalready ?
+            this.data = (D) new DataMap<>(this); // Init
         } else {
             // Convert to DataMap.
             /**
@@ -373,7 +382,7 @@ public class RespBase<D> implements Serializable {
              */
             if (data instanceof Map) { // e.g: LinkedHashMap
                 if (!(data instanceof DataMap)) {
-                    this.data = (D) new DataMap<>((Map) data);
+                    this.data = (D) new DataMap<>(this, (Map) data);
                 }
             } else {
                 throw new UnsupportedOperationException(format(
@@ -397,7 +406,7 @@ public class RespBase<D> implements Serializable {
         DataMap<Object> data = forMap();
         DataMap<Object> nodeMap = (DataMap<Object>) data.get(nodeKey);
         if (isNull(nodeMap)) {
-            data.put(nodeKey, (D) (nodeMap = new DataMap<>()));
+            data.put(nodeKey, (D) (nodeMap = new DataMap<>(this)));
         }
         return nodeMap;
     }
@@ -409,8 +418,8 @@ public class RespBase<D> implements Serializable {
      * 
      * @return
      */
-    private boolean checkDataAvailable() {
-        return nonNull(getData()) && getData() != DEFAULT_DATA;
+    private boolean checkDataForAvailable() {
+        return nonNull(getData()) && getData() != DEFAULT_DATA_VALUE;
     }
 
     /**
@@ -475,7 +484,7 @@ public class RespBase<D> implements Serializable {
      * @return
      */
     public static final <T> RespBase<T> create(String status) {
-        return new RespBase<T>().withStatus(status);
+        return new RespBase<T>().withStatus(status).withRequestId(WebUtils3Bridges.getRequestParam(DEFAULT_REQUESTID_NAME));
     }
 
     /**
@@ -511,14 +520,10 @@ public class RespBase<D> implements Serializable {
     public static class DataMap<V> extends LinkedHashMap<String, V> {
         private static final long serialVersionUID = 741193108777950437L;
 
-        /**
-         * Constructs an empty insertion-ordered <tt>LinkedHashMap</tt> instance
-         * with the specified initial capacity and a default load factor (0.75).
-         *
-         * @throws IllegalArgumentException
-         *             if the initial capacity is negative
-         */
-        public DataMap() {
+        private transient @NotNull @JsonIgnore RespBase<?> withParent;
+
+        public DataMap(@NotNull RespBase<?> withParent) {
+            this.withParent = notNullOf(withParent, "withParent");
         }
 
         /**
@@ -530,8 +535,9 @@ public class RespBase<D> implements Serializable {
          * @throws IllegalArgumentException
          *             if the initial capacity is negative
          */
-        public DataMap(int initialCapacity) {
+        public DataMap(@NotNull RespBase<?> withParent, int initialCapacity) {
             super(initialCapacity);
+            this.withParent = notNullOf(withParent, "withParent");
         }
 
         /**
@@ -546,8 +552,9 @@ public class RespBase<D> implements Serializable {
          *             if the initial capacity is negative or the load factor is
          *             nonpositive
          */
-        public DataMap(int initialCapacity, float loadFactor) {
+        public DataMap(@NotNull RespBase<?> withParent, int initialCapacity, float loadFactor) {
             super(initialCapacity, loadFactor);
+            this.withParent = notNullOf(withParent, "withParent");
         }
 
         /**
@@ -556,13 +563,14 @@ public class RespBase<D> implements Serializable {
          * instance is created with a default load factor (0.75) and an initial
          * capacity sufficient to hold the mappings in the specified map.
          *
-         * @param m
+         * @param existingMap
          *            the map whose mappings are to be placed in this map
          * @throws NullPointerException
          *             if the specified map is null
          */
-        public DataMap(Map<String, V> m) {
-            super(m);
+        public DataMap(@NotNull RespBase<?> withParent, Map<String, V> existingMap) {
+            super(existingMap);
+            this.withParent = notNullOf(withParent, "withParent");
         }
 
         /**
@@ -580,8 +588,9 @@ public class RespBase<D> implements Serializable {
          *             if the initial capacity is negative or the load factor is
          *             nonpositive
          */
-        public DataMap(int initialCapacity, float loadFactor, boolean accessOrder) {
+        public DataMap(@NotNull RespBase<?> withParent, int initialCapacity, float loadFactor, boolean accessOrder) {
             super(initialCapacity, loadFactor, accessOrder);
+            this.withParent = notNullOf(withParent, "withParent");
         }
 
         @Override
@@ -620,6 +629,11 @@ public class RespBase<D> implements Serializable {
         public DataMap<V> andPutAll(Map<? extends String, ? extends V> m) {
             putAll(m);
             return this;
+        }
+
+        @SuppressWarnings("unchecked")
+        public <D> RespBase<D> withParent() {
+            return (RespBase<D>) this.withParent;
         }
     }
 
@@ -824,14 +838,36 @@ public class RespBase<D> implements Serializable {
     }
 
     /**
+     * Bridge utils for {@link com.wl4g.infra.context.utils.web.WebUtils3}
+     */
+    public static final class WebUtils3Bridges {
+        public static final Class<?> webUtils3Class = resolveClassNameNullable("com.wl4g.infra.context.utils.web.WebUtils3");
+        public static final Method getRequestParameterMethod = findMethodNullable(webUtils3Class, "getRequestParameter",
+                String.class);
+
+        public static String getRequestParam(String paramName) {
+            if (nonNull(getRequestParameterMethod)) {
+                makeAccessible(getRequestParameterMethod);
+                return (String) invokeMethod(getRequestParameterMethod, null, paramName);
+            }
+            return null;
+        }
+    }
+
+    /**
      * Default status value.
      */
-    public static final String DEFAULT_STATUS = "Normal";
+    public static final String DEFAULT_STATUS_VALUE = "Normal";
+
+    /**
+     * Default requestId parameter name.
+     */
+    public static final String DEFAULT_REQUESTID_NAME = getStringProperty("REQUEST_ID_NAME", "requestId");
 
     /**
      * Default requestId value.
      */
-    public static final String DEFAULT_REQUESTID = null;
+    public static final String DEFAULT_REQUESTID_VALUE = null;
 
     /**
      * Default data value.</br>
@@ -843,6 +879,6 @@ public class RespBase<D> implements Serializable {
      *JsonMappingException: No serializer found for class java.lang.Object and no properties discovered to create BeanSerializer (to avoid exception, disable SerializationFeature.FAIL_ON_EMPTY_BEANS) (through reference chain: com.wl4g.infra.common.web.rest.RespBase["data"])
      * </pre>
      */
-    public static final Object DEFAULT_DATA = emptyMap();
+    public static final Object DEFAULT_DATA_VALUE = emptyMap();
 
 }
