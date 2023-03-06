@@ -15,6 +15,8 @@
  */
 package com.wl4g.infra.common.web;
 
+import static java.util.Objects.nonNull;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -137,18 +139,18 @@ public class CookieUtils {
      */
     public static String getCookie(HttpServletRequest request, HttpServletResponse response, String name, boolean isRemove) {
         String value = null;
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals(name)) {
+        final Cookie[] cookies = request.getCookies();
+        if (nonNull(cookies)) {
+            for (Cookie c : cookies) {
+                if (nonNull(c) && c.getName().equalsIgnoreCase(name)) {
                     try {
-                        value = URLDecoder.decode(cookie.getValue(), "utf-8");
-                    } catch (UnsupportedEncodingException e) {
-                        throw new IllegalStateException(e);
+                        value = URLDecoder.decode(c.getValue(), "utf-8");
+                    } catch (UnsupportedEncodingException ex) {
+                        throw new IllegalStateException(ex);
                     }
                     if (isRemove) {
-                        cookie.setMaxAge(0);
-                        response.addCookie(cookie);
+                        c.setMaxAge(0);
+                        response.addCookie(c);
                     }
                 }
             }

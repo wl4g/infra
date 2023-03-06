@@ -41,6 +41,8 @@ import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -484,7 +486,7 @@ public class RespBase<D> implements Serializable {
      * @return
      */
     public static final <T> RespBase<T> create(String status) {
-        return new RespBase<T>().withStatus(status).withRequestId(WebUtils3Bridges.getRequestParam(DEFAULT_REQUESTID_NAME));
+        return new RespBase<T>().withStatus(status).withRequestId(WebUtils3Bridges.getDefaultMergedParam(DEFAULT_REQUESTID_NAME));
     }
 
     /**
@@ -842,13 +844,17 @@ public class RespBase<D> implements Serializable {
      */
     public static final class WebUtils3Bridges {
         public static final Class<?> webUtils3Class = resolveClassNameNullable("com.wl4g.infra.context.utils.web.WebUtils3");
-        public static final Method getRequestParameterMethod = findMethodNullable(webUtils3Class, "getRequestParameter",
-                String.class);
+        public static final Method getDefaultMergedParamMethod = findMethodNullable(webUtils3Class, "getDefaultMergedParam",
+                String.class, String.class);
 
-        public static String getRequestParam(String paramName) {
-            if (nonNull(getRequestParameterMethod)) {
-                makeAccessible(getRequestParameterMethod);
-                return (String) invokeMethod(getRequestParameterMethod, null, paramName);
+        public static String getDefaultMergedParam(@NotBlank String paramName) {
+            return getDefaultMergedParam(paramName, null);
+        }
+
+        public static String getDefaultMergedParam(@NotBlank String paramName, @Nullable String defaultValue) {
+            if (nonNull(getDefaultMergedParamMethod)) {
+                makeAccessible(getDefaultMergedParamMethod);
+                return (String) invokeMethod(getDefaultMergedParamMethod, null, paramName, defaultValue);
             }
             return null;
         }

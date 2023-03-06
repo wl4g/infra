@@ -15,11 +15,14 @@
  */
 package com.wl4g.infra.context.utils.web;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import static java.util.Objects.nonNull;
 import static org.springframework.web.context.request.RequestContextHolder.getRequestAttributes;
+
+import javax.annotation.Nullable;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotBlank;
+
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.wl4g.infra.common.web.WebUtils2;
@@ -33,25 +36,41 @@ import com.wl4g.infra.common.web.WebUtils2;
  */
 public abstract class WebUtils3 extends WebUtils2 {
 
-	/**
-	 * Gets request parameter.
-	 * 
-	 * @param name
-	 * @return
-	 */
-	public static String getRequestParameter(String name) {
-		HttpServletRequest request = currentServletRequest();
-		return nonNull(request) ? request.getParameter(name) : null;
-	}
+    /**
+     * Gets for request parameter.
+     * 
+     * @param name
+     * @return
+     */
+    public static String getRequestParameter(String name) {
+        final HttpServletRequest request = currentServletRequest();
+        return nonNull(request) ? getRequestParam(request, name, false) : null;
+    }
 
-	public static HttpServletRequest currentServletRequest() {
-		ServletRequestAttributes attr = (ServletRequestAttributes) getRequestAttributes();
-		return nonNull(attr) ? attr.getRequest() : null;
-	}
+    /**
+     * Gets for request header.
+     * 
+     * @param name
+     * @return
+     */
+    public static String getRequestHeader(String name) {
+        final HttpServletRequest request = currentServletRequest();
+        return nonNull(request) ? getHeader(request, name, false) : null;
+    }
 
-	public static HttpServletResponse currentServletResponse() {
-		ServletRequestAttributes attr = (ServletRequestAttributes) getRequestAttributes();
-		return nonNull(attr) ? attr.getResponse() : null;
-	}
+    public static String getDefaultMergedParam(final @NotBlank String key, final @Nullable String defaultValue) {
+        final HttpServletRequest request = currentServletRequest();
+        return nonNull(request) ? WebUtils2.getDefaultMergedParam(request, null, key, defaultValue) : null;
+    }
+
+    public static HttpServletRequest currentServletRequest() {
+        ServletRequestAttributes attr = (ServletRequestAttributes) getRequestAttributes();
+        return nonNull(attr) ? attr.getRequest() : null;
+    }
+
+    public static HttpServletResponse currentServletResponse() {
+        ServletRequestAttributes attr = (ServletRequestAttributes) getRequestAttributes();
+        return nonNull(attr) ? attr.getResponse() : null;
+    }
 
 }

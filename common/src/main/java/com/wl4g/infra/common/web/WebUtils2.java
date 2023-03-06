@@ -32,6 +32,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.equalsAnyIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -40,6 +41,7 @@ import static org.apache.commons.lang3.StringUtils.startsWithIgnoreCase;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -62,6 +64,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.google.common.annotations.Beta;
 import com.google.common.base.Charsets;
 import com.google.common.net.MediaType;
+import com.wl4g.infra.common.collection.CollectionUtils2;
 import com.wl4g.infra.common.collection.multimap.LinkedMultiValueMap;
 import com.wl4g.infra.common.collection.multimap.MultiValueMap;
 import com.wl4g.infra.common.lang.StringUtils2;
@@ -238,7 +241,8 @@ public abstract class WebUtils2 extends WebUtils {
      * @param required
      * @return
      */
-    public static String getRequestParam(ServletRequest request, String paramName, boolean required) {
+    public static String getRequestParam(@NotNull ServletRequest request, String paramName, boolean required) {
+        notNullOf(request, "request");
         String paramValue = request.getParameter(paramName);
         String cleanedValue = paramValue;
         if (paramValue != null) {
@@ -272,7 +276,8 @@ public abstract class WebUtils2 extends WebUtils {
      * @return e.g:https://portal.mydomain.com/myapp/index?cid=xx&tid=xxx =>
      *         https://portal.mydomain.com/myapp/index?cid=xx&tid=xxx
      */
-    public static String getFullRequestURL(HttpServletRequest request) {
+    public static String getFullRequestURL(@NotNull HttpServletRequest request) {
+        notNullOf(request, "request");
         return getFullRequestURL(request, true);
     }
 
@@ -285,7 +290,8 @@ public abstract class WebUtils2 extends WebUtils {
      * @return e.g:https://portal.mydomain.com/myapp/index?cid=xx&tid=xxx =>
      *         https://portal.mydomain.com/myapp/index?cid=xx&tid=xxx
      */
-    public static String getFullRequestURL(HttpServletRequest request, boolean includeQuery) {
+    public static String getFullRequestURL(@NotNull HttpServletRequest request, boolean includeQuery) {
+        notNullOf(request, "request");
         String queryString = includeQuery ? request.getQueryString() : null;
         return request.getRequestURL().toString() + (StringUtils.isEmpty(queryString) ? "" : ("?" + queryString));
     }
@@ -297,7 +303,8 @@ public abstract class WebUtils2 extends WebUtils {
      * @return e.g:https://portal.mydomain.com/myapp/index?cid=xx&tid=xxx =>
      *         /myapp/index?cid=xx&tid=xxx
      */
-    public static String getFullRequestURI(HttpServletRequest request) {
+    public static String getFullRequestURI(@NotNull HttpServletRequest request) {
+        notNullOf(request, "request");
         String queryString = request.getQueryString();
         return request.getRequestURI() + (StringUtils.isEmpty(queryString) ? "" : ("?" + queryString));
     }
@@ -308,7 +315,8 @@ public abstract class WebUtils2 extends WebUtils {
      * @param request
      * @return
      */
-    public static boolean hasHeader(HttpServletRequest request, String name) {
+    public static boolean hasHeader(@NotNull HttpServletRequest request, String name) {
+        notNullOf(request, "request");
         Enumeration<String> names = request.getHeaderNames();
         while (names.hasMoreElements()) {
             if (StringUtils.equalsIgnoreCase(names.nextElement(), name)) {
@@ -336,7 +344,8 @@ public abstract class WebUtils2 extends WebUtils {
      * @param required
      * @return
      */
-    public static String getHeader(HttpServletRequest request, String headerName, boolean required) {
+    public static String getHeader(@NotNull HttpServletRequest request, String headerName, boolean required) {
+        notNullOf(request, "request");
         String headerValue = request.getHeader(headerName);
         String cleanedValue = headerValue;
         if (headerValue != null) {
@@ -393,7 +402,9 @@ public abstract class WebUtils2 extends WebUtils {
      * @param hasCtxPath
      * @return
      */
-    public static String getRFCBaseURI(HttpServletRequest request, boolean hasCtxPath) {
+    public static String getRFCBaseURI(@NotNull HttpServletRequest request, boolean hasCtxPath) {
+        notNullOf(request, "request");
+
         // Context path
         String ctxPath = request.getContextPath();
         notNull(ctxPath, "Http request contextPath must not be null");
@@ -462,7 +473,8 @@ public abstract class WebUtils2 extends WebUtils {
      * @param request
      * @return
      */
-    public static String getAvaliableRequestRememberUrl(HttpServletRequest request) {
+    public static String getAvaliableRequestRememberUrl(@NotNull HttpServletRequest request) {
+        notNullOf(request, "request");
         String rememberUrl = request.getHeader("Referer");
         // #[RFC7231], https://tools.ietf.org/html/rfc7231#section-5.5.2
         rememberUrl = isNotBlank(rememberUrl) ? rememberUrl : request.getHeader("Referrer");
@@ -501,6 +513,67 @@ public abstract class WebUtils2 extends WebUtils {
             return false;
         }
         return isTrue(stacktrace.toLowerCase(US), false);
+    }
+
+    /**
+     * Gets parameter by fallback for request query, headers, cookies, default
+     * value.
+     * 
+     * @param <T>
+     * @param request
+     * @param bodyArgs
+     * @param key
+     * @param defaultValue
+     * @return
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public static <T> T getDefaultMergedParam(
+            final @NotNull HttpServletRequest request,
+            final @Nullable Map<String, Object> bodyArgs,
+            final @NotBlank String key,
+            final @Nullable T defaultValue) {
+        notNullOf(request, "request");
+        hasTextOf(key, "key");
+        final Map<String, String> queryParams = getFirstParameters(request);
+        final Map<String, String> headers = getRequestHeaders(request);
+
+        // 1. Get parameter by query (first priority).
+        Object value = queryParams.get(key);
+        // 2. Get parameter by headers (second priority).
+        if (StringUtils2.isEmpty(value)) {
+            // Notice: It may be converted to lowercase by services such as
+            // front-end load balancing and gateways.
+            // value = headers.get(key);
+            value = headers.entrySet()
+                    .stream()
+                    .filter(e -> equalsAnyIgnoreCase(e.getKey(), key, "x-".concat(key)))
+                    .map(e -> e.getValue())
+                    .findFirst()
+                    .orElse(null);
+        }
+        // 3. Get parameter by cookie (third priority).
+        if (StringUtils2.isEmpty(value)) {
+            value = CookieUtils.getCookie(request, key);
+        }
+        // 4. Get parameter by body (four priority).
+        if (StringUtils2.isEmpty(value) && nonNull(bodyArgs)) {
+            final Object valueObj = bodyArgs.get(key);
+            if (nonNull(valueObj)) {
+                if (valueObj instanceof String) {
+                    value = valueObj.toString();
+                } else if (valueObj instanceof Collection) {
+                    value = CollectionUtils2.safeList((Collection) valueObj);
+                }
+            }
+        }
+        // 5. Use default if none.
+        value = StringUtils2.isEmpty(value) ? defaultValue : value;
+
+        // Transform string value to collection.
+        if (defaultValue instanceof Collection && value instanceof String) {
+            value = asList(split((String) value, ","));
+        }
+        return (T) value;
     }
 
     /**
