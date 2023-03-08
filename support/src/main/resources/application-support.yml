@@ -16,11 +16,11 @@ spring:
     #support:
     #  cli.enabled: false # Default by false
     #  jedis:
-    #    enabled: false # Default by true
-    #    #passwd: ""
+    #    enabled: true # Default by true
+    #    #passwd: "123456"
     #    connect-timeout: 10000
     #    max-attempts: 10
-    #    nodes: ${IAM_REDIS_NODES:owner-node5:6379,owner-node5:6380,owner-node5:6381,owner-node3:7379,owner-node3:7380,owner-node3:7381}
+    #    nodes: ${REDIS_NODES:localhost:6379,localhost:6380,localhost:6381,localhost:7379,localhost:7380,localhost:7381}
     #  notification:
     #    mail:
     #      enabled: false # Default by false

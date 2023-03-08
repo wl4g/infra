@@ -45,7 +45,7 @@ public class JedisClientFactoryBean extends JedisClientBuilder implements Factor
 
     public JedisClientFactoryBean(@Nullable JedisProperties config, @Nullable JedisCluster jedisCluster,
             @Nullable JedisPool jedisPool) {
-        super(null, jedisCluster, jedisPool);
+        super(config, jedisCluster, jedisPool);
     }
 
     @Override
