@@ -23,12 +23,17 @@ import static com.wl4g.infra.common.web.rest.RespBase.RetCode.BAD_PARAMS;
 import static com.wl4g.infra.common.web.rest.RespBase.RetCode.UNSUPPORTED;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.join;
+import static org.apache.commons.lang3.StringUtils.trimToEmpty;
+import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.validation.FieldError;
@@ -152,19 +157,27 @@ public class DefaultSmartErrorHandler extends AbstractSmartErrorHandler {
         if (nonNull(exception) && exception instanceof Throwable) {
             errmsg.append(getRootCausesString((Throwable) exception, true));
         }
-        final Object trace = model.get("trace");
-        if (nonNull(trace) && trace instanceof String) {
-            final String[] lines = ((String) trace).split("\n");
-            if (nonNull(lines) && lines.length > 0) {
-                final String first = lines[0];
-                final int lastIndex = first.lastIndexOf(":");
-                errmsg.append(lastIndex <= 0 ? first : first.substring(lastIndex));
-            }
+        final Object stacktrace = model.get("trace");
+        if (nonNull(stacktrace) && !stacktrace.toString().isEmpty()) {
+            errmsg.append(extractRootCauseMessage((String) stacktrace));
         }
 
         return errmsg.toString();
     }
 
+    public static String extractRootCauseMessage(String stacktrace) {
+        if (nonNull(stacktrace) && stacktrace instanceof String) {
+            final List<String> errStacks = new ArrayList<>(4);
+            final Matcher matcher = Pattern.compile(DEFAULT_ERRMSG_REGEX).matcher(stacktrace);
+            while (matcher.find()) {
+                errStacks.add(matcher.group());
+            }
+            return trimToEmpty(join(errStacks.toArray(), LINE_SEPARATOR));
+        }
+        return stacktrace;
+    }
+
     public static final int ORDER_DEFAULT_SMART_ERROR_HANDLER = 1000;
+    public static final String DEFAULT_ERRMSG_REGEX = "Caused by:(.+)|at <js>(\\s|\\.)([a-zA-Z0-9]+)\\((.+)\\)";
 
 }
