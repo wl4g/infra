@@ -26,7 +26,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -77,7 +76,7 @@ public abstract class BaseBean implements Serializable {
      * The organization structure code, which can be used for data permissions
      * as an organization tree, or in tenant isolation scenarios
      */
-    private @NotBlank String orgCode;
+    private @Nullable String orgCode;
 
     /**
      * The data record enable state.
@@ -380,6 +379,6 @@ public abstract class BaseBean implements Serializable {
     /*
      * Default super administrator user name.
      */
-    public static transient final String DEFAULT_SUPER_USER = "root";
+    public static transient final String DEFAULT_SUPER_USER = "unknown";
 
 }
