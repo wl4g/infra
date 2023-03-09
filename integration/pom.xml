@@ -53,15 +53,15 @@
 	<parent>
 		<groupId>com.wl4g</groupId>
 		<artifactId>infra-parent</artifactId>
-		<version>3.1.11</version>
+		<version>3.1.12</version>
 	</parent>
 	<modules>
 		<module>integration-feign-common</module>
 		<module>integration-feign-core</module>
 		<module>integration-feign-istio</module>
-		<!-- <module>integration-feign-istio-example</module> -->
+		<module>integration-feign-istio-example</module>
 		<module>integration-feign-springcloud</module>
-		<!-- <module>integration-feign-springcloud-example</module> -->
+    <module>integration-feign-springcloud-example</module>
 		<!-- <module>integration-feign-dubbo</module> -->
 		<!-- <module>integration-feign-dubbo-example</module> -->
 		<module>integration-eureka</module>
