@@ -169,11 +169,6 @@
         <dependencies>
             <dependency>
                 <groupId>com.wl4g</groupId>
-                <artifactId>infra</artifactId>
-                <version>${project.parent.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wl4g</groupId>
                 <artifactId>infra-common</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
