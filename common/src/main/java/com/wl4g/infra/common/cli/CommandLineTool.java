@@ -17,6 +17,7 @@ package com.wl4g.infra.common.cli;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToList;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Exceptions.getStackTraceAsString;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
@@ -177,6 +178,7 @@ public class CommandLineTool {
         }
 
         public Builder width(@Min(0) int width) {
+            isTrueOf(width >= 0, "width >= 0");
             this.width = width;
             return this;
         }
