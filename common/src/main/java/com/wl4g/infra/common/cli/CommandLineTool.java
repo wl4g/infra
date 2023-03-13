@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -83,6 +84,7 @@ public class CommandLineTool {
     public final static class Builder {
         protected final Logger log = getLogger(getClass());
 
+        private int width = 120;
         private final RemovableOptions options = new RemovableOptions();
 
         /**
@@ -163,15 +165,6 @@ public class CommandLineTool {
             return this;
         }
 
-        public void help(String header, String footer, boolean exit) {
-            HelpFormatter formatter = new HelpFormatter();
-            formatter.setSyntaxPrefix("\nUsage: [OPTIONS] ...\n");
-            formatter.printHelp(120, "\n", header, options, footer);
-            if (exit) {
-                System.exit(1);
-            }
-        }
-
         public Builder helpIfEmpty(String[] args, boolean exit) {
             if (isNull(args) || args.length == 0) {
                 help("", "", exit);
@@ -183,16 +176,24 @@ public class CommandLineTool {
             return helpIfEmpty(args, true);
         }
 
-        /**
-         * Build parsing to command line wrapper.
-         * 
-         * @param args
-         * @return
-         */
+        public Builder width(@Min(0) int width) {
+            this.width = width;
+            return this;
+        }
+
+        public void help(String header, String footer, boolean exit) {
+            final HelpFormatter formatter = new HelpFormatter();
+            formatter.setSyntaxPrefix("\nUsage: [OPTIONS] ...\n");
+            formatter.printHelp(width, "\n", header, options, footer);
+            if (exit) {
+                System.exit(1);
+            }
+        }
+
         public CommandLineFacade build(String args[]) {
             // If there is only arguments 'help,--help' then print usage and
             // exit.
-            if (checkHelp(args)) {
+            if (checkForHelp(args)) {
                 help("", "", true);
                 return null;
             }
@@ -211,7 +212,7 @@ public class CommandLineTool {
                         value = isBlank(value) ? ((HelpOption) o).getDefaultValue() : value;
                         return "-".concat(o.getOpt()).concat(",--").concat(o.getLongOpt()).concat("=").concat(trimToEmpty(value));
                     }).collect(toList());
-                    System.out.printf("%s pre-parsed: %s\n\n", new Date().toString(), printArgs);
+                    System.out.printf("%s prepare parse: %s\n\n", new Date().toString(), printArgs);
                 }
 
                 return new CommandLineFacade(line, this);
@@ -222,13 +223,7 @@ public class CommandLineTool {
             return null;
         }
 
-        /**
-         * Check for help command.
-         * 
-         * @param args
-         * @return
-         */
-        private boolean checkHelp(String args[]) {
+        private boolean checkForHelp(String args[]) {
             return isNull(args) || (args.length == 1 && equalsAnyIgnoreCase(args[0], "help", "--help"));
         }
     }
@@ -236,7 +231,6 @@ public class CommandLineTool {
     @Getter
     public static class HelpOption extends Option {
         private static final long serialVersionUID = 1950613325131445963L;
-
         private final String defaultValue;
 
         public HelpOption(@Nullable String shortOpt, @NotBlank String longOpt, @Nullable String defaultValue, boolean required,
