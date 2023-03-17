@@ -29,6 +29,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.wl4g.infra.common.bridge.RpcContextHolderBridges;
 import com.wl4g.infra.common.id.SnowflakeIdGenerator;
@@ -70,7 +71,8 @@ public abstract class BaseBean implements Serializable {
     // swagger requires read-only, there is a conflict, so we should solve this
     // problem on the swagger side.
     // @JsonIgnoreProperties(allowGetters = true, allowSetters = true)
-    private Long id;
+    // see:https://github.com/FasterXML/jackson-databind/issues/3125
+    private @JsonProperty Long id;
 
     /**
      * The organization structure code, which can be used for data permissions
