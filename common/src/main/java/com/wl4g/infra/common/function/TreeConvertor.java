@@ -16,22 +16,23 @@
 
 package com.wl4g.infra.common.function;
 
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static java.lang.String.valueOf;
+import static java.util.Objects.nonNull;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.NotThreadSafe;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.wl4g.infra.common.annotation.Todo;
-
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.NotThreadSafe;
-
-import static com.wl4g.infra.common.function.TreeConvertor.TreeNode;
-import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import com.wl4g.infra.common.function.TreeConvertor.TreeNode;
 
 /**
  * 
@@ -40,26 +41,21 @@ import static com.wl4g.infra.common.lang.Assert2.notNullOf;
  * @author James Wong <jameswong1376@gmail.com>>
  * @version v1.0 2017-09-08
  * @since
- * @param <T>
+ * @param <E>
  */
 @NotThreadSafe
-public class TreeConvertor<T extends TreeNode<T>> {
-    private final String rootParentId;
-    private final NodeIdMatcher matcher;
-    private final List<T> subChildrens = new ArrayList<>();
-    private final List<T> retList = new ArrayList<>();
+public class TreeConvertor<ID, E extends TreeNode<ID, E>> {
+    private final ID rootParentId;
+    private final NodeIdMatcher<ID> matcher;
+    private final List<E> childrens = new ArrayList<>();
+    private final List<E> flatNodes = new ArrayList<>();
 
+    @SuppressWarnings("unchecked")
     public TreeConvertor() {
-        this(null, NodeIdMatcher.defaultInstance);
+        this(null, (NodeIdMatcher<ID>) NodeIdMatcher.DEFAULT);
     }
 
-    /**
-     * 创建树结构转换器
-     * 
-     * @param rootParentId
-     *            跟节点的parentId的值
-     */
-    public TreeConvertor(@Nullable String rootParentId, @NotNull NodeIdMatcher matcher) {
+    public TreeConvertor(@Nullable ID rootParentId, @NotNull NodeIdMatcher<ID> matcher) {
         this.rootParentId = rootParentId;
         this.matcher = notNullOf(matcher, "matcher");
     }
@@ -67,30 +63,29 @@ public class TreeConvertor<T extends TreeNode<T>> {
     /**
      * 将平面树格式化为children树
      * 
-     * @param planeTree
+     * @param flatTree
      *            平面结构的树列表
      * @param isFilterLowest
      *            是否过滤(每层)最低级的节点
      * @return 返回包含children节点关系的树
      */
-    public List<T> formatToChildren(List<T> planeTree, boolean isFilterLowest) {
+    public List<E> formatToChildren(List<E> flatTree, boolean isFilterLowest) {
         // 1.1 parse children tree.
-        List<T> childrenTree = new ArrayList<T>();
+        List<E> childrenTree = new ArrayList<E>(flatTree.size() / 2);
 
-        for (T n : planeTree) {
+        for (E n : flatTree) {
             if (n != null && matcher.eq(n.getParentId(), rootParentId)) {
                 childrenTree.add(n);
             }
-
-            for (T t : planeTree) {
-                if (t != null && n != null && matcher.eq(t.getParentId(), n.getId())) {
-
+            for (E t : flatTree) {
+                if (nonNull(t) && nonNull(n) && matcher.eq(t.getParentId(), n.getId())) {
                     if (emptyChildrens(n)) {
-                        List<T> childrens = new ArrayList<T>();
+                        List<E> childrens = new ArrayList<E>();
                         childrens.add(t);
                         n.setChildrens(childrens);
-                    } else
+                    } else {
                         n.getChildrens().add(t);
+                    }
                 }
             }
         }
@@ -105,23 +100,21 @@ public class TreeConvertor<T extends TreeNode<T>> {
     /**
      * 将children解析为平面树
      * 
-     * @param childrenTree
+     * @param treeNodes
      *            children结构的树列表
      * @return 返回不包含children节点关系(以parentId做父子关系)的平面树
      */
-    public List<T> parseChildren(List<T> childrenTree) {
-
-        if (childrenTree != null) {
-            for (T n : childrenTree) {
+    public List<E> parseChildren(List<E> treeNodes) {
+        if (treeNodes != null) {
+            for (E n : treeNodes) {
                 if (!emptyChildrens(n)) {
                     parseChildren(n.getChildrens());
                     n.getChildrens().clear();
                 }
-                retList.add(n);
+                flatNodes.add(n);
             }
         }
-
-        return retList;
+        return flatNodes;
     }
 
     /**
@@ -133,19 +126,17 @@ public class TreeConvertor<T extends TreeNode<T>> {
      *            目标父级ID
      * @return 返回包含pId以及所有子、孙节点
      */
-    public List<T> subChildrens(List<T> childrenTree, String pId) {
-
+    public List<E> subChildrens(List<E> childrenTree, ID parentId) {
         if (childrenTree != null) {
-            for (T t : childrenTree) {
-                if (matcher.eq(t.getId(), String.valueOf(pId)))
-                    subChildrens.add(t);
-
+            for (E t : childrenTree) {
+                if (matcher.eq(t.getId(), parentId)) {
+                    childrens.add(t);
+                }
                 // 继续递归直到找到匹配节点为止.
-                subChildrens(t.getChildrens(), pId);
+                subChildrens(t.getChildrens(), parentId);
             }
         }
-
-        return subChildrens;
+        return childrens;
     }
 
     /**
@@ -158,21 +149,18 @@ public class TreeConvertor<T extends TreeNode<T>> {
      * @return
      * @sine
      */
-    private List<T> childrenLevelSet(T parent, List<T> childrenTree) {
-
-        for (T t : childrenTree) {
+    private List<E> childrenLevelSet(E parent, List<E> childrenTree) {
+        for (E t : childrenTree) {
             if (matcher.eq(t.getParentId(), rootParentId)) {
                 t.setLevel(0);
             } else if (parent != null) {
                 increaseLevel(t, parent.getLevel());
             }
-
             if (!emptyChildrens(t)) {
                 // 继续递归下级节点.
                 childrenLevelSet(t, t.getChildrens());
             }
         }
-
         return childrenTree;
     }
 
@@ -184,19 +172,17 @@ public class TreeConvertor<T extends TreeNode<T>> {
      * @param childrenTree
      * @return
      */
-    private List<T> filterChildren(List<T> childrenTree) {
-
-        Iterator<T> it = childrenTree.iterator();
+    private List<E> filterChildren(List<E> childrenTree) {
+        final Iterator<E> it = childrenTree.iterator();
         while (it.hasNext()) {
-            T t = it.next();
-
-            if (!emptyChildrens(t))
+            final E t = it.next();
+            if (!emptyChildrens(t)) {
                 // 继续递归直到找到匹配节点为止.
                 filterChildren(t.getChildrens());
-            else
+            } else {
                 it.remove();
+            }
         }
-
         return childrenTree;
     }
 
@@ -206,7 +192,7 @@ public class TreeConvertor<T extends TreeNode<T>> {
      * @param t
      * @return
      */
-    private boolean emptyChildrens(T t) {
+    private boolean emptyChildrens(E t) {
         return (t.getChildrens() == null || t.getChildrens().isEmpty());
     }
 
@@ -218,7 +204,7 @@ public class TreeConvertor<T extends TreeNode<T>> {
      * @param parentLevel
      *            父节点级别
      */
-    private void increaseLevel(T t, int parentLevel) {
+    private void increaseLevel(E t, int parentLevel) {
         t.setLevel(++parentLevel);
     }
 
@@ -229,9 +215,9 @@ public class TreeConvertor<T extends TreeNode<T>> {
      * @param parentLevel
      */
     @Todo
-    public List<T> childrenTotalSet(List<T> childrenTree) {
+    public List<E> childrenTotalSet(List<E> childrenTree) {
         // TODO
-        // for (T t : childrenTree) {
+        // for (E t : childrenTree) {
         // if (matcher.eq(t.getParentId(), rootParentId)) {
         // // Map<String, Integer> nodeSubs = new HashMap<String,
         // // Integer>();
@@ -251,27 +237,26 @@ public class TreeConvertor<T extends TreeNode<T>> {
      * @author James Wong <jameswong1376@gmail.com>>
      * @version v1.0 2017-09-08
      * @since
-     * @param <T>
+     * @param <E>
      */
-    public static interface TreeNode<T> extends Serializable {
-
+    public static interface TreeNode<ID, E> extends Serializable {
         // --- Tree node basic. ---
 
-        String getId();
+        ID getId();
 
-        void setId(String id);
+        void setId(ID id);
 
-        String getParentId();
+        ID getParentId();
 
-        void setParentId(String parentId);
+        void setParentId(ID parentId);
 
         int getLevel();
 
         void setLevel(int level);
 
-        List<T> getChildrens();
+        List<E> getChildrens();
 
-        void setChildrens(List<T> childrens);
+        void setChildrens(List<E> childrens);
 
         // --- Node statistics. ---
 
@@ -301,17 +286,9 @@ public class TreeConvertor<T extends TreeNode<T>> {
         default void setValue(Double data) {
             // Ignore
         }
-
     }
 
-    /**
-     * {@link NodeIdMatcher}
-     *
-     * @author James Wong <jameswong1376@gmail.com>>
-     * @version v1.0 2020-11-04
-     * @since
-     */
-    public static interface NodeIdMatcher {
+    public static interface NodeIdMatcher<ID> {
 
         /**
          * Check nodes ID is equals.
@@ -320,13 +297,13 @@ public class TreeConvertor<T extends TreeNode<T>> {
          * @param nodeId2
          * @return
          */
-        boolean eq(String nodeId1, String nodeId2);
+        boolean eq(ID nodeId1, ID nodeId2);
 
         /**
          * Default {@link NodeIdMatcher} instance of string equals.
          */
-        public static final NodeIdMatcher defaultInstance = (nodeId1, nodeId2) -> StringUtils.equals(nodeId1, nodeId2);
-
+        public static final NodeIdMatcher<Object> DEFAULT = (id1, id2) -> StringUtils.equals(valueOf(id1).toString(),
+                valueOf(id2).toString());
     }
 
 }
