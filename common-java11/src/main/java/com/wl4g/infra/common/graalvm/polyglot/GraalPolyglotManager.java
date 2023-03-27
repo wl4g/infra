@@ -73,7 +73,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class GraalPolyglotManager implements Closeable {
 
-    private @NotNull SimpleSyncContextPool contextPool;
+    private final @NotNull IContextPool contextPool;
 
     public static GraalPolyglotManager newDefaultGraalJS(
             @Nullable String workingRootDir,
@@ -141,12 +141,17 @@ public class GraalPolyglotManager implements Closeable {
     }
 
     public GraalPolyglotManager(@Min(1) int maxPoolSize, Function<Map<String, Object>, Tuple3> instantiator) {
+        this(new SynchronousContextPool(maxPoolSize, instantiator));
+    }
+
+    public GraalPolyglotManager(IContextPool contextPool) {
         try {
-            log.info("Initialzing graalvm polyglot context pool ...");
-            this.contextPool = new SimpleSyncContextPool(maxPoolSize, instantiator);
-            log.info("Initialzed graalvm polyglot context pool for {}", contextPool);
-        } catch (Exception e) {
-            throw e;
+            notNullOf(contextPool, "contextPool");
+            log.info("Initialzing graal polyglot context pool ...");
+            this.contextPool = contextPool;
+            log.info("Initialzed graal polyglot context pool for {}", contextPool);
+        } catch (Throwable ex) {
+            throw ex;
         }
     }
 
@@ -162,23 +167,27 @@ public class GraalPolyglotManager implements Closeable {
         }
     }
 
-    public ContextWrapper getContext(@Nullable Map<String, Object> metadata) {
-        return getContext(true, metadata);
+    public ContextWrapper getContext(@Nullable Map<String, Object> requestMetadata) {
+        return getContext(true, requestMetadata);
     }
 
-    public ContextWrapper getContext(boolean must, @Nullable Map<String, Object> metadata) {
-        return contextPool.take(must, metadata);
+    public ContextWrapper getContext(boolean must, @Nullable Map<String, Object> requestMetadata) {
+        return contextPool.take(must, requestMetadata);
+    }
+
+    public static interface IContextPool extends AutoCloseable {
+        ContextWrapper take(boolean must, @Nullable Map<String, Object> requestMetadata);
     }
 
     @Getter
     @Slf4j
-    public static class SimpleSyncContextPool implements AutoCloseable {
+    public static class SynchronousContextPool implements IContextPool {
         private final ContextWrapper[] contextCached;
         private final int maxPoolSize;
         private final AtomicInteger seq = new AtomicInteger(0);
         private final Function<Map<String, Object>, Tuple3> instantiator;
 
-        public SimpleSyncContextPool(@Min(1) int maxPoolSize, Function<Map<String, Object>, Tuple3> instantiator) {
+        public SynchronousContextPool(@Min(1) int maxPoolSize, Function<Map<String, Object>, Tuple3> instantiator) {
             isTrue(maxPoolSize >= 1, "maxPoolSize >= 1");
             notNullOf(instantiator, "instantiator");
             this.maxPoolSize = maxPoolSize;
@@ -199,7 +208,8 @@ public class GraalPolyglotManager implements Closeable {
         // throw new IllegalStateException("Could not got context from pool");
         // }
 
-        protected synchronized ContextWrapper take(boolean must, @Nullable Map<String, Object> currentMetadata) {
+        @Override
+        public synchronized ContextWrapper take(boolean must, @Nullable Map<String, Object> requestMetadata) {
             int openedSize = 0;
             ContextWrapper takeContext = null;
             for (int i = 0; i < contextCached.length; i++) {
@@ -208,9 +218,9 @@ public class GraalPolyglotManager implements Closeable {
                     if (context.isOpened()) {
                         ++openedSize;
                     } else {
-                        if (nonNull(currentMetadata)) {
-                            final var md = safeMap(context.getCurrentMetadata());
-                            if (safeMap(currentMetadata).entrySet()
+                        if (nonNull(requestMetadata)) {
+                            final var md = safeMap(context.getMetadata());
+                            if (safeMap(requestMetadata).entrySet()
                                     .stream()
                                     .anyMatch(e -> eqIgnCase(md.get(e.getKey()), e.getValue()))) {
                                 takeContext = context;
@@ -223,14 +233,14 @@ public class GraalPolyglotManager implements Closeable {
             }
             // Checking for new instantiate context.
             if (checkNewCreate(takeContext, openedSize)) { // limit-max
-                takeContext = contextCached[seq.get()] = newInstance(currentMetadata);
+                takeContext = contextCached[seq.get()] = newInstance(requestMetadata);
             }
             if (nonNull(takeContext)) {
-                takeContext.open(currentMetadata);
+                takeContext.open();
                 return takeContext;
             }
             if (must) {
-                throw new NoPolyglotContextException(format("Could not obtain context from pool of '%s'", currentMetadata));
+                throw new NoPolyglotContextException(format("Could not obtain context from pool of '%s'", requestMetadata));
             }
             return null;
         }
@@ -239,7 +249,7 @@ public class GraalPolyglotManager implements Closeable {
             try {
                 final var newContext = instantiator.apply(metadata);
                 return new ContextWrapper(seq.incrementAndGet(), (Context) newContext.getItem1(),
-                        (OutputStream) newContext.getItem2(), (OutputStream) newContext.getItem3());
+                        (OutputStream) newContext.getItem2(), (OutputStream) newContext.getItem3(), metadata);
             } catch (Throwable ex) {
                 throw new IllegalStateException("Unable to new instantiate context object.", ex);
             }
@@ -280,7 +290,7 @@ public class GraalPolyglotManager implements Closeable {
         private @NotNull Context context;
         private @Nullable OutputStream stdout;
         private @Nullable OutputStream stderr;
-        private @Nullable Map<String, Object> currentMetadata;
+        private @Nullable Map<String, Object> metadata;
         /**
          * Pooling context marker, because js does not support multi-threaded
          * execution in the same context at the same time. </br>
@@ -292,12 +302,13 @@ public class GraalPolyglotManager implements Closeable {
         private @Getter(value = AccessLevel.PRIVATE) final AtomicBoolean opened = new AtomicBoolean(false);
 
         public ContextWrapper(@NotBlank int id, @NotNull Context context, @Nullable OutputStream stdout,
-                @Nullable OutputStream stderr) {
+                @Nullable OutputStream stderr, @Nullable Map<String, Object> metadata) {
             this.id = id;
             this.name = "graal-ctx-pool-" + id;
             this.context = notNullOf(context, "context");
             this.stdout = stdout;
             this.stderr = stderr;
+            this.metadata = metadata;
         }
 
         @Override
@@ -309,8 +320,6 @@ public class GraalPolyglotManager implements Closeable {
                     this.opened.set(false);
                 } catch (Throwable ex) {
                     log.warn(format("Unable to closing context of %s", name), ex);
-                } finally {
-                    this.currentMetadata = null;
                 }
             } else {
                 throw new Error("Should't to be here");
@@ -321,8 +330,7 @@ public class GraalPolyglotManager implements Closeable {
             return this.opened.get();
         }
 
-        public synchronized void open(@Nullable Map<String, Object> currentMetadata) {
-            this.currentMetadata = currentMetadata;
+        public synchronized void open() {
             if (opened.compareAndSet(false, true)) {
                 try {
                     // see:https://github.com/oracle/graaljs/blob/master/graal-js/src/com.oracle.truffle.js.test.threading/src/com/oracle/truffle/js/test/threading/ConcurrentAccess.java#L198

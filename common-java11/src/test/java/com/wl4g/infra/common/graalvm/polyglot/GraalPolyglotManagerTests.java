@@ -36,7 +36,7 @@ import org.junit.Test;
 import com.google.common.base.Charsets;
 import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager.ContextWrapper;
 import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager.NoPolyglotContextException;
-import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager.SimpleSyncContextPool;
+import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager.SynchronousContextPool;
 import com.wl4g.infra.common.io.FileIOUtils;
 import com.wl4g.infra.common.lang.tuples.Tuple3;
 
@@ -51,7 +51,7 @@ public class GraalPolyglotManagerTests {
 
     @Test
     public void testTakeNoOverflow() throws Exception {
-        try (SimpleSyncContextPool pool = new SimpleSyncContextPool(10, metadata -> new Tuple3(Context.create()));) {
+        try (SynchronousContextPool pool = new SynchronousContextPool(10, metadata -> new Tuple3(Context.create()));) {
             try {
                 for (int i = 0; i < 10; i++) {
                     ContextWrapper context = pool.take(true, null);
@@ -67,7 +67,7 @@ public class GraalPolyglotManagerTests {
 
     @Test(expected = IllegalStateException.class)
     public void testTakeOverflow() throws Exception {
-        try (SimpleSyncContextPool pool = new SimpleSyncContextPool(10, metadata -> new Tuple3(Context.create()));) {
+        try (SynchronousContextPool pool = new SynchronousContextPool(10, metadata -> new Tuple3(Context.create()));) {
             try {
                 for (int i = 0; i < 11; i++) {
                     ContextWrapper context = pool.take(true, null);
@@ -83,7 +83,7 @@ public class GraalPolyglotManagerTests {
 
     @Test
     public void testTakeNoOverflowWithRelease() throws Exception {
-        try (SimpleSyncContextPool pool = new SimpleSyncContextPool(10, metadata -> new Tuple3(Context.create()));) {
+        try (SynchronousContextPool pool = new SynchronousContextPool(10, metadata -> new Tuple3(Context.create()));) {
             try {
                 for (int i = 0; i < 20; i++) {
                     try (ContextWrapper context = pool.take(true, null);) {
@@ -147,7 +147,9 @@ public class GraalPolyglotManagerTests {
         }
         latch.await();
 
-        if (safeArrayToList(manager.getContextPool().getContextCached()).stream().filter(cc -> isNull(cc)).count() > 0) {
+        if (safeArrayToList(((SynchronousContextPool) manager.getContextPool()).getContextCached()).stream()
+                .filter(cc -> isNull(cc))
+                .count() > 0) {
             throw new RuntimeException("Concurrency process has bug???");
         }
 

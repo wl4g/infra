@@ -17,6 +17,7 @@ package com.wl4g.infra.common.lang;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static java.lang.String.valueOf;
 import static java.util.Objects.isNull;
 
 import java.io.ByteArrayOutputStream;
@@ -486,28 +487,19 @@ public abstract class StringUtils2 extends org.apache.commons.lang3.StringUtils 
     }
 
     /**
-     * 校验字符串是否相等
+     * Equals for objects.
      * 
-     * @param str1
-     * @param str2
+     * @param obj1
+     * @param obj2
      * @return
      */
     public static boolean eqIgnCase(Object obj1, Object obj2) {
-
-        if (obj1 == null || obj2 == null) {
+        if (obj1 == null && obj2 == null) {
             return true;
-            /*
-             * 1. 再次判断obj1.toString()是为了控制这种情况： new
-             * User()对象，但User重写了toString方法且返回空. 2.
-             * 再次判断str1.toString()使用equalsIgnoreCase判断是为了除开这种情况:
-             * obj1属于string类型，obj2属于double类型
-             */
-        } else if (obj1 == obj2 || equalsIgnoreCase(obj1.toString(), obj2.toString())) {
-            return true;
-        } else if (obj1 instanceof CharSequence && obj2 instanceof CharSequence) {
-            return equalsIgnoreCase(String.valueOf(obj1).trim(), String.valueOf(obj2).trim());
         }
-
+        if (equalsIgnoreCase(valueOf(obj1).toString(), valueOf(obj2).toString())) {
+            return true;
+        }
         return false;
     }
 
