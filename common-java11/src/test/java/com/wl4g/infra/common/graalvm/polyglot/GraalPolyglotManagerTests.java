@@ -99,7 +99,7 @@ public class GraalPolyglotManagerTests {
     }
 
     @Test(expected = NoPolyglotContextException.class)
-    public void testCouldNotGetPool() throws Exception {
+    public void testCouldNotGetPoolForJS() throws Exception {
         System.setProperty("polyglot.engine.WarnInterpreterOnly", "false"); // disabled-warning
         System.out.println(org.graalvm.polyglot.Engine.class);
 
@@ -115,7 +115,7 @@ public class GraalPolyglotManagerTests {
 
         System.setProperty("graaljs.context.pool.max", maxPoolSize + "");
         GraalPolyglotManager manager = GraalPolyglotManager
-                .newDefaultGraalJS("/tmp/" + GraalPolyglotManagerTests.class.getSimpleName(), metadata -> null, metadata -> null);
+                .newDefaultForJS("/tmp/" + GraalPolyglotManagerTests.class.getSimpleName(), metadata -> null, metadata -> null);
 
         for (int i = 0; i < concurrency; i++) {
             new Thread(() -> {

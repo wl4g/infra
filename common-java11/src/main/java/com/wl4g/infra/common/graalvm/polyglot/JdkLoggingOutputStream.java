@@ -16,6 +16,7 @@
 package com.wl4g.infra.common.graalvm.polyglot;
 
 import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.lang.Exceptions.getStackTraceAsString;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.lang.String.format;
@@ -39,6 +40,7 @@ import java.util.logging.SimpleFormatter;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 import com.google.common.base.Charsets;
 import com.wl4g.infra.common.io.FileIOUtils;
@@ -61,20 +63,25 @@ public class JdkLoggingOutputStream extends OutputStream {
     private final int fileMaxCount;
     private final Logger logger;
     private final boolean isStdErr;
+    private final SimpleFormatter formatter;
 
     public JdkLoggingOutputStream() {
         this(false);
     }
 
     public JdkLoggingOutputStream(boolean isStdErr) {
-        this(null, null, null, null, true, isStdErr);
+        this(null, null, null, null, true, isStdErr, DEFAULT_FORMATTER);
     }
 
     public JdkLoggingOutputStream(@Nullable String filePattern, @Nullable Level level, @Nullable @Min(1024) Integer fileMaxSize,
-            @Nullable @Min(1) Integer fileMaxCount, boolean enableConsole, boolean isStdErr) {
+            @Nullable @Min(1) Integer fileMaxCount, boolean enableConsole, boolean isStdErr, @NotNull SimpleFormatter formatter) {
+        this.formatter = notNullOf(formatter, "formatter");
+
         this.filePattern = nonNull(filePattern) ? filePattern
                 : JAVA_IO_TMPDIR.concat("/").concat(JdkLoggingOutputStream.class.getSimpleName()).concat(".log");
+
         this.level = nonNull(level) ? level : Level.ALL;
+
         if (nonNull(fileMaxSize)) {
             isTrueOf(fileMaxSize >= 1024, "fileMaxSize >= 1024");
         }
@@ -117,6 +124,7 @@ public class JdkLoggingOutputStream extends OutputStream {
                 });
             }
             this.isStdErr = isStdErr;
+
         } catch (Exception e) {
             throw new IllegalStateException("Failed to initialize logger", e);
         }
@@ -137,10 +145,10 @@ public class JdkLoggingOutputStream extends OutputStream {
         }
     }
 
-    static final ThreadLocal<DateTimeFormatter> DEFAULT_DATE_FORMATTER_LOCAL = ThreadLocal
+    public static final ThreadLocal<DateTimeFormatter> DEFAULT_DATE_FORMATTER_LOCAL = ThreadLocal
             .withInitial(() -> DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS").withZone(ZoneId.systemDefault()));
 
-    static final SimpleFormatter DEFAULT_FORMATTER = new SimpleFormatter() {
+    public static final SimpleFormatter DEFAULT_FORMATTER = new SimpleFormatter() {
         @Override
         public String format(LogRecord record) {
             final Map<String, Object> json = new LinkedHashMap<>();
