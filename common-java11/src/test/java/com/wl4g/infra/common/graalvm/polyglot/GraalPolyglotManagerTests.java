@@ -114,8 +114,8 @@ public class GraalPolyglotManagerTests {
         CountDownLatch latch = new CountDownLatch(concurrency);
 
         System.setProperty("graaljs.context.pool.max", maxPoolSize + "");
-        GraalPolyglotManager manager = GraalPolyglotManager
-                .newDefaultForJS("/tmp/" + GraalPolyglotManagerTests.class.getSimpleName(), metadata -> null, metadata -> null);
+        GraalPolyglotManager manager = GraalPolyglotManager.newDefaultForJS(
+                "/tmp/" + GraalPolyglotManagerTests.class.getSimpleName(), null, metadata -> null, metadata -> null);
 
         for (int i = 0; i < concurrency; i++) {
             new Thread(() -> {
