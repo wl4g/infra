@@ -51,6 +51,7 @@ import org.graalvm.polyglot.PolyglotAccess;
 import org.graalvm.polyglot.ResourceLimits;
 import org.graalvm.polyglot.Source;
 import org.graalvm.polyglot.Value;
+import org.graalvm.polyglot.io.FileSystem;
 
 import com.wl4g.infra.common.io.FileIOUtils;
 import com.wl4g.infra.common.lang.EnvironmentUtil;
@@ -101,7 +102,7 @@ public class GraalPolyglotManager implements Closeable {
             throw new IllegalStateException(ex);
         }
 
-        return newDefaultFor("js", workingRootDir, options, null, null, null);
+        return newDefaultFor("js", workingRootDir, options, null, null, null, null);
     }
 
     public static GraalPolyglotManager newDefaultForPython(
@@ -109,13 +110,13 @@ public class GraalPolyglotManager implements Closeable {
             @Nullable Function<Map<String, Object>, OutputStream> stdoutCreator,
             @Nullable Function<Map<String, Object>, OutputStream> stderrCreator) {
 
-        // Add graal.js suffix path.
+        // Add graal for python suffix path.
         workingRootDir = isBlank(workingRootDir) ? JAVA_IO_TMPDIR.concat("__graalpy_working") : workingRootDir;
 
         // Extraction graal.js from environment.
         final var options = EnvironmentUtil.getConfigProperties("graal.polyglot.options.");
 
-        return newDefaultFor("python", workingRootDir, options, null, null, null);
+        return newDefaultFor("python", workingRootDir, options, null, null, null, null);
     }
 
     public static GraalPolyglotManager newDefaultForR(
@@ -123,13 +124,13 @@ public class GraalPolyglotManager implements Closeable {
             @Nullable Function<Map<String, Object>, OutputStream> stdoutCreator,
             @Nullable Function<Map<String, Object>, OutputStream> stderrCreator) {
 
-        // Add graal.js suffix path.
+        // Add graal for R suffix path.
         workingRootDir = isBlank(workingRootDir) ? JAVA_IO_TMPDIR.concat("__graalr_working") : workingRootDir;
 
         // Extraction graal.js from environment.
         final var options = EnvironmentUtil.getConfigProperties("graal.polyglot.options.");
 
-        return newDefaultFor("r", workingRootDir, options, null, null, null);
+        return newDefaultFor("r", workingRootDir, options, null, null, null, null);
     }
 
     public static GraalPolyglotManager newDefaultForRuby(
@@ -137,17 +138,24 @@ public class GraalPolyglotManager implements Closeable {
             @Nullable Function<Map<String, Object>, OutputStream> stdoutCreator,
             @Nullable Function<Map<String, Object>, OutputStream> stderrCreator) {
 
-        // Add graal.js suffix path.
+        // Add graal for ruby suffix path.
         workingRootDir = isBlank(workingRootDir) ? JAVA_IO_TMPDIR.concat("__graalrb_working") : workingRootDir;
 
         // Extraction graal.js from environment.
         final var options = EnvironmentUtil.getConfigProperties("graal.polyglot.options.");
 
-        return newDefaultFor("ruby", workingRootDir, options, null, null, null);
+        return newDefaultFor("ruby", workingRootDir, options, null, null, null, null);
     }
 
     /**
-     * Create graal polgylot manager instance with default.
+     * Create graal polgylot manager instance with default. </br>
+     * </br>
+     * for example:
+     * 
+     * <pre>
+     * var virtualRootDir = Path.of("/path/to/rootdir");
+     * var virtualRootFS = FileSystems.newFileSystem(virtualRootDir, null);
+     * </pre>
      * 
      * @param language
      *            see to
@@ -155,6 +163,7 @@ public class GraalPolyglotManager implements Closeable {
      * @param workingRootDir
      * @param options
      * @param polyglotAccess
+     * @param fileSystem
      * @param stdoutCreator
      * @param stderrCreator
      * @return
@@ -164,6 +173,7 @@ public class GraalPolyglotManager implements Closeable {
             @NotBlank String workingRootDir,
             @Nullable Map<String, String> options,
             @Nullable PolyglotAccess polyglotAccess,
+            @Nullable FileSystem fileSystem,
             @Nullable Function<Map<String, Object>, OutputStream> stdoutCreator,
             @Nullable Function<Map<String, Object>, OutputStream> stderrCreator) {
         hasTextOf(language, "language");
@@ -177,7 +187,7 @@ public class GraalPolyglotManager implements Closeable {
                 final OutputStream stderr = isNull(stderrCreator) ? null : stderrCreator.apply(metadata);
 
                 // Addidtion to metadata.
-                final var newContext = Context.newBuilder(language) // Only-allowed-JS-language
+                final Context.Builder builder = Context.newBuilder(language) // Only-allowed-JS-language
                         .allowAllAccess(getBooleanProperty("graal.polyglot.allowAllAccess", true))
                         .allowExperimentalOptions(getBooleanProperty("graal.polyglot.allowExperimentalOptions", true))
                         .allowIO(getBooleanProperty("graal.polyglot.allowIO", true))
@@ -199,9 +209,12 @@ public class GraalPolyglotManager implements Closeable {
                         // see:com.oracle.truffle.polyglot.PolyglotLoggers#asHandler()
                         .out(isNull(stdout) ? System.out : stdout)
                         .err(isNull(stderr) ? System.err : stderr)
-                        .options(safeMap(options))
-                        .build();
-                return new Tuple3(newContext, stdout, stderr);
+                        .options(safeMap(options));
+                if (nonNull(fileSystem)) {
+                    builder.fileSystem(fileSystem);
+                }
+
+                return new Tuple3(builder.build(), stdout, stderr);
             });
         } catch (Throwable ex) {
             throw new IllegalStateException(ex);
