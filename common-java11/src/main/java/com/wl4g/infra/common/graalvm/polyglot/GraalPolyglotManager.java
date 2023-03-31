@@ -79,6 +79,7 @@ public class GraalPolyglotManager implements Closeable {
 
     public static GraalPolyglotManager newDefaultForJS(
             @Nullable String workingRootDir,
+            @Nullable FileSystem fileSystem,
             @Nullable Function<Map<String, Object>, OutputStream> stdoutCreator,
             @Nullable Function<Map<String, Object>, OutputStream> stderrCreator) {
 
@@ -102,11 +103,12 @@ public class GraalPolyglotManager implements Closeable {
             throw new IllegalStateException(ex);
         }
 
-        return newDefaultFor("js", workingRootDir, options, null, null, null, null);
+        return newDefaultFor("js", workingRootDir, options, null, fileSystem, null, null);
     }
 
     public static GraalPolyglotManager newDefaultForPython(
             @Nullable String workingRootDir,
+            @Nullable FileSystem fileSystem,
             @Nullable Function<Map<String, Object>, OutputStream> stdoutCreator,
             @Nullable Function<Map<String, Object>, OutputStream> stderrCreator) {
 
@@ -116,11 +118,12 @@ public class GraalPolyglotManager implements Closeable {
         // Extraction graal.js from environment.
         final var options = EnvironmentUtil.getConfigProperties("graal.polyglot.options.");
 
-        return newDefaultFor("python", workingRootDir, options, null, null, null, null);
+        return newDefaultFor("python", workingRootDir, options, null, fileSystem, null, null);
     }
 
     public static GraalPolyglotManager newDefaultForR(
             @Nullable String workingRootDir,
+            @Nullable FileSystem fileSystem,
             @Nullable Function<Map<String, Object>, OutputStream> stdoutCreator,
             @Nullable Function<Map<String, Object>, OutputStream> stderrCreator) {
 
@@ -130,11 +133,12 @@ public class GraalPolyglotManager implements Closeable {
         // Extraction graal.js from environment.
         final var options = EnvironmentUtil.getConfigProperties("graal.polyglot.options.");
 
-        return newDefaultFor("r", workingRootDir, options, null, null, null, null);
+        return newDefaultFor("r", workingRootDir, options, null, fileSystem, null, null);
     }
 
     public static GraalPolyglotManager newDefaultForRuby(
             @Nullable String workingRootDir,
+            @Nullable FileSystem fileSystem,
             @Nullable Function<Map<String, Object>, OutputStream> stdoutCreator,
             @Nullable Function<Map<String, Object>, OutputStream> stderrCreator) {
 
