@@ -16,6 +16,7 @@
 package com.wl4g.infra.common.graalvm.polyglot;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.isTrue;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.lang.EnvironmentUtil.getBooleanProperty;
@@ -67,7 +68,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author James Wong
  * @version 2022-09-23
  * @since v3.0.0
- * @see https://www.graalvm.org/22.0/reference-manual/js/Modules/
+ * @see https://www.graalvm.org/22.2/reference-manual/embed-languages/#compile-and-run-a-polyglot-application
  */
 @Getter
 @Slf4j
@@ -75,49 +76,121 @@ public class GraalPolyglotManager implements Closeable {
 
     private final @NotNull IContextPool contextPool;
 
-    public static GraalPolyglotManager newDefaultGraalJS(
+    public static GraalPolyglotManager newDefaultForJS(
             @Nullable String workingRootDir,
             @Nullable Function<Map<String, Object>, OutputStream> stdoutCreator,
             @Nullable Function<Map<String, Object>, OutputStream> stderrCreator) {
+
+        // Add graal.js suffix path.
+        workingRootDir = isBlank(workingRootDir) ? JAVA_IO_TMPDIR.concat("__graaljs_working") : workingRootDir;
+
+        // Extraction graal.js from environment.
+        final var options = EnvironmentUtil.getConfigProperties("graal.polyglot.options.");
+        options.put("js.shared-array-buffer", "true");
+
+        // Enable CommonJS experimental support.
+        // see:https://www.graalvm.org/22.0/reference-manual/js/Modules/
+        options.put("js.commonjs-require", "true");
+
+        // (optional) folder where the NPM modules to be loaded are located.
+        final var commonjsDir = new File(workingRootDir.concat("/commonjs-root"));
         try {
-            final String _workingRootDir = isBlank(workingRootDir) ? JAVA_IO_TMPDIR.concat("__graaljs_script_caches")
-                    : workingRootDir;
-
-            // Extraction graal.js from environment.
-            final Map<String, String> options = EnvironmentUtil.getConfigProperties("graaljs.options.");
-
-            // Enable CommonJS experimental support.
-            // see:https://www.graalvm.org/22.0/reference-manual/js/Modules/
-            options.put("js.commonjs-require", "true");
-
-            // (optional) folder where the NPM modules to be loaded are located.
-            final File commonjsDir = new File(_workingRootDir.concat("/commonjs-root"));
             FileIOUtils.forceMkdir(commonjsDir);
             options.put("js.commonjs-require-cwd", commonjsDir.getAbsolutePath());
+        } catch (IOException ex) {
+            throw new IllegalStateException(ex);
+        }
 
-            final File workingDir = new File(getProperty("graaljs.currentWorkingDir", _workingRootDir.concat("/working")));
+        return newDefaultFor("js", workingRootDir, options, null, null, null);
+    }
+
+    public static GraalPolyglotManager newDefaultForPython(
+            @Nullable String workingRootDir,
+            @Nullable Function<Map<String, Object>, OutputStream> stdoutCreator,
+            @Nullable Function<Map<String, Object>, OutputStream> stderrCreator) {
+
+        // Add graal.js suffix path.
+        workingRootDir = isBlank(workingRootDir) ? JAVA_IO_TMPDIR.concat("__graalpy_working") : workingRootDir;
+
+        // Extraction graal.js from environment.
+        final var options = EnvironmentUtil.getConfigProperties("graal.polyglot.options.");
+
+        return newDefaultFor("python", workingRootDir, options, null, null, null);
+    }
+
+    public static GraalPolyglotManager newDefaultForR(
+            @Nullable String workingRootDir,
+            @Nullable Function<Map<String, Object>, OutputStream> stdoutCreator,
+            @Nullable Function<Map<String, Object>, OutputStream> stderrCreator) {
+
+        // Add graal.js suffix path.
+        workingRootDir = isBlank(workingRootDir) ? JAVA_IO_TMPDIR.concat("__graalr_working") : workingRootDir;
+
+        // Extraction graal.js from environment.
+        final var options = EnvironmentUtil.getConfigProperties("graal.polyglot.options.");
+
+        return newDefaultFor("r", workingRootDir, options, null, null, null);
+    }
+
+    public static GraalPolyglotManager newDefaultForRuby(
+            @Nullable String workingRootDir,
+            @Nullable Function<Map<String, Object>, OutputStream> stdoutCreator,
+            @Nullable Function<Map<String, Object>, OutputStream> stderrCreator) {
+
+        // Add graal.js suffix path.
+        workingRootDir = isBlank(workingRootDir) ? JAVA_IO_TMPDIR.concat("__graalrb_working") : workingRootDir;
+
+        // Extraction graal.js from environment.
+        final var options = EnvironmentUtil.getConfigProperties("graal.polyglot.options.");
+
+        return newDefaultFor("ruby", workingRootDir, options, null, null, null);
+    }
+
+    /**
+     * Create graal polgylot manager instance with default.
+     * 
+     * @param language
+     *            see to
+     *            https://www.graalvm.org/22.2/reference-manual/polyglot-programming/#passing-options-for-language-launchers
+     * @param workingRootDir
+     * @param options
+     * @param polyglotAccess
+     * @param stdoutCreator
+     * @param stderrCreator
+     * @return
+     */
+    public static GraalPolyglotManager newDefaultFor(
+            @NotBlank String language,
+            @NotBlank String workingRootDir,
+            @Nullable Map<String, String> options,
+            @Nullable PolyglotAccess polyglotAccess,
+            @Nullable Function<Map<String, Object>, OutputStream> stdoutCreator,
+            @Nullable Function<Map<String, Object>, OutputStream> stderrCreator) {
+        hasTextOf(language, "language");
+        hasTextOf(workingRootDir, "workingRootDir");
+        try {
+            final File workingDir = new File(getProperty("graal.polyglot.currentWorkingDir", workingRootDir.concat("/working")));
             FileIOUtils.forceMkdir(workingDir);
 
-            return new GraalPolyglotManager(getIntProperty("graaljs.context.pool.max", 1024), metadata -> {
+            return new GraalPolyglotManager(getIntProperty("graal.polyglot.context.pool.max", 1024), metadata -> {
                 final OutputStream stdout = isNull(stdoutCreator) ? null : stdoutCreator.apply(metadata);
                 final OutputStream stderr = isNull(stderrCreator) ? null : stderrCreator.apply(metadata);
 
                 // Addidtion to metadata.
-
-                final var newContext = Context.newBuilder("js") // Only-allowed-JS-language
-                        .allowAllAccess(getBooleanProperty("graaljs.allowAllAccess", true))
-                        .allowExperimentalOptions(getBooleanProperty("graaljs.allowExperimentalOptions", true))
-                        .allowIO(getBooleanProperty("graaljs.allowIO", true))
-                        .allowCreateProcess(getBooleanProperty("graaljs.allowCreateProcess", true))
-                        .allowCreateThread(getBooleanProperty("graaljs.allowCreateThread", true))
-                        .allowNativeAccess(getBooleanProperty("graaljs.allowNativeAccess", true))
-                        .allowHostClassLoading(getBooleanProperty("graaljs.allowHostClassLoading", true))
-                        .allowValueSharing(getBooleanProperty("graaljs.allowValueSharing", true))
-                        .allowPolyglotAccess(PolyglotAccess.ALL)
-                        .useSystemExit(getBooleanProperty("graaljs.useSystemExit", false))
+                final var newContext = Context.newBuilder(language) // Only-allowed-JS-language
+                        .allowAllAccess(getBooleanProperty("graal.polyglot.allowAllAccess", true))
+                        .allowExperimentalOptions(getBooleanProperty("graal.polyglot.allowExperimentalOptions", true))
+                        .allowIO(getBooleanProperty("graal.polyglot.allowIO", true))
+                        .allowCreateProcess(getBooleanProperty("graal.polyglot.allowCreateProcess", true))
+                        .allowCreateThread(getBooleanProperty("graal.polyglot.allowCreateThread", true))
+                        .allowNativeAccess(getBooleanProperty("graal.polyglot.allowNativeAccess", true))
+                        .allowHostClassLoading(getBooleanProperty("graal.polyglot.allowHostClassLoading", true))
+                        .allowValueSharing(getBooleanProperty("graal.polyglot.allowValueSharing", true))
+                        .allowPolyglotAccess(isNull(polyglotAccess) ? PolyglotAccess.ALL : polyglotAccess)
+                        .useSystemExit(getBooleanProperty("graal.polyglot.useSystemExit", false))
                         .currentWorkingDirectory(workingDir.toPath())
                         .resourceLimits(ResourceLimits.newBuilder()
-                                .statementLimit(getLongProperty("graaljs.resourceLimits", Long.MAX_VALUE), null)
+                                .statementLimit(getLongProperty("graal.polyglot.resourceLimits", Long.MAX_VALUE), null)
                                 .build())
                         // Note: The custom logHandler is invalid for
                         // 'console.log'
@@ -126,7 +199,7 @@ public class GraalPolyglotManager implements Closeable {
                         // see:com.oracle.truffle.polyglot.PolyglotLoggers#asHandler()
                         .out(isNull(stdout) ? System.out : stdout)
                         .err(isNull(stderr) ? System.err : stderr)
-                        .options(options)
+                        .options(safeMap(options))
                         .build();
                 return new Tuple3(newContext, stdout, stderr);
             });
