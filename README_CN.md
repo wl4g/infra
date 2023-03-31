@@ -9,7 +9,7 @@
 
 ## 目录说明
 
-```
+```bash
 ├── infra-bom # dopass-infra公共依赖
 ├── infra-common # 常用Utils、Helpers等, 如 SSH2Holders/SnowflakeIdGenerator/Encodes/ClassPathResourcePatternResolver等
 ├── infra-common-shade # infra-common模块的集成包
