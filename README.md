@@ -16,7 +16,7 @@ A enterprise-grade microservice infrastructure framework, The following framewor
 
 ## Directories structure
 
-```
+```bash
 ├── infra-bom # dopass-infra Public dependence
 ├── infra-common # Commonly used utils and helpers, e.g SSH2Holders/SnowflakeIdGenerator/Encodes/, etc
 ├── infra-common-shade # infra-common Integration package for modules
