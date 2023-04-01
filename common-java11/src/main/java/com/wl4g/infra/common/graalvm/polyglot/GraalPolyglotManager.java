@@ -23,6 +23,7 @@ import static com.wl4g.infra.common.lang.EnvironmentUtil.getBooleanProperty;
 import static com.wl4g.infra.common.lang.EnvironmentUtil.getIntProperty;
 import static com.wl4g.infra.common.lang.EnvironmentUtil.getLongProperty;
 import static com.wl4g.infra.common.lang.EnvironmentUtil.getProperty;
+import static com.wl4g.infra.common.lang.EnvironmentUtil.getStringProperty;
 import static com.wl4g.infra.common.lang.StringUtils2.eqIgnCase;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
@@ -78,16 +79,13 @@ public class GraalPolyglotManager implements Closeable {
     private final @NotNull IContextPool contextPool;
 
     public static GraalPolyglotManager newDefaultForJS(
-            @Nullable String workingRootDir,
+            @Nullable String currentWorkingDir,
             @Nullable FileSystem fileSystem,
             @Nullable Function<Map<String, Object>, OutputStream> stdoutCreator,
             @Nullable Function<Map<String, Object>, OutputStream> stderrCreator) {
 
-        // Add graal.js suffix path.
-        workingRootDir = isBlank(workingRootDir) ? JAVA_IO_TMPDIR.concat("__graaljs_working") : workingRootDir;
-
         // Extraction graal.js from environment.
-        final var options = EnvironmentUtil.getConfigProperties("graal.polyglot.options.");
+        final var options = EnvironmentUtil.getConfigProperties("graal.polyglot.js.options.");
         options.put("js.shared-array-buffer", "true");
 
         // Enable CommonJS experimental support.
@@ -95,60 +93,53 @@ public class GraalPolyglotManager implements Closeable {
         options.put("js.commonjs-require", "true");
 
         // (optional) folder where the NPM modules to be loaded are located.
-        final var commonjsDir = new File(workingRootDir.concat("/commonjs-root"));
         try {
+            final var commonjsDir = new File(
+                    getStringProperty("graal.polyglot.js.commonjsDir", JAVA_IO_TMPDIR.concat("/commonjs-dir")));
             FileIOUtils.forceMkdir(commonjsDir);
+            // see:com.oracle.truffle.js.runtime.JSRealm#addCommonJSGlobals()
             options.put("js.commonjs-require-cwd", commonjsDir.getAbsolutePath());
-        } catch (IOException ex) {
+        } catch (Throwable ex) {
             throw new IllegalStateException(ex);
         }
 
-        return newDefaultFor("js", workingRootDir, options, null, fileSystem, null, null);
+        return newDefaultFor("js", currentWorkingDir, options, null, fileSystem, null, null);
     }
 
     public static GraalPolyglotManager newDefaultForPython(
-            @Nullable String workingRootDir,
+            @Nullable String currentWorkingDir,
             @Nullable FileSystem fileSystem,
             @Nullable Function<Map<String, Object>, OutputStream> stdoutCreator,
             @Nullable Function<Map<String, Object>, OutputStream> stderrCreator) {
 
-        // Add graal for python suffix path.
-        workingRootDir = isBlank(workingRootDir) ? JAVA_IO_TMPDIR.concat("__graalpy_working") : workingRootDir;
-
         // Extraction graal.js from environment.
-        final var options = EnvironmentUtil.getConfigProperties("graal.polyglot.options.");
+        final var options = EnvironmentUtil.getConfigProperties("graal.polyglot.python.options.");
 
-        return newDefaultFor("python", workingRootDir, options, null, fileSystem, null, null);
+        return newDefaultFor("python", currentWorkingDir, options, null, fileSystem, null, null);
     }
 
     public static GraalPolyglotManager newDefaultForR(
-            @Nullable String workingRootDir,
+            @Nullable String currentWorkingDir,
             @Nullable FileSystem fileSystem,
             @Nullable Function<Map<String, Object>, OutputStream> stdoutCreator,
             @Nullable Function<Map<String, Object>, OutputStream> stderrCreator) {
 
-        // Add graal for R suffix path.
-        workingRootDir = isBlank(workingRootDir) ? JAVA_IO_TMPDIR.concat("__graalr_working") : workingRootDir;
-
         // Extraction graal.js from environment.
-        final var options = EnvironmentUtil.getConfigProperties("graal.polyglot.options.");
+        final var options = EnvironmentUtil.getConfigProperties("graal.polyglot.r.options.");
 
-        return newDefaultFor("r", workingRootDir, options, null, fileSystem, null, null);
+        return newDefaultFor("r", currentWorkingDir, options, null, fileSystem, null, null);
     }
 
     public static GraalPolyglotManager newDefaultForRuby(
-            @Nullable String workingRootDir,
+            @Nullable String currentWorkingDir,
             @Nullable FileSystem fileSystem,
             @Nullable Function<Map<String, Object>, OutputStream> stdoutCreator,
             @Nullable Function<Map<String, Object>, OutputStream> stderrCreator) {
 
-        // Add graal for ruby suffix path.
-        workingRootDir = isBlank(workingRootDir) ? JAVA_IO_TMPDIR.concat("__graalrb_working") : workingRootDir;
-
         // Extraction graal.js from environment.
-        final var options = EnvironmentUtil.getConfigProperties("graal.polyglot.options.");
+        final var options = EnvironmentUtil.getConfigProperties("graal.polyglot.ruby.options.");
 
-        return newDefaultFor("ruby", workingRootDir, options, null, null, null, null);
+        return newDefaultFor("ruby", currentWorkingDir, options, null, null, null, null);
     }
 
     /**
@@ -164,7 +155,7 @@ public class GraalPolyglotManager implements Closeable {
      * @param language
      *            see to
      *            https://www.graalvm.org/22.2/reference-manual/polyglot-programming/#passing-options-for-language-launchers
-     * @param workingRootDir
+     * @param currentWorkingDir
      * @param options
      * @param polyglotAccess
      * @param fileSystem
@@ -174,17 +165,20 @@ public class GraalPolyglotManager implements Closeable {
      */
     public static GraalPolyglotManager newDefaultFor(
             @NotBlank String language,
-            @NotBlank String workingRootDir,
+            @Nullable String currentWorkingDir,
             @Nullable Map<String, String> options,
             @Nullable PolyglotAccess polyglotAccess,
             @Nullable FileSystem fileSystem,
             @Nullable Function<Map<String, Object>, OutputStream> stdoutCreator,
             @Nullable Function<Map<String, Object>, OutputStream> stderrCreator) {
+
         hasTextOf(language, "language");
-        hasTextOf(workingRootDir, "workingRootDir");
         try {
-            final File workingDir = new File(getProperty("graal.polyglot.currentWorkingDir", workingRootDir.concat("/working")));
-            FileIOUtils.forceMkdir(workingDir);
+            final String _currentWorkingDir = getProperty("graal.polyglot.currentWorkingDir", currentWorkingDir);
+            final File currentWorkingDirFile = isBlank(_currentWorkingDir) ? null : new File(_currentWorkingDir);
+            if (nonNull(currentWorkingDirFile)) {
+                FileIOUtils.forceMkdir(currentWorkingDirFile);
+            }
 
             return new GraalPolyglotManager(getIntProperty("graal.polyglot.context.pool.max", 1024), metadata -> {
                 final OutputStream stdout = isNull(stdoutCreator) ? null : stdoutCreator.apply(metadata);
@@ -202,7 +196,6 @@ public class GraalPolyglotManager implements Closeable {
                         .allowValueSharing(getBooleanProperty("graal.polyglot.allowValueSharing", true))
                         .allowPolyglotAccess(isNull(polyglotAccess) ? PolyglotAccess.ALL : polyglotAccess)
                         .useSystemExit(getBooleanProperty("graal.polyglot.useSystemExit", false))
-                        .currentWorkingDirectory(workingDir.toPath())
                         .resourceLimits(ResourceLimits.newBuilder()
                                 .statementLimit(getLongProperty("graal.polyglot.resourceLimits", Long.MAX_VALUE), null)
                                 .build())
@@ -214,12 +207,17 @@ public class GraalPolyglotManager implements Closeable {
                         .out(isNull(stdout) ? System.out : stdout)
                         .err(isNull(stderr) ? System.err : stderr)
                         .options(safeMap(options));
+
+                if (nonNull(currentWorkingDirFile)) {
+                    builder.currentWorkingDirectory(currentWorkingDirFile.toPath());
+                }
                 if (nonNull(fileSystem)) {
                     builder.fileSystem(fileSystem);
                 }
 
                 return new Tuple3(builder.build(), stdout, stderr);
             });
+
         } catch (Throwable ex) {
             throw new IllegalStateException(ex);
         }
