@@ -17,7 +17,7 @@ A enterprise-grade microservice infrastructure framework, The following framewor
 ## Directories structure
 
 ```bash
-├── infra-bom # dopass-infra Public dependence
+├── infra-bom # infra Public dependence
 ├── infra-common # Commonly used utils and helpers, e.g SSH2Holders/SnowflakeIdGenerator/Encodes/, etc
 ├── infra-common-shade # infra-common Integration package for modules
 ├── infra-context # Enhancements based on springboot context features, such as support for custom SpringApplication#setDefaultProperties coverage configuration (META-INF/bootstrapping.groovy), built-in request/response body debug log output, integrated opentelemetry tracking, etc.

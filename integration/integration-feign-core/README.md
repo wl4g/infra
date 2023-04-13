@@ -44,7 +44,7 @@ Now we can use it as we normally use `Spring`.
     @Autowired
     private GithubService1 githubService1;
     
-    List<GitHubContributor> contributors = githubService1.getContributors("wl4g", "dopass-infras");
+    List<GitHubContributor> contributors = githubService1.getContributors("wl4g", "infras");
     logger.info("contributors={}", new Gson().toJson(contributors));    
 ```
 

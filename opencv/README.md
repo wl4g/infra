@@ -6,8 +6,8 @@ Authors:
     <Wanglsir@gmail.com, 983708408@qq.com, 855349515>
 
 Relevant open source project reference:</br>
-&nbsp;&nbsp;&nbsp;&nbsp;[https://github.com/wl4g/dopass-infra](https://github.com/wl4g/dopass-infra)</br>
-&nbsp;&nbsp;&nbsp;&nbsp;[https://gitee.com/wl4g/dopass-infra](https://gitee.com/wl4g/dopass-infra)</br>
+&nbsp;&nbsp;&nbsp;&nbsp;[https://github.com/wl4g/infra](https://github.com/wl4g/infra)</br>
+&nbsp;&nbsp;&nbsp;&nbsp;[https://gitee.com/wl4g/infra](https://gitee.com/wl4g/infra)</br>
 &nbsp;&nbsp;&nbsp;&nbsp;[https://github.com/wl4g/iam](https://github.com/wl4g/iam)</br>
 &nbsp;&nbsp;&nbsp;&nbsp;[https://gitee.com/wl4g/iam](https://gitee.com/wl4g/iam)</br>
 &nbsp;&nbsp;&nbsp;&nbsp;[https://github.com/wl4g/infra-dopaas](https://github.com/wl4g/infra-dopaas)</br>

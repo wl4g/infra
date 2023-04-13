@@ -10,7 +10,7 @@
 ## 目录说明
 
 ```bash
-├── infra-bom # dopass-infra公共依赖
+├── infra-bom # infra公共依赖
 ├── infra-common # 常用Utils、Helpers等, 如 SSH2Holders/SnowflakeIdGenerator/Encodes/ClassPathResourcePatternResolver等
 ├── infra-common-shade # infra-common模块的集成包
 ├── infra-context # 基于springboot context 特性增强，如支持自定义SpringApplication#setDefaultProperties覆盖配置(META-INF/bootstrapping.groovy)、内置request/response body调试日志输出、集成opentelemetry追踪等

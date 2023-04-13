@@ -20,12 +20,12 @@
     <scm>
         <connection>scm:git:git@github.com:wl4g/infra.git</connection>
         <developerConnection>scm:git:git@github.com:wl4g/infra.git</developerConnection>
-        <url>https://github.com/wl4g/dopass-infra</url>
+        <url>https://github.com/wl4g/infra</url>
         <tag>HEAD</tag>
     </scm>
     <issueManagement>
         <system>github</system>
-        <url>https://github.com/wl4g/dopass-infra/issues</url>
+        <url>https://github.com/wl4g/infra/issues</url>
     </issueManagement>
     <developers>
         <developer>

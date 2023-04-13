@@ -58,7 +58,7 @@ public class SpringBootFeignTests {
 
     @Test
     public void test1() {
-        List<GitHubContributor> contributors = githubService1.getContributors("wl4g", "dopass-infra");
+        List<GitHubContributor> contributors = githubService1.getContributors("wl4g", "infra");
         log.info(">>> Result:");
         log.info("contributors={}", new Gson().toJson(contributors));
     }
