@@ -119,7 +119,7 @@ public abstract class ContainerRuntimeTool {
         PODMAN(".slice/libpod-"),
 
         @Deprecated
-        RKT(".slice/rkt"),
+        RKT(".slice/rkt-"),
 
         /**
          * The JVM is currently running in the container of the Kubernetes
@@ -131,22 +131,23 @@ public abstract class ContainerRuntimeTool {
          * $ docker exec -it &lt;containerId&gt; sh
          * $ cat /proc/1/cgroup
          * 
-         *   12:rdma:/
-         *   11:cpuset:/kubepods.slice/kubepods-besteffort.slice/kubepods-besteffort-podce0df6b4_a5ca_4d75_985e_0bd284e9f9db.slice/crio-6a876a89da9a2f9fa06981848be05bb493dbb5ed67b35603404c2eb3cc9ce12c.scope
-         *   10:blkio:/kubepods.slice/kubepods-besteffort.slice/kubepods-besteffort-podce0df6b4_a5ca_4d75_985e_0bd284e9f9db.slice/crio-6a876a89da9a2f9fa06981848be05bb493dbb5ed67b35603404c2eb3cc9ce12c.scope
-         *   9:devices:/kubepods.slice/kubepods-besteffort.slice/kubepods-besteffort-podce0df6b4_a5ca_4d75_985e_0bd284e9f9db.slice/crio-6a876a89da9a2f9fa06981848be05bb493dbb5ed67b35603404c2eb3cc9ce12c.scope
-         *   8:memory:/kubepods.slice/kubepods-besteffort.slice/kubepods-besteffort-podce0df6b4_a5ca_4d75_985e_0bd284e9f9db.slice/crio-6a876a89da9a2f9fa06981848be05bb493dbb5ed67b35603404c2eb3cc9ce12c.scope
-         *   7:cpu,cpuacct:/kubepods.slice/kubepods-besteffort.slice/kubepods-besteffort-podce0df6b4_a5ca_4d75_985e_0bd284e9f9db.slice/crio-6a876a89da9a2f9fa06981848be05bb493dbb5ed67b35603404c2eb3cc9ce12c.scope
-         *   6:hugetlb:/kubepods.slice/kubepods-besteffort.slice/kubepods-besteffort-podce0df6b4_a5ca_4d75_985e_0bd284e9f9db.slice/crio-6a876a89da9a2f9fa06981848be05bb493dbb5ed67b35603404c2eb3cc9ce12c.scope
-         *   5:perf_event:/kubepods.slice/kubepods-besteffort.slice/kubepods-besteffort-podce0df6b4_a5ca_4d75_985e_0bd284e9f9db.slice/crio-6a876a89da9a2f9fa06981848be05bb493dbb5ed67b35603404c2eb3cc9ce12c.scope
-         *   4:freezer:/kubepods.slice/kubepods-besteffort.slice/kubepods-besteffort-podce0df6b4_a5ca_4d75_985e_0bd284e9f9db.slice/crio-6a876a89da9a2f9fa06981848be05bb493dbb5ed67b35603404c2eb3cc9ce12c.scope
-         *   3:net_cls,net_prio:/kubepods.slice/kubepods-besteffort.slice/kubepods-besteffort-podce0df6b4_a5ca_4d75_985e_0bd284e9f9db.slice/crio-6a876a89da9a2f9fa06981848be05bb493dbb5ed67b35603404c2eb3cc9ce12c.scope
-         *   2:pids:/kubepods.slice/kubepods-besteffort.slice/kubepods-besteffort-podce0df6b4_a5ca_4d75_985e_0bd284e9f9db.slice/crio-6a876a89da9a2f9fa06981848be05bb493dbb5ed67b35603404c2eb3cc9ce12c.scope
-         *   1:name=systemd:/kubepods.slice/kubepods-besteffort.slice/kubepods-besteffort-podce0df6b4_a5ca_4d75_985e_0bd284e9f9db.slice/crio-6a876a89da9a2f9fa06981848be05bb493dbb5ed67b35603404c2eb3cc9ce12c.scope
-         *   0::/kubepods.slice/kubepods-besteffort.slice/kubepods-besteffort-podce0df6b4_a5ca_4d75_985e_0bd284e9f9db.slice/crio-6a876a89da9a2f9fa06981848be05bb493dbb5ed67b35603404c2eb3cc9ce12c.scope
+         *  13:devices:/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod96b3a117_710c_475f_b2a3_022958c3c63c.slice/cri-containerd-494f01f1987498ed7deab56635b9009f5fc2319a17e02064bcac4a29c0357b0d.scope
+         *  12:pids:/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod96b3a117_710c_475f_b2a3_022958c3c63c.slice/cri-containerd-494f01f1987498ed7deab56635b9009f5fc2319a17e02064bcac4a29c0357b0d.scope
+         *  11:memory:/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod96b3a117_710c_475f_b2a3_022958c3c63c.slice/cri-containerd-494f01f1987498ed7deab56635b9009f5fc2319a17e02064bcac4a29c0357b0d.scope
+         *  10:blkio:/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod96b3a117_710c_475f_b2a3_022958c3c63c.slice/cri-containerd-494f01f1987498ed7deab56635b9009f5fc2319a17e02064bcac4a29c0357b0d.scope
+         *  9:cpuset:/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod96b3a117_710c_475f_b2a3_022958c3c63c.slice/cri-containerd-494f01f1987498ed7deab56635b9009f5fc2319a17e02064bcac4a29c0357b0d.scope
+         *  8:hugetlb:/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod96b3a117_710c_475f_b2a3_022958c3c63c.slice/cri-containerd-494f01f1987498ed7deab56635b9009f5fc2319a17e02064bcac4a29c0357b0d.scope
+         *  7:net_cls,net_prio:/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod96b3a117_710c_475f_b2a3_022958c3c63c.slice/cri-containerd-494f01f1987498ed7deab56635b9009f5fc2319a17e02064bcac4a29c0357b0d.scope
+         *  6:cpu,cpuacct:/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod96b3a117_710c_475f_b2a3_022958c3c63c.slice/cri-containerd-494f01f1987498ed7deab56635b9009f5fc2319a17e02064bcac4a29c0357b0d.scope
+         *  5:rdma:/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod96b3a117_710c_475f_b2a3_022958c3c63c.slice/cri-containerd-494f01f1987498ed7deab56635b9009f5fc2319a17e02064bcac4a29c0357b0d.scope
+         *  4:perf_event:/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod96b3a117_710c_475f_b2a3_022958c3c63c.slice/cri-containerd-494f01f1987498ed7deab56635b9009f5fc2319a17e02064bcac4a29c0357b0d.scope
+         *  3:freezer:/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod96b3a117_710c_475f_b2a3_022958c3c63c.slice/cri-containerd-494f01f1987498ed7deab56635b9009f5fc2319a17e02064bcac4a29c0357b0d.scope
+         *  2:misc:/
+         *  1:name=systemd:/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod96b3a117_710c_475f_b2a3_022958c3c63c.slice/cri-containerd-494f01f1987498ed7deab56635b9009f5fc2319a17e02064bcac4a29c0357b0d.scope
+         *  0::/
          * </pre>
          */
-        KUBERNETES(".slice/kubepods"),
+        KUBERNETES(".slice/kubepods-"),
 
         /**
          * The JVM is currently running in the non-container on the Hosted.
