@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>infra-support</artifactId>
+	<artifactId>infra-integration-feign-istio</artifactId>
 	<packaging>jar</packaging>
-	<name>Infra Support</name>
+	<name>Infra Integration SpringBoot Feign Istio</name>
 	<url>http://infra.wl4g.com</url>
-	<description>Infra Component Support.</description>
+	<description>Infra Component Integration with based on SpringBoot + Feign Istio.</description>
 	<organization>
 		<name>wl4g</name>
 		<url>https://infra.wl4g.com</url>
@@ -52,8 +52,8 @@
 	</developers>
 	<parent>
 		<groupId>com.wl4g</groupId>
-		<artifactId>infra-parent</artifactId>
-		<version>3.1.26</version>
+		<artifactId>infra-integration</artifactId>
+		<version>3.1.25</version>
 	</parent>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -68,82 +68,27 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
-			<dependency>
-				<groupId>redis.clients</groupId>
-				<artifactId>jedis</artifactId>
-				<version>3.6.1</version>
-			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<dependencies>
 		<dependency>
 			<groupId>com.wl4g</groupId>
-			<artifactId>infra-core</artifactId>
+			<artifactId>infra-integration-feign-core</artifactId>
 		</dependency>
-		<!-- Redis. -->
+		<!-- https://github.com/fabric8io/kubernetes-client/tree/master/extensions/istio -->
 		<dependency>
-			<groupId>redis.clients</groupId>
-			<artifactId>jedis</artifactId>
-			<!-- <optional>true</optional> -->
-		</dependency>
-		<!-- Jetcache. -->
-		<!-- <dependency> -->
-		<!-- <groupId>com.alicp.jetcache</groupId> -->
-		<!-- <artifactId>jetcache-redis-lettuce</artifactId> -->
-		<!-- </dependency> -->
-		<!-- Lettuce. -->
-		<!-- <dependency> -->
-		<!-- <groupId>io.lettuce</groupId> -->
-		<!-- <artifactId>lettuce-core</artifactId> -->
-		<!-- </dependency> -->
-		<!-- Notification. -->
-	    <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>javax.mail-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
-        </dependency>
-		<!-- Aliyun. -->
-		<dependency>
-			<groupId>com.aliyun</groupId>
-			<artifactId>aliyun-java-sdk-dysmsapi</artifactId>
+			<groupId>io.fabric8</groupId>
+			<artifactId>kubernetes-client</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.aliyun</groupId>
-			<artifactId>aliyun-java-sdk-core</artifactId>
-		</dependency>
-		<!-- SSH -->
-		<!-- Ethz SSH2 -->
-		<dependency>
-			<groupId>ch.ethz.ganymed</groupId>
-			<artifactId>ganymed-ssh2</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<!-- SSHD -->
-		<dependency>
-			<groupId>org.apache.sshd</groupId>
-			<artifactId>sshd-netty</artifactId>
-			<scope>provided</scope>
+			<groupId>io.fabric8</groupId>
+			<artifactId>istio-client</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.sshd</groupId>
-			<artifactId>sshd-scp</artifactId>
-			<scope>provided</scope>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
 		</dependency>
-		<!-- SSHJ -->
-		<dependency>
-			<groupId>com.hierynomus</groupId>
-			<artifactId>sshj</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.jcraft</groupId>
-			<artifactId>jsch</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<!-- Tests -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -151,6 +96,15 @@
 		</dependency>
 	</dependencies>
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**</include>
+				</includes>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

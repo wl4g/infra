@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>infra-core</artifactId>
+	<artifactId>infra-context</artifactId>
 	<packaging>jar</packaging>
-	<name>Infra Core</name>
+	<name>Infra Context</name>
 	<url>http://infra.wl4g.com</url>
-	<description>Infra Component Core Module.</description>
+	<description>Infra Component Context Module.</description>
 	<organization>
 		<name>wl4g</name>
 		<url>https://infra.wl4g.com</url>
@@ -53,7 +53,7 @@
 	<parent>
 		<groupId>com.wl4g</groupId>
 		<artifactId>infra-parent</artifactId>
-		<version>3.1.26</version>
+		<version>3.1.25</version>
 	</parent>
 	<properties>
 		<java.version>1.8</java.version>
@@ -74,10 +74,6 @@
 		<dependency>
 			<groupId>com.wl4g</groupId>
 			<artifactId>infra-common</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.wl4g</groupId>
-			<artifactId>infra-context</artifactId>
 		</dependency>
 		<!-- Spring based -->
 		<dependency>
@@ -171,37 +167,6 @@
 					<artifactId>netty-codec-socks</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		<!-- Used for view page. -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-freemarker</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.tomcat.embed</groupId>
-					<artifactId>tomcat-embed-websocket</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<!-- TODO 待移除，计划后续从springcloud演进到springboot+istio平台 -->
-		<!-- <dependency> -->
-		<!-- <groupId>org.springframework.cloud</groupId> -->
-		<!-- <artifactId>spring-cloud-context</artifactId> -->
-		<!-- </dependency> -->
-		<!-- <dependency> -->
-		<!-- <groupId>org.springframework.cloud</groupId> -->
-		<!-- <artifactId>spring-cloud-commons</artifactId> -->
-		<!-- </dependency> -->
-		<!-- Invalid spring-cloud-commons indirect dependency on HttpCore?? -->
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpcore</artifactId>
-			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.yaml</groupId>

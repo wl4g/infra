@@ -1,10 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>infra-integration-feign-springcloud-example-starter-web</artifactId>
-	<name>Infra Integration Feign SpringCloud Example Web</name>
+	<artifactId>infra-integration-feign-istio-example-starter-service</artifactId>
+	<name>Infra Integration Feign Dubbo Example Service</name>
 	<url>http://infra.wl4g.com</url>
-	<description>Infra Integration with Feign SpringCloud Examples Starter Web.</description>
+	<description>Infra integration istio examples starter web.</description>
 	<organization>
 		<name>wl4g</name>
 		<url>https://infra.wl4g.com</url>
@@ -51,24 +51,28 @@
 	</developers>
 	<parent>
 		<groupId>com.wl4g</groupId>
-		<artifactId>infra-integration-feign-springcloud-example</artifactId>
-		<version>3.1.26</version>
+		<artifactId>infra-integration-feign-istio-example</artifactId>
+		<version>3.1.25</version>
 	</parent>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
-		<final.name>springcloud-example-web</final.name>
-		<bootstrap-classname>com.wl4g.FeginSpringCloudExampleWeb</bootstrap-classname>
+		<final.name>istio-example-service</final.name>
+		<bootstrap-classname>com.wl4g.FeginIstioExampleService</bootstrap-classname>
 	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>com.wl4g</groupId>
-			<artifactId>infra-core</artifactId>
+			<artifactId>infra-integration-feign-istio-example-interface</artifactId>
+			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.wl4g</groupId>
-			<artifactId>infra-integration-feign-springcloud-example-interface</artifactId>
-			<version>${project.parent.version}</version>
+			<artifactId>infra-data</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
 		</dependency>
 	</dependencies>
 	<build>
