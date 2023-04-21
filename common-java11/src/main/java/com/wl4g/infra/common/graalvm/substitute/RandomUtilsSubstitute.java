@@ -28,7 +28,6 @@ import com.oracle.svm.core.annotate.TargetClass;
  * {@link RandomUtilsSubstitute}
  * 
  * @author James Wong
- * @version 2023-02-07
  * @since v3.1.0
  */
 @TargetClass(className = "org.apache.commons.lang3.RandomUtils")
