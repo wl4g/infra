@@ -387,7 +387,7 @@
                 <artifactId>jna</artifactId>
                 <version>${jna.version}</version>
             </dependency>
-            <!-- Generic tool's. -->
+            <!-- Common Tools -->
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
