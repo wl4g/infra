@@ -49,7 +49,7 @@ function usages() {
     echo $"
 Usage: ./$(basename $0) [OPTIONS] [arg1] [arg2] ...
     version                                         Print maven project POM version.
-    upgrade-push                                    Upgrade pom and build push.
+    upgrade-push                                    Upgrade pom and push.
 "
 }
 
