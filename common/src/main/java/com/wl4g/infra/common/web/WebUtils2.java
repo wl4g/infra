@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>>
+ * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,7 +74,7 @@ import com.wl4g.infra.common.runtime.JvmRuntimeTool;
 /**
  * Generic Web utility.
  * 
- * @author James Wong <jameswong1376@gmail.com>
+ * @author James Wong James Wong <jameswong1376@gmail.com>
  * @version v1.0
  * @date 2018年11月30日
  * @since
@@ -579,7 +579,7 @@ public abstract class WebUtils2 extends WebUtils {
     /**
      * Generic dynamic web message response type processing enumeration.
      * 
-     * @author James Wong <jameswong1376@gmail.com>
+     * @author James Wong James Wong <jameswong1376@gmail.com>
      * @version v1.0
      * @date 2019年1月4日
      * @since

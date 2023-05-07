@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>>
+ * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ import redis.clients.jedis.util.SafeEncoder;
  * pointer iteration. </font> See: <a href=
  * "https://www.jianshu.com/p/2f31881bf847">https://www.jianshu.com/p/2f31881bf847</a>
  * 
- * @author James Wong <jameswong1376@gmail.com>
+ * @author James Wong James Wong <jameswong1376@gmail.com>
  * @version v1.0 2018年11月9日
  * @since
  * @param <E>
@@ -357,7 +357,7 @@ public class HashScanCursor<E> implements Iterator<Entry<String, E>> {
     /**
      * Cursor state
      * 
-     * @author James Wong <jameswong1376@gmail.com>
+     * @author James Wong James Wong <jameswong1376@gmail.com>
      * @version v1.0 2019年4月1日
      * @since
      */
@@ -368,7 +368,7 @@ public class HashScanCursor<E> implements Iterator<Entry<String, E>> {
     /**
      * Scan cursor wrapper.
      * 
-     * @author James Wong <jameswong1376@gmail.com>>
+     * @author James Wong <jameswong1376@gmail.com>
      * @version v1.0 2019年11月4日
      * @since
      */

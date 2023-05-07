@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>>
+ * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ import com.wl4g.infra.common.log.SmartLogger;
 /**
  * Generic local scheduler & task runner.
  * 
- * @author James Wong <jameswong1376@gmail.com>
+ * @author James Wong James Wong <jameswong1376@gmail.com>
  * @version v1.0 2019年6月2日
  * @since
  * @see {@link org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler}

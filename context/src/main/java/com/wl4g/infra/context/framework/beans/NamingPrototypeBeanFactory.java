@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>>
+ * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import org.springframework.beans.factory.BeanFactory;
 /**
  * Naming prototype bean factory.</br>
  * 
- * @author <James Wong@gmail.com, 983708408@qq.com>
+ * @author James Wong <jameswong1376@gmail.com>
  * @version v1.0.0 2019-10-09
  * @since
  */

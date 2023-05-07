@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * Counter monitor measure properties.
  * 
- * @author James Wong <jameswong1376@gmail.com>
+ * @author James Wong James Wong <jameswong1376@gmail.com>
  * @version v1.0
  * @date 2018年6月1日
  * @since

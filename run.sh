@@ -1,6 +1,6 @@
 #!/bin/bash
 # Copyright (c) 2017 ~ 2025, the original authors individual Inc,
-# All rights reserved. Contact us James Wong <jameswong1376@gmail.com>
+# All rights reserved. Contact us James Wong James Wong <jameswong1376@gmail.com>
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,

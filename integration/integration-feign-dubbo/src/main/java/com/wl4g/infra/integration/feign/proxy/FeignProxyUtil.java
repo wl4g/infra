@@ -33,7 +33,7 @@ import com.wl4g.infra.integration.feign.proxy.FeignProxyUtil;
  * 
  * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version v1.0 2020-11-23
- * @sine v1.0
+ * @since v2.0
  * @see
  */
 public final class FeignProxyUtil {

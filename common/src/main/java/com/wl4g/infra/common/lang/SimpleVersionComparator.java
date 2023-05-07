@@ -24,7 +24,7 @@ import com.wl4g.infra.common.log.SmartLogger;
  * 
  * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version v1.0 2020-11-30
- * @sine v1.0
+ * @since v2.0
  * @see https://www.cnblogs.com/yucongblog/p/5600312.html
  */
 public class SimpleVersionComparator implements Comparator<String> {

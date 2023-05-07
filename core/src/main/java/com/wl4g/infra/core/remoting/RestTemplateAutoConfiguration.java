@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>>
+ * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
  * 
  * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version v1.0 2019-12-24
- * @sine v1.0
+ * @since v2.0
  * @see
  */
 @SuppressWarnings("deprecation")
@@ -105,7 +105,7 @@ public class RestTemplateAutoConfiguration {
      * Verifies a SSL peer host name based on an explicit whitelist of allowed
      * hosts.
      * 
-     * @author James Wong <jameswong1376@gmail.com>
+     * @author James Wong James Wong <jameswong1376@gmail.com>
      * @version v1.0
      * @date 2018年11月20日
      * @since
@@ -152,7 +152,7 @@ public class RestTemplateAutoConfiguration {
      * Validates an SSL peer's hostname using a regular expression that a
      * candidate host must match in order to be verified.
      * 
-     * @author James Wong <jameswong1376@gmail.com>
+     * @author James Wong James Wong <jameswong1376@gmail.com>
      * @version v1.0
      * @date 2018年11月20日
      * @since
@@ -182,7 +182,7 @@ public class RestTemplateAutoConfiguration {
      * Hostname verifier that performs no host name verification for an SSL peer
      * such that all hosts are allowed.
      * 
-     * @author James Wong <jameswong1376@gmail.com>
+     * @author James Wong James Wong <jameswong1376@gmail.com>
      * @version v1.0
      * @date 2018年11月20日
      * @since
@@ -199,7 +199,7 @@ public class RestTemplateAutoConfiguration {
     /**
      * Remote rest template properties
      * 
-     * @author James Wong <jameswong1376@gmail.com>
+     * @author James Wong James Wong <jameswong1376@gmail.com>
      * @version v1.0
      * @date 2018年11月20日
      * @since
@@ -248,7 +248,7 @@ public class RestTemplateAutoConfiguration {
     /**
      * Remote SSL context properties.
      * 
-     * @author James Wong <jameswong1376@gmail.com>
+     * @author James Wong James Wong <jameswong1376@gmail.com>
      * @version v1.0
      * @date 2018年11月21日
      * @since

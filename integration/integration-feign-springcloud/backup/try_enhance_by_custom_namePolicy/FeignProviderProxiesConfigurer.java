@@ -55,7 +55,7 @@ import static java.lang.String.format;
  * 
  * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version v1.0 2020-11-23
- * @sine v1.0
+ * @since v2.0
  * @see
  */
 @Order(FEIGN_PROXY_ORDER)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>>
+ * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ import io.swagger.annotations.ApiParam;
  * very grateful for {@link com.github.pageSpechelper.PageSpec} work and fully
  * abide by your agreements.
  * 
- * @auhtor James Wong <jameswong1376@gmail.com>>
+ * @auhtor James Wong <jameswong1376@gmail.com>
  * @version v1.0 2018年9月7日
  * @since
  * @see https://github.com/pageSpechelper/Mybatis-PageHelper/blob/master/wikis/zh/Interceptor.md

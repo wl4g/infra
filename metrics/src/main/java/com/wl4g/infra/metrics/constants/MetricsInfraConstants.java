@@ -20,7 +20,7 @@ import com.wl4g.infra.core.constant.CoreInfraConstants;
 /**
  * {@link MetricsConstants}
  * 
- * @author &lt;James Wong <jameswong1376@gmail.com>&gt;
+ * @author &lt;James Wong James Wong <jameswong1376@gmail.com>&gt;
  * @version 2022-07-12
  * @since v3.0.0
  */

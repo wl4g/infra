@@ -10,7 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
  * 
  * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version v1.0 2021-01-08
- * @sine v1.0
+ * @since v2.0
  * @see
  */
 @EnableWebSecurity

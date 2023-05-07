@@ -43,7 +43,7 @@ import com.wl4g.infra.integration.feign.context.RpcContextRegistry;
  * 
  * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version v1.0 2020-12-07
- * @sine v1.0
+ * @since v2.0
  * @see https://blog.csdn.net/qq_38377774/article/details/108204661
  * @see https://www.jianshu.com/p/089778701921
  * @see https://github.com/apache/dubbo/issues/1533

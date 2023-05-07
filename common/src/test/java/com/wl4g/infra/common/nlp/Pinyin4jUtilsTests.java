@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>>
+ * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ package com.wl4g.infra.common.nlp;
  * 
  * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version 2020-10-07
- * @sine v1.0.0
+ * @since v2.0.0
  * @see
  */
 public class Pinyin4jUtilsTests {

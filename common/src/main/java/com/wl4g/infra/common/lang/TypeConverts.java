@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>>
+ * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import static org.apache.commons.lang3.StringUtils.isNumeric;
 /**
  * 类型字节转换器
  * 
- * @author James Wong <jameswong1376@gmail.com>
+ * @author James Wong James Wong <jameswong1376@gmail.com>
  * @version v1.0
  * @time 2016年9月26日
  * @since

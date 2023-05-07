@@ -35,7 +35,7 @@ import java.lang.annotation.*;
  * @author Spencer Gibb
  * @author Dave Syer
  * @version v1.0 2019-11-20
- * @sine v1.0
+ * @since v2.0
  * @see Implementation simulated of refer:
  *      {@link org.springframework.cloud.openfeign.EnableFeignClients}
  */

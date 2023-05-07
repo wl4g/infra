@@ -1,7 +1,7 @@
 package com.wl4g;
 /*
  * Copyright (C) 2017 ~ 2025 the original author or authors.
- * <James Wong@gmail.com, 983708408@qq.com> Technology CO.LTD.
+ * <jameswong1376@gmail.com> Technology CO.LTD.
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +16,7 @@ package com.wl4g;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * 
- * Reference to website: http://wl4g.com
+ * Reference to website: https://wl4g.github.io
  */
 
 import org.springframework.boot.SpringApplication;
@@ -29,7 +29,7 @@ import com.wl4g.infra.integration.feign.core.annotation.EnableFeignConsumers;
  * 
  * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version v1.0 2021-03-18
- * @sine v1.0
+ * @since v2.0
  * @see
  */
 // @EnableFeignClients("com.wl4g.infra.integration.feign.istio.example.service")

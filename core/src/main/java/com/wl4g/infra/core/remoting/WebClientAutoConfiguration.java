@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>>
+ * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ import reactor.netty.tcp.TcpClient;
  * 
  * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version v1.0 2020-12-24
- * @sine v1.0
+ * @since v2.0
  * @see
  */
 @ConditionalOnClass({ ClientHttpConnector.class, HttpClient.class })
@@ -71,7 +71,7 @@ public class WebClientAutoConfiguration {
     /**
      * Remote rest template properties
      * 
-     * @author James Wong <jameswong1376@gmail.com>
+     * @author James Wong James Wong <jameswong1376@gmail.com>
      * @version v1.0
      * @date 2018年11月20日
      * @since
@@ -120,7 +120,7 @@ public class WebClientAutoConfiguration {
     /**
      * Remote SSL context properties.
      * 
-     * @author James Wong <jameswong1376@gmail.com>
+     * @author James Wong James Wong <jameswong1376@gmail.com>
      * @version v1.0
      * @date 2018年11月21日
      * @since

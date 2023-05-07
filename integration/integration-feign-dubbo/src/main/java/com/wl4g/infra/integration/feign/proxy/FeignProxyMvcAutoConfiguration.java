@@ -70,7 +70,7 @@ import com.wl4g.infra.integration.feign.proxy.FeignProxyController;
  * 
  * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version v1.0 2019-11-20
- * @sine v1.0
+ * @since v2.0
  * @see Thannks refer: https://gitee.com/leecho/spring-cloud-feign-proxy
  */
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
@@ -228,7 +228,7 @@ public class FeignProxyMvcAutoConfiguration implements InitializingBean {
 	 * 
 	 * @author James Wong &lt;jameswong1376@gmail.com&gt;
 	 * @version v1.0 2020-11-26
-	 * @sine v1.0
+	 * @since v2.0
 	 * @see {@link org.springframework.web.servlet.DispatcherServlet#getHandler()}
 	 */
 	static class FeignProxyRequestHandlerMapping extends ServletHandlerMappingSupport {

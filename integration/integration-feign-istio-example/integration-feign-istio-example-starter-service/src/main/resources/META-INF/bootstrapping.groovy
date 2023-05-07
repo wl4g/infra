@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Reference to website: http://wl4g.com
+ * Reference to website: https://wl4g.github.io
  */
 
 import static com.wl4g.infra.common.lang.ClassUtils2.isPresent
@@ -27,36 +27,33 @@ import com.wl4g.infra.context.boot.listener.IBootstrappingConfigurer
  */
 class ExampleFacadeBootstrappingConfigurer implements IBootstrappingConfigurer {
 
-	@Override
-	def int getOrder() {
-		return -100
-	}
+    @Override
+    def int getOrder() {
+        return -100
+    }
 
-	@Override
-	def Properties defaultProperties(Properties prevDefaultProperties) {
-		def defaultProperties = new Properties()
-		// Preset spring.config.name
-		// for example: spring auto load for 'application-dev.yml/application-data-dev.yml'
-		def configName = new StringBuffer("application,example-web")
+    @Override
+    void defaultProperties(Properties prevDefaultProperties) {
+        // Preset spring.config.name
+        // for example: spring auto load for 'application-dev.yml/application-data-dev.yml'
+        def configName = new StringBuffer("application,example-web")
 
-		// Preset spring.config.location
-		// for example: spring auto load for 'classpath:/application-web-dev.yml'
-		def location = new StringBuffer("classpath:/")
-		if (isPresent("org.springframework.cloud.openfeign.FeignClient") && isPresent("org.springframework.cloud.openfeign.FeignAutoConfiguration")) {
-			configName.append(",example-web-scf");
-			location.append(",classpath:/scf/")
-		} else if (isPresent("com.wl4g.infra.integration.feign.core.annotation.FeignConsumer")) {
-			configName.append(",example-web-sbf");
-			location.append(",classpath:/sbf/")
-		} else if (isPresent("com.alibaba.dubbo.rpc.Filter") && isPresent("com.alibaba.boot.dubbo.autoconfigure.DubboAutoConfiguration")) {
-			configName.append(",example-web-dubbo");
-			location.append(",classpath:/dubbo/")
-		}
+        // Preset spring.config.location
+        // for example: spring auto load for 'classpath:/application-web-dev.yml'
+        def location = new StringBuffer("classpath:/")
+        if (isPresent("org.springframework.cloud.openfeign.FeignClient") && isPresent("org.springframework.cloud.openfeign.FeignAutoConfiguration")) {
+            configName.append(",example-web-scf");
+            location.append(",classpath:/scf/")
+        } else if (isPresent("com.wl4g.infra.integration.feign.core.annotation.FeignConsumer")) {
+            configName.append(",example-web-sbf");
+            location.append(",classpath:/sbf/")
+        } else if (isPresent("com.alibaba.dubbo.rpc.Filter") && isPresent("com.alibaba.boot.dubbo.autoconfigure.DubboAutoConfiguration")) {
+            configName.append(",example-web-dubbo");
+            location.append(",classpath:/dubbo/")
+        }
 
-		defaultProperties.put(CONFIG_NAME_PROPERTY, configName.toString())
-		defaultProperties.put(CONFIG_ADDITIONAL_LOCATION_PROPERTY, location.toString())
-
-		return defaultProperties
-	}
+        prevDefaultProperties.put(CONFIG_NAME_PROPERTY, configName.toString())
+        prevDefaultProperties.put(CONFIG_ADDITIONAL_LOCATION_PROPERTY, location.toString())
+    }
 
 }

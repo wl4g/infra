@@ -44,7 +44,7 @@ import static java.util.Collections.emptySet;
  * 
  * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version v1.0 2020-11-20
- * @sine v1.0
+ * @since v2.0
  * @see Implementation simulated of refer to
  *      {@link org.springframework.cloud.openfeign.EnableFeignClients}
  * @see {@link com.alibaba.boot.dubbo.autoconfigure.DubboAutoConfiguration}

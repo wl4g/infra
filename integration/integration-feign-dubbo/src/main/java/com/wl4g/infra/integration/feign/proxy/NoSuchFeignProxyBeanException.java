@@ -26,7 +26,7 @@ import org.springframework.beans.BeansException;
  * 
  * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version v1.0 2020-11-25
- * @sine v1.0
+ * @since v2.0
  * @see
  */
 public class NoSuchFeignProxyBeanException extends BeansException {

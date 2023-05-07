@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>>
+ * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ import com.wl4g.infra.common.log.SmartLogger;
 /**
  * Mybatis {@link SqlSessionFactory} developments hotspot mapper re-loader.
  * 
- * @author James Wong <jameswong1376@gmail.com>>
+ * @author James Wong <jameswong1376@gmail.com>
  * @version v1.0 2019年11月14日
  * @since
  */
@@ -297,7 +297,7 @@ public final class SqlSessionMapperHotspotLoader implements ApplicationRunner {
     /**
      * Mybatis mappers hotspot loader properties configuration.
      * 
-     * @author James Wong <jameswong1376@gmail.com>>
+     * @author James Wong <jameswong1376@gmail.com>
      * @version v1.0 2019年11月14日
      * @since
      */

@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @author liqiu
  * @version v1.0 2019-11-20
- * @sine v1.0
+ * @since v2.0
  * @see
  */
 @RestController

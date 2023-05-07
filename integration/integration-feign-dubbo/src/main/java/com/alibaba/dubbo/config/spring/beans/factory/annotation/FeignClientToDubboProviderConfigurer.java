@@ -70,7 +70,7 @@ import static com.wl4g.infra.integration.feign.springcloud.proxy.FeignProxyUtil.
  * 
  * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version v1.0 2020-11-20
- * @sine v1.0
+ * @since v2.0
  * @see {@link com.alibaba.dubbo.config.spring.beans.factory.annotation.ServiceAnnotationBeanPostProcessor}
  * @see {@link org.apache.dubbo.config.spring.beans.factory.annotation.ServiceAnnotationBeanPostProcessor}
  * @see {@link com.alibaba.dubbo.config.spring.ServiceBean}

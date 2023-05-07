@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Reference to website: http://wl4g.com
+ * Reference to website: https://wl4g.github.io
  */
 
 import static com.wl4g.infra.common.lang.ClassUtils2.isPresent
@@ -33,8 +33,7 @@ class ExampleWebIBootstrappingConfigurer implements IBootstrappingConfigurer {
 	}
 
 	@Override
-	def Properties defaultProperties(Properties prevDefaultProperties) {
-		def defaultProperties = new Properties()
+	void defaultProperties(Properties prevDefaultProperties) {
 		// Preset spring.config.name
 		// for example: spring auto load for 'application-dev.yml/application-data-dev.yml'
 		def configName = new StringBuffer("application,example-web")
@@ -53,10 +52,8 @@ class ExampleWebIBootstrappingConfigurer implements IBootstrappingConfigurer {
 			location.append(",classpath:/dubbo/")
 		}
 
-		defaultProperties.put(CONFIG_NAME_PROPERTY, configName.toString())
-		defaultProperties.put(CONFIG_ADDITIONAL_LOCATION_PROPERTY, location.toString())
-
-		return defaultProperties
+		prevDefaultProperties.put(CONFIG_NAME_PROPERTY, configName.toString())
+		prevDefaultProperties.put(CONFIG_ADDITIONAL_LOCATION_PROPERTY, location.toString())
 	}
 
 }

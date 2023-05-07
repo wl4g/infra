@@ -19,7 +19,7 @@ import lombok.CustomLog;
  * `@AutoConfigureBefore(MonitorMetricsConfiguration.class)`<br/>
  * MonitorMetricsConfiguration objects must be created before that.<br/>
  * 
- * @author James Wong <jameswong1376@gmail.com>
+ * @author James Wong James Wong <jameswong1376@gmail.com>
  * @version v1.0
  * @date 2018年5月31日
  * @since

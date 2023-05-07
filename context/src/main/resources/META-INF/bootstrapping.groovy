@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Reference to website: http://wl4g.com
+ * Reference to website: https://wl4g.github.io
  */
 
 import static com.wl4g.infra.common.lang.ClassUtils2.isPresent

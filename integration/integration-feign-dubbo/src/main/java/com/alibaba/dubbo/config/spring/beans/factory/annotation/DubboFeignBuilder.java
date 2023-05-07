@@ -29,7 +29,7 @@ import org.springframework.context.ApplicationContext;
  * 
  * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version v1.0 2020-11-21
- * @sine v1.0
+ * @since v2.0
  * @see
  */
 public class DubboFeignBuilder extends Feign.Builder {

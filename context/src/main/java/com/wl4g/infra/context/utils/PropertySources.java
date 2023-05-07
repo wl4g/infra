@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>>
+ * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ import org.springframework.core.io.ByteArrayResource;
 /**
  * YAML and properties source resovler.
  * 
- * @author James Wong <jameswong1376@gmail.com>
+ * @author James Wong James Wong <jameswong1376@gmail.com>
  * @version v1.0
  * @date 2018年10月30日
  * @since
@@ -60,7 +60,7 @@ public abstract class PropertySources {
      * {@link ConfigType}
      * 
      * @author James Wong &lt;jameswong1376@gmail.com&gt;
-     * @sine v1.0
+     * @since v2.0
      * @see
      */
     public static enum ConfigType {
@@ -95,7 +95,7 @@ public abstract class PropertySources {
      * {@link ResolveHandler}
      * 
      * @author James Wong &lt;jameswong1376@gmail.com&gt;
-     * @sine v1.0
+     * @since v2.0
      * @see
      */
     public static interface ResolveHandler {
@@ -106,7 +106,7 @@ public abstract class PropertySources {
      * {@link YamlResolveHandler}
      * 
      * @author James Wong &lt;jameswong1376@gmail.com&gt;
-     * @sine v1.0
+     * @since v2.0
      * @see
      */
     private static class YamlResolveHandler implements ResolveHandler {
@@ -132,7 +132,7 @@ public abstract class PropertySources {
      * {@link PropertiesResolveHandler}
      * 
      * @author James Wong &lt;jameswong1376@gmail.com&gt;
-     * @sine v1.0
+     * @since v2.0
      * @see
      */
     private static class PropertiesResolveHandler implements ResolveHandler {
