@@ -1,13 +1,13 @@
 # Infra
 
-> 企业级微服务基础架构框架，已整合以下框架，支持在以下框架之间无缝切换:
+> 企业级微服务基础架构框架, 整合了以下框架, 支持在以下框架之间无缝切换:
 
 - [**`feign+springboot`**](./integration/integration-feign-core)
 - [**`feign+springcloud`**](./integration/integration-feign-springcloud)
 - [**`feign+springboot+istio`**](./integration/integration-feign-istio)
 - [**`feign+springboot+dubbo`**](./integration/integration-feign-dubbo)
 
-## 目录说明
+## Directories
 
 ```bash
 ├── infra-bom # infra公共依赖
