@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>infra-integration</artifactId>
-	<packaging>pom</packaging>
-	<name>Infra Integration</name>
+	<artifactId>infra-integration-feign-istio</artifactId>
+	<packaging>jar</packaging>
+	<name>Infra Integration SpringBoot Feign Istio</name>
 	<url>http://infra.wl4g.com</url>
-	<description>Infra Integration with Projects.</description>
+	<description>Infra Component Integration with based on SpringBoot + Feign Istio.</description>
 	<organization>
 		<name>wl4g</name>
 		<url>https://infra.wl4g.com</url>
@@ -52,45 +52,56 @@
 	</developers>
 	<parent>
 		<groupId>com.wl4g</groupId>
-		<artifactId>infra-parent</artifactId>
-		<version>3.1.27</version>
+		<artifactId>infra-integration</artifactId>
+		<version>3.1.26</version>
 	</parent>
-	<modules>
-		<module>integration-feign-common</module>
-		<module>integration-feign-core</module>
-		<module>integration-feign-istio</module>
-		<module>integration-feign-istio-example</module>
-		<module>integration-feign-springcloud</module>
-    <module>integration-feign-springcloud-example</module>
-		<!-- <module>integration-feign-dubbo</module> -->
-		<!-- <module>integration-feign-dubbo-example</module> -->
-		<module>integration-eureka</module>
-		<!--<module>integration-nacos</module> -->
-		<!--<module>integration-etcd</module> -->
-		<!--<module>integration-consul</module> -->
-		<!--<module>integration-zookeeper</module> -->
-	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
-		<apache-dubbo-starter.version>2.7.10</apache-dubbo-starter.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>org.apache.dubbo</groupId>
-				<artifactId>dubbo-spring-boot-starter</artifactId>
-				<version>${apache-dubbo-starter.version}</version>
+				<groupId>com.wl4g</groupId>
+				<artifactId>infra-bom</artifactId>
+				<version>${project.parent.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+	<dependencies>
+		<dependency>
+			<groupId>com.wl4g</groupId>
+			<artifactId>infra-integration-feign-core</artifactId>
+		</dependency>
+		<!-- https://github.com/fabric8io/kubernetes-client/tree/master/extensions/istio -->
+		<dependency>
+			<groupId>io.fabric8</groupId>
+			<artifactId>kubernetes-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.fabric8</groupId>
+			<artifactId>istio-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 	<build>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
-				<filtering>false</filtering>
+				<filtering>true</filtering>
 				<includes>
-					<include>**.*</include>
+					<include>**</include>
 				</includes>
 			</resource>
 		</resources>

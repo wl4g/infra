@@ -1,10 +1,12 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>infra-integration-feign-istio-example-starter-service</artifactId>
-	<name>Infra Integration Feign Dubbo Example Service</name>
+	<artifactId>infra-integration-feign-istio-example</artifactId>
+	<packaging>pom</packaging>
+	<name>Infra Integration Feign Istio Example</name>
 	<url>http://infra.wl4g.com</url>
-	<description>Infra integration istio examples starter web.</description>
+	<description>Infra integration istio examples projects.</description>
 	<organization>
 		<name>wl4g</name>
 		<url>https://infra.wl4g.com</url>
@@ -51,35 +53,37 @@
 	</developers>
 	<parent>
 		<groupId>com.wl4g</groupId>
-		<artifactId>infra-integration-feign-istio-example</artifactId>
-		<version>3.1.27</version>
+		<artifactId>infra-integration</artifactId>
+		<version>3.1.26</version>
 	</parent>
+	<modules>
+		<module>integration-feign-istio-example-interface</module>
+		<module>integration-feign-istio-example-starter-service</module>
+		<module>integration-feign-istio-example-starter-web</module>
+	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
-		<final.name>istio-example-service</final.name>
-		<bootstrap-classname>com.wl4g.FeginIstioExampleService</bootstrap-classname>
 	</properties>
-	<dependencies>
-		<dependency>
-			<groupId>com.wl4g</groupId>
-			<artifactId>infra-integration-feign-istio-example-interface</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.wl4g</groupId>
-			<artifactId>infra-data</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-		</dependency>
-	</dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.wl4g</groupId>
+				<artifactId>infra-bom</artifactId>
+				<version>${project.parent.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 	<build>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
 				<filtering>false</filtering>
+				<includes>
+					<include>**.*</include>
+				</includes>
 			</resource>
 		</resources>
 		<plugins>
@@ -100,25 +104,6 @@
 						<phase>verify</phase>
 						<goals>
 							<goal>jar-no-fork</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<mainClass>${bootstrap-classname}</mainClass>
-					<finalName>${final.name}-${project.version}</finalName>
-					<!-- for using: java -cp myapp.jar -Dloader.main=com.MyApp org.springframework.boot.loader.PropertiesLauncher -->
-					<!-- @see:https://www.baeldung.com/spring-boot-main-class -->
-					<!-- @see:https://www.jianshu.com/p/66a101c85485 -->
-					<layout>ZIP</layout>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>repackage</goal>
 						</goals>
 					</execution>
 				</executions>

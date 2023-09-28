@@ -58,7 +58,7 @@ import static org.yaml.snakeyaml.env.EnvScalarConstructor.ENV_TAG;
 public abstract class YamlUtils {
 
     public static <T> T parse(@NotBlank String yaml, @Nullable String rootPath, @NotNull Class<T> clazz) {
-        return parse(yaml, null, null, null, clazz);
+        return parse(yaml, null, null, rootPath, clazz);
     }
 
     public static <T> T parse(
@@ -74,7 +74,7 @@ public abstract class YamlUtils {
             @Nullable LoaderOptions options,
             @Nullable String rootPath,
             @NotNull Class<T> clazz) {
-        return parse(yaml, null, options, null, clazz);
+        return parse(yaml, null, options, rootPath, clazz);
     }
 
     @SuppressWarnings({ "unchecked" })
