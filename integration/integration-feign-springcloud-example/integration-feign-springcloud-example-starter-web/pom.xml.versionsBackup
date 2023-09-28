@@ -1,12 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>infra-integration-feign-springcloud-example</artifactId>
-	<packaging>pom</packaging>
-	<name>Infra Integration Feign SpringCloud Example</name>
+	<artifactId>infra-integration-feign-springcloud-example-starter-web</artifactId>
+	<name>Infra Integration Feign SpringCloud Example Web</name>
 	<url>http://infra.wl4g.com</url>
-	<description>Infra Integration with Examples Projects.</description>
+	<description>Infra Integration with Feign SpringCloud Examples Starter Web.</description>
 	<organization>
 		<name>wl4g</name>
 		<url>https://infra.wl4g.com</url>
@@ -53,37 +51,31 @@
 	</developers>
 	<parent>
 		<groupId>com.wl4g</groupId>
-		<artifactId>infra-integration</artifactId>
-		<version>3.1.29</version>
+		<artifactId>infra-integration-feign-springcloud-example</artifactId>
+		<version>3.1.28</version>
 	</parent>
-	<modules>
-		<module>integration-feign-springcloud-example-interface</module>
-		<module>integration-feign-springcloud-example-starter-service</module>
-		<module>integration-feign-springcloud-example-starter-web</module>
-	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
+		<final.name>springcloud-example-web</final.name>
+		<bootstrap-classname>com.wl4g.FeginSpringCloudExampleWeb</bootstrap-classname>
 	</properties>
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>com.wl4g</groupId>
-				<artifactId>infra-bom</artifactId>
-				<version>${project.parent.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+	<dependencies>
+		<dependency>
+			<groupId>com.wl4g</groupId>
+			<artifactId>infra-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.wl4g</groupId>
+			<artifactId>infra-integration-feign-springcloud-example-interface</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+	</dependencies>
 	<build>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
 				<filtering>false</filtering>
-				<includes>
-					<include>**.*</include>
-				</includes>
 			</resource>
 		</resources>
 		<plugins>
@@ -104,6 +96,25 @@
 						<phase>verify</phase>
 						<goals>
 							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<mainClass>${bootstrap-classname}</mainClass>
+					<finalName>${final.name}-${project.version}</finalName>
+					<!-- for using: java -cp myapp.jar -Dloader.main=com.MyApp org.springframework.boot.loader.PropertiesLauncher -->
+					<!-- @see:https://www.baeldung.com/spring-boot-main-class -->
+					<!-- @see:https://www.jianshu.com/p/66a101c85485 -->
+					<layout>ZIP</layout>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
 						</goals>
 					</execution>
 				</executions>

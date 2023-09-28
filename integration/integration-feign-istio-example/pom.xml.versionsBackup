@@ -2,11 +2,11 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>infra-integration-feign-springcloud-example</artifactId>
+	<artifactId>infra-integration-feign-istio-example</artifactId>
 	<packaging>pom</packaging>
-	<name>Infra Integration Feign SpringCloud Example</name>
+	<name>Infra Integration Feign Istio Example</name>
 	<url>http://infra.wl4g.com</url>
-	<description>Infra Integration with Examples Projects.</description>
+	<description>Infra integration istio examples projects.</description>
 	<organization>
 		<name>wl4g</name>
 		<url>https://infra.wl4g.com</url>
@@ -54,12 +54,12 @@
 	<parent>
 		<groupId>com.wl4g</groupId>
 		<artifactId>infra-integration</artifactId>
-		<version>3.1.29</version>
+		<version>3.1.28</version>
 	</parent>
 	<modules>
-		<module>integration-feign-springcloud-example-interface</module>
-		<module>integration-feign-springcloud-example-starter-service</module>
-		<module>integration-feign-springcloud-example-starter-web</module>
+		<module>integration-feign-istio-example-interface</module>
+		<module>integration-feign-istio-example-starter-service</module>
+		<module>integration-feign-istio-example-starter-web</module>
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -1,12 +1,11 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>infra-integration-feign-springcloud-example</artifactId>
-	<packaging>pom</packaging>
-	<name>Infra Integration Feign SpringCloud Example</name>
+	<artifactId>infra-integration-feign-istio-example-interface</artifactId>
+	<packaging>jar</packaging>
+	<name>Infra Integration Feign Dubbo Example Interface</name>
 	<url>http://infra.wl4g.com</url>
-	<description>Infra Integration with Examples Projects.</description>
+	<description>Infra integration istio examples interface.</description>
 	<organization>
 		<name>wl4g</name>
 		<url>https://infra.wl4g.com</url>
@@ -53,29 +52,37 @@
 	</developers>
 	<parent>
 		<groupId>com.wl4g</groupId>
-		<artifactId>infra-integration</artifactId>
-		<version>3.1.29</version>
+		<artifactId>infra-integration-feign-istio-example</artifactId>
+		<version>3.1.28</version>
 	</parent>
-	<modules>
-		<module>integration-feign-springcloud-example-interface</module>
-		<module>integration-feign-springcloud-example-starter-service</module>
-		<module>integration-feign-springcloud-example-starter-web</module>
-	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
 	</properties>
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>com.wl4g</groupId>
-				<artifactId>infra-bom</artifactId>
-				<version>${project.parent.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+	<dependencies>
+		<!-- Here are 3 different replaceable distributed architectures:(It can only be one of them) -->
+
+		<!-- ①[SpringBoot + Feign Istio] When turned on comments and @SpringBootFeignClients is used on the boot class, it is automatically 
+			configured. -->
+		<dependency>
+			<groupId>com.wl4g</groupId>
+			<artifactId>infra-integration-feign-istio</artifactId>
+		</dependency>
+
+		<!-- ②[SpringCloud + Feign Netflix] When turned on comments and @FeignClients is used on the boot class, it is automatically 
+			configured. -->
+		<!-- <dependency> -->
+		<!-- <groupId>com.wl4g</groupId> -->
+		<!-- <artifactId>infra-integration-feign-springcloud</artifactId> -->
+		<!-- </dependency> -->
+
+		<!-- ③[SpringCloud + (Feign)Dubbo] When turned on comments and @FeignClients is used on the boot class, it is automatically 
+			configured. Notes: Only relying on feign's interface annotation. -->
+		<!-- <dependency> -->
+		<!-- <groupId>com.wl4g</groupId> -->
+		<!-- <artifactId>infra-integration-feign-springcloud-dubbo</artifactId> -->
+		<!-- </dependency> -->
+	</dependencies>
 	<build>
 		<resources>
 			<resource>

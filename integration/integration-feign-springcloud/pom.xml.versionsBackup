@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>infra-data</artifactId>
+	<artifactId>infra-integration-feign-springcloud</artifactId>
 	<packaging>jar</packaging>
-	<name>Infra Data</name>
+	<name>Infra Integration Feign SpringCloud</name>
 	<url>http://infra.wl4g.com</url>
-	<description>Infra Component Data Source Module.</description>
+	<description>Infra Component Integration with based on SpringCloud feign.</description>
 	<organization>
 		<name>wl4g</name>
 		<url>https://infra.wl4g.com</url>
@@ -52,8 +52,8 @@
 	</developers>
 	<parent>
 		<groupId>com.wl4g</groupId>
-		<artifactId>infra-parent</artifactId>
-		<version>3.1.29</version>
+		<artifactId>infra-integration</artifactId>
+		<version>3.1.28</version>
 	</parent>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -75,39 +75,70 @@
 			<groupId>com.wl4g</groupId>
 			<artifactId>infra-core</artifactId>
 		</dependency>
-		<!-- Database -->
+		<!-- e.g. for extension RpcContextHolder -->
 		<dependency>
-			<groupId>com.zaxxer</groupId>
-			<artifactId>HikariCP</artifactId>
+			<groupId>com.wl4g</groupId>
+			<artifactId>infra-integration-feign-core</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.alibaba</groupId>
-			<artifactId>druid</artifactId>
-			<optional>true</optional>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
-		<!-- Mybatis -->
 		<dependency>
-			<groupId>org.mybatis.spring.boot</groupId>
-			<artifactId>mybatis-spring-boot-starter</artifactId>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
 			<exclusions>
+				<!-- Because it is not mature enough at present, it is not recommended to use it for the time being. spring-cloud-ribbon should continue 
+					to be used. -->
+				<!-- <exclusion> -->
+				<!-- <groupId>org.springframework.cloud</groupId> -->
+				<!-- <artifactId>spring-cloud-starter-loadbalancer</artifactId> -->
+				<!-- </exclusion> -->
 				<exclusion>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-autoconfigure</artifactId>
+					<groupId>org.springframework.cloud</groupId>
+					<artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>com.github.pagehelper</groupId>
-			<artifactId>pagehelper</artifactId>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+		</dependency>
+		<!-- spring-cloud-loadbalancer-2.2.6.RELEASE.jar Retrying is not supported at this time -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.springframework.retry</groupId> -->
+		<!-- <artifactId>spring-retry</artifactId> -->
+		<!-- <scope>compile</scope> -->
+		<!-- <exclusions> -->
+		<!-- <exclusion> -->
+		<!-- <artifactId>spring-core</artifactId> -->
+		<!-- <groupId>org.springframework</groupId> -->
+		<!-- </exclusion> -->
+		<!-- </exclusions> -->
+		<!-- </dependency> -->
+		<dependency>
+			<groupId>com.alibaba.cloud</groupId>
+			<artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+			<optional>true</optional><!-- Auto adapt by class -->
+		</dependency>
+		<dependency>
+			<groupId>io.github.resilience4j</groupId>
+			<artifactId>resilience4j-spring-boot2</artifactId>
+			<optional>true</optional><!-- Auto adapt by class -->
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webflux</artifactId>
+			<scope>provided</scope>
 		</dependency>
 		<!-- Tests -->
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -117,7 +148,7 @@
 				<directory>src/main/resources</directory>
 				<filtering>true</filtering>
 				<includes>
-					<include>**.*</include>
+					<include>**</include>
 				</includes>
 			</resource>
 		</resources>

@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>infra-support</artifactId>
-	<packaging>jar</packaging>
-	<name>Infra Support</name>
+	<artifactId>infra-integration</artifactId>
+	<packaging>pom</packaging>
+	<name>Infra Integration</name>
 	<url>http://infra.wl4g.com</url>
-	<description>Infra Component Support.</description>
+	<description>Infra Integration with Projects.</description>
 	<organization>
 		<name>wl4g</name>
 		<url>https://infra.wl4g.com</url>
@@ -53,104 +53,47 @@
 	<parent>
 		<groupId>com.wl4g</groupId>
 		<artifactId>infra-parent</artifactId>
-		<version>3.1.29</version>
+		<version>3.1.28</version>
 	</parent>
+	<modules>
+		<module>integration-feign-common</module>
+		<module>integration-feign-core</module>
+		<module>integration-feign-istio</module>
+		<module>integration-feign-istio-example</module>
+		<module>integration-feign-springcloud</module>
+    <module>integration-feign-springcloud-example</module>
+		<!-- <module>integration-feign-dubbo</module> -->
+		<!-- <module>integration-feign-dubbo-example</module> -->
+		<module>integration-eureka</module>
+		<!--<module>integration-nacos</module> -->
+		<!--<module>integration-etcd</module> -->
+		<!--<module>integration-consul</module> -->
+		<!--<module>integration-zookeeper</module> -->
+	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
+		<apache-dubbo-starter.version>2.7.10</apache-dubbo-starter.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>com.wl4g</groupId>
-				<artifactId>infra-bom</artifactId>
-				<version>${project.parent.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>redis.clients</groupId>
-				<artifactId>jedis</artifactId>
-				<version>3.6.1</version>
+				<groupId>org.apache.dubbo</groupId>
+				<artifactId>dubbo-spring-boot-starter</artifactId>
+				<version>${apache-dubbo-starter.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-	<dependencies>
-		<dependency>
-			<groupId>com.wl4g</groupId>
-			<artifactId>infra-core</artifactId>
-		</dependency>
-		<!-- Redis. -->
-		<dependency>
-			<groupId>redis.clients</groupId>
-			<artifactId>jedis</artifactId>
-			<!-- <optional>true</optional> -->
-		</dependency>
-		<!-- Jetcache. -->
-		<!-- <dependency> -->
-		<!-- <groupId>com.alicp.jetcache</groupId> -->
-		<!-- <artifactId>jetcache-redis-lettuce</artifactId> -->
-		<!-- </dependency> -->
-		<!-- Lettuce. -->
-		<!-- <dependency> -->
-		<!-- <groupId>io.lettuce</groupId> -->
-		<!-- <artifactId>lettuce-core</artifactId> -->
-		<!-- </dependency> -->
-		<!-- Notification. -->
-	    <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>javax.mail-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
-        </dependency>
-		<!-- Aliyun. -->
-		<dependency>
-			<groupId>com.aliyun</groupId>
-			<artifactId>aliyun-java-sdk-dysmsapi</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.aliyun</groupId>
-			<artifactId>aliyun-java-sdk-core</artifactId>
-		</dependency>
-		<!-- SSH -->
-		<!-- Ethz SSH2 -->
-		<dependency>
-			<groupId>ch.ethz.ganymed</groupId>
-			<artifactId>ganymed-ssh2</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<!-- SSHD -->
-		<dependency>
-			<groupId>org.apache.sshd</groupId>
-			<artifactId>sshd-netty</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.sshd</groupId>
-			<artifactId>sshd-scp</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<!-- SSHJ -->
-		<dependency>
-			<groupId>com.hierynomus</groupId>
-			<artifactId>sshj</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.jcraft</groupId>
-			<artifactId>jsch</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<!-- Tests -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>false</filtering>
+				<includes>
+					<include>**.*</include>
+				</includes>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
