@@ -49,7 +49,7 @@ function usages() {
     echo $"
 Usage: ./$(basename $0) [OPTIONS] [arg1] [arg2] ...
     version                                         Print maven project POM version.
-    upgrade-push                                    Upgrade pom and push.
+    upgrade-push                                    Upgrade pom and push to release job. (eg: 3.1.30)
 "
 }
 
@@ -73,10 +73,10 @@ function do_upgrade_push() {
 
     log "Cleaup the temporary pom version backup files ..."
     set +e
-    git -C $BASE_DIR rm -rf $BASE_DIR/pom.xml.versionsBackup >/dev/null 2>&1
-    git -C $BASE_DIR rm -rf $BASE_DIR/*/pom.xml.versionsBackup >/dev/null 2>&1
-    git -C $BASE_DIR rm -rf $BASE_DIR/*/*/pom.xml.versionsBackup >/dev/null 2>&1
-    git -C $BASE_DIR rm -rf $BASE_DIR/*/*/*/pom.xml.versionsBackup >/dev/null 2>&1
+    \rm -rf $BASE_DIR/pom.xml.versionsBackup >/dev/null 2>&1
+    \rm -rf $BASE_DIR/*/pom.xml.versionsBackup >/dev/null 2>&1
+    \rm -rf $BASE_DIR/*/*/pom.xml.versionsBackup >/dev/null 2>&1
+    \rm -rf $BASE_DIR/*/*/*/pom.xml.versionsBackup >/dev/null 2>&1
     set -e
 
     git -C $BASE_DIR add .
