@@ -29,7 +29,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collector.Characteristics;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections.map.CaseInsensitiveMap;
+import org.apache.commons.collections4.map.CaseInsensitiveMap;
 
 /**
  * Enhanced collectors utility.

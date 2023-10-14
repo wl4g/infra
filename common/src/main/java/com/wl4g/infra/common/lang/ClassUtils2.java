@@ -52,7 +52,7 @@ import java.util.StringJoiner;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import com.wl4g.infra.common.collection.ConcurrentReferenceHashMap;
 import com.wl4g.infra.common.reflect.ReflectionUtils2;

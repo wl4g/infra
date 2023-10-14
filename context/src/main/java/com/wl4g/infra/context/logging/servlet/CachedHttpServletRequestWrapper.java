@@ -71,12 +71,12 @@ public class CachedHttpServletRequestWrapper extends HttpServletRequestWrapper {
      * Note: where the web server closes the underlying IO input stream, Source
      * code analysis see:
      * {@link org.apache.catalina.core.StandardContext#fireRequestDestroyEvent}↓
-     * {@link org.apache.catalina.connector.CoyoteAdapter#service(Request,Response)}↓
+     * {@link org.apache.catalina.connector.CoyoteAdapter#service(Request, Response)}↓
      * {@link org.apache.catalina.connector.Request#finishRequest()}↓
      * {@link org.apache.catalina.connector.Response#finishResponse()}↓
      * {@link org.apache.catalina.connector.OutputBuffer#close()}↓
      * {@link org.apache.catalina.connector.Request#inputBuffer#close()}↓
-     * 
+     *
      * <p>
      * Summary: There is no need to manually close the underlying TCP network
      * stream, because the web server will manage it, and the in-memory byte
@@ -85,13 +85,13 @@ public class CachedHttpServletRequestWrapper extends HttpServletRequestWrapper {
      * byte array, this pseudo IO stream JVM will recycle it by GC (only open
      * local file streams or network streams need to be displayed to close it)
      * </p>
-     * 
+     *
      * <p>
      * 总结：对应底层TCP网络流无需显示手动关闭，因为web服务器会管理好它，对于外层包装的内存式字节输入流(ByteArrayInputStream)也无需手动关闭它，
      * 因为本质上这种伪IO流就是缓存的字节数组，就是个普通对象，JVM会GC回收它（只有显示打开的本地文件流或网络流才需要显示关闭它）
      * </p>
-     * 
-     * @see https://yaoyinglong.github.io/Blog/中间件/Tomcat/Tomcat处理响应过程/
+     *
+     * @see <a href="https://yaoyinglong.github.io/Blog/中间件/Tomcat/Tomcat处理响应过程/">...</a>
      */
     @Override
     public ServletInputStream getInputStream() throws IOException {

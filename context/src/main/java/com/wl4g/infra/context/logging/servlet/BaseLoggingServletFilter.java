@@ -21,7 +21,7 @@ import static com.wl4g.infra.common.collection.Collectors2.toCaseInsensitiveHash
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.lang.FastTimeClock.currentTimeMillis;
 import static java.util.Objects.isNull;
-import static org.apache.commons.collections.EnumerationUtils.toList;
+import static org.apache.commons.collections4.EnumerationUtils.toList;
 
 import java.io.IOException;
 import java.util.List;
@@ -110,9 +110,6 @@ public abstract class BaseLoggingServletFilter implements Filter {
 
     /**
      * Check if enable print logs needs to be filtered
-     * 
-     * @param exchange
-     * @return
      */
     protected boolean isLoggingRequest(HttpServletRequest req) {
         if (!loggingConfig.isEnabled()) {

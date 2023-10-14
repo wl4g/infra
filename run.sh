@@ -73,10 +73,10 @@ function do_upgrade_push() {
 
     log "Cleaup the temporary pom version backup files ..."
     set +e
-    git -C $BASE_DIR rm -rf pom.xml.versionsBackup >/dev/null 2>&1
-    git -C $BASE_DIR rm -rf */pom.xml.versionsBackup >/dev/null 2>&1
-    git -C $BASE_DIR rm -rf */*/pom.xml.versionsBackup >/dev/null 2>&1
-    git -C $BASE_DIR rm -rf */*/*/pom.xml.versionsBackup >/dev/null 2>&1
+    git -C $BASE_DIR rm -rf $BASE_DIR/pom.xml.versionsBackup >/dev/null 2>&1
+    git -C $BASE_DIR rm -rf $BASE_DIR/*/pom.xml.versionsBackup >/dev/null 2>&1
+    git -C $BASE_DIR rm -rf $BASE_DIR/*/*/pom.xml.versionsBackup >/dev/null 2>&1
+    git -C $BASE_DIR rm -rf $BASE_DIR/*/*/*/pom.xml.versionsBackup >/dev/null 2>&1
     set -e
 
     git -C $BASE_DIR add .

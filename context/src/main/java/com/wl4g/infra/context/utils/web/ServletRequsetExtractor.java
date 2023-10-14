@@ -23,9 +23,10 @@ import java.net.URI;
 import java.security.Principal;
 import java.util.Collection;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.collections.EnumerationUtils;
+import org.apache.commons.collections4.EnumerationUtils;
 
 import com.wl4g.infra.common.web.CookieUtils;
 import com.wl4g.infra.common.web.WebUtils.WebRequestExtractor;
@@ -94,7 +95,6 @@ public class ServletRequsetExtractor implements WebRequestExtractor {
         return request.getParameter(name);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Collection<String> getHeaderNames() {
         return EnumerationUtils.toList(request.getHeaderNames());
@@ -107,7 +107,7 @@ public class ServletRequsetExtractor implements WebRequestExtractor {
 
     @Override
     public Collection<String> getCookieNames() {
-        return safeArrayToList(request.getCookies()).stream().map(c -> c.getName()).collect(toList());
+        return safeArrayToList(request.getCookies()).stream().map(Cookie::getName).collect(toList());
     }
 
     @Override

@@ -58,7 +58,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import org.apache.commons.collections.EnumerationUtils;
+import org.apache.commons.collections4.EnumerationUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.annotations.Beta;

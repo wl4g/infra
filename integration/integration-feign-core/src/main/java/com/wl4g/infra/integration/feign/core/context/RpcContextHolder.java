@@ -156,9 +156,6 @@ public abstract class RpcContextHolder {
 
     /**
      * Sets all attachments to current rpc context.
-     * 
-     * @param key
-     * @param value
      */
     public void setAttachments(@Nullable Map<? extends String, ? extends String> attachments) {
         safeMap(attachments).forEach((key, value) -> setAttachment(key, value));

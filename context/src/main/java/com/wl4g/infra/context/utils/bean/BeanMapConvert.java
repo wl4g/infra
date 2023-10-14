@@ -20,11 +20,14 @@ import org.springframework.util.ReflectionUtils;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static com.wl4g.infra.common.reflect.TypeUtils2.isSimpleType;
 import static java.util.Objects.isNull;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 /**
  * Bean and Map Convert. </br>
@@ -112,7 +115,7 @@ public final class BeanMapConvert {
 	 */
 	public static String toUriParmaters(Map<String, Object> params) {
 		if (isNull(params)) {
-			return EMPTY;
+			return "";
 		}
 
 		// To query URI of parameters.

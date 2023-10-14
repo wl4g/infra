@@ -62,8 +62,7 @@ import reactor.core.publisher.Mono;
  * 
  * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version 2020-09-12
- * @since v2.0.0
- * @see https://blog.csdn.net/keets1992/article/details/85077874
+ * @since v2.0
  */
 @ErrorController
 @ControllerAdvice

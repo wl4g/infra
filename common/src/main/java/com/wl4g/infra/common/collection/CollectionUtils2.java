@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.wl4g.infra.common.collection;
 
-import static com.wl4g.infra.common.lang.Assert2.isTrue;
-import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.emptySet;
-import static java.util.Objects.isNull;
-import static java.util.stream.Collectors.toList;
+import com.wl4g.infra.common.collection.multimap.MultiValueMap;
+import com.wl4g.infra.common.function.ProcessFunction;
+import com.wl4g.infra.common.lang.Assert2;
+import com.wl4g.infra.common.lang.ObjectUtils2;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.EnumerationUtils;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -43,26 +43,24 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.EnumerationUtils;
-
-import com.wl4g.infra.common.collection.multimap.MultiValueMap;
-import com.wl4g.infra.common.function.ProcessFunction;
-import com.wl4g.infra.common.lang.Assert2;
-import com.wl4g.infra.common.lang.ObjectUtils2;
+import static com.wl4g.infra.common.lang.Assert2.isTrue;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
+import static java.util.Objects.isNull;
+import static java.util.stream.Collectors.toList;
 
 /**
  * Miscellaneous collection utility methods. Mainly for internal use within the
  * framework.
- * 
+ *
  * @author James Wong <jameswong1376@gmail.com>
  * @version v1.0 2018年11月4日
- * @since
  */
-public abstract class CollectionUtils2 extends CollectionUtils {
+public abstract class CollectionUtils2 {
 
     // ----------------------------------------------
     // --- Spring collection util methods. ---
@@ -71,13 +69,23 @@ public abstract class CollectionUtils2 extends CollectionUtils {
     /**
      * Return {@code true} if the supplied Map is {@code null} or empty.
      * Otherwise, return {@code false}.
-     * 
-     * @param map
-     *            the Map to check
+     *
+     * @param map the Map to check
      * @return whether the given Map is empty
      */
     public static boolean isEmpty(Map<?, ?> map) {
         return (map == null || map.isEmpty());
+    }
+
+    /**
+     * Return {@code true} if the supplied Collection is {@code null} or empty.
+     * Otherwise, return {@code false}.
+     *
+     * @param coll the Collection to check
+     * @return whether the given Collection is empty
+     */
+    public static boolean isEmpty(Collection<?> coll) {
+        return (coll == null || coll.isEmpty());
     }
 
     /**
@@ -90,9 +98,8 @@ public abstract class CollectionUtils2 extends CollectionUtils {
      * runtime.
      * <p>
      * A {@code null} source value will be converted to an empty List.
-     * 
-     * @param source
-     *            the (potentially primitive) array
+     *
+     * @param source the (potentially primitive) array
      * @return the converted List result
      * @see ObjectUtils2#toObjectArray(Object)
      * @see Arrays#asList(Object[])
@@ -104,11 +111,9 @@ public abstract class CollectionUtils2 extends CollectionUtils {
 
     /**
      * Merge the given array into the given Collection.
-     * 
-     * @param array
-     *            the array to merge (may be {@code null})
-     * @param collection
-     *            the target Collection to merge the array into
+     *
+     * @param array      the array to merge (may be {@code null})
+     * @param collection the target Collection to merge the array into
      */
     @SuppressWarnings("unchecked")
     public static <E> void mergeArrayIntoCollection(Object array, Collection<E> collection) {
@@ -127,11 +132,9 @@ public abstract class CollectionUtils2 extends CollectionUtils {
      * <p>
      * Uses {@code Properties.propertyNames()} to even catch default properties
      * linked into the original Properties instance.
-     * 
-     * @param props
-     *            the Properties instance to merge (may be {@code null})
-     * @param map
-     *            the target Map to merge the properties into
+     *
+     * @param props the Properties instance to merge (may be {@code null})
+     * @param map   the target Map to merge the properties into
      */
     @SuppressWarnings("unchecked")
     public static <K, V> void mergePropertiesIntoMap(Properties props, Map<K, V> map) {
@@ -139,7 +142,7 @@ public abstract class CollectionUtils2 extends CollectionUtils {
             throw new IllegalArgumentException("Map must not be null");
         }
         if (props != null) {
-            for (Enumeration<?> en = props.propertyNames(); en.hasMoreElements();) {
+            for (Enumeration<?> en = props.propertyNames(); en.hasMoreElements(); ) {
                 String key = (String) en.nextElement();
                 Object value = props.get(key);
                 if (value == null) {
@@ -154,11 +157,9 @@ public abstract class CollectionUtils2 extends CollectionUtils {
 
     /**
      * Check whether the given Iterator contains the given element.
-     * 
-     * @param iterator
-     *            the Iterator to check
-     * @param element
-     *            the element to look for
+     *
+     * @param iterator the Iterator to check
+     * @param element  the element to look for
      * @return {@code true} if found, {@code false} else
      */
     public static boolean contains(Iterator<?> iterator, Object element) {
@@ -175,11 +176,9 @@ public abstract class CollectionUtils2 extends CollectionUtils {
 
     /**
      * Check whether the given Enumeration contains the given element.
-     * 
-     * @param enumeration
-     *            the Enumeration to check
-     * @param element
-     *            the element to look for
+     *
+     * @param enumeration the Enumeration to check
+     * @param element     the element to look for
      * @return {@code true} if found, {@code false} else
      */
     public static boolean contains(Enumeration<?> enumeration, Object element) {
@@ -199,11 +198,9 @@ public abstract class CollectionUtils2 extends CollectionUtils {
      * <p>
      * Enforces the given instance to be present, rather than returning
      * {@code true} for an equal element as well.
-     * 
-     * @param collection
-     *            the Collection to check
-     * @param element
-     *            the element to look for
+     *
+     * @param collection the Collection to check
+     * @param element    the element to look for
      * @return {@code true} if found, {@code false} else
      */
     public static boolean containsInstance(Collection<?> collection, Object element) {
@@ -222,16 +219,14 @@ public abstract class CollectionUtils2 extends CollectionUtils {
      * '{@code source}'. If no element in '{@code candidates}' is present in
      * '{@code source}' returns {@code null}. Iteration order is
      * {@link Collection} implementation specific.
-     * 
-     * @param source
-     *            the source Collection
-     * @param candidates
-     *            the candidates to search for
+     *
+     * @param source     the source Collection
+     * @param candidates the candidates to search for
      * @return the first present object, or {@code null} if not found
      */
     @SuppressWarnings("unchecked")
     public static <E> E findFirstMatch(Collection<?> source, Collection<E> candidates) {
-        if (isEmpty(source) || isEmpty(candidates)) {
+        if (CollectionUtils.isEmpty(source) || CollectionUtils.isEmpty(candidates)) {
             return null;
         }
         for (Object candidate : candidates) {
@@ -244,17 +239,15 @@ public abstract class CollectionUtils2 extends CollectionUtils {
 
     /**
      * Find a single value of the given type in the given Collection.
-     * 
-     * @param collection
-     *            the Collection to search
-     * @param type
-     *            the type to look for
+     *
+     * @param collection the Collection to search
+     * @param type       the type to look for
      * @return a value of the given type found if there is a clear match, or
-     *         {@code null} if none or more than one such value found
+     * {@code null} if none or more than one such value found
      */
     @SuppressWarnings("unchecked")
     public static <T> T findValueOfType(Collection<?> collection, Class<T> type) {
-        if (isEmpty(collection)) {
+        if (CollectionUtils.isEmpty(collection)) {
             return null;
         }
         T value = null;
@@ -274,16 +267,14 @@ public abstract class CollectionUtils2 extends CollectionUtils {
      * Find a single value of one of the given types in the given Collection:
      * searching the Collection for a value of the first type, then searching
      * for a value of the second type, etc.
-     * 
-     * @param collection
-     *            the collection to search
-     * @param types
-     *            the types to look for, in prioritized order
+     *
+     * @param collection the collection to search
+     * @param types      the types to look for, in prioritized order
      * @return a value of one of the given types found if there is a clear
-     *         match, or {@code null} if none or more than one such value found
+     * match, or {@code null} if none or more than one such value found
      */
     public static Object findValueOfType(Collection<?> collection, Class<?>[] types) {
-        if (isEmpty(collection) || ObjectUtils2.isEmpty(types)) {
+        if (CollectionUtils.isEmpty(collection) || ObjectUtils2.isEmpty(types)) {
             return null;
         }
         for (Class<?> type : types) {
@@ -298,14 +289,13 @@ public abstract class CollectionUtils2 extends CollectionUtils {
     /**
      * Determine whether the given Collection only contains a single unique
      * object.
-     * 
-     * @param collection
-     *            the Collection to check
+     *
+     * @param collection the Collection to check
      * @return {@code true} if the collection contains a single reference or
-     *         multiple references to the same instance, {@code false} else
+     * multiple references to the same instance, {@code false} else
      */
     public static boolean hasUniqueObject(Collection<?> collection) {
-        if (isEmpty(collection)) {
+        if (CollectionUtils.isEmpty(collection)) {
             return false;
         }
         boolean hasCandidate = false;
@@ -323,14 +313,13 @@ public abstract class CollectionUtils2 extends CollectionUtils {
 
     /**
      * Find the common element type of the given Collection, if any.
-     * 
-     * @param collection
-     *            the Collection to check
+     *
+     * @param collection the Collection to check
      * @return the common element type, or {@code null} if no clear common type
-     *         has been found (or the collection was empty)
+     * has been found (or the collection was empty)
      */
     public static Class<?> findCommonElementType(Collection<?> collection) {
-        if (isEmpty(collection)) {
+        if (CollectionUtils.isEmpty(collection)) {
             return null;
         }
         Class<?> candidate = null;
@@ -362,9 +351,8 @@ public abstract class CollectionUtils2 extends CollectionUtils {
 
     /**
      * Adapt a {@code Map<K, List<V>>} to an {@code MultiValueMap<K, V>}.
-     * 
-     * @param map
-     *            the original map
+     *
+     * @param map the original map
      * @return the multi-value map
      * @since 3.1
      */
@@ -374,9 +362,8 @@ public abstract class CollectionUtils2 extends CollectionUtils {
 
     /**
      * Return an unmodifiable view of the specified multi-value map.
-     * 
-     * @param map
-     *            the map for which an unmodifiable view is to be returned.
+     *
+     * @param map the map for which an unmodifiable view is to be returned.
      * @return an unmodifiable view of the specified multi-value map.
      * @since 3.1
      */
@@ -395,7 +382,6 @@ public abstract class CollectionUtils2 extends CollectionUtils {
     /**
      * Adapts a Map to the MultiValueMap contract.
      */
-    @SuppressWarnings("serial")
     private static class MultiValueMapAdapter<K, V> implements MultiValueMap<K, V>, Serializable {
 
         private final Map<K, List<V>> map;
@@ -535,19 +521,13 @@ public abstract class CollectionUtils2 extends CollectionUtils {
 
     /**
      * Is empty array.
-     * 
-     * @param collection
-     * @return
      */
     public static <T> boolean isEmptyArray(T[] array) {
-        return isNull(array) || array.length <= 0;
+        return isNull(array) || array.length == 0;
     }
 
     /**
      * Safe collection list.
-     * 
-     * @param collection
-     * @return
      */
     @SuppressWarnings("unchecked")
     public static <T> T[] safeArray(Class<T> componentType, T... array) {
@@ -557,26 +537,21 @@ public abstract class CollectionUtils2 extends CollectionUtils {
     /**
      * Ensure that the default is at least an ArrayList instance (when the
      * parameter is empty)
-     * 
-     * @param array
-     * @return
      */
     public static <T> List<T> safeArrayToList(T[] array) {
         if (isNull(array)) {
             return new ArrayList<>(2);
         }
         List<T> list = new ArrayList<>(array.length);
-        for (T t : array)
+        for (T t : array) {
             list.add(t);
+        }
         return list;
     }
 
     /**
      * Ensure that the default is at least an ArrayList instance (when the
      * parameter is empty)
-     * 
-     * @param array
-     * @return
      */
     public static <T> Set<T> safeArrayToSet(T[] array) {
         return isNull(array) ? new LinkedHashSet<>(2) : new LinkedHashSet<>(asList(array));
@@ -584,40 +559,27 @@ public abstract class CollectionUtils2 extends CollectionUtils {
 
     /**
      * Safe enumeration to list.
-     * 
-     * @param enum
-     * @return
      */
-    @SuppressWarnings("unchecked")
     public static <T> List<T> safeEnumerationToList(Enumeration<T> enumeration) {
         return isNull(enumeration) ? emptyList() : EnumerationUtils.toList(enumeration);
     }
 
     /**
      * Safe collection list.
-     * 
-     * @param list
-     * @return
      */
     public static <T> List<T> safeList(List<T> list) {
-        return isEmpty(list) ? emptyList() : list;
+        return CollectionUtils.isEmpty(list) ? emptyList() : list;
     }
 
     /**
      * Safe collection list.
-     * 
-     * @param list
-     * @return
      */
     public static <T> List<T> safeList(Collection<T> list) {
-        return isEmpty(list) ? emptyList() : list.stream().collect(toList());
+        return CollectionUtils.isEmpty(list) ? emptyList() : list.stream().collect(toList());
     }
 
     /**
      * Safe array to list.
-     * 
-     * @param array
-     * @return
      */
     public static <T> List<T> safeToList(Class<T> componentType, T[] array) {
         return safeArrayToList(safeArray(componentType, array));
@@ -625,19 +587,13 @@ public abstract class CollectionUtils2 extends CollectionUtils {
 
     /**
      * Safe collection set.
-     * 
-     * @param set
-     * @return
      */
     public static <T> Set<T> safeSet(Set<T> set) {
-        return isEmpty(set) ? emptySet() : set;
+        return CollectionUtils.isEmpty(set) ? emptySet() : set;
     }
 
     /**
      * Safe collection map.
-     * 
-     * @param map
-     * @return
      */
     public static <K, V> Map<K, V> safeMap(Map<K, V> map) {
         return CollectionUtils2.isEmpty(map) ? emptyMap() : map;
@@ -646,75 +602,54 @@ public abstract class CollectionUtils2 extends CollectionUtils {
     /**
      * Ensure that the default is at least an ArrayList instance (when the
      * parameter is empty)
-     * 
-     * @param list
-     * @return
      */
     public static <T> List<T> ensureList(List<T> list) {
-        return isEmpty(list) ? new ArrayList<T>() : list;
+        return CollectionUtils.isEmpty(list) ? new ArrayList<T>() : list;
     }
 
     /**
      * Ensure that the default is at least an fallback list instance (when the
      * parameter is empty)
-     * 
-     * @param list
-     * @param fallback
-     * @return
      */
     public static <T> List<T> ensureList(List<T> list, List<T> fallback) {
-        return isEmpty(list) ? fallback : list;
+        return CollectionUtils.isEmpty(list) ? fallback : list;
     }
 
     /**
      * Ensure that the default is at least an HashSet instance (when the
      * parameter is empty)
-     * 
-     * @param set
-     * @return
      */
     public static <T> Set<T> ensureSet(Set<T> set) {
-        return isEmpty(set) ? new HashSet<T>() : set;
+        return CollectionUtils.isEmpty(set) ? new HashSet<T>() : set;
     }
 
     /**
      * Ensure that the default is at least an fallback set instance (when the
      * parameter is empty)
-     * 
-     * @param set
-     * @param fallback
-     * @return
      */
     public static <T> Set<T> ensureSet(Set<T> set, Set<T> fallback) {
-        return isEmpty(set) ? fallback : set;
+        return CollectionUtils.isEmpty(set) ? fallback : set;
     }
 
     /**
      * Ensure that the default is at least an HashMap instance (when the
      * parameter is empty)
-     * 
-     * @param map
-     * @return
      */
     public static <K, V> Map<K, V> ensureMap(Map<K, V> map) {
-        return isEmpty(map) ? new HashMap<>() : map;
+        return isNull(map) ? new HashMap<>() : map;
     }
 
     /**
      * Ensure that the default is at least an fallback map instance (when the
      * parameter is empty)
-     * 
-     * @param map
-     * @param fallback
-     * @return
      */
     public static <K, V> Map<K, V> ensureMap(Map<K, V> map, Map<K, V> fallback) {
-        return isEmpty(map) ? fallback : map;
+        return isNull(map) ? fallback : map;
     }
 
     /**
      * Remove duplicate collection elements.
-     * 
+     *
      * @param collection
      * @return
      */
@@ -727,10 +662,6 @@ public abstract class CollectionUtils2 extends CollectionUtils {
 
     /**
      * Extract iterable element by iterations(index).
-     * 
-     * @param iter
-     * @param defaultValue
-     * @return
      */
     @Nullable
     public static <T> T extractFirst(@Nullable Iterable<T> iter) {
@@ -739,7 +670,7 @@ public abstract class CollectionUtils2 extends CollectionUtils {
 
     /**
      * Extract iterable element by iterations(index).
-     * 
+     *
      * @param iter
      * @param defaultValue
      * @return
@@ -751,13 +682,10 @@ public abstract class CollectionUtils2 extends CollectionUtils {
 
     /**
      * Extract iterable element by iterations(index).
-     * 
-     * @param iter
-     *            Target collection iterable
-     * @param byIndex
-     *            The element to be extracted belongs to that iteration
-     * @param defaultValue
-     *            Default value.
+     *
+     * @param iter         Target collection iterable
+     * @param byIndex      The element to be extracted belongs to that iteration
+     * @param defaultValue Default value.
      * @return
      */
     @Nullable
@@ -781,7 +709,7 @@ public abstract class CollectionUtils2 extends CollectionUtils {
 
     /**
      * Move the first matching element to the first position.
-     * 
+     *
      * @return
      */
     @Nullable

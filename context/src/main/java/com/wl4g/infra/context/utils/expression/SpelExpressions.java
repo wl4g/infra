@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.wl4g.infra.context.utils.expression;
 
 import javax.annotation.Nullable;
+
 import org.springframework.context.expression.MapAccessor;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.EvaluationException;
@@ -43,153 +45,159 @@ import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 
 /**
  * {@link SpelExpressions}
- * 
+ *
  * @author James Wong &lt;jameswong1376@gmail.com&gt;
  * @version 2020-09-15
- * @since v2.0.0
  * @see
+ * @since v2.0.0
  */
 public abstract class SpelExpressions {
 
-	/** Class load of package prefixs. */
-	private List<String> knownPackagePrefixes = new ArrayList<>(4);
+    /**
+     * Class load of package prefixs.
+     */
+    private final List<String> knownPackagePrefixes = new ArrayList<>(4);
 
-	private SpelExpressions() {
-	}
+    private SpelExpressions() {
+    }
 
-	/**
-	 * New create {@link SpelExpressions}
-	 * 
-	 * @param classes
-	 * @return
-	 */
-	public static SpelExpressions create(Class<?>... classes) {
-		SpelExpressions instance = new SpelExpressions() {
-		};
-		if (!isEmptyArray(classes)) {
-			for (Class<?> cls : classes) {
-				/**
-				 * @see {@link org.springframework.expression.spel.support.StandardTypeLocator#knownPackagePrefixes}
-				 */
-				String packagePrefix = cls.getName();
-				// inner class for example:
-				// com.mycompany.myproject.bean.User$WorkInfo
-				packagePrefix = packagePrefix.substring(0, packagePrefix.lastIndexOf("."));
-				instance.knownPackagePrefixes.add(packagePrefix);
-			}
-		}
-		return instance;
-	}
+    /**
+     * New create {@link SpelExpressions}
+     *
+     * @param classes
+     * @return
+     */
+    public static SpelExpressions create(Class<?>... classes) {
+        SpelExpressions instance = new SpelExpressions() {
+        };
+        if (!isEmptyArray(classes)) {
+            for (Class<?> cls : classes) {
+                /*
+                 * {@link org.springframework.expression.spel.support.StandardTypeLocator#knownPackagePrefixes}
+                 */
+                String packagePrefix = cls.getName();
+                // inner class for example:
+                // com.mycompany.myproject.bean.User$WorkInfo
+                packagePrefix = packagePrefix.substring(0, packagePrefix.lastIndexOf("."));
+                instance.knownPackagePrefixes.add(packagePrefix);
+            }
+        }
+        return instance;
+    }
 
-	/**
-	 * New create {@link SpelExpressions}
-	 * 
-	 * @param packagePrefixs
-	 * @return
-	 */
-	public static SpelExpressions createWithPackages(String... packagePrefixs) {
-		SpelExpressions instance = new SpelExpressions() {
-		};
-		if (!isEmptyArray(packagePrefixs)) {
-			for (String prefix : packagePrefixs) {
-				/**
-				 * @see {@link org.springframework.expression.spel.support.StandardTypeLocator#knownPackagePrefixes}
-				 */
-				instance.knownPackagePrefixes.add(prefix);
-			}
-		}
-		return instance;
-	}
+    /**
+     * New create {@link SpelExpressions}
+     *
+     * @param packagePrefixs
+     * @return
+     */
+    public static SpelExpressions createWithPackages(String... packagePrefixs) {
+        SpelExpressions instance = new SpelExpressions() {
+        };
+        if (!isEmptyArray(packagePrefixs)) {
+            for (String prefix : packagePrefixs) {
+                /*
+                 * {@link org.springframework.expression.spel.support.StandardTypeLocator#knownPackagePrefixes}
+                 */
+                instance.knownPackagePrefixes.add(prefix);
+            }
+        }
+        return instance;
+    }
 
-	/**
-	 * Resolving spring expression to real value.
-	 * 
-	 * @param expression
-	 * @return
-	 */
-	public <T> T resolve(@NotBlank String expression) throws EvaluationException {
-		hasTextOf(expression, "expression");
-		return resolve(expression, null);
-	}
+    /**
+     * Resolving spring expression to real value.
+     *
+     * @param expression
+     * @return
+     */
+    public <T> T resolve(@NotBlank String expression) throws EvaluationException {
+        hasTextOf(expression, "expression");
+        return resolve(expression, null);
+    }
 
-	/**
-	 * Resolving spring expression to real value.
-	 * 
-	 * @param expression
-	 * @param model
-	 * @return
-	 */
-	public <T> T resolve(@NotBlank String expression, @Nullable Object model) throws EvaluationException {
-		return resolve(expression, model, null);
-	}
+    /**
+     * Resolving spring expression to real value.
+     *
+     * @param expression
+     * @param model
+     * @return
+     */
+    public <T> T resolve(@NotBlank String expression, @Nullable Object model) throws EvaluationException {
+        return resolve(expression, model, null);
+    }
 
-	/**
-	 * Resolving spring expression to real value.
-	 * 
-	 * @param expression
-	 * @param model
-	 * @return
-	 */
-	@SuppressWarnings({ "unchecked" })
-	public <T> T resolve(@NotBlank String expression, @Nullable Object model,
-			@Nullable CallbackFunction<EvaluationContext> customizer) throws EvaluationException {
-		hasTextOf(expression, "expression");
+    /**
+     * Resolving spring expression to real value.
+     *
+     * @param expression
+     * @param model
+     * @return
+     */
+    @SuppressWarnings({"unchecked"})
+    public <T> T resolve(@NotBlank String expression, @Nullable Object model,
+                         @Nullable CallbackFunction<EvaluationContext> customizer) throws EvaluationException {
+        hasTextOf(expression, "expression");
 
-		// Create expression parser.
-		StandardEvaluationContext context = new StandardEvaluationContext(model);
-		StandardTypeLocator locator = new StandardTypeLocator(ClassUtils.getDefaultClassLoader());
-		safeList(knownPackagePrefixes).forEach(p -> locator.registerImport(p));
-		context.setTypeLocator(locator);
-		context.setPropertyAccessors(defaultPropertyAccessors);
+        // Create expression parser.
+        StandardEvaluationContext context = new StandardEvaluationContext(model);
+        StandardTypeLocator locator = new StandardTypeLocator(ClassUtils.getDefaultClassLoader());
+        safeList(knownPackagePrefixes).forEach(p -> locator.registerImport(p));
+        context.setTypeLocator(locator);
+        context.setPropertyAccessors(defaultPropertyAccessors);
 
-		// Customize evaluation context.
-		if (nonNull(customizer)) {
-			try {
-				customizer.process(context);
-			} catch (Exception e) {
-				throw new IllegalStateException(e);
-			}
-		}
+        // Customize evaluation context.
+        if (nonNull(customizer)) {
+            try {
+                customizer.process(context);
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
+            }
+        }
 
-		return (T) defaultParser.parseExpression(expression, ParserContext.TEMPLATE_EXPRESSION).getValue(context);
-	}
+        return (T) defaultParser.parseExpression(expression, ParserContext.TEMPLATE_EXPRESSION).getValue(context);
+    }
 
-	/**
-	 * Check if it can be a spel template expression. refer:
-	 * {@link ParserContext#TEMPLATE_EXPRESSION}
-	 * 
-	 * @param expectExpr
-	 * @return
-	 */
-	public static boolean hasSpelTemplateExpr(@NotBlank String expectExpr) {
-		int startIndex = expectExpr.indexOf("#{");
-		int endIndex = expectExpr.lastIndexOf("}");
-		return startIndex >= 0 && startIndex < endIndex;
-	}
+    /**
+     * Check if it can be a spel template expression. refer:
+     * {@link ParserContext#TEMPLATE_EXPRESSION}
+     *
+     * @param expectExpr
+     * @return
+     */
+    public static boolean hasSpelTemplateExpr(@NotBlank String expectExpr) {
+        int startIndex = expectExpr.indexOf("#{");
+        int endIndex = expectExpr.lastIndexOf("}");
+        return startIndex >= 0 && startIndex < endIndex;
+    }
 
-	/**
-	 * Wrapper as spel template expression. refer:
-	 * {@link ParserContext#TEMPLATE_EXPRESSION}
-	 * 
-	 * @param maybeExpr
-	 * @return
-	 */
-	public static String wrapExprSpelTemplate(@NotBlank String maybeExpr) {
-		return hasSpelTemplateExpr(maybeExpr) ? maybeExpr : "#{".concat(maybeExpr).concat("}");
-	}
+    /**
+     * Wrapper as spel template expression. refer:
+     * {@link ParserContext#TEMPLATE_EXPRESSION}
+     *
+     * @param maybeExpr
+     * @return
+     */
+    public static String wrapExprSpelTemplate(@NotBlank String maybeExpr) {
+        return hasSpelTemplateExpr(maybeExpr) ? maybeExpr : "#{".concat(maybeExpr).concat("}");
+    }
 
-	/** {@link ExpressionParser} */
-	private static final ExpressionParser defaultParser = new SpelExpressionParser();
+    /**
+     * {@link ExpressionParser}
+     */
+    private static final ExpressionParser defaultParser = new SpelExpressionParser();
 
-	/** {@link PropertyAccessor} */
-	@SuppressWarnings("serial")
-	private static final List<PropertyAccessor> defaultPropertyAccessors = new ArrayList<PropertyAccessor>() {
-		{
-			// supported for map
-			add(new MapAccessor());
-			// supported for bean(default)
-			add(new ReflectivePropertyAccessor());
-		}
-	};
+    /**
+     * {@link PropertyAccessor}
+     */
+    @SuppressWarnings("serial")
+    private static final List<PropertyAccessor> defaultPropertyAccessors = new ArrayList<PropertyAccessor>() {
+        {
+            // supported for map
+            add(new MapAccessor());
+            // supported for bean(default)
+            add(new ReflectivePropertyAccessor());
+        }
+    };
 
 }

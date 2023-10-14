@@ -21,7 +21,7 @@ import static com.wl4g.infra.common.web.rest.RespBase.RetCode.SYS_ERR;
 import static java.lang.String.format;
 import static java.util.Collections.sort;
 import static java.util.Objects.nonNull;
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 
