@@ -13,24 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.wl4g.infra.common.serialize;
-
-import static com.wl4g.infra.common.serialize.JacksonUtils.deepClone;
-import static com.wl4g.infra.common.serialize.JacksonUtils.parseArrayMapString;
-import static com.wl4g.infra.common.serialize.JacksonUtils.parseArrayString;
-import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
-import static com.wl4g.infra.common.serialize.JacksonUtils.parseToNode;
-import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
-import static java.lang.System.out;
-import static java.util.Collections.singletonMap;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.Test;
-import org.junit.jupiter.api.Assertions;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -41,7 +25,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wl4g.infra.common.serialize.JacksonUtils.DefaultDeserialzePropertyTransformer;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -49,6 +32,23 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static com.wl4g.infra.common.serialize.JacksonUtils.deepClone;
+import static com.wl4g.infra.common.serialize.JacksonUtils.parseArrayMapString;
+import static com.wl4g.infra.common.serialize.JacksonUtils.parseArrayString;
+import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
+import static com.wl4g.infra.common.serialize.JacksonUtils.parseToNode;
+import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
+import static java.lang.System.out;
+import static java.util.Collections.singletonMap;
+import static java.util.Objects.requireNonNull;
 
 public class JacksonUtilsTests {
 
@@ -111,15 +111,25 @@ public class JacksonUtilsTests {
     @Test
     public void testJSONView_with_custom_include_exclude_properties() {
         TestUserInfo user = new TestUserInfo(1313466574534868992L, 36, "james", "wong", singletonMap("foo", "bar"));
-        String json1 = toJSONString(IgnoreFieldView.class, user, false, null, null);
+
+        String json1 = toJSONString(JsonView1.class, user, false, null, null);
         System.out.println("json1 : " + json1);
         assert !json1.contains("\"id\"");
+        assert json1.contains("\"firstName\"");
+        assert json1.contains("\"lastName\"");
+        assert json1.contains("\"age\"");
+        assert json1.contains("\"attributes\"");
 
-        String json2 = toJSONString(AllView.class, user, false, null, null);
+        String json2 = toJSONString(JsonView2.class, user, false, null, null);
         System.out.println("json2 : " + json2);
-        final TestUserInfo user1 = parseJSON(IgnoreFieldView.class, json2, TestUserInfo.class);
-        System.out.println(user1);
-        assert user1.getId() == null;
+        assert json2.contains("\"id\"");
+        assert !json2.contains("\"firstName\"");
+        assert json2.contains("\"lastName\"");
+        assert json2.contains("\"age\"");
+        assert json2.contains("\"attributes\"");
+
+        final TestUserInfo user1 = parseJSON(JsonView1.class, json2, TestUserInfo.class);
+        Assertions.assertNotNull(requireNonNull(user1).getId());
     }
 
     @Getter
@@ -128,20 +138,20 @@ public class JacksonUtilsTests {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class TestUserInfo {
-        private @JsonView({ AllView.class }) Long id;
+        private @JsonView({JsonView2.class}) Long id;
         private Integer age;
-        private @JsonView({ IgnoreFieldView.class }) String firstName;
-        private @JsonView({ AllView.class, IgnoreFieldView.class }) String lastName;
+        private @JsonView({JsonView1.class}) String firstName;
+        private @JsonView({JsonView2.class, JsonView1.class}) String lastName;
         private Map<String, String> attributes = new HashMap<>();
     }
 
-    public static interface AllView {
+    public interface JsonView2 {
     }
 
-    public static interface IgnoreFieldView {
+    public interface JsonView1 {
     }
 
-    public static interface TestUserBeanParent {
+    public interface TestUserBeanParent {
     }
 
     @Getter
@@ -282,9 +292,9 @@ public class JacksonUtilsTests {
 
     // 1.多态参见:https://swagger.io/docs/specification/data-models/inheritance-and-polymorphism/
     // 2.对于swagger3注解,父类必须是抽象的，否则swagger3页面请求参数schemas展开后会以父类名重复展示3个.
-    @Schema(oneOf = { TestCar.class, TestBicycle.class }, discriminatorProperty = "@type")
+    @Schema(oneOf = {TestCar.class, TestBicycle.class}, discriminatorProperty = "@type")
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type", visible = true)
-    @JsonSubTypes({ @Type(value = TestCar.class, name = "car"), @Type(value = TestBicycle.class, name = "bicycle") })
+    @JsonSubTypes({@Type(value = TestCar.class, name = "car"), @Type(value = TestBicycle.class, name = "bicycle")})
     @Getter
     @Setter
     @SuperBuilder

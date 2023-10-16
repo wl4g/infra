@@ -68,7 +68,7 @@
         <javax-inject.version>1</javax-inject.version>
         <javax-mail.version>1.6.2</javax-mail.version>
         <javax-servlet-api.version>4.0.1</javax-servlet-api.version>
-        <jsr305.version>3.0.1</jsr305.version>
+        <jsr305.version>3.0.2</jsr305.version>
         <hibernate-validator.version>6.0.16.Final</hibernate-validator.version>
         <validation-api.version>2.0.1.Final</validation-api.version>
         <javassist.version>3.20.0-GA</javassist.version>
@@ -89,16 +89,16 @@
         <commons-lang3.version>3.5</commons-lang3.version>
         <commons-collection4.version>4.4</commons-collection4.version>
         <commons-math3.version>3.6.1</commons-math3.version>
-        <commons-beanutils.version>1.9.3</commons-beanutils.version>
+        <commons-beanutils.version>1.9.4</commons-beanutils.version>
         <commons-dbutils.version>1.8</commons-dbutils.version>
         <commons-pool2.version>2.11.1</commons-pool2.version>
         <commons-codec.version>1.10</commons-codec.version>
         <commons-cli.version>1.4</commons-cli.version>
-        <commons-io.version>2.6</commons-io.version>
-        <commons-fileupload.version>1.4</commons-fileupload.version>
+        <commons-io.version>2.14.0</commons-io.version>
+        <commons-fileupload.version>1.5</commons-fileupload.version>
         <commons-csv.version>1.4</commons-csv.version>
         <commons-exec.version>1.3</commons-exec.version>
-        <commons-compress.version>1.20</commons-compress.version>
+        <commons-compress.version>1.24.0</commons-compress.version>
         <joda-time.version>2.10.6</joda-time.version>
         <lombok.version>1.18.24</lombok.version>
         <typesafe-config.version>1.4.0</typesafe-config.version>
@@ -115,15 +115,15 @@
         <httpcore.version>4.4.9</httpcore.version>
         <okhttp.version>4.10.0</okhttp.version>
         <!-- compression -->
-        <snappy.version>1.1.7.3</snappy.version>
+        <snappy.version>1.1.10.5</snappy.version>
         <!-- excel/word -->
         <easyexcel.version>2.2.6</easyexcel.version>
         <!-- task/scheduler -->
-        <quartz.version>2.2.2</quartz.version>
+        <quartz.version>2.3.2</quartz.version>
         <!-- serialization -->
         <!-- Note: Must be consistent with springboot -->
         <!-- <jackson.version>2.10.2</jackson.version> -->
-        <jackson.version>2.13.1</jackson.version>
+        <jackson.version>2.15.3</jackson.version>
         <jaxb-xml.version>2.3.3</jaxb-xml.version>
         <!-- <fastjson.version>1.2.56</fastjson.version> -->
         <protobuf.version>3.8.0</protobuf.version>
@@ -161,7 +161,7 @@
         <!-- Arthas -->
         <arthas.version>3.6.6</arthas.version>
         <!-- SPOTBUGS -->
-        <spotbugs.version>4.1.2</spotbugs.version>
+        <spotbugs.version>4.8.0</spotbugs.version>
         <!-- Reflections -->
         <reflections.version>0.10.2</reflections.version>
         <!-- Expression -->
