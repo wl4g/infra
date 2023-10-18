@@ -113,7 +113,6 @@ public abstract class GenericITContainerManager implements Closeable {
     private static String dockerDaemonVmIp;
 
     // IT runtime properties definitions.
-    private final AtomicBoolean initialized = new AtomicBoolean(false);
     // see:https://java.testcontainers.org/modules/kafka/#example
     private final Map<String, ITGenericContainerWrapper> mwContainers = new ConcurrentHashMap<>();
     private CountDownLatch mwContainersStartedLatch;
@@ -314,7 +313,7 @@ public abstract class GenericITContainerManager implements Closeable {
     private void startForMgmtContainers() throws Exception {
         // ---------------- Startup MGMT Containers(e.g: kafka-ui/mongodb-express) -----------------
 
-        if (!mwContainers.values().stream().anyMatch(c ->
+        if (mwContainers.values().stream().noneMatch(c ->
                 c.getContainer().getDockerImageName().toUpperCase().contains("KAFKA"))) {
             log.warn("Skip start for mgmt containers because not found IT kafka containers.");
             return;
