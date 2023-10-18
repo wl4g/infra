@@ -109,8 +109,9 @@ public abstract class GenericITContainerManager implements Closeable {
     public static final int IT_DATA_MOCKERS_TIMEOUT = parseInt(getenv().getOrDefault("IT_DATA_MOCKERS_TIMEOUT", "300"));
 
     // IT docker daemon properties definitions.
-    private static String localHostIp;
+    private static final int DOCKER_DAEMON_PORT = parseInt(getenv().getOrDefault("IT_DOCKER_DAEMON_PORT", "2375"));
     private static String dockerDaemonVmIp;
+    private static String localHostIp;
 
     // IT runtime properties definitions.
     // see:https://java.testcontainers.org/modules/kafka/#example
@@ -210,7 +211,7 @@ public abstract class GenericITContainerManager implements Closeable {
             TestcontainersConfiguration.getInstance().updateGlobalConfig("docker.client.strategy",
                     EnvironmentAndSystemPropertyClientProviderStrategy.class.getName());
             TestcontainersConfiguration.getInstance()
-                    .updateGlobalConfig("docker.host", format("tcp://%s:2375", itDockerHost));
+                    .updateGlobalConfig("docker.host", format("tcp://%s:%s", itDockerHost, DOCKER_DAEMON_PORT));
         }
     }
 

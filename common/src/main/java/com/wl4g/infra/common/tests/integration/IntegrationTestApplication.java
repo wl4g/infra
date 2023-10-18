@@ -39,6 +39,7 @@ import static java.util.Objects.requireNonNull;
 @Slf4j
 @Getter
 public class IntegrationTestApplication {
+    public static final String IT_ASSERTION_APPLICATION_CLASS_KEY = "IT_ASSERTION_APPLICATION_CLASS";
     private static volatile IntegrationTestApplication INSTANCE;
     private ConfigurableApplicationContext context;
     private Runnable startedListener;
@@ -53,7 +54,7 @@ public class IntegrationTestApplication {
             synchronized (IntegrationTestApplication.class) {
                 if (isNull(INSTANCE)) {
                     final String itApplicationClass = System.getenv()
-                            .getOrDefault("IT_ASSERTION_APPLICATION_CLASS",
+                            .getOrDefault(IT_ASSERTION_APPLICATION_CLASS_KEY,
                                     IntegrationTestApplication.class.getName());
                     try {
                         INSTANCE = (IntegrationTestApplication) ClassUtils2.forName(itApplicationClass,
