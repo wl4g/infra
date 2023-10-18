@@ -78,6 +78,7 @@
         <mybatis-springboot.version>2.2.2</mybatis-springboot.version>
         <!-- logging. -->
         <slf4j-api.version>1.7.25</slf4j-api.version>
+        <logback.version>1.2.12</logback.version>
         <!-- runtime -->
         <swagger.version>1.6.2</swagger.version>
         <swagger-v3.version>2.2.2</swagger-v3.version>
@@ -141,8 +142,6 @@
         <flexmark-all.version>0.62.2</flexmark-all.version>
         <!-- AI/NLP -->
         <belerweb.pinyin4j.version>2.5.1</belerweb.pinyin4j.version>
-        <!-- testing -->
-        <junit.version>4.13.1</junit.version>
         <!-- Seata -->
         <druid-spring-boot-starter.version>1.1.10</druid-spring-boot-starter.version>
         <seata.version>1.4.0</seata.version>
@@ -166,6 +165,17 @@
         <reflections.version>0.10.2</reflections.version>
         <!-- Expression -->
         <aviator.version>5.3.1</aviator.version>
+        <!-- Kafka -->
+        <kafka.version>3.6.0</kafka.version>
+        <!-- RocketMQ -->
+        <rocketmq.version>4.9.7</rocketmq.version>
+        <!-- Spring Boot -->
+        <spring-boot.version>2.7.13</spring-boot.version>
+        <!-- Testing -->
+        <junit.version>4.13.2</junit.version>
+        <junit-jupiter.version>5.8.1</junit-jupiter.version>
+        <testcontainers.version>1.18.3</testcontainers.version>
+        <docker-java.version>3.2.11</docker-java.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -333,7 +343,7 @@
                 <artifactId>jsr305</artifactId>
                 <version>${jsr305.version}</version>
             </dependency>
-            <!-- Validation, Note: that the use of '$NO-MVN-MAN-VER$' is valid for the current dependency. When this project is referenced externally, 
+            <!-- Validation, Note: that the use of '$NO-MVN-MAN-VER$' is valid for the current dependency. When this project is referenced externally,
 				the indirect dependency will fail, possibly leading to dependency incompatible versions. -->
             <dependency>
                 <groupId>org.hibernate</groupId>
@@ -367,11 +377,21 @@
                 <artifactId>mybatis-spring-boot-starter</artifactId>
                 <version>${mybatis-springboot.version}</version>
             </dependency>
-            <!-- Logging's. -->
+            <!-- Logging. -->
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>${slf4j-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
+                <version>${logback.version}</version>
             </dependency>
             <!-- Runtime. -->
             <dependency>
@@ -894,13 +914,6 @@
                 <artifactId>pinyin4j</artifactId>
                 <version>${belerweb.pinyin4j.version}</version>
             </dependency>
-            <!-- Testing's. -->
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>${junit.version}</version>
-                <scope>test</scope>
-            </dependency>
             <!-- Seata -->
             <dependency>
                 <groupId>com.alibaba</groupId>
@@ -1154,6 +1167,75 @@
                 <groupId>com.taobao.arthas</groupId>
                 <artifactId>arthas-packaging</artifactId>
                 <version>${arthas.version}</version>
+            </dependency>
+            <!-- Kafka. -->
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka-clients</artifactId>
+                <version>${kafka.version}</version>
+            </dependency>
+            <!-- RocketMQ. -->
+            <dependency>
+                <groupId>org.apache.rocketmq</groupId>
+                <artifactId>rocketmq-client</artifactId>
+                <version>${rocketmq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.rocketmq</groupId>
+                <artifactId>rocketmq-tools</artifactId>
+                <version>${rocketmq.version}</version>
+            </dependency>
+            <!-- Spring Boot. -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-autoconfigure</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+            <!-- Testing. -->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>${junit-jupiter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-api</artifactId>
+                <version>${junit-jupiter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
+                <version>${junit-jupiter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.vintage</groupId>
+                <artifactId>junit-vintage-engine</artifactId>
+                <version>${junit-jupiter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers</artifactId>
+                <version>${testcontainers.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>${testcontainers.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>kafka</artifactId>
+                <version>${testcontainers.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.docker-java</groupId>
+                <artifactId>docker-java-core</artifactId>
+                <version>${docker-java.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
