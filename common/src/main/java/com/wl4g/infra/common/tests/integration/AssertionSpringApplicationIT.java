@@ -20,6 +20,7 @@ import com.wl4g.infra.common.task.NamedThreadFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -28,6 +29,7 @@ import static java.lang.System.currentTimeMillis;
 import static java.lang.System.getenv;
 import static java.time.Duration.ofSeconds;
 import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -49,6 +51,13 @@ public abstract class AssertionSpringApplicationIT extends AnnotationOrderedIT {
 
     @SuppressWarnings("unused")
     public AssertionSpringApplicationIT() {
+        this.itApplication = IntegrationTestApplication.getInstance();
+    }
+
+    @SuppressWarnings("unused")
+    public AssertionSpringApplicationIT(@NotNull Class<? extends IntegrationTestApplication> itAppClass) {
+        requireNonNull(itAppClass, "itAppClass must not be null");
+        System.setProperty(IntegrationTestApplication.IT_ASSERTION_APPLICATION_CLASS_KEY, itAppClass.getName());
         this.itApplication = IntegrationTestApplication.getInstance();
     }
 
