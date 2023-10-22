@@ -21,19 +21,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 
 import static java.lang.Integer.parseInt;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.System.getenv;
 import static java.time.Duration.ofSeconds;
 import static java.util.Objects.nonNull;
-import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -53,12 +47,14 @@ public abstract class AssertionSpringApplicationIT extends AnnotationOrderedIT {
 
     private final IntegrationTestApplication itApplication;
 
-    public AssertionSpringApplicationIT(IntegrationTestApplication itApplication) {
-        this.itApplication = requireNonNull(itApplication, "itApplication");
+    @SuppressWarnings("unused")
+    public AssertionSpringApplicationIT() {
+        this.itApplication = IntegrationTestApplication.getInstance();
     }
 
+    @SuppressWarnings("unused")
     @Test
-    public void startITApplicationAndAssertionTasks() throws Exception {
+    public void startITApplicationAndAssertionTasks() {
         log.info("Do integration test application ...");
         //
         // MANUAL: Startup integration test spring application.

@@ -27,8 +27,13 @@ import org.springframework.context.annotation.Configuration;
 
 import javax.validation.constraints.NotNull;
 
+import static java.lang.System.getProperty;
+import static java.lang.System.getenv;
+import static java.util.Locale.US;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.replace;
 
 /**
  * The {@link IntegrationTestApplication}
@@ -38,26 +43,27 @@ import static java.util.Objects.requireNonNull;
  **/
 @Slf4j
 @Getter
-public class IntegrationTestApplication {
-    public static final String IT_ASSERTION_APPLICATION_CLASS_KEY = "IT_ASSERTION_APPLICATION_CLASS";
+public abstract class IntegrationTestApplication {
+    public static final String IT_ASSERTION_APPLICATION_CLASS_ENV = "IT_ASSERTION_APPLICATION_CLASS";
+    public static final String IT_ASSERTION_APPLICATION_CLASS_KEY = replace(IT_ASSERTION_APPLICATION_CLASS_ENV.toLowerCase(US), "_", ".");
     private static volatile IntegrationTestApplication INSTANCE;
     private ConfigurableApplicationContext context;
     private Runnable startedListener;
-
-    public void doMain(String[] args) {
-        log.info("Starting for Integration Test Application ...");
-        SpringApplication.run(getClass(), args);
-    }
 
     public static IntegrationTestApplication getInstance() {
         if (isNull(INSTANCE)) {
             synchronized (IntegrationTestApplication.class) {
                 if (isNull(INSTANCE)) {
-                    final String itApplicationClass = System.getenv()
-                            .getOrDefault(IT_ASSERTION_APPLICATION_CLASS_KEY,
-                                    IntegrationTestApplication.class.getName());
+                    String itAppClass = getenv(IT_ASSERTION_APPLICATION_CLASS_ENV);
+                    if (isBlank(itAppClass)) {
+                        itAppClass = getProperty(IT_ASSERTION_APPLICATION_CLASS_KEY);
+                    }
+                    if (isBlank(itAppClass)) {
+                        throw new IllegalStateException(String.format("Could not create integration test main class instance, please sets JVM property '%s' or environment '%s'",
+                                IT_ASSERTION_APPLICATION_CLASS_KEY, IT_ASSERTION_APPLICATION_CLASS_ENV));
+                    }
                     try {
-                        INSTANCE = (IntegrationTestApplication) ClassUtils2.forName(itApplicationClass,
+                        INSTANCE = (IntegrationTestApplication) ClassUtils2.forName(itAppClass,
                                         Thread.currentThread().getContextClassLoader())
                                 .getConstructor()
                                 .newInstance();
@@ -70,6 +76,11 @@ public class IntegrationTestApplication {
         return INSTANCE;
     }
 
+    public void doMain(String[] args) {
+        log.info("Starting for Integration Test Application ...");
+        SpringApplication.run(getClass(), args);
+    }
+
     public void exit() {
         SpringApplication.exit(context);
     }
@@ -78,6 +89,7 @@ public class IntegrationTestApplication {
         this.startedListener = requireNonNull(startedListener, "startedListener");
     }
 
+    @SuppressWarnings("unused")
     @Configuration
     static class IntegrationTestApplicationConfiguration {
         @Bean

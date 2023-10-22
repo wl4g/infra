@@ -54,6 +54,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 import java.io.Closeable;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -78,14 +79,9 @@ import static com.wl4g.infra.common.serialize.JacksonUtils.parseToNode;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
-import static java.lang.System.currentTimeMillis;
-import static java.lang.System.err;
-import static java.lang.System.getenv;
-import static java.lang.System.out;
+import static java.lang.System.*;
 import static java.util.Collections.singletonList;
-import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
-import static java.util.Objects.requireNonNull;
+import static java.util.Objects.*;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -251,7 +247,7 @@ public abstract class GenericITContainerManager implements Closeable {
     }
 
     @Override
-    public void close() {
+    public void close() throws IOException {
         close(false);
     }
 
