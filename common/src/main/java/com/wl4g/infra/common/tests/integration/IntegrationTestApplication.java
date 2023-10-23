@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,8 +45,8 @@ import static org.apache.commons.lang3.StringUtils.replace;
 @Slf4j
 @Getter
 public abstract class IntegrationTestApplication {
-    public static final String IT_ASSERTION_APPLICATION_CLASS_ENV = "IT_ASSERTION_APPLICATION_CLASS";
-    public static final String IT_ASSERTION_APPLICATION_CLASS_KEY = replace(IT_ASSERTION_APPLICATION_CLASS_ENV.toLowerCase(US), "_", ".");
+    public static final String IT_ASSERTION_APPLICATION_CLASS_KEY = "it.assertion.application.class";
+    public static final String IT_ASSERTION_APPLICATION_CLASS_ENV = replace(IT_ASSERTION_APPLICATION_CLASS_KEY.toLowerCase(US), ".", "_");
     private static volatile IntegrationTestApplication INSTANCE;
     private ConfigurableApplicationContext context;
     private Runnable startedListener;
@@ -91,6 +92,7 @@ public abstract class IntegrationTestApplication {
 
     @SuppressWarnings("unused")
     @Configuration
+    @ConditionalOnProperty(name = IT_ASSERTION_APPLICATION_CLASS_KEY)
     static class IntegrationTestApplicationConfiguration {
         @Bean
         public ApplicationRunner applicationRunner(ConfigurableApplicationContext context) {
