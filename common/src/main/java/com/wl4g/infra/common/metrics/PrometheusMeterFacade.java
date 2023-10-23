@@ -15,32 +15,9 @@
  */
 package com.wl4g.infra.common.metrics;
 
-import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
-import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static java.lang.String.format;
-import static java.lang.String.valueOf;
-import static java.util.Arrays.asList;
-import static java.util.Objects.isNull;
-
-import java.lang.reflect.Constructor;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
-
 import com.google.common.collect.Lists;
 import com.wl4g.infra.common.net.InetUtils;
-
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.DistributionSummary;
-import io.micrometer.core.instrument.Gauge;
-import io.micrometer.core.instrument.ImmutableTag;
-import io.micrometer.core.instrument.Meter;
-import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.Tags;
-import io.micrometer.core.instrument.Timer;
+import io.micrometer.core.instrument.*;
 import io.micrometer.core.instrument.distribution.DistributionStatisticConfig;
 import io.micrometer.core.instrument.distribution.HistogramSnapshot;
 import io.micrometer.prometheus.PrometheusCounter;
@@ -55,19 +32,37 @@ import lombok.AllArgsConstructor;
 import lombok.CustomLog;
 import lombok.Getter;
 
+import javax.annotation.Nullable;
+import java.lang.reflect.Constructor;
+import java.time.Duration;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
+
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static java.lang.String.format;
+import static java.lang.String.valueOf;
+import static java.util.Arrays.asList;
+import static java.util.Objects.isNull;
+
 /**
  * {@link PrometheusMeterFacade}, Tends to use Prometheus standards.
- * 
+ * <p>
  * Counter, Timer, Gauge, DistributionSummary, etc.
- * 
+ * <p>
  * {@link PrometheusMeterRegistry}
- * 
+ *
  * @author &lt;James Wong James Wong <jameswong1376@gmail.com>&gt;
  * @version 2021-11-16 v1.0.0
  * @since v1.0.0
  */
 @Getter
 @CustomLog
+@SuppressWarnings("unused")
 public class PrometheusMeterFacade {
     private final String serviceId;
     private final boolean secure;
@@ -78,7 +73,7 @@ public class PrometheusMeterFacade {
     private final LocalInstanceSpec localSpec;
 
     public PrometheusMeterFacade(PrometheusMeterRegistry meterRegistry, String serviceId, boolean secure, InetUtils inet,
-            int port) {
+                                 int port) {
         this.meterRegistry = notNullOf(meterRegistry, "meterRegistry");
         this.serviceId = hasTextOf(serviceId, "serviceId");
         this.secure = secure;
@@ -137,6 +132,12 @@ public class PrometheusMeterFacade {
 
     // --- Timer. ---
 
+    /**
+     * It is recommended to use {@link #timer(String, String, Duration[], String...)} because
+     * it generates data distributed by original buckets, which is more conducive to global analysis
+     * of multiple Pods metrics on the metrics server instead of letting the client (single pod calculation)
+     */
+    @Deprecated
     public Timer timer(String name, String help, double[] percentiles, String... tags) {
         try {
             return Timer.builder(name)
@@ -151,18 +152,34 @@ public class PrometheusMeterFacade {
         }
     }
 
+    /**
+     * io.micrometer first hard-codes added the default distribution bucket (which may be very unreasonable
+     * and does not conform to the actual situation), but allows custom settings of slos (service level objectives).
+     * The purpose of its design should be to prevent users from arbitrarily settings to ensure possible rationality.
+     * <p>
+     * see to {@link io.micrometer.core.instrument.distribution.PercentileHistogramBuckets#buckets(DistributionStatisticConfig)}
+     * and {@link io.micrometer.core.instrument.distribution.DistributionStatisticConfig#getHistogramBuckets(boolean)}
+     * </p>
+     */
+    public Timer timer(String name, String help, @Nullable Duration[] slos, String... tags) {
+        try {
+            return Timer.builder(name)
+                    .description(help)
+                    .tags(applyDefaultTags(tags))
+                    .publishPercentileHistogram()
+                    .serviceLevelObjectives(slos)
+                    .register(meterRegistry);
+        } catch (Throwable e) {
+            log.error(format("Unable to timer meter for metrics: '%s', help: '%s', tags: %s", name, help, asList(tags)), e);
+            return EMPTY_TIMER;
+        }
+    }
+
     // --- Summary. ---
 
     /**
      * Used default configuration refer to:
      * {@link DistributionStatisticConfig#DEFAULT}
-     * 
-     * @param name
-     * @param help
-     * @param scale
-     * @param slos
-     * @param tags
-     * @return
      */
     public DistributionSummary summary(String name, String help, double scale, double[] percentiles, String... tags) {
         return DistributionSummary.builder(name)
@@ -177,13 +194,6 @@ public class PrometheusMeterFacade {
     /**
      * Used default configuration refer to:
      * {@link DistributionStatisticConfig#DEFAULT}
-     * 
-     * @param name
-     * @param help
-     * @param scale
-     * @param slos
-     * @param tags
-     * @return
      */
     public DistributionSummary summarySlos(String name, String help, double scale, double[] slos, String... tags) {
         return DistributionSummary.builder(name)
@@ -250,15 +260,15 @@ public class PrometheusMeterFacade {
     //
 
     public static Counter newPrometheusCounter(Meter.Id id) {
-        return newConstructor(PrometheusCounter.class, new Object[] { id });
+        return newConstructor(PrometheusCounter.class, id);
     }
 
     public static Timer newPrometheusTimer(Meter.Id id) {
-        return newConstructor(PrometheusTimer.class, new Object[] { id });
+        return newConstructor(PrometheusTimer.class, id);
     }
 
     public static DistributionSummary newPrometheusDistributionSummary(Meter.Id id) {
-        return newConstructor(PrometheusDistributionSummary.class, new Object[] { id });
+        return newConstructor(PrometheusDistributionSummary.class, id);
     }
 
     @SuppressWarnings("unchecked")

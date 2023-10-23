@@ -19,12 +19,14 @@ package com.wl4g.infra.common.tests.integration;
 import ch.qos.logback.classic.Level;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.dockerjava.api.command.InspectContainerResponse;
+import com.google.common.annotations.VisibleForTesting;
 import com.wl4g.infra.common.cli.ProcessUtils;
 import com.wl4g.infra.common.net.InetUtils;
 import com.wl4g.infra.common.reflect.ReflectionUtils2;
 import com.wl4g.infra.common.tests.integration.mock.AbstractDataMocker;
 import com.wl4g.infra.common.tests.integration.testcontainers.RocketMQContainer;
 import lombok.Getter;
+import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -46,6 +48,7 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.dockerclient.EnvironmentAndSystemPropertyClientProviderStrategy;
 import org.testcontainers.utility.DockerImageName;
+import org.testcontainers.utility.ResourceReaper;
 import org.testcontainers.utility.TestcontainersConfiguration;
 
 import javax.validation.constraints.Min;
@@ -55,6 +58,7 @@ import javax.validation.constraints.Null;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -75,9 +79,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToList;
+import static com.wl4g.infra.common.lang.EnvironmentUtil.*;
+import static com.wl4g.infra.common.reflect.ReflectionUtils2.findFieldNullable;
+import static com.wl4g.infra.common.reflect.ReflectionUtils2.getField;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseToNode;
-import static java.lang.Boolean.parseBoolean;
-import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
 import static java.lang.System.*;
 import static java.util.Collections.singletonList;
@@ -87,6 +92,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.SystemUtils.IS_OS_MAC;
 import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
  * The {@link GenericITContainerManager}
@@ -95,17 +101,17 @@ import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
  * @since v3.1
  **/
 //@Testcontainers
-@SuppressWarnings({"rawtypes", "unchecked", "deprecation"})
+@SuppressWarnings({"rawtypes", "unchecked", "deprecation", "unused"})
 public abstract class GenericITContainerManager implements Closeable {
     public static final String KAFKA_UI_01 = "kafka-ui-01";
     // The assertion operation timeout(seconds)
-    public static final int IT_START_MW_CONTAINERS_TIMEOUT = parseInt(getenv().getOrDefault("IT_START_HW_CONTAINERS_TIMEOUT", "600"));
-    public static final boolean IT_START_MGMT_CONTAINERS_ENABLE = parseBoolean(getenv().getOrDefault("IT_START_MGMT_CONTAINERS_ENABLE", "true"));
-    public static final int IT_START_MGMT_CONTAINERS_TIMEOUT = parseInt(getenv().getOrDefault("IT_START_MGMT_CONTAINERS_TIMEOUT", "600"));
-    public static final int IT_DATA_MOCKERS_TIMEOUT = parseInt(getenv().getOrDefault("IT_DATA_MOCKERS_TIMEOUT", "300"));
+    public static final int IT_START_MW_CONTAINERS_TIMEOUT = getIntProperty("IT_START_HW_CONTAINERS_TIMEOUT", 600);
+    public static final boolean IT_START_MGMT_CONTAINERS_ENABLE = getBooleanProperty("IT_START_MGMT_CONTAINERS_ENABLE", true);
+    public static final int IT_START_MGMT_CONTAINERS_TIMEOUT = getIntProperty("IT_START_MGMT_CONTAINERS_TIMEOUT", 600);
+    public static final int IT_DATA_MOCKERS_TIMEOUT = getIntProperty("IT_DATA_MOCKERS_TIMEOUT", 300);
 
     // IT docker daemon properties definitions.
-    private static final int DOCKER_DAEMON_PORT = parseInt(getenv().getOrDefault("IT_DOCKER_DAEMON_PORT", "2375"));
+    private static final int DOCKER_DAEMON_PORT = getIntProperty("IT_DOCKER_DAEMON_PORT", 2375);
     private static String dockerDaemonVmIp;
     private static String localHostIp;
 
@@ -144,9 +150,11 @@ public abstract class GenericITContainerManager implements Closeable {
 
         setupITLocalHostIp();
         setupITDockerHost();
+        setupRyukContainerIfNeed();
     }
 
-    private static void setupITLocalHostIp() {
+    @VisibleForTesting
+    static void setupITLocalHostIp() {
         try (InetUtils helper = new InetUtils(new InetUtils.InetUtilsProperties())) {
             localHostIp = helper.findFirstNonLoopbackHostInfo().getIpAddress();
         }
@@ -155,7 +163,8 @@ public abstract class GenericITContainerManager implements Closeable {
     /**
      * Set Up to IT docker host. (for compatibility with local multipass VM in docker)
      */
-    private static void setupITDockerHost() {
+    @VisibleForTesting
+    static void setupITDockerHost() {
         String itDockerHost = getenv("IT_DOCKER_HOST");
         if (isBlank(itDockerHost)) {
             // Detect for docker daemon VM IP in multipass(MacOS).
@@ -208,6 +217,32 @@ public abstract class GenericITContainerManager implements Closeable {
                     EnvironmentAndSystemPropertyClientProviderStrategy.class.getName());
             TestcontainersConfiguration.getInstance()
                     .updateGlobalConfig("docker.host", format("tcp://%s:%s", itDockerHost, DOCKER_DAEMON_PORT));
+        }
+    }
+
+    /**
+     * {@link org.testcontainers.DockerClientFactory#client()}
+     * {@link org.testcontainers.utility.ResourceReaper#instance()}
+     * {@link org.testcontainers.utility.ResourceReaper#init()}
+     * {@linktext org.testcontainers.utility.RyukResourceReaper#ryukContainer}
+     */
+    @VisibleForTesting
+    static void setupRyukContainerIfNeed() {
+        try {
+            final ResourceReaper reaper = ResourceReaper.instance();
+            final Class<?> reaperResourceCls = ClassUtils.getClass("org.testcontainers.utility.RyukResourceReaper");
+            final Class<?> ryukContainerCls = ClassUtils.getClass("org.testcontainers.utility.RyukContainer");
+            if (reaperResourceCls.isAssignableFrom(reaper.getClass())) {
+                final Field ryukContainerField = findFieldNullable(reaperResourceCls, "ryukContainer", ryukContainerCls);
+                if (nonNull(ryukContainerField)) {
+                    final GenericContainer ryukContainer = getField(ryukContainerField, reaper, true);
+                    final String ryukImageName = getStringProperty("IT_RYUK_CONTAINER_IMAGE",
+                            "registry.cn-shenzhen.aliyuncs.com/wl4g-k8s/testcontainers_ryuk:0.5.1");
+                    ryukContainer.setDockerImageName(ryukImageName);
+                }
+            }
+        } catch (Exception e) {
+            err.printf("Unable to setup ryuk container, cause by: %s%n", getRootCauseMessage(e));
         }
     }
 
@@ -295,12 +330,10 @@ public abstract class GenericITContainerManager implements Closeable {
 
         // Run for middleware containers.
         log.info("Starting for IT middleware containers ...");
-        mwContainers.forEach((name, c) -> {
-            new Thread(() -> {
-                log.info("Starting IT middleware container: {}", name);
-                c.start();
-            }).start();
-        });
+        mwContainers.forEach((name, c) -> new Thread(() -> {
+            log.info("Starting IT middleware container: {}", name);
+            c.start();
+        }).start());
         if (!mwContainersStartedLatch.await(IT_START_MW_CONTAINERS_TIMEOUT, TimeUnit.SECONDS)) {
             throw new TimeoutException("Failed to start IT middleware containers. timeout: " + IT_START_MW_CONTAINERS_TIMEOUT + "s");
         }
@@ -326,12 +359,10 @@ public abstract class GenericITContainerManager implements Closeable {
 
         // Run for mgmt containers.
         log.info("Starting for IT mgmt containers ...");
-        mgmtContainers.forEach((name, c) -> {
-            new Thread(() -> {
-                log.info("Starting IT mgmt container: {}", name);
-                c.start();
-            }).start();
-        });
+        mgmtContainers.forEach((name, c) -> new Thread(() -> {
+            log.info("Starting IT mgmt container: {}", name);
+            c.start();
+        }).start());
         if (!mgmtContainersStartedLatch.await(IT_START_MGMT_CONTAINERS_TIMEOUT, TimeUnit.SECONDS)) {
             throw new TimeoutException("Failed to start IT mgmt containers. timeout: " + IT_START_MGMT_CONTAINERS_TIMEOUT + "s");
         }
@@ -348,13 +379,11 @@ public abstract class GenericITContainerManager implements Closeable {
         dataMockersFinishedLatch = new CountDownLatch(dataMockers.size());
 
         log.info("Starting for IT data mockers ...");
-        dataMockers.forEach((name, mocker) -> {
-            new Thread(() -> {
-                log.info("Starting IT data mocker: {}", name);
-                mocker.run();
-                mocker.printStatistics();
-            }).start();
-        });
+        dataMockers.forEach((name, mocker) -> new Thread(() -> {
+            log.info("Starting IT data mocker: {}", name);
+            mocker.run();
+            mocker.printStatistics();
+        }).start());
         if (!dataMockersFinishedLatch.await(IT_DATA_MOCKERS_TIMEOUT, TimeUnit.SECONDS)) {
             throw new TimeoutException("Failed to start IT data mockers. timeout: " + IT_DATA_MOCKERS_TIMEOUT + "s");
         }

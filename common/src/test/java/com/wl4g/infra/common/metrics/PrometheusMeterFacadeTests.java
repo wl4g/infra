@@ -15,40 +15,33 @@
  */
 package com.wl4g.infra.common.metrics;
 
-import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
-import static java.util.Arrays.asList;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-
-import java.time.Duration;
-
-import javax.validation.constraints.NotNull;
-
-import org.junit.Before;
-import org.junit.Test;
-
 import com.wl4g.infra.common.net.InetUtils;
 import com.wl4g.infra.common.net.InetUtils.InetUtilsProperties;
-
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.DistributionSummary;
-import io.micrometer.core.instrument.Gauge;
-import io.micrometer.core.instrument.Meter;
+import io.micrometer.core.instrument.*;
 import io.micrometer.core.instrument.Meter.Type;
-import io.micrometer.core.instrument.Tags;
-import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.distribution.DistributionStatisticConfig;
 import io.micrometer.core.instrument.distribution.HistogramSnapshot;
 import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusCounter;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
+import org.junit.Before;
+import org.junit.Test;
+
+import javax.validation.constraints.NotNull;
+import java.time.Duration;
+
+import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
+import static java.time.Duration.ofMillis;
+import static java.util.Arrays.asList;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
  * {@link PrometheusMeterFacadeTests}
- * 
+ *
  * @author &lt;James Wong James Wong <jameswong1376@gmail.com>&gt;
  * @version 2021-11-16 v1.0.0
+ * @see <a href="https://www.baeldung.com/micrometer">...</a>
  * @since v1.0.0
- * @see https://www.baeldung.com/micrometer
  */
 public class PrometheusMeterFacadeTests {
 
@@ -81,9 +74,9 @@ public class PrometheusMeterFacadeTests {
     }
 
     @Test
-    public void testUseTimer() {
+    public void testUseTimer1() {
         // Gets or create timer by metrics name and tags.
-        Timer timer = facade.timer("test_metric3", "", new double[] { 0.3, 0.5, 0.9, 0.95 }, "key1", "value1");
+        Timer timer = facade.timer("test_metric3_1", "", new double[]{0.3, 0.5, 0.9, 0.95}, "key1", "value1");
 
         // For the convenience of calculation, the test data set are all
         // integers.
@@ -107,6 +100,64 @@ public class PrometheusMeterFacadeTests {
         timer.record(1800, MILLISECONDS);
         timer.record(1900, MILLISECONDS);
         timer.record(2000, MILLISECONDS);
+        timer.record(3000, MILLISECONDS);
+
+        System.out.println("count: " + timer.count());
+        System.out.println("total: " + timer.totalTime(MILLISECONDS));
+        System.out.println("  max: " + timer.max(MILLISECONDS));
+        System.out.println(" mean: " + timer.mean(MILLISECONDS));
+        System.out.println(" json: " + toJSONString(timer));
+
+        System.out.println("--------------------");
+        HistogramSnapshot snapshot = timer.takeSnapshot();
+        System.out.println("        snapshot: " + snapshot);
+        System.out.println(" histogramCounts: " + asList(snapshot.histogramCounts()));
+        System.out.println("percentileValues: " + asList(snapshot.percentileValues()));
+
+        System.out.println("--------------------");
+        snapshot.outputSummary(System.out, 1d);
+    }
+
+
+    @Test
+    public void testUseTimer2() {
+        // Gets or create timer by metrics name and tags.
+        Timer timer = facade.timer("test_metric3_2", "",
+                new Duration[]{
+                        ofMillis(50),
+                        ofMillis(200),
+                        ofMillis(500),
+                        ofMillis(1000),
+                        ofMillis(1500),
+                        ofMillis(2000),
+                        ofMillis(10000),
+                        ofMillis(99999),
+                },
+                "key1", "value1");
+
+        // For the convenience of calculation, the test data set are all
+        // integers.
+        timer.record(100, MILLISECONDS);
+        timer.record(200, MILLISECONDS);
+        timer.record(300, MILLISECONDS);
+        timer.record(400, MILLISECONDS);
+        timer.record(500, MILLISECONDS);
+        timer.record(600, MILLISECONDS);
+        timer.record(700, MILLISECONDS);
+        timer.record(800, MILLISECONDS);
+        timer.record(900, MILLISECONDS);
+        timer.record(1000, MILLISECONDS);
+        timer.record(1100, MILLISECONDS);
+        timer.record(1200, MILLISECONDS);
+        timer.record(1300, MILLISECONDS);
+        timer.record(1400, MILLISECONDS);
+        timer.record(1500, MILLISECONDS);
+        timer.record(1600, MILLISECONDS);
+        timer.record(1700, MILLISECONDS);
+        timer.record(1800, MILLISECONDS);
+        timer.record(1900, MILLISECONDS);
+        timer.record(2000, MILLISECONDS);
+        timer.record(3000, MILLISECONDS);
 
         System.out.println("count: " + timer.count());
         System.out.println("total: " + timer.totalTime(MILLISECONDS));
@@ -135,7 +186,7 @@ public class PrometheusMeterFacadeTests {
     @Test
     public void testUseSummary() {
         // Gets or create distribution summary by metrics name and tags.
-        DistributionSummary summary = facade.summary("test_metric5", "", 1d, new double[] { 0.2, 0.5, 0.9, 0.95 }, "key1",
+        DistributionSummary summary = facade.summary("test_metric5", "", 1d, new double[]{0.2, 0.5, 0.9, 0.95}, "key1",
                 "value1");
 
         // statistics cost time
@@ -176,7 +227,7 @@ public class PrometheusMeterFacadeTests {
     @Test
     public void testUseSummary2() {
         // Gets or create distribution summary by metrics name and tags.
-        DistributionSummary summary = facade.summarySlos("test_metric5", "", 0.1d, new double[] { 1, 10, 5 }, "key1", "value1");
+        DistributionSummary summary = facade.summarySlos("test_metric5", "", 0.1d, new double[]{1, 10, 5}, "key1", "value1");
 
         // statistics cost time
         summary.record(301.133d);
