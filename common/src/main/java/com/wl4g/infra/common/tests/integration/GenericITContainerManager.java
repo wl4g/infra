@@ -104,6 +104,7 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMess
 @SuppressWarnings({"rawtypes", "unchecked", "deprecation", "unused"})
 public abstract class GenericITContainerManager implements Closeable {
     public static final String KAFKA_UI_01 = "kafka-ui-01";
+
     // The assertion operation timeout(seconds)
     public static final int IT_START_MW_CONTAINERS_TIMEOUT = getIntProperty("IT_START_HW_CONTAINERS_TIMEOUT", 600);
     public static final boolean IT_START_MGMT_CONTAINERS_ENABLE = getBooleanProperty("IT_START_MGMT_CONTAINERS_ENABLE", true);
@@ -112,8 +113,8 @@ public abstract class GenericITContainerManager implements Closeable {
 
     // IT docker daemon properties definitions.
     private static final int DOCKER_DAEMON_PORT = getIntProperty("IT_DOCKER_DAEMON_PORT", 2375);
-    private static String dockerDaemonVmIp;
-    private static String localHostIp;
+    private static @Getter String dockerDaemonVmIp;
+    private static @Getter String localHostIp;
 
     // IT runtime properties definitions.
     // see:https://java.testcontainers.org/modules/kafka/#example
@@ -389,7 +390,7 @@ public abstract class GenericITContainerManager implements Closeable {
         }
     }
 
-    protected abstract void initMiddlewareContainers(@NotNull Supplier<CountDownLatch> startedLatch,
+    protected abstract void initMiddlewareContainers(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
                                                      @NotNull Map<String, ITGenericContainerWrapper> mwContainers);
 
     protected void initManagementContainers(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
