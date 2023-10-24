@@ -18,16 +18,16 @@ package com.wl4g.infra.common.tests.integration;
 import org.junit.Test;
 
 /**
- * The {@link GenericITContainerManagerTest}
+ * The {@link ITContainerManagerSupportTest}
  *
  * @author James Wong
  * @since v3.1
  **/
-public class GenericITContainerManagerTest {
+public class ITContainerManagerSupportTest {
 
     @Test
     public void testSetupRyukContainerIfNeed() {
-        GenericITContainerManager.setupRyukContainerIfNeed();
+        ITContainerManagerSupport.setupRyukContainerIfNeed();
     }
 
 }
