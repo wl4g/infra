@@ -298,7 +298,7 @@ public abstract class GenericITContainerManager extends ITContainerManagerSuppor
         return new ITGenericContainerWrapper(mappedPort, kafkaUiContainer);
     }
 
-    private ITGenericContainerWrapper buildBitnami24PrometheusContainer(Supplier<CountDownLatch> startedLatchSupplier,
+    public ITGenericContainerWrapper buildBitnami24PrometheusContainer(Supplier<CountDownLatch> startedLatchSupplier,
                                                                         int mappedPort,
                                                                         int scrapeIntervalSeconds,
                                                                         List<String> scrapeUrls,
@@ -312,7 +312,7 @@ public abstract class GenericITContainerManager extends ITContainerManagerSuppor
     }
 
     @SuppressWarnings({"rawtypes", "unchecked", "unused", "all"})
-    private ITGenericContainerWrapper buildBitnamiPrometheusContainer(Supplier<CountDownLatch> startedLatchSupplier,
+    public ITGenericContainerWrapper buildBitnamiPrometheusContainer(Supplier<CountDownLatch> startedLatchSupplier,
                                                                       @Min(1024) int mappedPort,
                                                                       @NotBlank String imageName,
                                                                       @NotBlank String imageVersion,
@@ -372,7 +372,7 @@ public abstract class GenericITContainerManager extends ITContainerManagerSuppor
         return new ITGenericContainerWrapper(mappedPort, prometheusContainer);
     }
 
-    private ITGenericContainerWrapper buildBitnami101GrafanaContainer(Supplier<CountDownLatch> startedLatchSupplier,
+    public ITGenericContainerWrapper buildBitnami101GrafanaContainer(Supplier<CountDownLatch> startedLatchSupplier,
                                                                       int mappedPort,
                                                                       Map<String, String> env) {
         return buildBitnamiGrafanaContainer(startedLatchSupplier, mappedPort,
@@ -381,7 +381,7 @@ public abstract class GenericITContainerManager extends ITContainerManagerSuppor
     }
 
     @SuppressWarnings({"rawtypes", "unchecked", "unused", "all"})
-    private ITGenericContainerWrapper buildBitnamiGrafanaContainer(Supplier<CountDownLatch> startedLatchSupplier,
+    public ITGenericContainerWrapper buildBitnamiGrafanaContainer(Supplier<CountDownLatch> startedLatchSupplier,
                                                                    int mappedPort,
                                                                    String imageName,
                                                                    String imageVersion,
