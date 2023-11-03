@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.wl4g.infra.common.tests.integration;
+package com.wl4g.infra.common.tests.integration.manager;
 
 import ch.qos.logback.classic.Level;
 import com.google.common.annotations.VisibleForTesting;
@@ -33,12 +33,14 @@ import org.testcontainers.dockerclient.EnvironmentAndSystemPropertyClientProvide
 import org.testcontainers.utility.ResourceReaper;
 import org.testcontainers.utility.TestcontainersConfiguration;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
@@ -51,13 +53,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToList;
-import static com.wl4g.infra.common.lang.EnvironmentUtil.*;
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
+import static com.wl4g.infra.common.lang.EnvironmentUtil.getIntProperty;
+import static com.wl4g.infra.common.lang.EnvironmentUtil.getStringProperty;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.findFieldNullable;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.getField;
 import static java.lang.String.format;
 import static java.lang.System.*;
 import static java.util.Collections.unmodifiableMap;
-import static java.util.Objects.*;
+import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.SystemUtils.IS_OS_MAC;
@@ -65,18 +70,16 @@ import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
- * The {@link ITContainerManagerSupport}
+ * The {@link AbstractITContainerManager}
  *
  * @author James Wong
  * @since v3.1
  **/
 //@Testcontainers
 @SuppressWarnings({"rawtypes", "unchecked", "deprecation", "unused"})
-public abstract class ITContainerManagerSupport implements Closeable {
+public abstract class AbstractITContainerManager implements Closeable {
     // The assertion operation timeout(seconds)
-    public static final int IT_START_MW_CONTAINERS_TIMEOUT = getIntProperty("IT_START_HW_CONTAINERS_TIMEOUT", 600);
-    public static final boolean IT_START_MGMT_CONTAINERS_ENABLE = getBooleanProperty("IT_START_MGMT_CONTAINERS_ENABLE", true);
-    public static final int IT_START_MGMT_CONTAINERS_TIMEOUT = getIntProperty("IT_START_MGMT_CONTAINERS_TIMEOUT", 600);
+    public static final int IT_START_CONTAINERS_TIMEOUT = getIntProperty("IT_START_CONTAINERS_TIMEOUT", 600);
     public static final int IT_DATA_MOCKERS_TIMEOUT = getIntProperty("IT_DATA_MOCKERS_TIMEOUT", 300);
 
     // IT docker daemon properties definitions.
@@ -88,10 +91,9 @@ public abstract class ITContainerManagerSupport implements Closeable {
     // see:https://java.testcontainers.org/modules/kafka/#example
     private final Map<String, ITGenericContainerWrapper> mwContainers = new ConcurrentHashMap<>();
     private CountDownLatch mwContainersStartedLatch;
-    private final Map<String, ITGenericContainerWrapper> mgmtContainers = new ConcurrentHashMap<>();
-    private CountDownLatch mgmtContainersStartedLatch;
     private final Map<String, AbstractDataMocker> dataMockers = new ConcurrentHashMap<>();
     private CountDownLatch dataMockersFinishedLatch;
+
     //
     // Notice: That using @RunWith/@SpringBootTest to start the application cannot control the startup
     // sequence (e.g after the kafka container is started), so it can only be controlled by manual startup.
@@ -224,15 +226,13 @@ public abstract class ITContainerManagerSupport implements Closeable {
     //    extraEnvSupplier.forEach(registry::add);
     //}
 
-    //
     // ----- Integration Test Assertion Basic Methods. -----
-    //
 
     protected final Logger log = LoggerFactory.getLogger(getClass());
     private final AtomicBoolean started = new AtomicBoolean(false);
     private final AtomicInteger closePending;
 
-    public ITContainerManagerSupport(@NotNull Class<?> testClass) {
+    public AbstractITContainerManager(@NotNull Class<?> testClass) {
         requireNonNull(testClass, "testClass must not be null");
 
         // Find all methods total in target test class.
@@ -242,7 +242,7 @@ public abstract class ITContainerManagerSupport implements Closeable {
         // Check for use is must a static field in test class, so it will be shared by all test cases.
         safeArrayToList(ReflectionUtils2.getDeclaredFields(testClass))
                 .stream()
-                .filter(f -> ITContainerManagerSupport.class.isAssignableFrom(f.getType()))
+                .filter(f -> AbstractITContainerManager.class.isAssignableFrom(f.getType()))
                 .forEach(f -> {
                     if (!Modifier.isStatic(f.getModifiers())) {
                         throw new IllegalStateException(String.format("Field %s must be static, so it will be shared by all test cases.", f));
@@ -254,15 +254,12 @@ public abstract class ITContainerManagerSupport implements Closeable {
         return unmodifiableMap(mwContainers);
     }
 
-    public Map<String, ITGenericContainerWrapper> getMgmtContainers() {
-        return unmodifiableMap(mgmtContainers);
-    }
-
     @Override
     public void close() throws IOException {
         close(false);
     }
 
+    @SuppressWarnings("all")
     private void close(boolean force) {
         // If there are still test methods pending, skip closing.
         if (!force && closePending.decrementAndGet() > 0) {
@@ -271,9 +268,6 @@ public abstract class ITContainerManagerSupport implements Closeable {
         if (started.compareAndSet(true, false)) {
             log.info("Shutting down to IT middleware containers ...");
             mwContainers.values().forEach(ITGenericContainerWrapper::close);
-
-            log.info("Shutting down to IT mgmt containers ...");
-            mgmtContainers.values().forEach(ITGenericContainerWrapper::close);
 
             log.info("Shutting down to IT data mockers ...");
             dataMockers.values().forEach(dataMocker -> {
@@ -291,64 +285,64 @@ public abstract class ITContainerManagerSupport implements Closeable {
     public void start() throws Exception {
         if (started.compareAndSet(false, true)) {
             log.info(">>>>>>>>>> Initializing for IT containers manager ... <<<<<<<<<<");
-            startForMiddlewareContainers();
-            startForMgmtContainers();
+            startForMwContainers();
             startForDataMocks();
         }
     }
 
-    private void startForMiddlewareContainers() throws Exception {
-        // ---------------- Startup MW Containers(e.g: kafka/mongodb) -------------------
-
+    /**
+     * Startup middleware Containers(e.g: zookeeper/kafka/mongodb)
+     */
+    private void startForMwContainers() throws Exception {
         log.info("Initializing for IT middleware containers ...");
-        final Supplier<CountDownLatch> mwContainersStartedLatchSupplier = () -> mwContainersStartedLatch;
-        initMiddlewareContainers(mwContainersStartedLatchSupplier, mwContainers);
-        mwContainersStartedLatch = new CountDownLatch(mwContainers.size());
+
+        final Supplier<CountDownLatch> mwContainersStartedLatchSupplier = () -> this.mwContainersStartedLatch;
+        initMwContainers(mwContainersStartedLatchSupplier, mwContainers);
+        this.mwContainersStartedLatch = new CountDownLatch(mwContainers.size());
 
         // Run for middleware containers.
         log.info("Starting for IT middleware containers ...");
-        mwContainers.forEach((name, c) -> new Thread(() -> {
-            log.info("Starting IT middleware container: {}", name);
-            c.start();
-        }).start());
-        if (!mwContainersStartedLatch.await(IT_START_MW_CONTAINERS_TIMEOUT, TimeUnit.SECONDS)) {
-            throw new TimeoutException("Failed to start IT middleware containers. timeout: " + IT_START_MW_CONTAINERS_TIMEOUT + "s");
+        mwContainers.forEach((name, c) -> {
+            final List<String> dependsOn = c.getDependsOn();
+            final CountDownLatch startedLatch = c.getStartedLatch();
+
+            // Start a thread for each container
+            new Thread(() -> {
+                try {
+                    // Wait for the dependencies to start
+                    for (String dependency : dependsOn) {
+                        final ITGenericContainerWrapper container = mwContainers.get(dependency);
+                        if (nonNull(container)) {
+                            // 无需设置超时时间, 因为会有外部主线程中 mwContainersStartedLatch 控制超时.
+                            // await() 表示尽可能等待依赖的容器启动完成.
+                            container.getStartedLatch().await();
+                        } else {
+                            log.warn(">>> Could not found dependency container: {}", dependency);
+                        }
+                    }
+
+                    // Start the container
+                    log.info("Starting IT middleware container: {}", name);
+                    c.getContainer().start();
+
+                    // Count down the latch to signal the container has started
+                    startedLatch.countDown();
+                } catch (InterruptedException e) {
+                    log.error("Failed to start IT middleware container: {}", name, e);
+                }
+            }).start();
+        });
+
+        if (!mwContainersStartedLatch.await(IT_START_CONTAINERS_TIMEOUT, TimeUnit.SECONDS)) {
+            throw new TimeoutException("Failed to start IT middleware containers. timeout: " + IT_START_CONTAINERS_TIMEOUT + "s");
         }
         log.info("Started for IT middleware containers: " + mwContainers.keySet());
     }
 
-    private void startForMgmtContainers() throws Exception {
-        // ---------------- Startup MGMT Containers(e.g: kafka-ui/mongodb-express) -----------------
-
-        if (mwContainers.values().stream().noneMatch(c ->
-                c.getContainer().getDockerImageName().toUpperCase().contains("KAFKA"))) {
-            log.warn("Skip start for mgmt containers because not found IT kafka containers.");
-            return;
-        }
-
-        // Try to wait until the middleware container is ready to start.
-        Thread.sleep(5000L);
-
-        log.info("Initializing for IT mgmt containers ...");
-        final Supplier<CountDownLatch> mgmtContainersStartedLatchSupplier = () -> mgmtContainersStartedLatch;
-        initManagementContainers(mgmtContainersStartedLatchSupplier, mgmtContainers);
-        mgmtContainersStartedLatch = new CountDownLatch(mgmtContainers.size());
-
-        // Run for mgmt containers.
-        log.info("Starting for IT mgmt containers ...");
-        mgmtContainers.forEach((name, c) -> new Thread(() -> {
-            log.info("Starting IT mgmt container: {}", name);
-            c.start();
-        }).start());
-        if (!mgmtContainersStartedLatch.await(IT_START_MGMT_CONTAINERS_TIMEOUT, TimeUnit.SECONDS)) {
-            throw new TimeoutException("Failed to start IT mgmt containers. timeout: " + IT_START_MGMT_CONTAINERS_TIMEOUT + "s");
-        }
-        log.info("Started for IT mgmt containers: " + mgmtContainers.keySet());
-    }
-
+    /**
+     * Startup Data Mockers.
+     */
     private void startForDataMocks() throws Exception {
-        // ---------------- Startup Data Mockers --------------------
-
         // Run for data mockers.
         log.info("Initializing for IT data mockers ...");
         final Supplier<CountDownLatch> dataMockersFinishedLatchSupplier = () -> dataMockersFinishedLatch;
@@ -366,22 +360,17 @@ public abstract class ITContainerManagerSupport implements Closeable {
         }
     }
 
-    protected abstract void initMiddlewareContainers(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
-                                                     @NotNull Map<String, ITGenericContainerWrapper> mwContainers);
-
-    protected abstract void initManagementContainers(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
-                                            @NotNull Map<String, ITGenericContainerWrapper> mgmtContainers);
+    protected abstract void initMwContainers(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
+                                             @NotNull Map<String, ITGenericContainerWrapper> firstContainers);
 
     protected abstract void initDataMockers(@NotNull Supplier<CountDownLatch> finishedLatchSupplier,
                                             @NotNull Map<String, AbstractDataMocker> dataMockers);
 
-    //
-    // --------------------- Getting Run Containers Configuration  -----------------------
-    //
+    // ------ Getting Running Containers Configuration  ------
 
     @SuppressWarnings("unchecked")
     public <T extends ITGenericContainerWrapper> T getRequiredContainer(String name) {
-        return (T) requireNonNull(mwContainers.get(name), String.format("Could not get middleware container for %s", name));
+        return (T) requireNonNull(mwContainers.get(name), String.format("Could not get first container for %s", name));
     }
 
     @SuppressWarnings("unchecked")
@@ -389,15 +378,17 @@ public abstract class ITContainerManagerSupport implements Closeable {
         return (T) requireNonNull(dataMockers.get(name), String.format("Could not get data mocker for %s", name));
     }
 
-    public String getServersConnectionString(String protocol, String clusterName) {
+    @SuppressWarnings("all")
+    public String getServersConnectString(String protocol, String clusterName) {
         final ITGenericContainerWrapper container = getRequiredContainer(clusterName);
+        //
         //final int primaryMappedPort = container.getExposedPorts().stream().findFirst().orElseThrow(() ->
         //        new IllegalStateException("Could not get first mapped port for container server port."));
         final int primaryMappedPort = container.getPrimaryMappedPort();
-        return getServersConnectionString(protocol, primaryMappedPort);
+        return getServersConnectString(protocol, primaryMappedPort);
     }
 
-    public String getServersConnectionString(String protocol, int mappedPort) {
+    public String getServersConnectString(String protocol, int mappedPort) {
         String availableContainerHost = isBlank(dockerDaemonVmIp) ? localHostIp : dockerDaemonVmIp;
         return String.format("%s%s:%s", protocol, availableContainerHost, mappedPort);
     }
@@ -406,11 +397,16 @@ public abstract class ITContainerManagerSupport implements Closeable {
     public static class ITGenericContainerWrapper implements Closeable {
         private final int primaryMappedPort;
         private final GenericContainer<?> container;
+        private final List<String> dependsOn;
+        private final CountDownLatch startedLatch;
 
         public ITGenericContainerWrapper(int primaryMappedPort,
-                                         GenericContainer<?> container) {
+                                         @Nullable GenericContainer<?> container,
+                                         @Nullable List<String> dependsOn) {
             this.primaryMappedPort = primaryMappedPort;
             this.container = container;
+            this.dependsOn = dependsOn;
+            this.startedLatch = new CountDownLatch(safeList(dependsOn).size());
         }
 
         @Override

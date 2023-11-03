@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.infra.common.tests.integration;
+package com.wl4g.infra.common.tests.integration.manager;
 
 import org.junit.Test;
 
 /**
- * The {@link ITContainerManagerSupportTest}
+ * The {@link ITContainerManagerTest}
  *
  * @author James Wong
  * @since v3.1
  **/
-public class ITContainerManagerSupportTest {
+public class ITContainerManagerTest {
 
     @Test
     public void testSetupRyukContainerIfNeed() {
-        ITContainerManagerSupport.setupRyukContainerIfNeed();
+        AbstractITContainerManager.setupRyukContainerIfNeed();
     }
 
 }
