@@ -37,6 +37,7 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Supplier;
 
@@ -59,7 +60,6 @@ import static org.testcontainers.shaded.org.apache.commons.lang3.StringUtils.isB
 //@Testcontainers
 @SuppressWarnings({"rawtypes", "unused"})
 public abstract class GenericITContainerManager extends AbstractITContainerManager {
-    public static final String KAFKA_UI_01 = "kafka-ui-01";
 
     public GenericITContainerManager(@NotNull Class<?> testClass) {
         super(testClass);
@@ -317,8 +317,10 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
         Assertions.assertTrue(containerPort > 1024, "containerPort must be greater than 1024");
         Assertions.assertTrue(kafkaMetricsPort > 1024, "kafkaMetricsPort must be greater than 1024");
         Assertions.assertTrue(nonNull(kafkaClusters) && !kafkaClusters.isEmpty(), "kafkaClusters must not be empty");
-        Assertions.assertEquals(safeArrayToList(dependsOn).size(), kafkaClusters.size(), format("dependsOn size(%s) must be equal to kafkaClusters size(%s)",
-                safeArrayToList(dependsOn).size(), kafkaClusters.size()));
+        long kafkaClusterCount = kafkaClusters.stream().filter(d -> !isBlank(d)).count();
+        long dependsOnCount = safeArrayToList(dependsOn).stream().filter(Objects::nonNull).count();
+        Assertions.assertEquals(dependsOnCount, kafkaClusterCount, format("dependsOn size(%s) must be equal to kafkaClusters size(%s)",
+                dependsOnCount, kafkaClusterCount));
 
         final Map<String, String> mergeEnv = new HashMap<>(safeMap(env));
         mergeEnv.putIfAbsent("JAVA_OPTS", "-Djava.net.preferIPv4Stack=true -Xmx1G");
@@ -335,7 +337,7 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
         }
 
         return buildBitnamiContainer(startedLatchSupplier, "registry.cn-shenzhen.aliyuncs.com/wl4g-k8s/provectuslabs_kafka-ui",
-                imageTag, mappedPort, 9090, "kafka-ui", "(.*)Started KafkaUiApplication (.*)",
+                imageTag, mappedPort, containerPort, "kafka-ui", "(.*)Started KafkaUiApplication (.*)",
                 null, null, emptyMap(), mergeEnv, reusable, dependsOn);
     }
 
