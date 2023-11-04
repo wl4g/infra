@@ -34,17 +34,16 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
+import static java.util.Arrays.asList;
 import static java.util.Collections.*;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -116,7 +115,7 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
         //mergeEnv.putIfAbsent("ZOO_ENABLE_AUTH", "true");
         mergeEnv.putIfAbsent("ALLOW_ANONYMOUS_LOGIN", "yes");
         mergeEnv.putIfAbsent("ZOO_PORT_NUMBER", String.valueOf(serverPort));
-        return buildBitnamiContainer(startedLatchSupplier, imageRepo, imageTag, new int[]{serverPort, serverPort},
+        return buildBitnamiContainer(startedLatchSupplier, imageRepo, imageTag, asList(serverPort, serverPort),
                 "zookeeper", startedLogRegex, null, startupTimeout, null,
                 mergeEnv, createdListener, startedListener);
     }
@@ -146,7 +145,7 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
         }
 
         return buildBitnamiKafkaContainer(startedLatchSupplier, "registry.cn-shenzhen.aliyuncs.com/wl4g-k8s/bitnami_kafka",
-                "2.2.0", new int[]{serverPort, serverPort, jmxPort, jmxPort}, "(.*)Kafka Server started (.*)",
+                "2.2.0", asList(serverPort, serverPort, jmxPort, jmxPort), "(.*)started \\(kafka\\.server\\.KafkaServer\\)(.*)",
                 null, mergeEnv, null, null);
     }
 
@@ -191,7 +190,7 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
         }
 
         return buildBitnamiKafkaContainer(startedLatch, "registry.cn-shenzhen.aliyuncs.com/wl4g-k8s/bitnami_kafka",
-                "3.5", new int[]{serverPort, serverPort, jmxPort, jmxPort}, "(.*)Kafka Server started (.*)",
+                "3.5", asList(serverPort, serverPort, jmxPort, jmxPort), "(.*)Kafka Server started (.*)",
                 null, mergeEnv, null, null);
     }
 
@@ -223,7 +222,7 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
     public ITGenericContainer buildBitnamiKafkaContainer(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
                                                          @NotBlank String imageRepo,
                                                          @NotBlank String imageTag,
-                                                         @NotEmpty int[] portBindings,
+                                                         @NotEmpty List<Integer> portBindings,
                                                          @NotBlank String startedLogRegex,
                                                          @Nullable Duration startupTimeout,
                                                          @NotNull Map<String, String> env,
@@ -308,37 +307,38 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
     // --------------------- Kafka UI build Containers  ----------------------
 
     public ITGenericContainer buildProvectuslabsKafkaUI07xContainer(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
-                                                                    @NotNull List<String> kafkaClusters) {
-        return buildProvectuslabsKafkaUIContainer(startedLatchSupplier, "v0.7.1", 58888, 9997,
-                null, null, kafkaClusters, null, null);
+                                                                    @NotNull List<String> kafkaClusters,
+                                                                    @NotEmpty List<Integer> kafkaMetricsPorts) {
+        return buildProvectuslabsKafkaUIContainer(startedLatchSupplier, "v0.7.1", 58888,
+                null, null, kafkaClusters, kafkaMetricsPorts, null, null);
     }
 
     @SuppressWarnings("all")
     public ITGenericContainer buildProvectuslabsKafkaUIContainer(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
                                                                  @NotBlank String imageTag,
                                                                  @Min(1024) int serverPort,
-                                                                 @Min(1024) int kafkaMetricsPort,
-                                                                 @Nullable String auditLogTopic,
                                                                  @NotNull Map<String, String> env,
+                                                                 @Nullable String auditLogTopic,
                                                                  @NotNull List<String> kafkaClusters,
+                                                                 @NotEmpty List<Integer> kafkaMetricsPorts,
                                                                  @Nullable Consumer<String> createdListener,
                                                                  @Nullable Consumer<InspectContainerResponse> startedListener) {
         Assertions.assertNotNull(startedLatchSupplier, "startedLatchSupplier must not be null");
         Assertions.assertTrue(serverPort > 1024, "serverPort must be greater than 1024");
-        Assertions.assertTrue(kafkaMetricsPort > 1024, "kafkaMetricsPort must be greater than 1024");
         Assertions.assertTrue(nonNull(kafkaClusters) && !kafkaClusters.isEmpty(), "kafkaClusters must not be empty");
-        //long kafkaClusterCount = kafkaClusters.stream().filter(d -> !isBlank(d)).count();
-        //long dependsOnCount = safeArrayToList(dependsOn).stream().filter(Objects::nonNull).count();
-        //Assertions.assertEquals(dependsOnCount, kafkaClusterCount, format("dependsOn size(%s) must be equal to kafkaClusters size(%s)",
-        //        dependsOnCount, kafkaClusterCount));
+        long kafkaClusterCount = kafkaClusters.stream().filter(d -> !isBlank(d)).count();
+        long kafkaMetricsPortsCount = safeList(kafkaMetricsPorts).stream().filter(Objects::nonNull).count();
+        Assertions.assertEquals(kafkaMetricsPortsCount, kafkaClusterCount, format("kafkaMetricsPorts size(%s) must be equal to kafkaClusters size(%s)",
+                kafkaMetricsPortsCount, kafkaClusterCount));
 
         final Map<String, String> mergeEnv = new HashMap<>(safeMap(env));
         mergeEnv.putIfAbsent("JAVA_OPTS", "-Djava.net.preferIPv4Stack=true -Xmx1G");
+        mergeEnv.putIfAbsent("SERVER_PORT", valueOf(serverPort));
         for (int i = 0; i < kafkaClusters.size(); i++) {
             final String kafkaServers = kafkaClusters.get(i);
             mergeEnv.putIfAbsent("KAFKA_CLUSTERS_" + i + "_NAME", "it-cluster-" + i);
             mergeEnv.putIfAbsent("KAFKA_CLUSTERS_" + i + "_BOOTSTRAPSERVERS", kafkaServers);
-            mergeEnv.putIfAbsent("KAFKA_CLUSTERS_" + i + "_METRICS_PORT", valueOf(kafkaMetricsPort));
+            mergeEnv.putIfAbsent("KAFKA_CLUSTERS_" + i + "_METRICS_PORT", valueOf(kafkaMetricsPorts.get(i)));
             mergeEnv.putIfAbsent("KAFKA_CLUSTERS_" + i + "_AUDIT_TOPIC_AUDIT_ENABLED", "true");
             mergeEnv.putIfAbsent("KAFKA_CLUSTERS_" + i + "_AUDIT_TOPIC", isBlank(auditLogTopic) ? "__kui-audit-log" : auditLogTopic);
             mergeEnv.putIfAbsent("KAFKA_CLUSTERS_" + i + "_AUDIT_TOPIC_PROPERTIES_RETENTION_MS", "43200000");
@@ -347,8 +347,7 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
         }
 
         return buildBitnamiContainer(startedLatchSupplier, "registry.cn-shenzhen.aliyuncs.com/wl4g-k8s/provectuslabs_kafka-ui",
-                imageTag, new int[]{serverPort, 8080, kafkaMetricsPort, kafkaMetricsPort},
-                "kafka-ui", "(.*)Started KafkaUiApplication (.*)",
+                imageTag, asList(serverPort, serverPort), "kafka-ui", "(.*)Started KafkaUiApplication (.*)",
                 null, null, emptyMap(), mergeEnv, createdListener, startedListener);
     }
 
@@ -395,7 +394,7 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
         // @formatter:on
 
         return buildBitnamiContainer(startedLatchSupplier, "registry.cn-shenzhen.aliyuncs.com/wl4g-k8s/bitnami_prometheus",
-                imageTag, new int[]{serverPort, 9090}, "prometheus", "(.*)Server is ready to receive web requests(.*)",
+                imageTag, asList(serverPort, 9090), "prometheus", "(.*)Server is ready to receive web requests(.*)",
                 null, null, singletonMap("/opt/bitnami/prometheus/conf/prometheus.yml", prometheusConfig),
                 env, createdListener, startedListener);
     }
@@ -416,7 +415,7 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
                                                            @Nullable Consumer<String> createdListener,
                                                            @Nullable Consumer<InspectContainerResponse> startedListener) {
         return buildBitnamiContainer(startedLatchSupplier, "registry.cn-shenzhen.aliyuncs.com/wl4g-k8s/bitnami_grafana",
-                imageTag, new int[]{mappedPort, 3000}, "grafana", "(.*)HTTP Server Listen(.*)",
+                imageTag, asList(mappedPort, 3000), "grafana", "(.*)HTTP Server Listen(.*)",
                 null, null, null, env, createdListener, startedListener);
     }
 
@@ -425,7 +424,7 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
     public ITGenericContainer buildBitnamiContainer(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
                                                     @NotBlank String imageRepo,
                                                     @NotBlank String imageTag,
-                                                    @NotEmpty int[] portBindings,
+                                                    @NotEmpty List<Integer> portBindings,
                                                     @NotBlank String loggerName,
                                                     @NotBlank String startedLogRegex,
                                                     @Nullable String networkMode,
@@ -437,9 +436,20 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
         Assertions.assertNotNull(startedLatchSupplier, "startedLatchSupplier must not be null");
         Assertions.assertTrue(isNotBlank(imageRepo), "imageRepo must be like e.g: 'bitnami/zookeeper' or 'registry.cn-shenzhen.aliyuncs.com/wl4g-k8s/bitnami_zookeeper'");
         Assertions.assertTrue(isNotBlank(imageTag), "imageTag must be like 3.4.13");
-        Assertions.assertTrue(nonNull(portBindings) && portBindings.length % 2 == 0, "portBindings must be in pairs, e.g: [58080,8080,59090,9090]");
+        Assertions.assertTrue(nonNull(portBindings) && portBindings.size() % 2 == 0, "portBindings must be in pairs, e.g: [58080,8080,59090,9090]");
         Assertions.assertTrue(isNotBlank(loggerName), "loggerName must be empty");
         Assertions.assertTrue(isNotBlank(startedLogRegex), "loggerName must be empty");
+
+        startupTimeout = isNull(startupTimeout) ? Duration.ofSeconds(IT_START_CONTAINERS_TIMEOUT) : startupTimeout;
+
+        final List<String> portBindings0 = new ArrayList<>();
+        for (int i = 0; i < portBindings.size(); i += 2) {
+            Integer mappedPort = portBindings.get(i);
+            Integer containerPort = portBindings.get(i + 1);
+            Assertions.assertTrue(nonNull(mappedPort) && mappedPort > 1024, "mappedPort must be greater than 1024");
+            Assertions.assertTrue(nonNull(containerPort) && containerPort > 1024, "containerPort must be greater than 1024");
+            portBindings0.add(mappedPort + ":" + containerPort);
+        }
 
         @SuppressWarnings("rawtypes") final GenericContainer<?> container = new GenericContainer(imageRepo.concat(":").concat(imageTag)) {
             @SuppressWarnings("all")
@@ -468,13 +478,6 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
                 }
             }
         };
-
-        startupTimeout = isNull(startupTimeout) ? Duration.ofSeconds(IT_START_CONTAINERS_TIMEOUT) : startupTimeout;
-
-        final List<String> portBindings0 = new ArrayList<>();
-        for (int i = 0; i < portBindings.length; i += 2) {
-            portBindings0.add(portBindings[i] + ":" + portBindings[i + 1]);
-        }
 
         container.withEnv(env)
                 .withReuse(false)

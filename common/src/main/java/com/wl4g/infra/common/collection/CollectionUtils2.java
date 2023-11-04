@@ -543,9 +543,7 @@ public abstract class CollectionUtils2 {
             return new ArrayList<>(2);
         }
         List<T> list = new ArrayList<>(array.length);
-        for (T t : array) {
-            list.add(t);
-        }
+        list.addAll(asList(array));
         return list;
     }
 

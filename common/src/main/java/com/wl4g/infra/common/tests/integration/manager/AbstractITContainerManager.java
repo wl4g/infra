@@ -24,7 +24,6 @@ import com.wl4g.infra.common.reflect.ReflectionUtils2;
 import com.wl4g.infra.common.tests.integration.mock.AbstractDataMocker;
 import lombok.Getter;
 import org.apache.commons.lang3.ClassUtils;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.util.ReflectionUtils;
 import org.slf4j.Logger;
@@ -285,9 +284,14 @@ public abstract class AbstractITContainerManager implements Closeable {
 
     public void start() throws Exception {
         if (started.compareAndSet(false, true)) {
-            log.info(">>>>>>>>>> Initializing for IT containers manager ... <<<<<<<<<<");
-            startForMwContainers();
-            startForDataMocks();
+            try {
+                log.info(">>>>>>>>>> Initializing for IT containers manager ... <<<<<<<<<<");
+                startForMwContainers();
+                startForDataMocks();
+            } catch (Exception ex) {
+                log.error("Could not start IT containers manager", ex);
+                throw ex;
+            }
         }
     }
 
@@ -377,7 +381,6 @@ public abstract class AbstractITContainerManager implements Closeable {
         public ITGenericContainer(@NotEmpty List<String> portBindings,
                                   @NotNull GenericContainer<?> container) {
             portBindings = safeList(portBindings).stream().filter(Objects::nonNull).collect(toList());
-            Assertions.assertEquals(0, portBindings.size() % 2, "portBindings must be in pairs, e.g: [58080,8080,59090,9090]");
             this.portBindings = portBindings;
             this.container = requireNonNull(container, "container must not be null");
         }
