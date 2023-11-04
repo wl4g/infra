@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -396,6 +397,7 @@ public abstract class AbstractITContainerManager implements Closeable {
         public ITGenericContainer withDependsOn(@Nullable ITGenericContainer... dependsOn) {
             this.container.dependsOn(safeArrayToList(dependsOn)
                     .stream()
+                    .filter(Objects::nonNull)
                     .map(ITGenericContainer::getContainer)
                     .toArray(Startable[]::new));
             return this;
