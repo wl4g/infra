@@ -114,7 +114,7 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
         final Map<String, String> mergeEnv = new HashMap<>(safeMap(env));
         //mergeEnv.putIfAbsent("ZOO_ENABLE_AUTH", "true");
         mergeEnv.putIfAbsent("ALLOW_ANONYMOUS_LOGIN", "yes");
-        mergeEnv.put("ZOO_PORT_NUMBER", String.valueOf(containerPort));
+        mergeEnv.putIfAbsent("ZOO_PORT_NUMBER", String.valueOf(containerPort));
         return buildBitnamiContainer(startedLatchSupplier, imageRepo, imageTag, mappedPort, containerPort,
                 "zookeeper", startedLogRegex, null, startupTimeout, null,
                 mergeEnv);
@@ -420,6 +420,7 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
             @SuppressWarnings("all")
             @Override
             protected void containerIsCreated(String containerId) {
+                log.info("{}:{} container is created: {}", imageRepo, imageTag, containerId);
                 safeMap(configs).forEach((configPath, configContent) ->
                         copyFileToContainer(Transferable.of(configContent, 0777), configPath));
                 //final String originalCmd = StringUtils.join(containerInfo.getConfig().getCmd());
@@ -428,7 +429,7 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
 
             @Override
             protected void containerIsStarted(InspectContainerResponse containerInfo) {
-                log.info("{}:{} container is started: {}", imageRepo, imageTag, containerInfo.getId());
+                log.info("{}:{} container is started: {}", imageRepo, imageTag, containerInfo.toString());
                 startedLatchSupplier.get().countDown();
             }
         };
