@@ -36,13 +36,14 @@ import org.testcontainers.utility.ResourceReaper;
 import org.testcontainers.utility.TestcontainersConfiguration;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -56,6 +57,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToList;
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.EnvironmentUtil.getIntProperty;
 import static com.wl4g.infra.common.lang.EnvironmentUtil.getStringProperty;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.findFieldNullable;
@@ -65,8 +67,8 @@ import static java.lang.System.*;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.*;
 import static org.apache.commons.lang3.SystemUtils.IS_OS_MAC;
 import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
@@ -355,33 +357,29 @@ public abstract class AbstractITContainerManager implements Closeable {
     }
 
     @SuppressWarnings("all")
-    public String getServersConnectString(String protocol, String clusterName) {
+    public String getServersConnectString(String protocol, String clusterName, int portBindingsIndex) {
         final ITGenericContainer container = getRequiredContainer(clusterName);
-        //
-        //final int primaryMappedPort = container.getExposedPorts().stream().findFirst().orElseThrow(() ->
-        //        new IllegalStateException("Could not get first mapped port for container server port."));
-        final int primaryMappedPort = container.getPrimaryMappedPort();
-        return getServersConnectString(protocol, primaryMappedPort);
+        final String portBinding = container.getPortBindings().get(portBindingsIndex);
+        return getServersConnectString(protocol, Integer.parseInt(split(portBinding, ":")[0]));
     }
 
     public String getServersConnectString(String protocol, int mappedPort) {
-        String availableContainerHost = isBlank(dockerDaemonVmIp) ? localHostIp : dockerDaemonVmIp;
-        return String.format("%s%s:%s", protocol, availableContainerHost, mappedPort);
+        final String availableHost = isBlank(dockerDaemonVmIp) ? localHostIp : dockerDaemonVmIp;
+        return String.format("%s%s:%s", protocol, availableHost, mappedPort);
     }
 
     @Getter
     public static class ITGenericContainer implements Closeable {
-        private final int primaryMappedPort;
+        private final List<String> portBindings;
         private final GenericContainer<?> container;
 
         @SuppressWarnings("all")
-        public ITGenericContainer(@Min(1024) int primaryMappedPort,
-                                  @NotNull GenericContainer<?> container,
-                                  @Nullable ITGenericContainer... dependsOn) {
-            Assertions.assertTrue(primaryMappedPort >= 1024, "primaryMappedPort must be greater than or equal to 1024");
-            this.primaryMappedPort = primaryMappedPort;
+        public ITGenericContainer(@NotEmpty List<String> portBindings,
+                                  @NotNull GenericContainer<?> container) {
+            portBindings = safeList(portBindings).stream().filter(Objects::nonNull).collect(toList());
+            Assertions.assertEquals(0, portBindings.size() % 2, "portBindings must be in pairs, e.g: [58080,8080,59090,9090]");
+            this.portBindings = portBindings;
             this.container = requireNonNull(container, "container must not be null");
-            withDependsOn(dependsOn);
         }
 
         @Override
