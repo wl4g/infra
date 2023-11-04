@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.wl4g</groupId>
     <artifactId>infra-parent</artifactId>
-    <version>3.1.44</version>
+    <version>3.1.46</version>
     <packaging>pom</packaging>
     <name>Infra Parent</name>
     <url>http://infra.wl4g.com</url>

@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Supplier;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToList;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
@@ -47,6 +48,7 @@ import static java.util.Collections.*;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.testcontainers.shaded.org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * The {@link GenericITContainerManager}
@@ -77,51 +79,53 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
 
     // --------------------- ZOOKEEPER build container ---------------------
 
-    public ITGenericContainerWrapper buildBitnamiZookeeper34xContainer(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
-                                                                       @Min(1024) int mappedAndContainerPort,
-                                                                       @Nullable Map<String, String> env) {
+    public ITGenericContainer buildBitnamiZookeeper34xContainer(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
+                                                                @Min(1024) int mappedAndContainerPort,
+                                                                @Nullable Map<String, String> env) {
         return buildBitnamiZookeeperContainer(startedLatchSupplier, "registry.cn-shenzhen.aliyuncs.com/wl4g-k8s/bitnami_zookeeper",
                 "3.4.13", mappedAndContainerPort, mappedAndContainerPort,
                 "(.*)binding to port (.*)", null, env);
     }
 
-    public ITGenericContainerWrapper buildBitnamiZookeeper35xContainer(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
-                                                                       @Min(1024) int mappedAndContainerPort,
-                                                                       @Nullable Map<String, String> env) {
+    public ITGenericContainer buildBitnamiZookeeper35xContainer(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
+                                                                @Min(1024) int mappedAndContainerPort,
+                                                                @Nullable Map<String, String> env) {
         return buildBitnamiZookeeperContainer(startedLatchSupplier, "registry.cn-shenzhen.aliyuncs.com/wl4g-k8s/bitnami_zookeeper",
                 "3.5.9", mappedAndContainerPort, mappedAndContainerPort,
                 "(.*)binding to port (.*)", null, env);
     }
 
-    public ITGenericContainerWrapper buildBitnamiZookeeper36xContainer(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
-                                                                       @Min(1024) int mappedAndContainerPort,
-                                                                       @Nullable Map<String, String> env) {
+    public ITGenericContainer buildBitnamiZookeeper36xContainer(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
+                                                                @Min(1024) int mappedAndContainerPort,
+                                                                @Nullable Map<String, String> env) {
         return buildBitnamiZookeeperContainer(startedLatchSupplier, "registry.cn-shenzhen.aliyuncs.com/wl4g-k8s/bitnami_zookeeper",
                 "3.6.2", mappedAndContainerPort, mappedAndContainerPort,
                 "(.*)binding to port (.*)", null, env);
     }
 
-    public ITGenericContainerWrapper buildBitnamiZookeeperContainer(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
-                                                                    @NotBlank String imageRepo,
-                                                                    @NotBlank String imageTag,
-                                                                    @Min(1024) int mappedPort,
-                                                                    @Min(1024) int containerPort,
-                                                                    @NotBlank String startedLogRegex,
-                                                                    @Nullable Duration startupTimeout,
-                                                                    @Nullable Map<String, String> env) {
+    public ITGenericContainer buildBitnamiZookeeperContainer(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
+                                                             @NotBlank String imageRepo,
+                                                             @NotBlank String imageTag,
+                                                             @Min(1024) int mappedPort,
+                                                             @Min(1024) int containerPort,
+                                                             @NotBlank String startedLogRegex,
+                                                             @Nullable Duration startupTimeout,
+                                                             @Nullable Map<String, String> env) {
         final Map<String, String> mergeEnv = new HashMap<>(safeMap(env));
+        //mergeEnv.putIfAbsent("ZOO_ENABLE_AUTH", "true");
+        mergeEnv.putIfAbsent("ALLOW_ANONYMOUS_LOGIN", "yes");
         mergeEnv.put("ZOO_PORT_NUMBER", String.valueOf(containerPort));
         return buildBitnamiContainer(startedLatchSupplier, imageRepo, imageTag, mappedPort, containerPort,
                 "zookeeper", startedLogRegex, null, startupTimeout, null,
-                mergeEnv, null);
+                mergeEnv);
     }
 
     // --------------------- KAFKA build container ---------------------------
 
-    public ITGenericContainerWrapper buildBitnamiKafka22xContainer(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
-                                                                   @Min(1024) int mappedAndContainerPort,
-                                                                   @Nullable Map<String, String> env,
-                                                                   @NotBlank String zookeeperServers) {
+    public ITGenericContainer buildBitnamiKafka22xContainer(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
+                                                            @Min(1024) int mappedAndContainerPort,
+                                                            @Nullable Map<String, String> env,
+                                                            @NotBlank String zookeeperServers) {
         Assertions.assertTrue(isNotBlank(zookeeperServers), "zookeeperServers must not be blank");
 
         final String serverListen = getServersConnectString("PLAINTEXT://", mappedAndContainerPort);
@@ -138,12 +142,12 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
 
         return buildBitnamiKafkaContainer(startedLatchSupplier, "registry.cn-shenzhen.aliyuncs.com/wl4g-k8s/bitnami_kafka",
                 "2.2.0", mappedAndContainerPort, mappedAndContainerPort, "(.*)Kafka Server started (.*)",
-                null, mergeEnv, null);
+                null, mergeEnv);
     }
 
-    public ITGenericContainerWrapper buildBitnamiKafka35xContainer(@NotNull Supplier<CountDownLatch> startedLatch,
-                                                                   @Min(1024) int mappedAndContainerPort,
-                                                                   @Nullable Map<String, String> env) {
+    public ITGenericContainer buildBitnamiKafka35xContainer(@NotNull Supplier<CountDownLatch> startedLatch,
+                                                            @Min(1024) int mappedAndContainerPort,
+                                                            @Nullable Map<String, String> env) {
         // Generate controller port with retry.
         int controllerPort;
         do {
@@ -178,7 +182,7 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
 
         return buildBitnamiKafkaContainer(startedLatch, "registry.cn-shenzhen.aliyuncs.com/wl4g-k8s/bitnami_kafka",
                 "3.5", mappedAndContainerPort, mappedAndContainerPort, "(.*)Kafka Server started (.*)",
-                null, mergeEnv, null);
+                null, mergeEnv);
     }
 
     /**
@@ -206,15 +210,15 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
      * </pre>
      */
     @SuppressWarnings("all")
-    public ITGenericContainerWrapper buildBitnamiKafkaContainer(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
-                                                                @NotBlank String imageRepo,
-                                                                @NotBlank String imageTag,
-                                                                @Min(1024) int mappedPort,
-                                                                @Min(1024) int containerPort,
-                                                                @NotBlank String startedLogRegex,
-                                                                @Nullable Duration startupTimeout,
-                                                                @NotNull Map<String, String> env,
-                                                                @Nullable List<String> dependsOn) {
+    public ITGenericContainer buildBitnamiKafkaContainer(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
+                                                         @NotBlank String imageRepo,
+                                                         @NotBlank String imageTag,
+                                                         @Min(1024) int mappedPort,
+                                                         @Min(1024) int containerPort,
+                                                         @NotBlank String startedLogRegex,
+                                                         @Nullable Duration startupTimeout,
+                                                         @NotNull Map<String, String> env,
+                                                         @Nullable ITGenericContainer... dependsOn) {
         //final GenericContainer<?> kafka01 = new KafkaContainer(DockerImageName.parse("bitnami/kafka:2.8.1")
         //  .asCompatibleSubstituteFor("confluentinc/cp-kafka"))
         //  .withEmbeddedZookeeper();
@@ -247,19 +251,19 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
 
     // --------------------- RocketMQ build container ------------------------
 
-    public ITGenericContainerWrapper buildApacheRocketMQ49xContainer(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
-                                                                     @Min(1024) int mappedPort,
-                                                                     @Min(1024) int containerPort) {
+    public ITGenericContainer buildApacheRocketMQ49xContainer(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
+                                                              @Min(1024) int mappedPort,
+                                                              @Min(1024) int containerPort) {
         return buildApacheRocketMQContainer(startedLatchSupplier, "registry.cn-shenzhen.aliyuncs.com/wl4g-k8s/apache_rocketmq",
-                "4.9.7", mappedPort, containerPort, null);
+                "4.9.7", mappedPort, containerPort);
     }
 
-    public ITGenericContainerWrapper buildApacheRocketMQContainer(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
-                                                                  @NotBlank String imageRepo,
-                                                                  @NotBlank String imageTag,
-                                                                  @Min(1024) int mappedPort,
-                                                                  @Min(1024) int containerPort,
-                                                                  @Nullable List<String> dependsOn) {
+    public ITGenericContainer buildApacheRocketMQContainer(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
+                                                           @NotBlank String imageRepo,
+                                                           @NotBlank String imageTag,
+                                                           @Min(1024) int mappedPort,
+                                                           @Min(1024) int containerPort,
+                                                           @Nullable ITGenericContainer... dependsOn) {
         Assertions.assertTrue(mappedPort > 1024, "mappedPort must be greater than 1024");
         Assertions.assertTrue(containerPort > 1024, "containerPort must be greater than 1024");
 
@@ -274,35 +278,34 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
             }
         };
         container.setPortBindings(singletonList(String.format("%s:%s", mappedPort, containerPort)));
-        return new ITGenericContainerWrapper(mappedPort, container, dependsOn);
+        return new ITGenericContainer(mappedPort, container, dependsOn);
     }
 
     // --------------------- Kafka UI build Containers  ----------------------
 
-    public ITGenericContainerWrapper buildProvectuslabsKafkaUI07xContainer(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
-                                                                           @NotNull List<String> dependsOn,
-                                                                           @NotNull List<String> kafkaClusters) {
+    public ITGenericContainer buildProvectuslabsKafkaUI07xContainer(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
+                                                                    @NotNull List<String> kafkaClusters,
+                                                                    @NotNull ITGenericContainer... dependsOn) {
         return buildProvectuslabsKafkaUIContainer(startedLatchSupplier, "v0.7.1", 58888, 8080, 9997,
-                null, emptyMap(), dependsOn, kafkaClusters);
+                null, emptyMap(), kafkaClusters, dependsOn);
     }
 
-    public ITGenericContainerWrapper buildProvectuslabsKafkaUIContainer(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
-                                                                        @NotBlank String imageTag,
-                                                                        @Min(1024) int mappedPort,
-                                                                        @Min(1024) int containerPort,
-                                                                        @Min(1024) int kafkaMetricsPort,
-                                                                        @Nullable String auditLogTopic,
-                                                                        @NotNull Map<String, String> env,
-                                                                        @NotNull List<String> dependsOn,
-                                                                        @NotNull List<String> kafkaClusters) {
+    public ITGenericContainer buildProvectuslabsKafkaUIContainer(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
+                                                                 @NotBlank String imageTag,
+                                                                 @Min(1024) int mappedPort,
+                                                                 @Min(1024) int containerPort,
+                                                                 @Min(1024) int kafkaMetricsPort,
+                                                                 @Nullable String auditLogTopic,
+                                                                 @NotNull Map<String, String> env,
+                                                                 @NotNull List<String> kafkaClusters,
+                                                                 @NotNull ITGenericContainer... dependsOn) {
         Assertions.assertNotNull(startedLatchSupplier, "startedLatchSupplier must not be null");
         Assertions.assertTrue(mappedPort > 1024, "mappedPort must be greater than 1024");
         Assertions.assertTrue(containerPort > 1024, "containerPort must be greater than 1024");
         Assertions.assertTrue(kafkaMetricsPort > 1024, "kafkaMetricsPort must be greater than 1024");
-        Assertions.assertTrue(nonNull(dependsOn) && !dependsOn.isEmpty(), "dependsOn must not be empty");
         Assertions.assertTrue(nonNull(kafkaClusters) && !kafkaClusters.isEmpty(), "kafkaClusters must not be empty");
-        Assertions.assertEquals(dependsOn.size(), kafkaClusters.size(), format("dependsOn size(%s) must be equal to kafkaClusters size(%s)",
-                dependsOn.size(), kafkaClusters.size()));
+        Assertions.assertEquals(safeArrayToList(dependsOn).size(), kafkaClusters.size(), format("dependsOn size(%s) must be equal to kafkaClusters size(%s)",
+                safeArrayToList(dependsOn).size(), kafkaClusters.size()));
 
         final Map<String, String> mergeEnv = new HashMap<>(safeMap(env));
         mergeEnv.putIfAbsent("JAVA_OPTS", "-Djava.net.preferIPv4Stack=true -Xmx1G");
@@ -312,7 +315,7 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
             mergeEnv.putIfAbsent("KAFKA_CLUSTERS_" + i + "_BOOTSTRAPSERVERS", kafkaServers);
             mergeEnv.putIfAbsent("KAFKA_CLUSTERS_" + i + "_METRICS_PORT", valueOf(kafkaMetricsPort));
             mergeEnv.putIfAbsent("KAFKA_CLUSTERS_" + i + "_AUDIT_TOPIC_AUDIT_ENABLED", "true");
-            mergeEnv.putIfAbsent("KAFKA_CLUSTERS_" + i + "_AUDIT_TOPIC", org.testcontainers.shaded.org.apache.commons.lang3.StringUtils.isBlank(auditLogTopic) ? "__kui-audit-log" : auditLogTopic);
+            mergeEnv.putIfAbsent("KAFKA_CLUSTERS_" + i + "_AUDIT_TOPIC", isBlank(auditLogTopic) ? "__kui-audit-log" : auditLogTopic);
             mergeEnv.putIfAbsent("KAFKA_CLUSTERS_" + i + "_AUDIT_TOPIC_PROPERTIES_RETENTION_MS", "43200000");
             mergeEnv.putIfAbsent("KAFKA_CLUSTERS_" + i + "_AUDIT_TOPICS_PARTITIONS", "3");
             mergeEnv.putIfAbsent("KAFKA_CLUSTERS_" + i + "_AUDIT_LEVEL", "ALTER_ONLY");
@@ -325,26 +328,26 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
 
     // --------------------- Prometheus build Containers  --------------------
 
-    public ITGenericContainerWrapper buildBitnamiPrometheus24xContainer(Supplier<CountDownLatch> startedLatchSupplier,
-                                                                        @Min(1024) int mappedPort,
-                                                                        @Min(1) int scrapeIntervalSeconds,
-                                                                        List<String> scrapeUrls,
-                                                                        @Nullable Map<String, String> env,
-                                                                        @Nullable List<String> dependsOn) {
+    public ITGenericContainer buildBitnamiPrometheus24xContainer(Supplier<CountDownLatch> startedLatchSupplier,
+                                                                 @Min(1024) int mappedPort,
+                                                                 @Min(1) int scrapeIntervalSeconds,
+                                                                 List<String> scrapeUrls,
+                                                                 @Nullable Map<String, String> env,
+                                                                 @Nullable ITGenericContainer... dependsOn) {
         return buildBitnamiPrometheusContainer(startedLatchSupplier, mappedPort,
                 "registry.cn-shenzhen.aliyuncs.com/wl4g-k8s/bitnami_prometheus",
                 "2.47.2", scrapeIntervalSeconds, scrapeUrls, env, dependsOn);
     }
 
     @SuppressWarnings({"rawtypes", "unchecked", "unused", "all"})
-    public ITGenericContainerWrapper buildBitnamiPrometheusContainer(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
-                                                                     @Min(1024) int mappedPort,
-                                                                     @NotBlank String imageName,
-                                                                     @NotBlank String imageTag,
-                                                                     @Min(1) int scrapeIntervalSeconds,
-                                                                     @NotEmpty List<String> scrapeUrls,
-                                                                     @Nullable Map<String, String> env,
-                                                                     @Nullable List<String> dependsOn) {
+    public ITGenericContainer buildBitnamiPrometheusContainer(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
+                                                              @Min(1024) int mappedPort,
+                                                              @NotBlank String imageName,
+                                                              @NotBlank String imageTag,
+                                                              @Min(1) int scrapeIntervalSeconds,
+                                                              @NotEmpty List<String> scrapeUrls,
+                                                              @Nullable Map<String, String> env,
+                                                              @Nullable ITGenericContainer... dependsOn) {
         Assert2.isTrue(scrapeIntervalSeconds > 0, "scrapeIntervalSeconds must be greater than 0");
         Assert2.notEmptyOf(scrapeUrls, "scrapeUrls");
 
@@ -374,18 +377,18 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
 
     // --------------------- Grafana build Containers  -----------------------
 
-    public ITGenericContainerWrapper buildBitnamiGrafana101xContainer(Supplier<CountDownLatch> startedLatchSupplier,
-                                                                      int mappedPort,
-                                                                      @Nullable Map<String, String> env) {
-        return buildBitnamiGrafanaContainer(startedLatchSupplier, mappedPort, "10.1.5", env, null);
+    public ITGenericContainer buildBitnamiGrafana101xContainer(Supplier<CountDownLatch> startedLatchSupplier,
+                                                               int mappedPort,
+                                                               @Nullable Map<String, String> env) {
+        return buildBitnamiGrafanaContainer(startedLatchSupplier, mappedPort, "10.1.5", env);
     }
 
     @SuppressWarnings({"rawtypes", "unchecked", "unused", "all"})
-    public ITGenericContainerWrapper buildBitnamiGrafanaContainer(Supplier<CountDownLatch> startedLatchSupplier,
-                                                                  @Min(1024) int mappedPort,
-                                                                  @NotBlank String imageTag,
-                                                                  @Nullable Map<String, String> env,
-                                                                  @Nullable List<String> dependsOn) {
+    public ITGenericContainer buildBitnamiGrafanaContainer(Supplier<CountDownLatch> startedLatchSupplier,
+                                                           @Min(1024) int mappedPort,
+                                                           @NotBlank String imageTag,
+                                                           @Nullable Map<String, String> env,
+                                                           @Nullable ITGenericContainer... dependsOn) {
         return buildBitnamiContainer(startedLatchSupplier, "registry.cn-shenzhen.aliyuncs.com/wl4g-k8s/bitnami_grafana",
                 imageTag, mappedPort, 3000, "grafana", "(.*)HTTP Server Listen(.*)",
                 null, null, null, env, dependsOn);
@@ -393,18 +396,18 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
 
     // --------------------- Generic build container ---------------------
 
-    public ITGenericContainerWrapper buildBitnamiContainer(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
-                                                           @NotBlank String imageRepo,
-                                                           @NotBlank String imageTag,
-                                                           @Min(1024) int mappedPort,
-                                                           @Min(1024) int containerPort,
-                                                           @NotBlank String loggerName,
-                                                           @NotBlank String startedLogRegex,
-                                                           @Nullable String networkMode,
-                                                           @Nullable Duration startupTimeout,
-                                                           @Nullable Map<String, String> configs,
-                                                           @Nullable Map<String, String> env,
-                                                           @Nullable List<String> dependsOn) {
+    public ITGenericContainer buildBitnamiContainer(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
+                                                    @NotBlank String imageRepo,
+                                                    @NotBlank String imageTag,
+                                                    @Min(1024) int mappedPort,
+                                                    @Min(1024) int containerPort,
+                                                    @NotBlank String loggerName,
+                                                    @NotBlank String startedLogRegex,
+                                                    @Nullable String networkMode,
+                                                    @Nullable Duration startupTimeout,
+                                                    @Nullable Map<String, String> configs,
+                                                    @Nullable Map<String, String> env,
+                                                    @Nullable ITGenericContainer... dependsOn) {
         Assertions.assertNotNull(startedLatchSupplier, "startedLatchSupplier must not be null");
         Assertions.assertTrue(isNotBlank(imageRepo), "imageRepo must be like e.g: 'bitnami/zookeeper' or 'registry.cn-shenzhen.aliyuncs.com/wl4g-k8s/bitnami_zookeeper'");
         Assertions.assertTrue(isNotBlank(imageTag), "imageTag must be like 3.4.13");
@@ -433,15 +436,15 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
         startupTimeout = isNull(startupTimeout) ? Duration.ofSeconds(IT_START_CONTAINERS_TIMEOUT) : startupTimeout;
         container.withEnv(env)
                 .withReuse(false)
-                .withExposedPorts(mappedPort)
+                //.withExposedPorts(mappedPort) // no need
                 .withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger("testcontainers.".concat(loggerName))))
                 .waitingFor(Wait.forLogMessage(startedLogRegex, 1).withStartupTimeout(startupTimeout));
         container.setPortBindings(singletonList(mappedPort + ":" + containerPort));
-        if (!org.testcontainers.shaded.org.apache.commons.lang3.StringUtils.isBlank(networkMode)) {
+        if (!isBlank(networkMode)) {
             container.withNetworkMode(networkMode);
         }
 
-        return new ITGenericContainerWrapper(mappedPort, container, dependsOn);
+        return new ITGenericContainer(mappedPort, container, dependsOn);
     }
 
 }

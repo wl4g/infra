@@ -24,23 +24,25 @@ import com.wl4g.infra.common.reflect.ReflectionUtils2;
 import com.wl4g.infra.common.tests.integration.mock.AbstractDataMocker;
 import lombok.Getter;
 import org.apache.commons.lang3.ClassUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.dockerclient.EnvironmentAndSystemPropertyClientProviderStrategy;
+import org.testcontainers.lifecycle.Startable;
 import org.testcontainers.utility.ResourceReaper;
 import org.testcontainers.utility.TestcontainersConfiguration;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
@@ -53,7 +55,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToList;
-import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.EnvironmentUtil.getIntProperty;
 import static com.wl4g.infra.common.lang.EnvironmentUtil.getStringProperty;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.findFieldNullable;
@@ -89,7 +90,7 @@ public abstract class AbstractITContainerManager implements Closeable {
 
     // IT runtime properties definitions.
     // see:https://java.testcontainers.org/modules/kafka/#example
-    private final Map<String, ITGenericContainerWrapper> mwContainers = new ConcurrentHashMap<>();
+    private final Map<String, ITGenericContainer> mwContainers = new ConcurrentHashMap<>();
     private CountDownLatch mwContainersStartedLatch;
     private final Map<String, AbstractDataMocker> dataMockers = new ConcurrentHashMap<>();
     private CountDownLatch dataMockersFinishedLatch;
@@ -161,7 +162,7 @@ public abstract class AbstractITContainerManager implements Closeable {
                     itDockerHost = "npipe:////./pipe/docker_engine";
                 } else {
                     try {
-                        // call to windows multipass command findstr info docker
+                        // call to windows multipass command find str info docker
                         final String dockerDaemonVmIP = ProcessUtils
                                 .execSimpleString("cmd /c \"(if exist %SystemRoot%\\System32\\multipass.exe (multipass info docker | findstr /i IPv4 | awk \"{print $2}\") else (echo.))\"");
                         out.printf(">>> [Windows] Found local multipass(windows) VM for docker IP: %s%n", dockerDaemonVmIP);
@@ -195,9 +196,10 @@ public abstract class AbstractITContainerManager implements Closeable {
      * {@link org.testcontainers.DockerClientFactory#client()}
      * {@link org.testcontainers.utility.ResourceReaper#instance()}
      * {@link org.testcontainers.utility.ResourceReaper#init()}
-     * {@linktext org.testcontainers.utility.RyukResourceReaper#ryukContainer}
+     * {@link org.testcontainers.utility.RyukResourceReaper#ryukContainer}
      */
     @VisibleForTesting
+    @SuppressWarnings("all")
     static void setupRyukContainerIfNeed() {
         try {
             final ResourceReaper reaper = ResourceReaper.instance();
@@ -250,10 +252,6 @@ public abstract class AbstractITContainerManager implements Closeable {
                 });
     }
 
-    public Map<String, ITGenericContainerWrapper> getMwContainers() {
-        return unmodifiableMap(mwContainers);
-    }
-
     @Override
     public void close() throws IOException {
         close(false);
@@ -267,7 +265,7 @@ public abstract class AbstractITContainerManager implements Closeable {
         }
         if (started.compareAndSet(true, false)) {
             log.info("Shutting down to IT middleware containers ...");
-            mwContainers.values().forEach(ITGenericContainerWrapper::close);
+            mwContainers.values().forEach(ITGenericContainer::close);
 
             log.info("Shutting down to IT data mockers ...");
             dataMockers.values().forEach(dataMocker -> {
@@ -301,37 +299,11 @@ public abstract class AbstractITContainerManager implements Closeable {
         this.mwContainersStartedLatch = new CountDownLatch(mwContainers.size());
 
         // Run for middleware containers.
-        log.info("Starting for IT middleware containers ...");
-        mwContainers.forEach((name, c) -> {
-            final List<String> dependsOn = c.getDependsOn();
-            final CountDownLatch startedLatch = c.getStartedLatch();
-
-            // Start a thread for each container
-            new Thread(() -> {
-                try {
-                    // Wait for the dependencies to start
-                    for (String dependency : dependsOn) {
-                        final ITGenericContainerWrapper container = mwContainers.get(dependency);
-                        if (nonNull(container)) {
-                            // 无需设置超时时间, 因为会有外部主线程中 mwContainersStartedLatch 控制超时.
-                            // await() 表示尽可能等待依赖的容器启动完成.
-                            container.getStartedLatch().await();
-                        } else {
-                            log.warn(">>> Could not found dependency container: {}", dependency);
-                        }
-                    }
-
-                    // Start the container
-                    log.info("Starting IT middleware container: {}", name);
-                    c.getContainer().start();
-
-                    // Count down the latch to signal the container has started
-                    startedLatch.countDown();
-                } catch (InterruptedException e) {
-                    log.error("Failed to start IT middleware container: {}", name, e);
-                }
-            }).start();
-        });
+        log.info("Starting IT middleware containers ...");
+        mwContainers.forEach((name, container) -> new Thread(() -> {
+            log.info("Starting for IT middleware container: {}", name);
+            container.getContainer().start();
+        }).start());
 
         if (!mwContainersStartedLatch.await(IT_START_CONTAINERS_TIMEOUT, TimeUnit.SECONDS)) {
             throw new TimeoutException("Failed to start IT middleware containers. timeout: " + IT_START_CONTAINERS_TIMEOUT + "s");
@@ -343,14 +315,13 @@ public abstract class AbstractITContainerManager implements Closeable {
      * Startup Data Mockers.
      */
     private void startForDataMocks() throws Exception {
-        // Run for data mockers.
         log.info("Initializing for IT data mockers ...");
         final Supplier<CountDownLatch> dataMockersFinishedLatchSupplier = () -> dataMockersFinishedLatch;
         initDataMockers(dataMockersFinishedLatchSupplier, dataMockers);
-        dataMockersFinishedLatch = new CountDownLatch(dataMockers.size());
+        this.dataMockersFinishedLatch = new CountDownLatch(dataMockers.size());
 
         log.info("Starting for IT data mockers ...");
-        dataMockers.forEach((name, mocker) -> new Thread(() -> {
+        this.dataMockers.forEach((name, mocker) -> new Thread(() -> {
             log.info("Starting IT data mocker: {}", name);
             mocker.run();
             mocker.printStatistics();
@@ -361,15 +332,19 @@ public abstract class AbstractITContainerManager implements Closeable {
     }
 
     protected abstract void initMwContainers(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
-                                             @NotNull Map<String, ITGenericContainerWrapper> firstContainers);
+                                             @NotNull Map<String, ITGenericContainer> mwContainers);
 
     protected abstract void initDataMockers(@NotNull Supplier<CountDownLatch> finishedLatchSupplier,
                                             @NotNull Map<String, AbstractDataMocker> dataMockers);
 
     // ------ Getting Running Containers Configuration  ------
 
+    public Map<String, ITGenericContainer> getMwContainers() {
+        return unmodifiableMap(mwContainers);
+    }
+
     @SuppressWarnings("unchecked")
-    public <T extends ITGenericContainerWrapper> T getRequiredContainer(String name) {
+    public <T extends ITGenericContainer> T getRequiredContainer(String name) {
         return (T) requireNonNull(mwContainers.get(name), String.format("Could not get first container for %s", name));
     }
 
@@ -380,7 +355,7 @@ public abstract class AbstractITContainerManager implements Closeable {
 
     @SuppressWarnings("all")
     public String getServersConnectString(String protocol, String clusterName) {
-        final ITGenericContainerWrapper container = getRequiredContainer(clusterName);
+        final ITGenericContainer container = getRequiredContainer(clusterName);
         //
         //final int primaryMappedPort = container.getExposedPorts().stream().findFirst().orElseThrow(() ->
         //        new IllegalStateException("Could not get first mapped port for container server port."));
@@ -394,19 +369,18 @@ public abstract class AbstractITContainerManager implements Closeable {
     }
 
     @Getter
-    public static class ITGenericContainerWrapper implements Closeable {
+    public static class ITGenericContainer implements Closeable {
         private final int primaryMappedPort;
         private final GenericContainer<?> container;
-        private final List<String> dependsOn;
-        private final CountDownLatch startedLatch;
 
-        public ITGenericContainerWrapper(int primaryMappedPort,
-                                         @Nullable GenericContainer<?> container,
-                                         @Nullable List<String> dependsOn) {
+        @SuppressWarnings("all")
+        public ITGenericContainer(@Min(1024) int primaryMappedPort,
+                                  @NotNull GenericContainer<?> container,
+                                  @Nullable ITGenericContainer... dependsOn) {
+            Assertions.assertTrue(primaryMappedPort >= 1024, "primaryMappedPort must be greater than or equal to 1024");
             this.primaryMappedPort = primaryMappedPort;
-            this.container = container;
-            this.dependsOn = dependsOn;
-            this.startedLatch = new CountDownLatch(safeList(dependsOn).size());
+            this.container = requireNonNull(container, "container must not be null");
+            withDependsOn(dependsOn);
         }
 
         @Override
@@ -416,6 +390,15 @@ public abstract class AbstractITContainerManager implements Closeable {
 
         public void start() {
             container.start();
+        }
+
+        @SuppressWarnings("all")
+        public ITGenericContainer withDependsOn(@Nullable ITGenericContainer... dependsOn) {
+            this.container.dependsOn(safeArrayToList(dependsOn)
+                    .stream()
+                    .map(ITGenericContainer::getContainer)
+                    .toArray(Startable[]::new));
+            return this;
         }
     }
 
