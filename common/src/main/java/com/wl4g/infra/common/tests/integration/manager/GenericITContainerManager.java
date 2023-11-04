@@ -421,7 +421,7 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
             @Override
             protected void containerIsCreated(String containerId) {
                 safeMap(configs).forEach((configPath, configContent) ->
-                        copyFileToContainer(Transferable.of(configContent, 777), configPath));
+                        copyFileToContainer(Transferable.of(configContent, 0777), configPath));
                 //final String originalCmd = StringUtils.join(containerInfo.getConfig().getCmd());
                 //withCommand("sh", "-c", config + "; " + originalCmd);
             }
