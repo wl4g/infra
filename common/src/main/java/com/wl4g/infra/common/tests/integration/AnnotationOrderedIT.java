@@ -19,19 +19,16 @@ package com.wl4g.infra.common.tests.integration;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
 import org.junit.experimental.categories.Category;
-import org.junit.jupiter.api.ClassOrderer;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.TestClassOrder;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 
-import javax.validation.constraints.Null;
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -54,8 +51,8 @@ public abstract class AnnotationOrderedIT {
         this(null, null);
     }
 
-    public AnnotationOrderedIT(@Null Map<String, String> logPatterns,
-                               @Null BiConsumer<String, String> logConsumer) {
+    public AnnotationOrderedIT(@Nullable Map<String, String> logPatterns,
+                               @Nullable BiConsumer<String, String> logConsumer) {
         // Register log pattern local.
         if (nonNull(logPatterns)) {
             logPatterns.forEach((name, logPattern) -> {
@@ -69,17 +66,14 @@ public abstract class AnnotationOrderedIT {
         final AppenderBase<ILoggingEvent> listener = new AppenderBase<ILoggingEvent>() {
             @Override
             protected void append(ILoggingEvent event) {
-                if (logPatternMap.isEmpty()) {
-                    return;
-                }
-                logPatternMap.forEach((name, patternLocal) -> {
-                    final String logMsg = event.getFormattedMessage();
-                    if (patternLocal.get().matcher(logMsg).matches()) {
-                        if (nonNull(logConsumer)) {
+                if (nonNull(logConsumer)) {
+                    safeMap(logPatternMap).forEach((name, patternLocal) -> {
+                        final String logMsg = event.getFormattedMessage();
+                        if (patternLocal.get().matcher(logMsg).matches()) {
                             logConsumer.accept(name, logMsg);
                         }
-                    }
-                });
+                    });
+                }
             }
         };
         ((ch.qos.logback.classic.Logger) getLogger(Logger.ROOT_LOGGER_NAME))

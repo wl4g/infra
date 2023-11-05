@@ -55,7 +55,6 @@ public abstract class AssertionITContainerManager extends GenericITContainerMana
         super(testClass);
     }
 
-
     // --------------------- MQ consuming Assertion Runners  --------------
 
     @SuppressWarnings("all")
