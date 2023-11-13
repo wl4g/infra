@@ -49,7 +49,9 @@ function usages() {
     echo $"
 Usage: ./$(basename $0) [OPTIONS] [arg1] [arg2] ...
     version                                         Print maven project POM version.
-    upgrade-push                                    Upgrade pom and push to release job. (eg: 3.1.30)
+    upgrade                                         Upgrade pom project version. (eg: 3.1.30)
+    push                                            Pushing to git remote.
+    upgrade-push                                    Upgrade project version and push to git remote. (eg: 3.1.30)
 "
 }
 
@@ -62,7 +64,20 @@ function print_pom_version() {
     echo $POM_VERSION
 }
 
-function do_upgrade_push() {
+function do_push() {
+    new_version="$1"
+    if [ -z "$new_version" ]; then    
+      logErr "<new version> is missing."; exit 1
+    fi
+
+    git -C $BASE_DIR add .
+    git -C $BASE_DIR commit -m "feat: upgrade to v$new_version"
+    git -C $BASE_DIR tag v$new_version
+    git -C $BASE_DIR push origin v$new_version
+    git -C $BASE_DIR push
+}
+
+function do_upgrade() {
     new_version="$1"
     if [ -z "$new_version" ]; then
       logErr "<new version> is missing."; exit 1
@@ -78,17 +93,22 @@ function do_upgrade_push() {
     \rm -rf $BASE_DIR/*/*/pom.xml.versionsBackup >/dev/null 2>&1
     \rm -rf $BASE_DIR/*/*/*/pom.xml.versionsBackup >/dev/null 2>&1
     set -e
+}
 
-    git -C $BASE_DIR add .
-    git -C $BASE_DIR commit -m "feat: upgrade to v$new_version"
-    git -C $BASE_DIR tag v$new_version
-    git -C $BASE_DIR push origin v$new_version
-    git -C $BASE_DIR push
+function do_upgrade_push() {
+    do_upgrade "$1"
+    do_push "$1"
 }
 
 case $1 in
   version)
     print_pom_version
+    ;;
+  upgrade)
+    do_upgrade "$2"
+    ;;
+  push)
+    do_push "$2"
     ;;
   upgrade-push)
     do_upgrade_push "$2"

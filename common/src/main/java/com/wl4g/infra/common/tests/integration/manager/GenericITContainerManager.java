@@ -66,11 +66,11 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
 
     // --------------------- Getting Run Containers Configuration  -----------------------
 
-    public String getKafkaClusterServers(String clusterName) {
+    public String getKafkaConnectString(String clusterName) {
         return getServersConnectString("PLAINTEXT://", clusterName, 0);
     }
 
-    public String getRocketMQClusterServers(String clusterName) {
+    public String getRocketMQConnectString(String clusterName) {
         // return ((RocketMQContainer) getRequiredContainer(clusterName)).getNamesrvAddr();
         return getServersConnectString("", clusterName, 0);
     }
@@ -150,11 +150,16 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
     }
 
     public ITGenericContainer buildBitnamiKafka35xContainer(@NotNull Supplier<CountDownLatch> startedLatch,
+                                                            @Nullable String listenProtocol,
+                                                            @Nullable String listenName,
                                                             @Min(1024) int serverPort,
                                                             @Min(1024) int jmxPort,
                                                             @Nullable Map<String, String> env) {
         Assertions.assertTrue(serverPort > 1024, "serverPort must be greater than 1024");
         Assertions.assertTrue(jmxPort > 1024, "jmxPort must be greater than 1024");
+
+        listenProtocol = isBlank(listenProtocol) ? "PLAINTEXT://" : listenProtocol;
+        listenName = isBlank(listenName) ? listenProtocol.substring(0, listenProtocol.indexOf("://")) : listenName;
 
         // Generate controller port with retry.
         int controllerPort;
@@ -162,7 +167,7 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
             controllerPort = RandomUtils.nextInt(55535, 65535);
         } while (controllerPort == serverPort);
 
-        final String serverListen = getServersConnectString("PLAINTEXT://", serverPort);
+        final String serverListen = getServersConnectString(listenProtocol, serverPort);
 
         final Map<String, String> mergeEnv = new HashMap<>();
         mergeEnv.putIfAbsent("ALLOW_PLAINTEXT_LISTENER", "yes");
@@ -179,7 +184,7 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
         mergeEnv.putIfAbsent("KAFKA_CFG_ADVERTISED_LISTENERS", serverListen);
         mergeEnv.putIfAbsent("KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP", "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT");
         mergeEnv.putIfAbsent("KAFKA_CFG_CONTROLLER_LISTENER_NAMES", "CONTROLLER");
-        mergeEnv.putIfAbsent("KAFKA_CFG_INTER_BROKER_LISTENER_NAME", "PLAINTEXT");
+        mergeEnv.putIfAbsent("KAFKA_CFG_INTER_BROKER_LISTENER_NAME", listenName);
         // Other
         // see:https://github.com/bitnami/containers/blob/main/bitnami/kafka/3.5/debian-11/rootfs/opt/bitnami/scripts/libkafka.sh#L937
         mergeEnv.putIfAbsent("KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE", "true");
@@ -302,6 +307,50 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
         };
         container.setPortBindings(singletonList(String.format("%s:%s", serverPort, serverPort)));
         return new ITGenericContainer(singletonList(serverPort + ":" + serverPort), container);
+    }
+
+    // --------------------- Redis build Containers  ----------------------
+
+    public String getRedisConnectString(String serverName) {
+        return getServersConnectString("redis://", serverName, 0);
+    }
+
+    public ITGenericContainer buildBitnamiRedis6xContainer(Supplier<CountDownLatch> startedLatchSupplier,
+                                                           @Min(1024) int serverPort,
+                                                           @Nullable String redisMasterPassword,
+                                                           @Nullable Map<String, String> env) {
+        return buildBitnamiRedisContainer(startedLatchSupplier, "registry.cn-shenzhen.aliyuncs.com/wl4g-k8s/bitnami_redis", "6.2.14",
+                serverPort, redisMasterPassword, env, null, null);
+    }
+
+    public ITGenericContainer buildBitnamiRedis7xContainer(Supplier<CountDownLatch> startedLatchSupplier,
+                                                           @Min(1024) int serverPort,
+                                                           @Nullable String redisMasterPassword,
+                                                           @Nullable Map<String, String> env) {
+        return buildBitnamiRedisContainer(startedLatchSupplier, "registry.cn-shenzhen.aliyuncs.com/wl4g-k8s/bitnami_redis", "7.0.14",
+                serverPort, redisMasterPassword, env, null, null);
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked", "unused", "all"})
+    public ITGenericContainer buildBitnamiRedisContainer(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
+                                                         @NotBlank String imageName,
+                                                         @NotBlank String imageTag,
+                                                         @Min(1024) int serverPort,
+                                                         @Nullable String redisMasterPassword,
+                                                         @Nullable Map<String, String> env,
+                                                         @Nullable Consumer<String> createdListener,
+                                                         @Nullable Consumer<InspectContainerResponse> startedListener) {
+        final Map<String, String> mergeEnv = new HashMap<>();
+        //mergeEnv.put("REDIS_DISABLE_COMMANDS", "FLUSHDB,FLUSHALL");
+        mergeEnv.put("REDIS_PORT_NUMBER", serverPort + "");
+        if (isNotBlank(redisMasterPassword)) {
+            mergeEnv.put("REDIS_PASSWORD", redisMasterPassword);
+        } else {
+            mergeEnv.put("ALLOW_EMPTY_PASSWORD", "yes");
+        }
+        return buildBitnamiContainer(startedLatchSupplier, imageName,
+                imageTag, asList(serverPort, serverPort), "redis", "(.*)Ready to accept connections(.*)",
+                null, null, null, mergeEnv, createdListener, startedListener);
     }
 
     // --------------------- Kafka UI build Containers  ----------------------

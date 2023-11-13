@@ -16,30 +16,14 @@
 
 package com.wl4g.infra.common.tests.integration.mock;
 
-import org.slf4j.Logger;
-
-import java.io.IOException;
-
-import static org.slf4j.LoggerFactory.getLogger;
+import java.io.Closeable;
 
 /**
- * The {@link AbstractDataMocker}
+ * The {@link IDataMocker}
  *
  * @author James Wong
  * @since v3.1
  **/
-public abstract class AbstractDataMocker implements IDataMocker {
-    protected final Logger log = getLogger(getClass());
-
-    @Override
-    public void close() throws IOException {
-    }
-
-    //public static class MockCustomHostResolver implements HostResolver {
-    //    @Override
-    //    public InetAddress[] resolve(String host) throws UnknownHostException {
-    //        return new InetAddress[] {InetAddress.getLocalHost()};
-    //    }
-    //}
-
+public interface IDataMocker extends Runnable, Closeable {
+    void printStatistics();
 }

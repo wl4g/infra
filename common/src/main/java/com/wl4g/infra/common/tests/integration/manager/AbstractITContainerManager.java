@@ -21,7 +21,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.wl4g.infra.common.cli.ProcessUtils;
 import com.wl4g.infra.common.net.InetUtils;
 import com.wl4g.infra.common.reflect.ReflectionUtils2;
-import com.wl4g.infra.common.tests.integration.mock.AbstractDataMocker;
+import com.wl4g.infra.common.tests.integration.mock.IDataMocker;
 import lombok.Getter;
 import org.apache.commons.lang3.ClassUtils;
 import org.junit.jupiter.api.Test;
@@ -94,7 +94,7 @@ public abstract class AbstractITContainerManager implements Closeable {
     // see:https://java.testcontainers.org/modules/kafka/#example
     private final Map<String, ITGenericContainer> mwContainers = new ConcurrentHashMap<>();
     private CountDownLatch mwContainersStartedLatch;
-    private final Map<String, AbstractDataMocker> dataMockers = new ConcurrentHashMap<>();
+    private final Map<String, IDataMocker> dataMockers = new ConcurrentHashMap<>();
     private CountDownLatch dataMockersFinishedLatch;
 
     //
@@ -342,7 +342,7 @@ public abstract class AbstractITContainerManager implements Closeable {
                                              @NotNull Map<String, ITGenericContainer> mwContainers);
 
     protected abstract void initDataMockers(@NotNull Supplier<CountDownLatch> finishedLatchSupplier,
-                                            @NotNull Map<String, AbstractDataMocker> dataMockers);
+                                            @NotNull Map<String, IDataMocker> dataMockers);
 
     // ------ Getting Running Containers Configuration  ------
 
@@ -356,7 +356,7 @@ public abstract class AbstractITContainerManager implements Closeable {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends AbstractDataMocker> T getRequiredDataMocker(String name) {
+    public <T extends IDataMocker> T getRequiredDataMocker(String name) {
         return (T) requireNonNull(dataMockers.get(name), String.format("Could not get data mocker for %s", name));
     }
 
