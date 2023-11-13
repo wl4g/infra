@@ -220,7 +220,7 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
             controllerPort = RandomUtils.nextInt(55535, 65535);
         } while (controllerPort == serverPort);
 
-        final String serverListen = getServersConnectString("SASL_SSL", serverPort);
+        final String serverListen = getServersConnectString("SASL_SSL://", serverPort);
 
         final Map<String, String> mergeEnv = new HashMap<>();
         mergeEnv.putIfAbsent("ALLOW_PLAINTEXT_LISTENER", "no");
