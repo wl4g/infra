@@ -25,7 +25,12 @@ import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.errors.TopicExistsException;
 import org.apache.kafka.common.errors.UnknownTopicOrPartitionException;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.junit.jupiter.api.Assertions;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,6 +50,7 @@ import static java.util.Collections.singleton;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
  * The {@link SimpleKafkaDataMocker}
@@ -59,6 +65,8 @@ public class SimpleKafkaDataMocker extends AbstractDataMocker {
     private final Supplier<CountDownLatch> finishedLatchSupplier;
     private final String kafkaServers;
     private final String kafkaTopic;
+    private final Map<String, Object> adminOverrideProps;
+    private final Map<String, Object> producerOverrideProps;
     private final int partition;
     private final int replicationFactor;
     private final int limitTotal;
@@ -67,21 +75,38 @@ public class SimpleKafkaDataMocker extends AbstractDataMocker {
     private long beginTime = 0L;
     private long endTime = 0L;
 
-    public SimpleKafkaDataMocker(Supplier<CountDownLatch> finishedLatchSupplier,
-                                 String kafkaServers,
-                                 String kafkaTopic,
-                                 int partition,
-                                 int replicationFactor,
-                                 int limitTotal) {
-        this.finishedLatchSupplier = requireNonNull(finishedLatchSupplier);
-        this.kafkaServers = requireNonNull(kafkaServers);
-        this.kafkaTopic = requireNonNull(kafkaTopic);
+    public SimpleKafkaDataMocker(@NotNull Supplier<CountDownLatch> finishedLatchSupplier,
+                                 @NotBlank String kafkaServers,
+                                 @NotBlank String kafkaTopic,
+                                 @Min(1) int partition,
+                                 @Min(1) int replicationFactor,
+                                 @Min(1) int limitTotal) {
+        this(finishedLatchSupplier, kafkaServers, kafkaTopic, null, null, partition, replicationFactor, limitTotal);
+    }
+
+    @SuppressWarnings("all")
+    public SimpleKafkaDataMocker(@NotNull Supplier<CountDownLatch> finishedLatchSupplier,
+                                 @NotBlank String kafkaServers,
+                                 @NotBlank String kafkaTopic,
+                                 @Nullable Map<String, Object> adminOverrideProps,
+                                 @Nullable Map<String, Object> producerOverrideProps,
+                                 @Min(1) int partition,
+                                 @Min(1) int replicationFactor,
+                                 @Min(1) int limitTotal) {
+        this.finishedLatchSupplier = finishedLatchSupplier;
+        this.kafkaServers = kafkaServers;
+        this.kafkaTopic = kafkaTopic;
+        this.adminOverrideProps = adminOverrideProps;
+        this.producerOverrideProps = producerOverrideProps;
         this.partition = partition;
         this.replicationFactor = replicationFactor;
         this.limitTotal = limitTotal;
-        if (limitTotal <= 0) {
-            throw new IllegalArgumentException("Total must be greater than 0");
-        }
+        requireNonNull(finishedLatchSupplier, "finishedLatchSupplier must not be null");
+        Assertions.assertTrue(isNotBlank(kafkaServers), "kafkaServers must not be blank");
+        Assertions.assertTrue(isNotBlank(kafkaTopic), "kafkaTopic must not be blank");
+        Assertions.assertTrue(partition > 0, "partition must be greater than 0");
+        Assertions.assertTrue(replicationFactor > 0, "replicationFactor must be greater than 0");
+        Assertions.assertTrue(limitTotal > 0, "limitTotal must be greater than 0");
     }
 
     @Override
@@ -105,6 +130,9 @@ public class SimpleKafkaDataMocker extends AbstractDataMocker {
         log.info("Recreating to Kafka source topic: {} on {}", kafkaTopic, kafkaServers);
         final Properties props = new Properties();
         props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaServers);
+        if (nonNull(this.adminOverrideProps)) {
+            props.putAll(this.adminOverrideProps);
+        }
         try (AdminClient adminClient = AdminClient.create(props)) {
             try {
                 DeleteTopicsResult result = adminClient.deleteTopics(singleton(kafkaTopic));
@@ -155,6 +183,9 @@ public class SimpleKafkaDataMocker extends AbstractDataMocker {
         props.put(ProducerConfig.BATCH_SIZE_CONFIG, "32");
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        if (nonNull(this.producerOverrideProps)) {
+            props.putAll(this.producerOverrideProps);
+        }
         Producer<String, String> producer = null;
         try {
             producer = new KafkaProducer<>(props);

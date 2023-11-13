@@ -26,7 +26,12 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.rocketmq.client.consumer.DefaultLitePullConsumer;
 import org.apache.rocketmq.common.consumer.ConsumeFromWhere;
 import org.apache.rocketmq.common.message.MessageExt;
+import org.junit.jupiter.api.Assertions;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -58,14 +63,23 @@ public abstract class AssertionITContainerManager extends GenericITContainerMana
     // --------------------- MQ consuming Assertion Runners  --------------
 
     @SuppressWarnings("all")
-    public Runnable buildKafkaConsumingAssertionRunner(CountDownLatch latch,
-                                                       String kafkaServers,
-                                                       String topic,
-                                                       String groupId,
-                                                       int timeoutSeconds,
-                                                       Function<JsonNode, Boolean> collector,
-                                                       int exitOfCount,
-                                                       Consumer<Map<String, JsonNode>> assertion) {
+    public Runnable buildKafkaConsumingAssertionRunner(@NotNull CountDownLatch latch,
+                                                       @NotBlank String kafkaServers,
+                                                       @NotBlank String topic,
+                                                       @NotBlank String groupId,
+                                                       @Nullable Properties overrideProps,
+                                                       @Min(1) int timeoutSeconds,
+                                                       @NotNull Function<JsonNode, Boolean> collector,
+                                                       @Min(1) int exitConsumedThreshold,
+                                                       @NotNull Consumer<Map<String, JsonNode>> assertion) {
+        Assertions.assertNotNull(latch, "latch must not be null");
+        Assertions.assertNotNull(kafkaServers, "kafkaServers must not be null");
+        Assertions.assertNotNull(topic, "topic must not be null");
+        Assertions.assertNotNull(groupId, "groupId must not be null");
+        Assertions.assertTrue(timeoutSeconds > 0, "timeoutSeconds must be greater than 0");
+        Assertions.assertNotNull(collector, "collector must not be null");
+        Assertions.assertTrue(exitConsumedThreshold > 0, "exitConsumedThreshold must be greater than 0");
+        Assertions.assertNotNull(assertion, "assertion must not be null");
         return () -> {
             final Map<String, JsonNode> result = new ConcurrentHashMap<>();
             final Properties props = new Properties();
@@ -76,6 +90,9 @@ public abstract class AssertionITContainerManager extends GenericITContainerMana
             props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
             props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
             props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+            if (nonNull(overrideProps)) {
+                props.putAll(overrideProps);
+            }
             try (KafkaConsumer<String, Object> consumer = new KafkaConsumer<>(props)) {
                 consumer.subscribe(singletonList(topic));
                 final long start = currentTimeMillis();
@@ -95,7 +112,7 @@ public abstract class AssertionITContainerManager extends GenericITContainerMana
                             }
                         }
                     }
-                    if (result.size() >= exitOfCount) {
+                    if (result.size() >= exitConsumedThreshold) {
                         latch.countDown();
                         log.info("Assertion for Kafka consumer is valid. Total: " + result.size());
                         break;
@@ -118,7 +135,7 @@ public abstract class AssertionITContainerManager extends GenericITContainerMana
                                                           String groupId,
                                                           int timeoutSeconds,
                                                           Function<JsonNode, Boolean> collector,
-                                                          int exitOfCount,
+                                                          int exitConsumedThreshold,
                                                           Consumer<Map<String, JsonNode>> assertion) {
         return () -> {
             final Map<String, JsonNode> result = new ConcurrentHashMap<>();
@@ -143,7 +160,7 @@ public abstract class AssertionITContainerManager extends GenericITContainerMana
                             }
                         }
                     }
-                    if (result.size() >= exitOfCount) {
+                    if (result.size() >= exitConsumedThreshold) {
                         latch.countDown();
                         log.info("Assertion for RocketMQ consumer is valid. Total: " + result.size());
                         break;
