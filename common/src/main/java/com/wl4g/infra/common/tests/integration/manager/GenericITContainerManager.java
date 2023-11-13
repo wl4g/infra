@@ -203,11 +203,16 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
                                                                    @NotBlank String caCertPem,
                                                                    @NotBlank String serverCertPem,
                                                                    @NotBlank String serverCertKey,
+                                                                   @NotBlank String saslPlainJaasConfig,
                                                                    @Min(1024) int serverPort,
                                                                    @Min(1024) int jmxPort,
                                                                    @Nullable Map<String, String> env) {
         Assertions.assertTrue(serverPort > 1024, "serverPort must be greater than 1024");
         Assertions.assertTrue(jmxPort > 1024, "jmxPort must be greater than 1024");
+        Assertions.assertTrue(isNotBlank(caCertPem), "caCertPem must not be blank");
+        Assertions.assertTrue(isNotBlank(serverCertPem), "serverCertPem must not be blank");
+        Assertions.assertTrue(isNotBlank(serverCertKey), "serverCertKey must not be blank");
+        Assertions.assertTrue(isNotBlank(saslPlainJaasConfig), "saslPlainJaasConfig must not be blank");
 
         // Generate controller port with retry.
         int controllerPort;
@@ -218,7 +223,14 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
         final String serverListen = getServersConnectString("SASL_SSL", serverPort);
 
         final Map<String, String> mergeEnv = new HashMap<>();
-        mergeEnv.putIfAbsent("ALLOW_PLAINTEXT_LISTENER", "yes");
+        mergeEnv.putIfAbsent("ALLOW_PLAINTEXT_LISTENER", "no");
+        // SSL configs.
+        mergeEnv.putIfAbsent("KAFKA_TLS_TYPE", "PEM");
+        mergeEnv.putIfAbsent("KAFKA_SSL_CLIENT_AUTH", "required");
+        // SASL configs.
+        mergeEnv.putIfAbsent("KAFKA_SASL_MECHANISM", "PLAIN");
+        mergeEnv.putIfAbsent("KAFKA_SASL_JAAS_CONFIG", saslPlainJaasConfig);
+        // JMX settings
         mergeEnv.putIfAbsent("JMX_PORT", valueOf(jmxPort));
         // see:https://github.com/bitnami/containers/blob/main/bitnami/kafka/3.5/debian-11/docker-compose.yml
         // KRaft settings
