@@ -115,7 +115,7 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
         //mergeEnv.putIfAbsent("ZOO_ENABLE_AUTH", "true");
         mergeEnv.putIfAbsent("ALLOW_ANONYMOUS_LOGIN", "yes");
         mergeEnv.putIfAbsent("ZOO_PORT_NUMBER", String.valueOf(serverPort));
-        return buildBitnamiContainer(startedLatchSupplier, imageRepo, imageTag, asList(serverPort, serverPort),
+        return buildGenericContainer(startedLatchSupplier, imageRepo, imageTag, asList(serverPort, serverPort),
                 "zookeeper", startedLogRegex, null, startupTimeout, null,
                 mergeEnv, createdListener, startedListener);
     }
@@ -199,6 +199,66 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
                 null, mergeEnv, null, null);
     }
 
+    public ITGenericContainer buildBitnamiKafka35xSaslSslContainer(@javax.validation.constraints.NotNull Supplier<CountDownLatch> startedLatch,
+                                                                   @NotBlank String caCertPem,
+                                                                   @NotBlank String serverCertPem,
+                                                                   @NotBlank String serverCertKey,
+                                                                   @Min(1024) int serverPort,
+                                                                   @Min(1024) int jmxPort,
+                                                                   @Nullable Map<String, String> env) {
+        Assertions.assertTrue(serverPort > 1024, "serverPort must be greater than 1024");
+        Assertions.assertTrue(jmxPort > 1024, "jmxPort must be greater than 1024");
+
+        // Generate controller port with retry.
+        int controllerPort;
+        do {
+            controllerPort = RandomUtils.nextInt(55535, 65535);
+        } while (controllerPort == serverPort);
+
+        final String serverListen = getServersConnectString("SASL_SSL", serverPort);
+
+        final Map<String, String> mergeEnv = new HashMap<>();
+        mergeEnv.putIfAbsent("ALLOW_PLAINTEXT_LISTENER", "yes");
+        mergeEnv.putIfAbsent("JMX_PORT", valueOf(jmxPort));
+        // see:https://github.com/bitnami/containers/blob/main/bitnami/kafka/3.5/debian-11/docker-compose.yml
+        // KRaft settings
+        mergeEnv.putIfAbsent("KAFKA_CFG_NODE_ID", "0");
+        mergeEnv.putIfAbsent("KAFKA_CFG_PROCESS_ROLES", "controller,broker");
+        mergeEnv.putIfAbsent("KAFKA_CFG_CONTROLLER_QUORUM_VOTERS", format("0@localhost:%s", controllerPort));
+        //mergeEnv.put("KAFKA_CFG_CONTROLLER_QUORUM_VOTERS", format("0@%s:%s", localHostIp, controllerPort));
+        // Listeners, see:https://github.com/bitnami/containers/blob/main/bitnami/kafka/README.md#security
+        mergeEnv.putIfAbsent("KAFKA_CFG_LISTENERS", format("SASL_SSL://:%s,CONTROLLER://:%s", serverPort, controllerPort));
+        mergeEnv.putIfAbsent("KAFKA_CFG_ADVERTISED_LISTENERS", serverListen);
+        // CONTROLLER:PLAINTEXT,CONTROLLER:SASL_PLAINTEXT,PLAINTEXT:PLAINTEXT,SASL_SSL:SASL_SSL
+        mergeEnv.putIfAbsent("KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP", "CONTROLLER:SASL_PLAINTEXT,SASL_SSL:SASL_SSL");
+        mergeEnv.putIfAbsent("KAFKA_CFG_CONTROLLER_LISTENER_NAMES", "CONTROLLER");
+        mergeEnv.putIfAbsent("KAFKA_CFG_INTER_BROKER_LISTENER_NAME", "SASL_SSL");
+        // SASL
+        mergeEnv.putIfAbsent("KAFKA_CFG_SASL_MECHANISM_CONTROLLER_PROTOCOL", "PLAIN");
+        mergeEnv.putIfAbsent("KAFKA_CFG_SASL_MECHANISM_INTER_BROKER_PROTOCOL", "PLAIN");
+        // Other
+        // see:https://github.com/bitnami/containers/blob/main/bitnami/kafka/3.5/debian-11/rootfs/opt/bitnami/scripts/libkafka.sh#L937
+        mergeEnv.putIfAbsent("KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE", "true");
+
+        // Merge of override mergeEnv.
+        if (nonNull(env)) {
+            mergeEnv.putAll(env);
+        }
+
+        final List<String> commandParts = new ArrayList<>();
+        commandParts.add("sh");
+        commandParts.add("-c");
+        commandParts.add("mkdir -p /bitnami/kafka/config/certs && /opt/bitnami/scripts/kafka/run.sh");
+
+        final Map<String, String> configs = new HashMap<>();
+        configs.put("/bitnami/kafka/config/certs/kafka.truststore.pem", caCertPem);
+        configs.put("/bitnami/kafka/config/certs/kafka.keystore.pem", serverCertPem);
+        configs.put("/bitnami/kafka/config/certs/kafka.keystore.key", serverCertKey);
+        return buildGenericContainer(startedLatch, "registry.cn-shenzhen.aliyuncs.com/wl4g-k8s/bitnami_kafka",
+                "3.5", asList(serverPort, serverPort, jmxPort, jmxPort), "kafka", "(.*)Kafka Server started (.*)",
+                null, null, configs, mergeEnv, commandParts, null, null);
+    }
+
     /**
      * Manual tests for examples:
      *
@@ -259,7 +319,7 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
         //                .withStartupTimeout(startupTimeout));
         //kafkaContainer.setPortBindings(singletonList(serverPort + ":" + containerPort));
 
-        return buildBitnamiContainer(startedLatchSupplier, imageRepo, imageTag, portBindings,
+        return buildGenericContainer(startedLatchSupplier, imageRepo, imageTag, portBindings,
                 "kafka", startedLogRegex, null, startupTimeout, emptyMap(),
                 env, createdListener, startedListener);
     }
@@ -348,7 +408,7 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
         } else {
             mergeEnv.put("ALLOW_EMPTY_PASSWORD", "yes");
         }
-        return buildBitnamiContainer(startedLatchSupplier, imageName,
+        return buildGenericContainer(startedLatchSupplier, imageName,
                 imageTag, asList(serverPort, serverPort), "redis", "(.*)Ready to accept connections(.*)",
                 null, null, null, mergeEnv, createdListener, startedListener);
     }
@@ -395,7 +455,7 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
             mergeEnv.putIfAbsent("KAFKA_CLUSTERS_" + i + "_AUDIT_LEVEL", "ALTER_ONLY");
         }
 
-        return buildBitnamiContainer(startedLatchSupplier, "registry.cn-shenzhen.aliyuncs.com/wl4g-k8s/provectuslabs_kafka-ui",
+        return buildGenericContainer(startedLatchSupplier, "registry.cn-shenzhen.aliyuncs.com/wl4g-k8s/provectuslabs_kafka-ui",
                 imageTag, asList(serverPort, serverPort), "kafka-ui", "(.*)Started KafkaUiApplication (.*)",
                 null, null, emptyMap(), mergeEnv, createdListener, startedListener);
     }
@@ -442,7 +502,7 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
         }
         // @formatter:on
 
-        return buildBitnamiContainer(startedLatchSupplier, "registry.cn-shenzhen.aliyuncs.com/wl4g-k8s/bitnami_prometheus",
+        return buildGenericContainer(startedLatchSupplier, "registry.cn-shenzhen.aliyuncs.com/wl4g-k8s/bitnami_prometheus",
                 imageTag, asList(serverPort, 9090), "prometheus", "(.*)Server is ready to receive web requests(.*)",
                 null, null, singletonMap("/opt/bitnami/prometheus/conf/prometheus.yml", prometheusConfig),
                 env, createdListener, startedListener);
@@ -463,14 +523,14 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
                                                            @Nullable Map<String, String> env,
                                                            @Nullable Consumer<String> createdListener,
                                                            @Nullable Consumer<InspectContainerResponse> startedListener) {
-        return buildBitnamiContainer(startedLatchSupplier, "registry.cn-shenzhen.aliyuncs.com/wl4g-k8s/bitnami_grafana",
+        return buildGenericContainer(startedLatchSupplier, "registry.cn-shenzhen.aliyuncs.com/wl4g-k8s/bitnami_grafana",
                 imageTag, asList(mappedPort, 3000), "grafana", "(.*)HTTP Server Listen(.*)",
                 null, null, null, env, createdListener, startedListener);
     }
 
     // --------------------- Generic build container ---------------------
 
-    public ITGenericContainer buildBitnamiContainer(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
+    public ITGenericContainer buildGenericContainer(@NotNull Supplier<CountDownLatch> startedLatchSupplier,
                                                     @NotBlank String imageRepo,
                                                     @NotBlank String imageTag,
                                                     @NotEmpty List<Integer> portBindings,
@@ -480,6 +540,23 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
                                                     @Nullable Duration startupTimeout,
                                                     @Nullable Map<String, String> configs,
                                                     @Nullable Map<String, String> env,
+                                                    @Nullable Consumer<String> createdListener,
+                                                    @Nullable Consumer<InspectContainerResponse> startedListener) {
+        return buildGenericContainer(startedLatchSupplier, imageRepo, imageTag, portBindings, loggerName, startedLogRegex, networkMode,
+                startupTimeout, configs, env, null, createdListener, startedListener);
+    }
+
+    public ITGenericContainer buildGenericContainer(@javax.validation.constraints.NotNull Supplier<CountDownLatch> startedLatchSupplier,
+                                                    @NotBlank String imageRepo,
+                                                    @NotBlank String imageTag,
+                                                    @NotEmpty List<Integer> portBindings,
+                                                    @NotBlank String loggerName,
+                                                    @NotBlank String startedLogRegex,
+                                                    @Nullable String networkMode,
+                                                    @Nullable Duration startupTimeout,
+                                                    @Nullable Map<String, String> configs,
+                                                    @Nullable Map<String, String> env,
+                                                    @Nullable List<String> commandParts,
                                                     @Nullable Consumer<String> createdListener,
                                                     @Nullable Consumer<InspectContainerResponse> startedListener) {
         Assertions.assertNotNull(startedLatchSupplier, "startedLatchSupplier must not be null");
@@ -538,6 +615,10 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
             container.withNetworkMode(networkMode);
         }
         container.setStartupAttempts(3);
+
+        if (nonNull(commandParts) && !commandParts.isEmpty()) {
+            container.setCommand(commandParts.toArray(new String[0]));
+        }
 
         return new ITGenericContainer(portBindings0, container);
     }
