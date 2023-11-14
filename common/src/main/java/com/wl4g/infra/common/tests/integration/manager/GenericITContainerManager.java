@@ -146,14 +146,86 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
 
         return buildBitnamiKafkaContainer(startedLatchSupplier, "registry.cn-shenzhen.aliyuncs.com/wl4g-k8s/bitnami_kafka",
                 "2.2.0", asList(serverPort, serverPort, jmxPort, jmxPort), "(.*)started \\(kafka\\.server\\.KafkaServer\\)(.*)",
-                null, mergeEnv, null, null);
+                null, null, mergeEnv, null, null, null);
+    }
+
+    public ITGenericContainer buildBitnamiKafka35xSaslScramSha256SslContainer(@NotNull Supplier<CountDownLatch> startedLatch,
+                                                                              @NotBlank String caCertPem,
+                                                                              @NotBlank String serverCertPem,
+                                                                              @NotBlank String serverCertKey,
+                                                                              @Min(1024) int serverPort,
+                                                                              @Min(1024) int jmxPort,
+                                                                              @Nullable Map<String, String> env) {
+        final Map<String, String> mergeEnv = new HashMap<>(safeMap(env));
+        mergeEnv.putIfAbsent("KAFKA_SASL_MECHANISM", "SCRAM-SHA-256");
+        mergeEnv.putIfAbsent("KAFKA_CFG_SASL_MECHANISM_CONTROLLER_PROTOCOL", "SCRAM-SHA-256");
+        mergeEnv.putIfAbsent("KAFKA_CFG_SASL_MECHANISM_INTER_BROKER_PROTOCOL", "SCRAM-SHA-256");
+
+        return buildBitnamiKafka35xSaslPlainSslContainer(startedLatch, caCertPem, serverCertPem, serverCertKey,
+                serverPort, jmxPort, mergeEnv);
+    }
+
+    // see:https://github.com/bitnami/containers/blob/main/bitnami/kafka/README.md#security
+    // see:https://help.aliyun.com/document_detail/68325.html#section-0a2-3hs-9bb
+    @SuppressWarnings("all")
+    public ITGenericContainer buildBitnamiKafka35xSaslPlainSslContainer(@NotNull Supplier<CountDownLatch> startedLatch,
+                                                                        @NotBlank String caCertPem,
+                                                                        @NotBlank String serverCertPem,
+                                                                        @NotBlank String serverCertKey,
+                                                                        @Min(1024) int serverPort,
+                                                                        @Min(1024) int jmxPort,
+                                                                        @Nullable Map<String, String> env) {
+        Assertions.assertTrue(serverPort > 1024, "serverPort must be greater than 1024");
+        Assertions.assertTrue(jmxPort > 1024, "jmxPort must be greater than 1024");
+        Assertions.assertTrue(isNotBlank(caCertPem), "caCertPem must not be blank");
+        Assertions.assertTrue(isNotBlank(serverCertPem), "serverCertPem must not be blank");
+        Assertions.assertTrue(isNotBlank(serverCertKey), "serverCertKey must not be blank");
+
+        final Map<String, String> mergeEnv = new HashMap<>(safeMap(env));
+        mergeEnv.putIfAbsent("ALLOW_PLAINTEXT_LISTENER", "no");
+        // SSL configs.
+        mergeEnv.putIfAbsent("KAFKA_TLS_TYPE", "PEM");
+        mergeEnv.putIfAbsent("KAFKA_SSL_CLIENT_AUTH", "required");
+        // SASL configs.
+        mergeEnv.putIfAbsent("KAFKA_SASL_MECHANISM", "PLAIN");
+        mergeEnv.putIfAbsent("KAFKA_CFG_SASL_MECHANISM_CONTROLLER_PROTOCOL", "PLAIN");
+        mergeEnv.putIfAbsent("KAFKA_CFG_SASL_MECHANISM_INTER_BROKER_PROTOCOL", "PLAIN");
+        // Common configs.
+        // Listeners configs.
+        // see:https://github.com/bitnami/containers/blob/main/bitnami/kafka/README.md#security
+        // see:https://help.aliyun.com/document_detail/68325.html#section-0a2-3hs-9bb
+        mergeEnv.putIfAbsent("KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP", "CONTROLLER:SASL_PLAINTEXT,SASL_SSL:SASL_SSL");
+        mergeEnv.putIfAbsent("KAFKA_CFG_INTER_BROKER_LISTENER_NAME", "SASL_SSL");
+
+        final List<String> commandParts = new ArrayList<>();
+        commandParts.add("sh");
+        commandParts.add("-c");
+        commandParts.add("mkdir -p /bitnami/kafka/config/certs && /opt/bitnami/scripts/kafka/run.sh");
+
+        final Map<String, String> configs = new HashMap<>();
+        configs.put("/bitnami/kafka/config/certs/kafka.truststore.pem", caCertPem);
+        configs.put("/bitnami/kafka/config/certs/kafka.keystore.pem", serverCertPem);
+        configs.put("/bitnami/kafka/config/certs/kafka.keystore.key", serverCertKey);
+
+        return buildBitnamiKafka35xContainer(startedLatch, "SASL_SSL://", "SASL_SSL",
+                commandParts, serverPort, jmxPort, configs, mergeEnv);
+    }
+
+    public ITGenericContainer buildBitnamiKafka35xContainer(@NotNull Supplier<CountDownLatch> startedLatch,
+                                                            @Min(1024) int serverPort,
+                                                            @Min(1024) int jmxPort,
+                                                            @Nullable Map<String, String> env) {
+        return buildBitnamiKafka35xContainer(startedLatch, null, null, null,
+                serverPort, jmxPort, null, env);
     }
 
     public ITGenericContainer buildBitnamiKafka35xContainer(@NotNull Supplier<CountDownLatch> startedLatch,
                                                             @Nullable String listenProtocol,
                                                             @Nullable String listenName,
+                                                            @Nullable List<String> commandParts,
                                                             @Min(1024) int serverPort,
                                                             @Min(1024) int jmxPort,
+                                                            @Nullable Map<String, String> configs,
                                                             @Nullable Map<String, String> env) {
         Assertions.assertTrue(serverPort > 1024, "serverPort must be greater than 1024");
         Assertions.assertTrue(jmxPort > 1024, "jmxPort must be greater than 1024");
@@ -169,7 +241,7 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
 
         final String serverListen = getServersConnectString(listenProtocol, serverPort);
 
-        final Map<String, String> mergeEnv = new HashMap<>();
+        final Map<String, String> mergeEnv = new HashMap<>(safeMap(env));
         mergeEnv.putIfAbsent("ALLOW_PLAINTEXT_LISTENER", "yes");
         mergeEnv.putIfAbsent("JMX_PORT", valueOf(jmxPort));
         // see:https://github.com/bitnami/containers/blob/main/bitnami/kafka/3.5/debian-11/docker-compose.yml
@@ -177,11 +249,12 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
         mergeEnv.putIfAbsent("KAFKA_CFG_NODE_ID", "0");
         mergeEnv.putIfAbsent("KAFKA_CFG_PROCESS_ROLES", "controller,broker");
         mergeEnv.putIfAbsent("KAFKA_CFG_CONTROLLER_QUORUM_VOTERS", format("0@localhost:%s", controllerPort));
-        //mergeEnv.put("KAFKA_CFG_CONTROLLER_QUORUM_VOTERS", format("0@%s:%s", localHostIp, controllerPort));
+        //mergeEnv.putIfAbsent("KAFKA_CFG_CONTROLLER_QUORUM_VOTERS", format("0@%s:%s", localHostIp, controllerPort));
         // Listeners
-        mergeEnv.putIfAbsent("KAFKA_CFG_LISTENERS", format("PLAINTEXT://:%s,CONTROLLER://:%s", serverPort, controllerPort));
-        //mergeEnv.put("KAFKA_CFG_LISTENERS", serverListen + "," + format("CONTROLLER://%s:%s", localHostIp, controllerPort));
+        mergeEnv.putIfAbsent("KAFKA_CFG_LISTENERS", format("%s:%s,CONTROLLER://:%s", listenProtocol, serverPort, controllerPort));
+        //mergeEnv.putIfAbsent("KAFKA_CFG_LISTENERS", serverListen + "," + format("CONTROLLER://%s:%s", localHostIp, controllerPort));
         mergeEnv.putIfAbsent("KAFKA_CFG_ADVERTISED_LISTENERS", serverListen);
+        // CONTROLLER:PLAINTEXT,CONTROLLER:SASL_PLAINTEXT,PLAINTEXT:PLAINTEXT,SASL_SSL:SASL_SSL
         mergeEnv.putIfAbsent("KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP", "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT");
         mergeEnv.putIfAbsent("KAFKA_CFG_CONTROLLER_LISTENER_NAMES", "CONTROLLER");
         mergeEnv.putIfAbsent("KAFKA_CFG_INTER_BROKER_LISTENER_NAME", listenName);
@@ -189,86 +262,9 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
         // see:https://github.com/bitnami/containers/blob/main/bitnami/kafka/3.5/debian-11/rootfs/opt/bitnami/scripts/libkafka.sh#L937
         mergeEnv.putIfAbsent("KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE", "true");
 
-        // Merge of override mergeEnv.
-        if (nonNull(env)) {
-            mergeEnv.putAll(env);
-        }
-
         return buildBitnamiKafkaContainer(startedLatch, "registry.cn-shenzhen.aliyuncs.com/wl4g-k8s/bitnami_kafka",
                 "3.5", asList(serverPort, serverPort, jmxPort, jmxPort), "(.*)Kafka Server started (.*)",
-                null, mergeEnv, null, null);
-    }
-
-    public ITGenericContainer buildBitnamiKafka35xSaslSslContainer(@javax.validation.constraints.NotNull Supplier<CountDownLatch> startedLatch,
-                                                                   @NotBlank String caCertPem,
-                                                                   @NotBlank String serverCertPem,
-                                                                   @NotBlank String serverCertKey,
-                                                                   @NotBlank String saslPlainJaasConfig,
-                                                                   @Min(1024) int serverPort,
-                                                                   @Min(1024) int jmxPort,
-                                                                   @Nullable Map<String, String> env) {
-        Assertions.assertTrue(serverPort > 1024, "serverPort must be greater than 1024");
-        Assertions.assertTrue(jmxPort > 1024, "jmxPort must be greater than 1024");
-        Assertions.assertTrue(isNotBlank(caCertPem), "caCertPem must not be blank");
-        Assertions.assertTrue(isNotBlank(serverCertPem), "serverCertPem must not be blank");
-        Assertions.assertTrue(isNotBlank(serverCertKey), "serverCertKey must not be blank");
-        Assertions.assertTrue(isNotBlank(saslPlainJaasConfig), "saslPlainJaasConfig must not be blank");
-
-        // Generate controller port with retry.
-        int controllerPort;
-        do {
-            controllerPort = RandomUtils.nextInt(55535, 65535);
-        } while (controllerPort == serverPort);
-
-        final String serverListen = getServersConnectString("SASL_SSL://", serverPort);
-
-        final Map<String, String> mergeEnv = new HashMap<>();
-        mergeEnv.putIfAbsent("ALLOW_PLAINTEXT_LISTENER", "no");
-        // SSL configs.
-        mergeEnv.putIfAbsent("KAFKA_TLS_TYPE", "PEM");
-        mergeEnv.putIfAbsent("KAFKA_SSL_CLIENT_AUTH", "required");
-        // SASL configs.
-        mergeEnv.putIfAbsent("KAFKA_SASL_MECHANISM", "PLAIN");
-        mergeEnv.putIfAbsent("KAFKA_SASL_JAAS_CONFIG", saslPlainJaasConfig);
-        // JMX settings
-        mergeEnv.putIfAbsent("JMX_PORT", valueOf(jmxPort));
-        // see:https://github.com/bitnami/containers/blob/main/bitnami/kafka/3.5/debian-11/docker-compose.yml
-        // KRaft settings
-        mergeEnv.putIfAbsent("KAFKA_CFG_NODE_ID", "0");
-        mergeEnv.putIfAbsent("KAFKA_CFG_PROCESS_ROLES", "controller,broker");
-        mergeEnv.putIfAbsent("KAFKA_CFG_CONTROLLER_QUORUM_VOTERS", format("0@localhost:%s", controllerPort));
-        //mergeEnv.put("KAFKA_CFG_CONTROLLER_QUORUM_VOTERS", format("0@%s:%s", localHostIp, controllerPort));
-        // Listeners, see:https://github.com/bitnami/containers/blob/main/bitnami/kafka/README.md#security
-        mergeEnv.putIfAbsent("KAFKA_CFG_LISTENERS", format("SASL_SSL://:%s,CONTROLLER://:%s", serverPort, controllerPort));
-        mergeEnv.putIfAbsent("KAFKA_CFG_ADVERTISED_LISTENERS", serverListen);
-        // CONTROLLER:PLAINTEXT,CONTROLLER:SASL_PLAINTEXT,PLAINTEXT:PLAINTEXT,SASL_SSL:SASL_SSL
-        mergeEnv.putIfAbsent("KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP", "CONTROLLER:SASL_PLAINTEXT,SASL_SSL:SASL_SSL");
-        mergeEnv.putIfAbsent("KAFKA_CFG_CONTROLLER_LISTENER_NAMES", "CONTROLLER");
-        mergeEnv.putIfAbsent("KAFKA_CFG_INTER_BROKER_LISTENER_NAME", "SASL_SSL");
-        // SASL
-        mergeEnv.putIfAbsent("KAFKA_CFG_SASL_MECHANISM_CONTROLLER_PROTOCOL", "PLAIN");
-        mergeEnv.putIfAbsent("KAFKA_CFG_SASL_MECHANISM_INTER_BROKER_PROTOCOL", "PLAIN");
-        // Other
-        // see:https://github.com/bitnami/containers/blob/main/bitnami/kafka/3.5/debian-11/rootfs/opt/bitnami/scripts/libkafka.sh#L937
-        mergeEnv.putIfAbsent("KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE", "true");
-
-        // Merge of override mergeEnv.
-        if (nonNull(env)) {
-            mergeEnv.putAll(env);
-        }
-
-        final List<String> commandParts = new ArrayList<>();
-        commandParts.add("sh");
-        commandParts.add("-c");
-        commandParts.add("mkdir -p /bitnami/kafka/config/certs && /opt/bitnami/scripts/kafka/run.sh");
-
-        final Map<String, String> configs = new HashMap<>();
-        configs.put("/bitnami/kafka/config/certs/kafka.truststore.pem", caCertPem);
-        configs.put("/bitnami/kafka/config/certs/kafka.keystore.pem", serverCertPem);
-        configs.put("/bitnami/kafka/config/certs/kafka.keystore.key", serverCertKey);
-        return buildGenericContainer(startedLatch, "registry.cn-shenzhen.aliyuncs.com/wl4g-k8s/bitnami_kafka",
-                "3.5", asList(serverPort, serverPort, jmxPort, jmxPort), "kafka", "(.*)Kafka Server started (.*)",
-                null, null, configs, mergeEnv, commandParts, null, null);
+                null, configs, mergeEnv, null, null, null);
     }
 
     /**
@@ -302,7 +298,9 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
                                                          @NotEmpty List<Integer> portBindings,
                                                          @NotBlank String startedLogRegex,
                                                          @Nullable Duration startupTimeout,
+                                                         @Nullable Map<String, String> configs,
                                                          @NotNull Map<String, String> env,
+                                                         @Nullable List<String> commandParts,
                                                          @Nullable Consumer<String> createdListener,
                                                          @Nullable Consumer<InspectContainerResponse> startedListener) {
         //final GenericContainer<?> kafka01 = new KafkaContainer(DockerImageName.parse("bitnami/kafka:2.8.1")
@@ -332,8 +330,8 @@ public abstract class GenericITContainerManager extends AbstractITContainerManag
         //kafkaContainer.setPortBindings(singletonList(serverPort + ":" + containerPort));
 
         return buildGenericContainer(startedLatchSupplier, imageRepo, imageTag, portBindings,
-                "kafka", startedLogRegex, null, startupTimeout, emptyMap(),
-                env, createdListener, startedListener);
+                "kafka", startedLogRegex, null, startupTimeout, configs,
+                env, commandParts, createdListener, startedListener);
     }
 
     // --------------------- RocketMQ build container ------------------------

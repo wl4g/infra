@@ -53,7 +53,7 @@
 	<parent>
 		<groupId>com.wl4g</groupId>
 		<artifactId>infra-integration-feign-istio-example</artifactId>
-		<version>3.1.61</version>
+		<version>3.1.62</version>
 	</parent>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
