@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.wl4g</groupId>
     <artifactId>infra-parent</artifactId>
-    <version>3.1.63</version>
+    <version>3.1.65</version>
     <packaging>pom</packaging>
     <name>Infra Parent</name>
     <url>http://infra.wl4g.com</url>
@@ -83,7 +83,7 @@
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <maven-dockerfile-plugin.version>1.4.9</maven-dockerfile-plugin.version>
         <maven-proguard-plugin.version>2.1.1</maven-proguard-plugin.version>
-        <nexus-staging-maven-plugin.version>1.6.3</nexus-staging-maven-plugin.version>
+        <nexus-staging-maven-plugin.version>1.6.13</nexus-staging-maven-plugin.version>
         <maven-minify-plugin.version>1.7.6</maven-minify-plugin.version>
         <maven-checkstyle-plugin.version>3.1.1</maven-checkstyle-plugin.version>
         <maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
