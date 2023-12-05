@@ -33,7 +33,7 @@ import static java.util.Locale.US;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toMap;
-import static org.apache.commons.lang3.StringUtils.replace;
+import static org.apache.commons.lang3.StringUtils.replaceEach;
 import static org.apache.commons.lang3.StringUtils.startsWithIgnoreCase;
 
 /**
@@ -150,11 +150,11 @@ public abstract class EnvironmentUtil {
     }
 
     public static String toPropertyName(String name) {
-        return replace(name, "_", ".").toLowerCase(US);
+        return replaceEach(name, new String[]{"_", "-"}, new String[]{".", ""}).toLowerCase(US);
     }
 
     public static String toEnvName(String name) {
-        return replace(name, ".", "_").toUpperCase(US);
+        return replaceEach(name, new String[]{".", "-"}, new String[]{"_", ""}).toUpperCase(US);
     }
 
 }
