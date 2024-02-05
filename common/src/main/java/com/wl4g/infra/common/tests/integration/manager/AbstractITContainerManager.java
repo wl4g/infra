@@ -156,6 +156,22 @@ public abstract class AbstractITContainerManager implements Closeable {
                     } catch (Throwable ex) {
                         err.printf(">>> [MacOS] Unable to detect local multipass VM for docker. reason: %s%n", ex.getMessage());
                     }
+                    try {
+                        // 1. OrbStack 会创建如 bridge101: 2层接口, 且为容器自动映射了 DNS
+                        // 即如: docker run --name=minio1 --net=host minio/minio 的容器可直接 curl -I localhost:9900 访问
+                        // 或: curl -I minio1.orb.local:9900 访问
+                        // see:https://docs.orbstack.dev/docker/network#host-networking
+                        // 2. 启用 OrbStack 内嵌 docker 的 2375 tcp 端口. (~/.orbstack/config/docker.json)
+                        // see:https://docs.orbstack.dev/docker/#engine-config
+                        final String dockerDaemonVmIP = ProcessUtils
+                                .execSimpleString("[ $(command -v orbctl) ] && echo '127.0.0.1' || echo ''");
+                        out.printf(">>> [MacOS] Found local OrbStack(macos) VM for docker IP: %s%n", dockerDaemonVmIP);
+                        if (!isBlank(dockerDaemonVmIP)) {
+                            itDockerHost = dockerDaemonVmIP;
+                        }
+                    } catch (Throwable ex) {
+                        err.printf(">>> [MacOS] Unable to detect local OrbStack VM for docker. reason: %s%n", ex.getMessage());
+                    }
                 }
             }
             // Detect for docker daemon VM IP in multipass(Windows).

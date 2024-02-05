@@ -18,6 +18,8 @@ on:
   ## see:https://docs.github.com/en/actions/using-workflows/triggering-a-workflow#example-including-branches-and-tags
   push:
     branches:
+      - 'release**'
+      - 'release/**'
       - 'releases**'
       - 'releases/**' # eg: 'releases/**' will match the refs/heads/releases/10 Git ref.
     # Sequence of patterns matched against refs/tags

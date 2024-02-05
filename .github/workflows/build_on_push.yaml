@@ -16,12 +16,10 @@ on:
   ## see:https://docs.github.com/en/actions/using-workflows/triggering-a-workflow#example-including-branches-and-tags
   push:
     branches:
-      #- '**'
-      #- 'releases/**' # eg: 'releases/**' will match the refs/heads/releases/10 Git ref.
       - master
       - main
+      # - 'dev**' # 暂注释, 仅为减少 github action free plan 使用量
       - 'feature**'
-      # - 'dev**' # 暂时注释, 仅为减少 github action free plan 使用量
       - 'hotfix**'
   pull_request:
     branches:
