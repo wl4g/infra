@@ -49,9 +49,9 @@ function usages() {
     echo $"
 Usage: ./$(basename $0) [OPTIONS] [arg1] [arg2] ...
     version                                         Print maven project POM version.
-    upgrade                                         Upgrade pom project version. (eg: 3.1.30)
-    push                                            Pushing to git remote.
-    upgrade-push                                    Upgrade project version and push to git remote. (eg: 3.1.30)
+    upgrade                                         Upgrade pom project version. (e.g: 3.1.68)
+    push                                            Pushing to git remote. (e.g 3.1.68)
+    upgrade-push                                    Upgrade project version and push to git remote. (e.g: 3.1.68)
 "
 }
 

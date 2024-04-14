@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>infra-bom</artifactId>
     <packaging>pom</packaging>
@@ -51,7 +52,7 @@
     <parent>
         <groupId>com.wl4g</groupId>
         <artifactId>infra-parent</artifactId>
-        <version>3.1.68</version>
+        <version>3.1.69</version>
     </parent>
     <properties>
         <java.version>1.8</java.version>
@@ -171,6 +172,23 @@
         <rocketmq.version>4.9.7</rocketmq.version>
         <!-- Spring Boot -->
         <spring-boot.version>2.7.13</spring-boot.version>
+        <!--
+        Notice:
+        1. hive-exec:4.0.0 depends-on orc-core:2.0.0(but must jdk17+)
+        2. orc-core:1.9.3(jdk8+)!org.apache.orc.impl.TypeUtils depends-on
+        org.apache.hadoop.hive.ql.exec.vector.DateColumnVector
+        3. hive-exec:3.1.3 depends-on hive-storage-api:2.7.0
+        (no class: org.apache.hadoop.hive.ql.exec.vector.DateColumnVector)
+        4. hive-exec:4.0.0 depends-on hive-storage-api:4.0.0
+        (has class: org.apache.hadoop.hive.ql.exec.vector.DateColumnVector)
+        -->
+        <apache-orc.version>1.9.3</apache-orc.version>
+        <apache-hive-exec.version>3.1.3</apache-hive-exec.version>
+        <apache-hive-storage-api.version>2.8.1</apache-hive-storage-api.version>
+        <apache-hadoop.version>3.3.6</apache-hadoop.version>
+        <threetenbp.version>1.6.9</threetenbp.version>
+        <apache-parquet-avro.version>1.8.3</apache-parquet-avro.version>
+        <apache-parquet.version>1.13.1</apache-parquet.version>
         <!-- Testing -->
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.8.1</junit-jupiter.version>
@@ -1191,6 +1209,110 @@
                 <artifactId>spring-boot-autoconfigure</artifactId>
                 <version>${spring-boot.version}</version>
             </dependency>
+
+            <!-- Apache ORC -->
+            <!-- Notice: hive-exec:3.1.3 include shaded org.apache.orc.Xxx -->
+            <!-- <dependency>-->
+            <!--     <groupId>org.apache.orc</groupId>-->
+            <!--     <artifactId>orc-core</artifactId>-->
+            <!--     <version>${apache-orc.version}</version>-->
+            <!-- </dependency>-->
+            <!-- <dependency>-->
+            <!--     <groupId>org.apache.orc</groupId>-->
+            <!--     <artifactId>orc-mapreduce</artifactId>-->
+            <!--     <version>${apache-orc.version}</version>-->
+            <!-- </dependency>-->
+            <!-- no needs depends-on orc-core:1.9.3 -->
+            <!-- <dependency>-->
+            <!--     <groupId>org.apache.orc</groupId>-->
+            <!--     <artifactId>orc-shims</artifactId>-->
+            <!--     <version>${apache-orc.version}</version>-->
+            <!-- </dependency>-->
+            <!-- <dependency>-->
+            <!--     <groupId>org.apache.orc</groupId>-->
+            <!--     <artifactId>orc-tools</artifactId>-->
+            <!--     <version>${apache-orc.version}</version>-->
+            <!-- </dependency>-->
+            <dependency>
+                <groupId>org.apache.hive</groupId>
+                <artifactId>hive-exec</artifactId>
+                <version>${apache-hive-exec.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.logging.log4j</groupId>
+                        <artifactId>log4j-slf4j-impl</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.logging.log4j</groupId>
+                        <artifactId>log4j-to-slf4j</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hive</groupId>
+                <artifactId>hive-storage-api</artifactId>
+                <version>${apache-hive-storage-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-common</artifactId>
+                <version>${apache-hadoop.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-hdfs</artifactId>
+                <version>${apache-hadoop.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-client-api</artifactId>
+                <version>${apache-hadoop.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.threeten</groupId>
+                <artifactId>threetenbp</artifactId>
+                <version>${threetenbp.version}</version>
+            </dependency>
+
+            <!-- Apache Parquet -->
+            <dependency>
+                <groupId>org.apache.parquet</groupId>
+                <artifactId>parquet-avro</artifactId>
+                <!-- Using Avro API read/write Parquet, can't use 1.13.1 ?? -->
+                <version>${apache-parquet-avro.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.parquet</groupId>
+                <artifactId>parquet-hadoop</artifactId>
+                <version>${apache-parquet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.parquet</groupId>
+                <artifactId>parquet-column</artifactId>
+                <version>${apache-parquet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.parquet</groupId>
+                <artifactId>parquet-common</artifactId>
+                <version>${apache-parquet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.parquet</groupId>
+                <artifactId>parquet-encoding</artifactId>
+                <version>${apache-parquet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.parquet</groupId>
+                <artifactId>parquet-format-structures</artifactId>
+                <version>${apache-parquet.version}</version>
+            </dependency>
+            <!-- 可选，用于生成特定模型的Parquet读写代码 -->
+            <dependency>
+                <groupId>org.apache.parquet</groupId>
+                <artifactId>parquet-generator</artifactId>
+                <version>${apache-parquet.version}</version>
+            </dependency>
+
             <!-- Testing. -->
             <dependency>
                 <groupId>junit</groupId>

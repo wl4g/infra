@@ -53,7 +53,7 @@
     <parent>
         <groupId>com.wl4g</groupId>
         <artifactId>infra-parent</artifactId>
-        <version>3.1.68</version>
+        <version>3.1.69</version>
     </parent>
     <properties>
         <java.version>1.8</java.version>
@@ -160,6 +160,13 @@
         <dependency>
             <groupId>io.protostuff</groupId>
             <artifactId>protostuff-core</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <!-- Protobuf -->
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
@@ -512,6 +519,120 @@
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
+
+        <!-- Apache ORC -->
+        <!-- Notice: hive-exec:3.1.3 include shaded org.apache.orc.Xxx -->
+        <!-- <dependency>-->
+        <!--     <groupId>org.apache.orc</groupId>-->
+        <!--     <artifactId>orc-core</artifactId>-->
+        <!--     <scope>provided</scope>-->
+        <!--     <optional>true</optional>-->
+        <!-- </dependency>-->
+        <!-- <dependency>-->
+        <!--     <groupId>org.apache.orc</groupId>-->
+        <!--     <artifactId>orc-mapreduce</artifactId>-->
+        <!--     <scope>provided</scope>-->
+        <!--     <optional>true</optional>-->
+        <!-- </dependency>-->
+        <!-- no needs orc-core:1.9.3 -->
+        <!-- <dependency>-->
+        <!--     <groupId>org.apache.orc</groupId>-->
+        <!--     <artifactId>orc-shims</artifactId>-->
+        <!--     <scope>provided</scope>-->
+        <!--     <optional>true</optional>-->
+        <!-- </dependency>-->
+        <!-- <dependency>-->
+        <!--     <groupId>org.apache.orc</groupId>-->
+        <!--     <artifactId>orc-tools</artifactId>-->
+        <!--     <scope>provided</scope>-->
+        <!--     <optional>true</optional>-->
+        <!-- </dependency>-->
+        <dependency>
+            <groupId>org.apache.hive</groupId>
+            <artifactId>hive-exec</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-slf4j-impl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-to-slf4j</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-hdfs</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-client-api</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.threeten</groupId>
+            <artifactId>threetenbp</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Apache Parquet -->
+        <dependency>
+            <groupId>org.apache.parquet</groupId>
+            <artifactId>parquet-avro</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.parquet</groupId>
+            <artifactId>parquet-hadoop</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.parquet</groupId>
+            <artifactId>parquet-column</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.parquet</groupId>
+            <artifactId>parquet-common</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.parquet</groupId>
+            <artifactId>parquet-encoding</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.parquet</groupId>
+            <artifactId>parquet-format-structures</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <!-- 可选，用于生成特定模型的Parquet读写代码 -->
+        <dependency>
+            <groupId>org.apache.parquet</groupId>
+            <artifactId>parquet-generator</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+
         <!-- Tests -->
         <dependency>
             <groupId>junit</groupId>
@@ -590,6 +711,10 @@
             </resource>
         </resources>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
