@@ -69,7 +69,7 @@ function do_push() {
     if [ -z "$new_version" ]; then    
       logErr "<new version> is missing."; exit 1
     fi
-    if [ -n "$(echo git status -s)" ]; then
+    if [ -n "$(echo git -C $BASE_DIR status -s)" ]; then
       echo "Git committing ..."
       git -C $BASE_DIR add .
       git -C $BASE_DIR commit -m "feat: upgrade to v$new_version"
