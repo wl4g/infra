@@ -13,29 +13,47 @@
 
 package com.wl4g.infra.common.dataformat.orc;
 
+import lombok.NoArgsConstructor;
 import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
 import org.apache.orc.RecordReader;
 import org.apache.orc.TypeDescription;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.util.Properties;
 
 /**
  * The {@link GsonOrcHolder} class provides conversion utilities between ORC and Fastjson.
  */
-public abstract class GsonOrcHolder extends OrcJsonHolder {
+@NoArgsConstructor
+public class GsonOrcHolder extends OrcJsonHolder {
+
+    private static final GsonOrcHolder DEFAULT = new GsonOrcHolder();
+
+    public static GsonOrcHolder getDefault() {
+        return DEFAULT;
+    }
+
+    public GsonOrcHolder(boolean usePhysicalFsWriter,
+                         @Min(0) int batchMaxSize,
+                         @Nullable String timestampFormat,
+                         @Nullable Properties options) {
+        super(usePhysicalFsWriter, batchMaxSize, timestampFormat, options);
+    }
 
     // ----- Get ORC schema from JSON -----
 
     /**
      * Get the ORC schema type for the given Fastjson json.
      *
-     * @param node The json node.
+     * @param jsonNode The json node.
      * @return The ORC schema type.
      */
     @Override
-    public TypeDescription getSchemaFromJsonObject(@NotNull Object node) {
+    public TypeDescription getSchemaFromJsonObject(@NotNull Object jsonNode) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -62,7 +80,22 @@ public abstract class GsonOrcHolder extends OrcJsonHolder {
     }
 
     @Override
+    protected Iterable<Object> createArrayJsonNode() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
     protected void putObjectJsonNode(Object objectNode, String key, Object value) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    protected void addArrayJsonNode(Object arrayNode, Object value) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    protected Object convertToJsonNode(TypeDescription fieldSchema, ColumnVector colVector, int row) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

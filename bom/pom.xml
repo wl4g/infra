@@ -52,7 +52,7 @@
     <parent>
         <groupId>com.wl4g</groupId>
         <artifactId>infra-parent</artifactId>
-        <version>3.1.69</version>
+        <version>3.1.70</version>
     </parent>
     <properties>
         <java.version>1.8</java.version>
@@ -1211,17 +1211,17 @@
             </dependency>
 
             <!-- Apache ORC -->
-            <!-- Notice: hive-exec:3.1.3 include shaded org.apache.orc.Xxx -->
-            <!-- <dependency>-->
-            <!--     <groupId>org.apache.orc</groupId>-->
-            <!--     <artifactId>orc-core</artifactId>-->
-            <!--     <version>${apache-orc.version}</version>-->
-            <!-- </dependency>-->
-            <!-- <dependency>-->
-            <!--     <groupId>org.apache.orc</groupId>-->
-            <!--     <artifactId>orc-mapreduce</artifactId>-->
-            <!--     <version>${apache-orc.version}</version>-->
-            <!-- </dependency>-->
+            <!-- Notice: hive-exec:3.1.3 include shaded org.apache.orc.Xxx(1.5.8) -->
+             <dependency>
+                 <groupId>org.apache.orc</groupId>
+                 <artifactId>orc-core</artifactId>
+                 <version>${apache-orc.version}</version>
+             </dependency>
+             <dependency>
+                 <groupId>org.apache.orc</groupId>
+                 <artifactId>orc-mapreduce</artifactId>
+                 <version>${apache-orc.version}</version>
+             </dependency>
             <!-- no needs depends-on orc-core:1.9.3 -->
             <!-- <dependency>-->
             <!--     <groupId>org.apache.orc</groupId>-->
@@ -1233,21 +1233,31 @@
             <!--     <artifactId>orc-tools</artifactId>-->
             <!--     <version>${apache-orc.version}</version>-->
             <!-- </dependency>-->
-            <dependency>
-                <groupId>org.apache.hive</groupId>
-                <artifactId>hive-exec</artifactId>
-                <version>${apache-hive-exec.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.apache.logging.log4j</groupId>
-                        <artifactId>log4j-slf4j-impl</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.logging.log4j</groupId>
-                        <artifactId>log4j-to-slf4j</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
+            <!-- <dependency>-->
+                <!-- <groupId>org.apache.hive</groupId>-->
+                <!-- <artifactId>hive-common</artifactId>-->
+                <!-- <version>${apache-hive-exec.version}</version>-->
+                <!-- <exclusions>-->
+                    <!-- <exclusion>-->
+                    <!--     <groupId>org.apache.logging.log4j</groupId>-->
+                    <!--     <artifactId>log4j-slf4j-impl</artifactId>-->
+                    <!-- </exclusion>-->
+                    <!-- <exclusion>-->
+                    <!--     <groupId>org.apache.logging.log4j</groupId>-->
+                    <!--     <artifactId>log4j-to-slf4j</artifactId>-->
+                    <!-- </exclusion>-->
+                    <!-- [IMPORTANT: 解决 CPU 100% 问题]:
+                        hive-exec:3.1.3 会依赖 log4j-1.2-api:2.17.1
+                        spring-boot-dependencies:2.7.13 会依赖 log4j-1.2-api:2.17.2(provided)
+                        导致在 org.apache.log4j.Hierarchy.getInstance 产生死循环导致 CPU 爆满，因此这里必须排除 log4j-1.2-api
+                    -->
+                    <!-- <exclusion>-->
+                    <!--     <groupId>org.apache.logging.log4j</groupId>-->
+                    <!--     <artifactId>log4j-1.2-api</artifactId>-->
+                    <!-- </exclusion>-->
+                <!-- </exclusions>-->
+            <!-- </dependency>-->
+            <!-- 相比 hive-exec:3.1.3 更好(干净无包含 orc 类) -->
             <dependency>
                 <groupId>org.apache.hive</groupId>
                 <artifactId>hive-storage-api</artifactId>

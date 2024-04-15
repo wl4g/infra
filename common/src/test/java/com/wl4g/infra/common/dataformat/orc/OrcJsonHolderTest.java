@@ -19,9 +19,9 @@ package com.wl4g.infra.common.dataformat.orc;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.io.Files;
+import com.wl4g.infra.common.dataformat.DataFormatTestsSupport;
 import com.wl4g.infra.common.io.FileIOUtils;
 import com.wl4g.infra.common.math.Maths;
-import com.wl4g.infra.common.dataformat.DataFormatTestsSupport;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.orc.OrcFile;
@@ -67,22 +67,24 @@ public class OrcJsonHolderTest extends DataFormatTestsSupport {
 
     @Test
     public void testJacksonOrcCompression() throws Exception {
-        doTestJsonOrcCompression(JacksonOrcHolder.getInstance(), testJacksonNodes);
+        doTestJsonOrcCompression(JacksonOrcHolder.getDefault(), testJacksonNodes);
     }
 
     @Test
     public void testFastJsonOrcCompression() throws Exception {
-        doTestJsonOrcCompression(FastJsonOrcHolder.getInstance(), testFastJsonNodes);
+        //doTestJsonOrcCompression(FastJsonOrcHolder.getDefault(), testFastJsonNodes);
+        doTestJsonOrcCompression(new FastJsonOrcHolder(true), testFastJsonNodes);
     }
 
     @SuppressWarnings("all")
-    void doTestJsonOrcCompression(OrcJsonHolder holder, List testJsonNodes) throws Exception {
-        final TypeDescription schema = holder.getSchemaFromJsonObject(testJsonNodes.get(0));
+    void doTestJsonOrcCompression(OrcJsonHolder holder, List<?> testJsonNodes) throws Exception {
+        final TypeDescription schema = holder.getSchema(testJsonNodes.get(0));
 
         // Serialization
         //
         final ByteArrayOutputStream output = new ByteArrayOutputStream(10240);
-        holder.writeToOrc(testJsonNodes, schema, output, 1024, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX", null);
+        final Byte magic = null; // user custom magic, e.g: 0x01
+        holder.writeToOrc(testJsonNodes, schema, magic, output);
         final byte[] orcBytes = output.toByteArray();
 
         // for test: shell> orc-tools meta /tmp/1.orc
@@ -97,7 +99,7 @@ public class OrcJsonHolderTest extends DataFormatTestsSupport {
         final Iterator<Iterable<Object>> rowBatchIter = holder.readFromOrc(reader);
 
         out.printf(">>> Downsampling print top 10/%s records: %n", reader.getNumberOfRows());
-        if (rowBatchIter.hasNext()) {
+        if (rowBatchIter.hasNext()) { // next batch? (sub rows)
             final Iterator<Object> recordsIter = rowBatchIter.next().iterator(); // e.g: ArrayNode or JSONArray
             for (int i = 0; i < 10 && recordsIter.hasNext(); i++) {
                 final Object record = recordsIter.next(); // e.g: JsonNode or JSONObject

@@ -13,8 +13,10 @@
 
 package com.wl4g.infra.common.dataformat.orc;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import lombok.NoArgsConstructor;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.hive.ql.exec.vector.BytesColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
@@ -29,6 +31,7 @@ import org.apache.orc.RecordReader;
 import org.apache.orc.TypeDescription;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -36,7 +39,10 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
+import static com.wl4g.infra.common.dataformat.FastJsonFlatUtil.flatten;
+import static com.wl4g.infra.common.dataformat.FastJsonFlatUtil.unFlatten;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.lang.DateUtils2.formatDate;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -45,31 +51,53 @@ import static java.util.Objects.nonNull;
 /**
  * The {@link FastJsonOrcHolder} class provides conversion utilities between ORC and Fastjson.
  */
-public abstract class FastJsonOrcHolder extends OrcJsonHolder {
-    private static final FastJsonOrcHolder INSTANCE = new FastJsonOrcHolder() {
-    };
+@NoArgsConstructor
+public class FastJsonOrcHolder extends OrcJsonHolder {
+    private static final FastJsonOrcHolder DEFAULT = new FastJsonOrcHolder();
 
-    public static FastJsonOrcHolder getInstance() {
-        return INSTANCE;
+    public static FastJsonOrcHolder getDefault() {
+        return DEFAULT;
     }
 
-    protected FastJsonOrcHolder() {
+    private boolean useFlatSchema; // Flat mode fast but not general.
+
+    @SuppressWarnings("unused")
+    public FastJsonOrcHolder(boolean useFlatSchema) {
+        this.useFlatSchema = useFlatSchema;
+    }
+
+    @SuppressWarnings("unused")
+    public FastJsonOrcHolder(boolean usePhysicalFsWriter,
+                             boolean useFlatSchema,
+                             @Min(0) int batchMaxSize,
+                             @Nullable String timestampFormat,
+                             @Nullable Properties options) {
+        super(usePhysicalFsWriter, batchMaxSize, timestampFormat, options);
+        this.useFlatSchema = useFlatSchema;
     }
 
     // ----- Get ORC schema from JSON -----
 
+    @Override
+    public TypeDescription getSchema(@NotNull Object jsonNode) {
+        if (useFlatSchema) {
+            jsonNode = flatten((JSONObject) jsonNode);
+        }
+        return getSchemaFromJsonObject(jsonNode);
+    }
+
     /**
      * Get the ORC schema type for the given Fastjson json.
      *
-     * @param node The Fastjson json
+     * @param jsonNode The Fastjson json
      * @return The ORC schema type.
      */
     @Override
-    public TypeDescription getSchemaFromJsonObject(@NotNull Object node) {
-        notNullOf(node, "jsonNode");
-        if (node instanceof JSONObject) {
+    protected TypeDescription getSchemaFromJsonObject(@NotNull Object jsonNode) {
+        notNullOf(jsonNode, "jsonNode");
+        if (jsonNode instanceof JSONObject) {
             final TypeDescription structSchema = TypeDescription.createStruct();
-            for (Map.Entry<String, Object> entry : ((JSONObject) node).entrySet()) {
+            for (Map.Entry<String, Object> entry : ((JSONObject) jsonNode).entrySet()) {
                 final Object subNode = entry.getValue();
                 if (subNode instanceof JSONArray) {
                     structSchema.addField(entry.getKey(), getListSchemaFromArrayNode((JSONArray) subNode));
@@ -80,47 +108,47 @@ public abstract class FastJsonOrcHolder extends OrcJsonHolder {
                 }
             }
             return structSchema;
-        } else if (node instanceof JSONArray) {
-            return getListSchemaFromArrayNode(((JSONArray) node));
+        } else if (jsonNode instanceof JSONArray) {
+            return getListSchemaFromArrayNode(((JSONArray) jsonNode));
         } else {
-            return getPrimitiveTypeDescription(node);
+            return getPrimitiveTypeDescription(jsonNode);
         }
     }
 
     /**
      * Get the ORC schema type for the given Fastjson node.
      *
-     * @param node The Fastjson node
+     * @param value The Fastjson node
      * @return The ORC schema type
      */
     @SuppressWarnings("all")
-    private TypeDescription getPrimitiveTypeDescription(Object node) {
-        final Class<?> nodeType = node.getClass();
-        if (node instanceof JSONObject) {
-            return getSchemaFromJsonObject(node);
-        } else if (node instanceof JSONArray) {
-            return getListSchemaFromArrayNode((JSONArray) node);
-        } else if (node instanceof Collection) {
-            return getListSchemaFromArrayNode((JSONArray) node);
-        } else if (node instanceof Boolean || nodeType == boolean.class) {
+    private TypeDescription getPrimitiveTypeDescription(Object value) {
+        final Class<?> nodeType = value.getClass();
+        if (value instanceof JSONObject) {
+            return getSchemaFromJsonObject(value);
+        } else if (value instanceof JSONArray) {
+            return getListSchemaFromArrayNode((JSONArray) value);
+        } else if (value instanceof Collection) {
+            return getListSchemaFromArrayNode((JSONArray) value);
+        } else if (value instanceof Boolean || nodeType == boolean.class) {
             return TypeDescription.createBoolean();
-        } else if (node instanceof Integer || nodeType == int.class) {
+        } else if (value instanceof Integer || nodeType == int.class) {
             return TypeDescription.createInt();
-        } else if (node instanceof Long || nodeType == long.class) {
+        } else if (value instanceof Long || nodeType == long.class) {
             return TypeDescription.createLong();
-        } else if (node instanceof Float || nodeType == float.class) {
+        } else if (value instanceof Float || nodeType == float.class) {
             return TypeDescription.createFloat();
-        } else if (node instanceof Double || nodeType == double.class) {
+        } else if (value instanceof Double || nodeType == double.class) {
             return TypeDescription.createDouble();
-        } else if (node instanceof String) {
+        } else if (value instanceof String) {
             return TypeDescription.createString();
-        } else if (node instanceof Date || node instanceof java.sql.Date) {
+        } else if (value instanceof Date || value instanceof java.sql.Date) {
             return TypeDescription.createDate();
-        } else if (node instanceof BigDecimal) {
+        } else if (value instanceof BigDecimal) {
             return TypeDescription.createDecimal();
         } else {
             //return TypeDescription.createBinary();
-            throw new IllegalArgumentException("Unsupported the FastJson node type: " + node);
+            throw new IllegalArgumentException("Unsupported the FastJson node type: " + value);
         }
     }
 
@@ -128,7 +156,11 @@ public abstract class FastJsonOrcHolder extends OrcJsonHolder {
 
     @Override
     protected byte[] toJsonByteArray(Object record) {
-        return ((JSONObject) record).toJSONString().getBytes(UTF_8);
+        if (useFlatSchema) {
+            // Flatten json record to a single layer.
+            record = flatten(((JSONObject) record));
+        }
+        return JSON.toJSONString(record).getBytes(UTF_8);
     }
 
     // ----- Read ORC to JSON -----
@@ -158,6 +190,10 @@ public abstract class FastJsonOrcHolder extends OrcJsonHolder {
 
     @Override
     protected void addArrayJsonNode(Object arrayNode, Object value) {
+        if (useFlatSchema) {
+            // UnFlatten json record from a single layer.
+            value = unFlatten(((JSONObject) value));
+        }
         ((JSONArray) arrayNode).add(value);
     }
 

@@ -147,7 +147,7 @@ public class GsonReader implements RecordReader {
         }
 
         this.rowNumber += batch.size;
-        return batch.size != 0;
+        return batch.size != 0; // There is added data in this batch?
     }
 
     public float getProgress() throws IOException {

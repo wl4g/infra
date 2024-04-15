@@ -169,7 +169,7 @@ public class JacksonReader implements RecordReader {
         }
 
         this.rowNumber += rowBatch.size;
-        return rowBatch.size != 0;
+        return rowBatch.size != 0; // There is added data in this batch?
     }
 
     @Override

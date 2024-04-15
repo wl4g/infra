@@ -13,6 +13,7 @@
 
 package com.wl4g.infra.common.dataformat.orc;
 
+import lombok.AllArgsConstructor;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -32,6 +33,8 @@ import org.apache.orc.Reader;
 import org.apache.orc.RecordReader;
 import org.apache.orc.TypeDescription;
 import org.apache.orc.Writer;
+import org.apache.orc.impl.PhysicalFsWriter;
+import org.apache.orc.impl.writer.WriterEncryptionVariant;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
@@ -49,26 +52,60 @@ import java.util.List;
 import java.util.Properties;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.isEmpty;
-import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
 import static org.apache.orc.OrcFile.CompressionStrategy.COMPRESSION;
 
 /**
  * The {@link OrcJsonHolder} class provides conversion utilities between ORC and json.
  */
+@AllArgsConstructor
 public abstract class OrcJsonHolder {
+    private static final String DEFAULT_DATE_FORMATTER = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
+    private static final Configuration DEFAULT_CONF = new Configuration();
+    private static final Path DEFAULT_DUMMY_PATH = new Path("/dev/null");
+    private static final FileStatus DEFAULT_STATUS = new FileStatus(0, false, 0, 0, 0, DEFAULT_DUMMY_PATH);
+
+    private boolean usePhysicalFsWriter;
+    private @Min(0) int batchMaxSize;
+    private @Nullable String timestampFormat;
+    private @Nullable Properties options;
+
+    @SuppressWarnings("unused")
+    protected OrcJsonHolder() {
+        this.usePhysicalFsWriter = true;
+        this.batchMaxSize = 1024 * 1024;
+        this.timestampFormat = DEFAULT_DATE_FORMATTER;
+        this.options = new Properties() {
+            {
+                setProperty(OrcConf.COMPRESSION_STRATEGY.name(), COMPRESSION.name());
+            }
+        };
+    }
 
     // ----- Get ORC schema from JSON -----
 
     /**
      * Get the ORC schema type for the given json json.
      *
-     * @param node The record json node
+     * @param jsonNode The record json jsonNode
      * @return The ORC schema type.
      */
-    public abstract TypeDescription getSchemaFromJsonObject(@NotNull Object node);
+    public TypeDescription getSchema(@NotNull Object jsonNode) {
+        notNullOf(jsonNode, "jsonNode");
+        return getSchemaFromJsonObject(jsonNode);
+    }
+
+    /**
+     * Get the ORC schema type for the given json json.
+     *
+     * @param jsonNode The record json jsonNode
+     * @return The ORC schema type.
+     */
+    protected abstract TypeDescription getSchemaFromJsonObject(@NotNull Object jsonNode);
 
     /**
      * Get the ORC schema type for the given array node.
@@ -146,50 +183,55 @@ public abstract class OrcJsonHolder {
     // ----- Write ORC from JSON -----
 
     @SuppressWarnings("all")
-    public void writeToOrc(@NotNull List records,
-                           @NotNull TypeDescription schema,
-                           @NotNull OutputStream orcOutput,
-                           @Min(0) int size,
-                           @Nullable String timestampFormat,
-                           @Nullable Properties options) throws IOException {
+    public FileSystem.Statistics writeToOrc(@NotNull List<?> records,
+                                            @NotNull TypeDescription schema,
+                                            @Nullable Byte magic,
+                                            @NotNull OutputStream orcOutput) throws IOException {
         notNullOf(records, "records");
         notNullOf(schema, "schema");
-        isTrueOf(size >= 0, "size >= 0");
 
-        // Merge to all json records to bytes with separated by '\n'
-        final ByteArrayOutputStream jsonOutput = new ByteArrayOutputStream(size);
+        // Each json is at least 16B, which is a good number
+        final ByteArrayOutputStream jsonOutput = new ByteArrayOutputStream(records.size() * 16);
+        if (nonNull(magic)) {
+            jsonOutput.write(magic);
+        }
+        // Concatenate all json records to a byte input stream with '\n' delimiters.
         for (Object record : records) {
             jsonOutput.write(toJsonByteArray(record));
-            jsonOutput.write('\n');
+            jsonOutput.write(LINE_SEPARATOR.getBytes());
         }
-        writeToOrc(jsonOutput.toByteArray(), schema, orcOutput, timestampFormat, options);
+        return writeToOrc(jsonOutput.toByteArray(), schema, orcOutput);
     }
 
     @SuppressWarnings("ConstantConditions")
-    public void writeToOrc(@NotNull byte[] jsonBytes,
-                           @NotNull TypeDescription schema,
-                           @NotNull OutputStream orcOutput,
-                           @Nullable String timestampFormat,
-                           @Nullable Properties options) throws IOException {
+    public FileSystem.Statistics writeToOrc(@NotNull byte[] jsonBytes,
+                                            @NotNull TypeDescription schema,
+                                            @NotNull OutputStream orcOutput) throws IOException {
         notNullOf(jsonBytes, "jsonBytes");
         notNullOf(schema, "schema");
-        if (isNull(options)) {
-            options = new Properties();
-        }
-        options.setProperty(OrcConf.COMPRESSION_STRATEGY.name(), COMPRESSION.name());
 
         final OrcFile.WriterOptions writerOptions = OrcFile.writerOptions(options, DEFAULT_CONF)
-                                                           .fileSystem(new OrcStreamFileSystem(
-                                                                   new FSDataOutputStream(orcOutput, DEFAULT_STATISTICS), DEFAULT_STATUS, DEFAULT_CONF))
-                                                           .setSchema(schema);
-        try (final Writer writer = OrcFile.createWriter(DEFAULT_FAKE_PATH, writerOptions)) {
-            final VectorizedRowBatch rowBatch = schema.createRowBatch();
+                                                           .setSchema(schema)
+                                                           .version(OrcFile.Version.CURRENT);
+        final FileSystem.Statistics stats = new FileSystem.Statistics("stream://");
+        final FSDataOutputStream outputStream = new FSDataOutputStream(orcOutput, stats);
+        if (usePhysicalFsWriter) {
+            final PhysicalFsWriter physicalFsWriter = new PhysicalFsWriter(outputStream,
+                    writerOptions, new WriterEncryptionVariant[0]);
+            writerOptions.physicalWriter(physicalFsWriter);
+        } else {
+            writerOptions.fileSystem(new OrcStreamFileSystem(outputStream, DEFAULT_STATUS, DEFAULT_CONF));
+        }
+        try (final Writer writer = OrcFile.createWriter(DEFAULT_DUMMY_PATH, writerOptions)) {
+            final VectorizedRowBatch rowBatch = schema.createRowBatch(batchMaxSize);
             try (FSDataInputStream inputStream = new FSDataInputStream(new PositionedByteArrayInputStream(jsonBytes));
                  final RecordReader reader = createRecordReader(inputStream, jsonBytes.length, schema, timestampFormat)) {
-                reader.nextBatch(rowBatch);
-                writer.addRowBatch(rowBatch);
+                while (reader.nextBatch(rowBatch)) { // There is added data in this batch?
+                    writer.addRowBatch(rowBatch);
+                }
             }
         }
+        return stats;
     }
 
     protected abstract byte[] toJsonByteArray(Object record);
@@ -200,7 +242,6 @@ public abstract class OrcJsonHolder {
                                                        @Nullable String timestampFormat) throws IOException;
 
     // ----- Read ORC to JSON -----
-
 
     /**
      * Read ORC data to json node records.
@@ -240,10 +281,10 @@ public abstract class OrcJsonHolder {
         notNullOf(orcInput, "orcInput");
 
         final OrcFile.ReaderOptions options = OrcFile.readerOptions(isNull(conf) ? DEFAULT_CONF : conf);
-        final FileStatus status = new FileStatus(orcInput.available(), false, 0, 0, 0, DEFAULT_FAKE_PATH);
+        final FileStatus status = new FileStatus(orcInput.available(), false, 0, 0, 0, DEFAULT_DUMMY_PATH);
         options.filesystem(new OrcStreamFileSystem(new FSDataInputStream(orcInput), status, options.getConfiguration()));
 
-        try (final Reader reader = OrcFile.createReader(DEFAULT_FAKE_PATH, options)) {
+        try (final Reader reader = OrcFile.createReader(DEFAULT_DUMMY_PATH, options)) {
             return readFromOrc(reader);
         }
     }
@@ -392,7 +433,7 @@ public abstract class OrcJsonHolder {
      * The {@link PositionedByteArrayInputStream} class provides a byte array input stream with position support.
      * <p>
      *
-     * @see org.apache.orc.util.StreamWrapperFileSystem
+     * @see org/apache/orc/util/StreamWrapperFileSystem
      */
     protected static class PositionedByteArrayInputStream extends ByteArrayInputStream implements
             PositionedReadable, Seekable {
@@ -458,10 +499,5 @@ public abstract class OrcJsonHolder {
             return true;
         }
     }
-
-    private static final FileSystem.Statistics DEFAULT_STATISTICS = new FileSystem.Statistics("stream://");
-    private static final Configuration DEFAULT_CONF = new Configuration();
-    private static final Path DEFAULT_FAKE_PATH = new Path("/dev/null");
-    private static final FileStatus DEFAULT_STATUS = new FileStatus(0, false, 0, 0, 0, DEFAULT_FAKE_PATH);
 
 }
