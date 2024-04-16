@@ -44,6 +44,29 @@ import static org.testcontainers.shaded.org.apache.commons.lang3.RandomUtils.nex
  **/
 public abstract class DataFormatTestsSupport {
 
+
+    public static Path generateTestData0(String name) throws IOException {
+        final Map<String, Object> data = new HashMap<>();
+
+        data.put("__thingName__", "tc_S_thing_instance_name_1001");
+        data.put("__deviceId__", "tc_S_thing_id_1002");
+        data.put("__modelType__", "device");
+        data.put("__logicalInterfaceId__", "tc_S_modelId_1003");
+        data.put("__metricsType__", "1004");
+        data.put("__tenantId__", "s_t_connect");
+        data.put("__calculate_time__", "1713253721002");
+        data.put("__assetId__", "tc_S_thing_id_1002");
+        data.put("__physicalInterfaceId__", "tc_S_modelId_1003");
+        data.put("__deviceTypeId__", "tc_S_modelId_1003");
+        data.put("__deptScope__", "default");
+        data.put("__timestamp__", "1713253721002");
+        data.put("__cloud_time__", "1713253721002");
+
+        final Path generateFile = Files.createTempFile(name, ".json");
+        out.printf("Generating test file: %s%n", generateFile.toAbsolutePath());
+        return Files.write(generateFile, toJSONString(data).getBytes(Charsets.UTF_8));
+    }
+
     public static Path generateTestData1(String name) throws IOException {
         final Map<String, Object> data = new HashMap<>();
 
@@ -162,7 +185,7 @@ public abstract class DataFormatTestsSupport {
         return Files.write(generateFile, toJSONString(data).getBytes(Charsets.UTF_8));
     }
 
-    @SuppressWarnings("UnstableApiUsage")
+    @SuppressWarnings("unused")
     public static String loadResourceFileToString(String filename) {
         return testDataCache.computeIfAbsent(filename, f -> {
             try {

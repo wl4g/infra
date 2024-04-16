@@ -49,6 +49,7 @@ import java.sql.Timestamp;
 import java.util.Iterator;
 import java.util.List;
 
+import static com.wl4g.infra.common.dataformat.orc.OrcJsonHolder.DEFAULT_DATE_FORMATTER;
 import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -65,7 +66,6 @@ import static org.threeten.bp.format.DateTimeFormatter.ofPattern;
  */
 @Getter
 public class JacksonReader implements RecordReader {
-    private final static String DEFAULT_TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
     private final static ObjectMapper defaultObjectMapper = new ObjectMapper();
     private final static JsonFactory defaultJsonFactory = new JsonFactory();
 
@@ -107,7 +107,8 @@ public class JacksonReader implements RecordReader {
         this.input = underlying;
         this.totalSize = totalSize;
         this.parser = parser;
-        this.dateTimeFormatter = isBlank(timestampFormat) ? ofPattern(DEFAULT_TIMESTAMP_FORMAT) : ofPattern(timestampFormat);
+        this.dateTimeFormatter = isBlank(timestampFormat) ? ofPattern(DEFAULT_DATE_FORMATTER) :
+                ofPattern(timestampFormat);
 
         final List<TypeDescription> fieldTypes = schema.getChildren();
         this.converters = new JsonConverter[fieldTypes.size()];
@@ -203,7 +204,7 @@ public class JacksonReader implements RecordReader {
 
         @Override
         public void convert(JsonNode value, ColumnVector vec, int row) {
-            if (value != null && !value.isNull()) {
+            if (nonNull(value) && !value.isNull()) {
                 final MapColumnVector vector = (MapColumnVector) vec;
                 final Iterator<String> fieldNames = value.fieldNames();
                 vector.lengths[row] = value.size();
@@ -235,7 +236,7 @@ public class JacksonReader implements RecordReader {
 
         @Override
         public void convert(JsonNode value, ColumnVector vec, int row) {
-            if (value != null && !value.isNull()) {
+            if (nonNull(value) && !value.isNull()) {
                 final ListColumnVector vector = (ListColumnVector) vec;
                 final ArrayNode arrayNode = (ArrayNode) value;
                 vector.lengths[row] = arrayNode.size();
@@ -270,7 +271,7 @@ public class JacksonReader implements RecordReader {
 
         @Override
         public void convert(JsonNode value, ColumnVector vec, int row) {
-            if (value != null && !value.isNull()) {
+            if (nonNull(value) && !value.isNull()) {
                 final StructColumnVector vector = (StructColumnVector) vec;
                 final ObjectNode obj = (ObjectNode) value;
 
@@ -288,7 +289,7 @@ public class JacksonReader implements RecordReader {
     private static class DecimalColumnConverter implements JsonConverter {
         @Override
         public void convert(JsonNode value, ColumnVector vec, int row) {
-            if (value != null && !value.isNull()) {
+            if (nonNull(value) && !value.isNull()) {
                 DecimalColumnVector vector = (DecimalColumnVector) vec;
                 vector.vector[row].set(HiveDecimal.create(value.asText()));
             } else {
@@ -301,7 +302,7 @@ public class JacksonReader implements RecordReader {
     private class TimestampColumnConverter implements JsonConverter {
         @Override
         public void convert(JsonNode value, ColumnVector vec, int row) {
-            if (value != null && !value.isNull()) {
+            if (nonNull(value) && !value.isNull()) {
                 final TimestampColumnVector vector = (TimestampColumnVector) vec;
                 final TemporalAccessor temporalAccessor = dateTimeFormatter.parseBest(value.asText(),
                         ZonedDateTime.FROM, LocalDateTime.FROM);
@@ -331,7 +332,7 @@ public class JacksonReader implements RecordReader {
     private static class BinaryColumnConverter implements JsonConverter {
         @Override
         public void convert(JsonNode value, ColumnVector vec, int row) {
-            if (value != null && !value.isNull()) {
+            if (nonNull(value) && !value.isNull()) {
                 final BytesColumnVector vector = (BytesColumnVector) vec;
                 final String binStr = value.asText();
                 final byte[] bytes = new byte[binStr.length() / 2];
@@ -350,7 +351,7 @@ public class JacksonReader implements RecordReader {
     private static class StringColumnConverter implements JsonConverter {
         @Override
         public void convert(JsonNode value, ColumnVector vec, int row) {
-            if (value != null && !value.isNull()) {
+            if (nonNull(value) && !value.isNull()) {
                 BytesColumnVector vector = (BytesColumnVector) vec;
                 byte[] bytes = value.asText().getBytes();
                 vector.setRef(row, bytes, 0, bytes.length);
@@ -364,7 +365,7 @@ public class JacksonReader implements RecordReader {
     private static class DoubleColumnConverter implements JsonConverter {
         @Override
         public void convert(JsonNode value, ColumnVector vec, int row) {
-            if (value != null && !value.isNull()) {
+            if (nonNull(value) && !value.isNull()) {
                 final DoubleColumnVector vector = (DoubleColumnVector) vec;
                 vector.vector[row] = value.asDouble();
             } else {
@@ -377,7 +378,7 @@ public class JacksonReader implements RecordReader {
     private static class LongColumnConverter implements JsonConverter {
         @Override
         public void convert(JsonNode value, ColumnVector vec, int row) {
-            if (value != null && !value.isNull()) {
+            if (nonNull(value) && !value.isNull()) {
                 final LongColumnVector vector = (LongColumnVector) vec;
                 vector.vector[row] = value.asLong();
             } else {
@@ -390,7 +391,7 @@ public class JacksonReader implements RecordReader {
     private static class BooleanColumnConverter implements JsonConverter {
         @Override
         public void convert(JsonNode value, ColumnVector vec, int row) {
-            if (value != null && !value.isNull()) {
+            if (nonNull(value) && !value.isNull()) {
                 LongColumnVector vector = (LongColumnVector) vec;
                 vector.vector[row] = value.asBoolean() ? 1L : 0L;
             } else {

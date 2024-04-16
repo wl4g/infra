@@ -16,7 +16,9 @@
 
 package com.wl4g.infra.common.dataformat.orc;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.parser.Feature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.io.Files;
 import com.wl4g.infra.common.dataformat.DataFormatTestsSupport;
@@ -53,6 +55,17 @@ public class OrcJsonHolderTest extends DataFormatTestsSupport {
     private final static List<JsonNode> testJacksonNodes = new ArrayList<>();
     private final static List<JSONObject> testFastJsonNodes = new ArrayList<>();
 
+    static {
+        // Notice: 由于 FastJson 反序列化默认是 BigDecimal 类型, 导致 writeToOrc 时
+        // 对应列 schema 也对应 BigDecimal 类型, 进而导致用 orc-tools meta output.orc 时
+        // 输出信息 File raw data size 会比原始 json 文件大很多, 因此需关闭以优化压缩
+        // (因为调用 org.apache.orc.impl.ReaderImpl#getRawDataSize() -> getRawDataSizeOfColumn
+        // 会将 BigDecimal 类型按 112 bytes 计算, 而 Double 类型只需 8 bytes
+
+        // Global Disable FastJson deserialization Double to BigDecimal.
+        JSON.DEFAULT_PARSER_FEATURE &= ~Feature.UseBigDecimal.getMask();
+    }
+
     @SuppressWarnings("all")
     @BeforeClass
     public static void setup() throws IOException {
@@ -72,7 +85,13 @@ public class OrcJsonHolderTest extends DataFormatTestsSupport {
 
     @Test
     public void testFastJsonOrcCompression() throws Exception {
-        doTestJsonOrcCompression(FastJsonOrcHolder.builder().useFlatSchema(true).build(), testFastJsonNodes);
+        final Byte magic = 0xf; // user custom magic, e.g: 0x01
+        final FastJsonOrcHolder holder = FastJsonOrcHolder
+                .builder()
+                .useFlatSchema(false)
+                .magic(magic)
+                .build();
+        doTestJsonOrcCompression(holder, testFastJsonNodes);
     }
 
     @SuppressWarnings("all")
@@ -81,10 +100,9 @@ public class OrcJsonHolderTest extends DataFormatTestsSupport {
 
         // Serialization
         //
-        final ByteArrayOutputStream output = new ByteArrayOutputStream(10240);
-        final Byte magic = null; // user custom magic, e.g: 0x01
-        holder.writeToOrc(testJsonNodes, schema, output);
-        final byte[] orcBytes = output.toByteArray();
+        final ByteArrayOutputStream orcOutput = new ByteArrayOutputStream(1024);
+        holder.writeToOrc(testJsonNodes, schema, orcOutput);
+        final byte[] orcBytes = orcOutput.toByteArray();
 
         // for test: shell> orc-tools meta /tmp/1.orc
         FileIOUtils.writeFile(new File("/tmp/1.orc"), orcBytes, false);

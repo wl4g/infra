@@ -17,6 +17,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.hive.common.type.HiveDecimal;
 import org.apache.hadoop.hive.ql.exec.vector.BytesColumnVector;
@@ -48,12 +49,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import static com.wl4g.infra.common.dataformat.orc.OrcJsonHolder.DEFAULT_DATE_FORMATTER;
 import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static java.lang.Double.parseDouble;
+import static java.lang.Float.parseFloat;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.threeten.bp.LocalDateTime.FROM;
 import static org.threeten.bp.format.DateTimeFormatter.ofPattern;
 
 /**
@@ -62,10 +67,9 @@ import static org.threeten.bp.format.DateTimeFormatter.ofPattern;
  * @author James Wong
  * @since 1.0
  */
+@Slf4j
 @Getter
 public class FastJsonReader implements RecordReader {
-    private final static String DEFAULT_TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
-
     private final TypeDescription schema;
     private final Iterator<JSONObject> parser;
     private final JsonConverter[] converters;
@@ -83,7 +87,7 @@ public class FastJsonReader implements RecordReader {
         notNullOf(schema, "schema");
         isTrueOf(totalSize >= 0, "totalSize must be greater than or equal to 0");
 
-        final List<JSONObject> records = new ArrayList<>((int) totalSize); // TODO
+        final List<JSONObject> records = new ArrayList<>((int) totalSize);
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(underlying, UTF_8))) {
             String line;
             while (nonNull((line = reader.readLine()))) {
@@ -97,7 +101,7 @@ public class FastJsonReader implements RecordReader {
             throw new IllegalArgumentException("Root must be struct - " + schema);
         }
         this.totalSize = totalSize;
-        this.dateTimeFormatter = isBlank(timestampFormat) ? ofPattern(DEFAULT_TIMESTAMP_FORMAT) :
+        this.dateTimeFormatter = isBlank(timestampFormat) ? ofPattern(DEFAULT_DATE_FORMATTER) :
                 ofPattern(timestampFormat);
         List<TypeDescription> fieldTypes = schema.getChildren();
         this.converters = new JsonConverter[fieldTypes.size()];
@@ -267,9 +271,9 @@ public class FastJsonReader implements RecordReader {
                 final JSONObject obj = (JSONObject) value;
 
                 for (int c = 0; c < this.childrenConverters.length; ++c) {
-                    String fieldName = fieldNames.get(c);
-                    Object elem = obj.get(fieldName);
-                    if (elem == null) {
+                    final String fieldName = fieldNames.get(c);
+                    final Object elem = obj.get(fieldName);
+                    if (isNull(elem)) {
                         vec.isNull[row] = true;
                     } else {
                         this.childrenConverters[c].convert(elem, vector.fields[c], row);
@@ -285,7 +289,7 @@ public class FastJsonReader implements RecordReader {
     private static class DecimalColumnConverter implements JsonConverter {
         @Override
         public void convert(Object value, ColumnVector vec, int row) {
-            if (value != null) {
+            if (nonNull(value)) {
                 final DecimalColumnVector vector = (DecimalColumnVector) vec;
                 vector.vector[row].set(HiveDecimal.create(value.toString()));
             } else {
@@ -298,19 +302,18 @@ public class FastJsonReader implements RecordReader {
     private class TimestampColumnConverter implements JsonConverter {
         @Override
         public void convert(Object value, ColumnVector vec, int row) {
-            if (value != null) {
+            if (nonNull(value)) {
                 final TimestampColumnVector vector = (TimestampColumnVector) vec;
-                final TemporalAccessor temporalAccessor = dateTimeFormatter.parseBest(value.toString(),
-                        ZonedDateTime.FROM, LocalDateTime.FROM);
+                final TemporalAccessor temporal = dateTimeFormatter.parseBest(value.toString(), ZonedDateTime.FROM, FROM);
                 ZonedDateTime tz;
                 Timestamp timestamp;
-                if (temporalAccessor instanceof ZonedDateTime) {
-                    tz = (ZonedDateTime) temporalAccessor;
+                if (temporal instanceof ZonedDateTime) {
+                    tz = (ZonedDateTime) temporal;
                     timestamp = new Timestamp(tz.toEpochSecond() * 1000L);
                     timestamp.setNanos(tz.getNano());
                     vector.set(row, timestamp);
-                } else if (temporalAccessor instanceof LocalDateTime) {
-                    tz = ((LocalDateTime) temporalAccessor).atZone(ZoneId.systemDefault());
+                } else if (temporal instanceof LocalDateTime) {
+                    tz = ((LocalDateTime) temporal).atZone(ZoneId.systemDefault());
                     timestamp = new Timestamp(tz.toEpochSecond() * 1000L);
                     timestamp.setNanos(tz.getNano());
                     vector.set(row, timestamp);
@@ -328,18 +331,9 @@ public class FastJsonReader implements RecordReader {
     private static class BinaryColumnConverter implements JsonConverter {
         @Override
         public void convert(Object value, ColumnVector vec, int row) {
-            if (value != null) {
+            if (nonNull(value)) {
                 final BytesColumnVector vector = (BytesColumnVector) vec;
-                final String binStr = value.toString();
-                final byte[] bytes = new byte[binStr.length() / 2];
-
-                for (int i = 0; i < bytes.length; ++i) {
-                    try {
-                        bytes[i] = (byte) Integer.parseInt(binStr.substring(i * 2, i * 2 + 2), 16);
-                    } catch (NumberFormatException e) {
-                        throw new IllegalArgumentException("Invalid hex string: " + binStr, e);
-                    }
-                }
+                final byte[] bytes = value.toString().getBytes(UTF_8);
                 vector.setRef(row, bytes, 0, bytes.length);
             } else {
                 vec.noNulls = false;
@@ -351,9 +345,9 @@ public class FastJsonReader implements RecordReader {
     private static class StringColumnConverter implements JsonConverter {
         @Override
         public void convert(Object value, ColumnVector vec, int row) {
-            if (value != null) {
-                BytesColumnVector vector = (BytesColumnVector) vec;
-                byte[] bytes = value.toString().getBytes();
+            if (nonNull(value)) {
+                final BytesColumnVector vector = (BytesColumnVector) vec;
+                final byte[] bytes = value.toString().getBytes();
                 vector.setRef(row, bytes, 0, bytes.length);
             } else {
                 vec.noNulls = false;
@@ -365,9 +359,15 @@ public class FastJsonReader implements RecordReader {
     private static class DoubleColumnConverter implements JsonConverter {
         @Override
         public void convert(Object value, ColumnVector vec, int row) {
-            if (value != null) {
+            if (nonNull(value)) {
                 final DoubleColumnVector vector = (DoubleColumnVector) vec;
-                vector.vector[row] = Double.parseDouble(value.toString());
+                if (value instanceof Float) {
+                    vector.vector[row] = parseFloat(value.toString());
+                } else if (value instanceof Double) {
+                    vector.vector[row] = parseDouble(value.toString());
+                } else {
+                    log.debug("Invalid double value: " + value);
+                }
             } else {
                 vec.noNulls = false;
                 vec.isNull[row] = true;
@@ -378,9 +378,15 @@ public class FastJsonReader implements RecordReader {
     private static class LongColumnConverter implements JsonConverter {
         @Override
         public void convert(Object value, ColumnVector vec, int row) {
-            if (value != null) {
+            if (nonNull(value)) {
                 final LongColumnVector vector = (LongColumnVector) vec;
-                vector.vector[row] = Long.parseLong(value.toString());
+                if (value instanceof Integer) {
+                    vector.vector[row] = (Integer) value;
+                } else if (value instanceof Long) {
+                    vector.vector[row] = (Long) value;
+                } else {
+                    log.debug("Invalid long value: " + value);
+                }
             } else {
                 vec.noNulls = false;
                 vec.isNull[row] = true;
@@ -391,7 +397,7 @@ public class FastJsonReader implements RecordReader {
     private static class BooleanColumnConverter implements JsonConverter {
         @Override
         public void convert(Object value, ColumnVector vec, int row) {
-            if (value != null) {
+            if (nonNull(value)) {
                 LongColumnVector vector = (LongColumnVector) vec;
                 vector.vector[row] = (boolean) value ? 1L : 0L;
             } else {

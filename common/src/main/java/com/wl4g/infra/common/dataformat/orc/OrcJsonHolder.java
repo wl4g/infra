@@ -71,13 +71,13 @@ import static org.apache.orc.OrcFile.CompressionStrategy.COMPRESSION;
 @SuperBuilder
 public abstract class OrcJsonHolder {
     @SuppressWarnings("all")
-    private static final String DEFAULT_DATE_FORMATTER = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
-    private static final Configuration DEFAULT_CONF = new Configuration();
-    private static final Path DEFAULT_DUMMY_PATH = new Path("/dev/null");
-    private static final FileStatus DEFAULT_STATUS = new FileStatus(0, false, 0, 0, 0, DEFAULT_DUMMY_PATH);
+    static final String DEFAULT_DATE_FORMATTER = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
+    static final Configuration DEFAULT_CONF = new Configuration();
+    static final Path DEFAULT_DUMMY_PATH = new Path("/dev/null");
+    static final FileStatus DEFAULT_STATUS = new FileStatus(0, false, 0, 0, 0, DEFAULT_DUMMY_PATH);
 
     @Builder.Default
-    private boolean usePhysicalFsWriter = true;
+    private boolean usePhysicalFsWriter = false;
     @Builder.Default
     private @Nullable Properties options = new Properties() {
         {
@@ -91,7 +91,6 @@ public abstract class OrcJsonHolder {
     private @Min(0) int batchMaxSize = 1024 * 1024;
     @Builder.Default
     private @Nullable String timestampFormat = DEFAULT_DATE_FORMATTER;
-
 
     // ----- Get ORC schema from JSON -----
 
@@ -198,9 +197,6 @@ public abstract class OrcJsonHolder {
 
         // Each json is at least 16B, which is a good number
         final ByteArrayOutputStream jsonOutput = new ByteArrayOutputStream(records.size() * 16);
-        if (nonNull(magic)) {
-            jsonOutput.write(magic);
-        }
         // Concatenate all json records to a byte input stream with '\n' delimiters.
         for (Object record : records) {
             jsonOutput.write(toJsonByteArray(record));
@@ -220,12 +216,15 @@ public abstract class OrcJsonHolder {
                                                            .setSchema(schema)
                                                            .version(OrcFile.Version.CURRENT);
         final FileSystem.Statistics stats = new FileSystem.Statistics("stream://");
-        final FSDataOutputStream outputStream = new FSDataOutputStream(orcOutput, stats);
+        final FSDataOutputStream output = new FSDataOutputStream(orcOutput, stats);
         if (usePhysicalFsWriter) {
-            final PhysicalFsWriter physicalFsWriter = new PhysicalFsWriter(outputStream, writerOptions, encryption);
+            final PhysicalFsWriter physicalFsWriter = new PhysicalFsWriter(output, writerOptions, encryption);
             writerOptions.physicalWriter(physicalFsWriter);
         } else {
-            writerOptions.fileSystem(new OrcStreamFileSystem(outputStream, DEFAULT_STATUS, DEFAULT_CONF));
+            writerOptions.fileSystem(new OrcStreamFileSystem(output, DEFAULT_STATUS, DEFAULT_CONF));
+        }
+        if (nonNull(magic)) {
+            output.write(magic);
         }
         try (final Writer writer = OrcFile.createWriter(DEFAULT_DUMMY_PATH, writerOptions)) {
             final VectorizedRowBatch rowBatch = schema.createRowBatch(batchMaxSize);
@@ -290,6 +289,7 @@ public abstract class OrcJsonHolder {
         options.filesystem(new OrcStreamFileSystem(new FSDataInputStream(orcInput), status, options.getConfiguration()));
 
         try (final Reader reader = OrcFile.createReader(DEFAULT_DUMMY_PATH, options)) {
+            //System.out.println(reader.getRawDataSize());
             return readFromOrc(reader);
         }
     }
@@ -307,7 +307,7 @@ public abstract class OrcJsonHolder {
         final TypeDescription rootSchema = reader.getSchema();
         final List<TypeDescription> fieldSchemas = rootSchema.getChildren();
         final List<String> fieldNames = rootSchema.getFieldNames();
-        final VectorizedRowBatch batch = rootSchema.createRowBatch();
+        final VectorizedRowBatch batch = rootSchema.createRowBatch(batchMaxSize);
         final RecordReader orcReader = reader.rows(reader.options().schema(rootSchema));
         return new Iterator<Iterable<Object>>() {
             @Override
@@ -326,7 +326,8 @@ public abstract class OrcJsonHolder {
                     final Object recordNode = createObjectJsonNode();
                     for (int col = 0; col < batch.numCols; col++) {
                         final ColumnVector colVector = batch.cols[col];
-                        putObjectJsonNode(recordNode, fieldNames.get(col), convertToJsonNode(fieldSchemas.get(col), colVector, row));
+                        putObjectJsonNode(recordNode, fieldNames.get(col),
+                                convertToJsonNode(fieldSchemas.get(col), colVector, row));
                     }
                     addArrayJsonNode(arrayNode, recordNode);
                 }
