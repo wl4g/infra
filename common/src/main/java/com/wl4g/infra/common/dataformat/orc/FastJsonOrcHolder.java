@@ -16,7 +16,10 @@ package com.wl4g.infra.common.dataformat.orc;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import lombok.NoArgsConstructor;
+import com.google.common.annotations.Beta;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.hive.ql.exec.vector.BytesColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
@@ -31,7 +34,6 @@ import org.apache.orc.RecordReader;
 import org.apache.orc.TypeDescription;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -39,7 +41,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import static com.wl4g.infra.common.dataformat.FastJsonFlatUtil.flatten;
 import static com.wl4g.infra.common.dataformat.FastJsonFlatUtil.unFlatten;
@@ -51,30 +52,17 @@ import static java.util.Objects.nonNull;
 /**
  * The {@link FastJsonOrcHolder} class provides conversion utilities between ORC and Fastjson.
  */
-@NoArgsConstructor
+@Getter
+@SuperBuilder
 public class FastJsonOrcHolder extends OrcJsonHolder {
-    private static final FastJsonOrcHolder DEFAULT = new FastJsonOrcHolder();
+    private static final FastJsonOrcHolder DEFAULT = FastJsonOrcHolder.builder().build();
 
     public static FastJsonOrcHolder getDefault() {
         return DEFAULT;
     }
 
-    private boolean useFlatSchema; // Flat mode fast but not general.
-
-    @SuppressWarnings("unused")
-    public FastJsonOrcHolder(boolean useFlatSchema) {
-        this.useFlatSchema = useFlatSchema;
-    }
-
-    @SuppressWarnings("unused")
-    public FastJsonOrcHolder(boolean usePhysicalFsWriter,
-                             boolean useFlatSchema,
-                             @Min(0) int batchMaxSize,
-                             @Nullable String timestampFormat,
-                             @Nullable Properties options) {
-        super(usePhysicalFsWriter, batchMaxSize, timestampFormat, options);
-        this.useFlatSchema = useFlatSchema;
-    }
+    @Beta
+    private @Builder.Default boolean useFlatSchema = true; // Flat mode fast but not general.
 
     // ----- Get ORC schema from JSON -----
 

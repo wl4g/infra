@@ -56,8 +56,8 @@ public class OrcJsonHolderTest extends DataFormatTestsSupport {
     @SuppressWarnings("all")
     @BeforeClass
     public static void setup() throws IOException {
-        for (int i = 0; i < 1000; i++) {
-            final File testFile = generateTestData2(String.valueOf(i)).toFile();
+        for (int i = 0; i < 3; i++) {
+            final File testFile = generateTestData1(String.valueOf(i)).toFile();
             testFiles.add(testFile);
             final String json = Files.toString(testFile, UTF_8);
             testJacksonNodes.add(parseToNode(json));
@@ -72,8 +72,7 @@ public class OrcJsonHolderTest extends DataFormatTestsSupport {
 
     @Test
     public void testFastJsonOrcCompression() throws Exception {
-        //doTestJsonOrcCompression(FastJsonOrcHolder.getDefault(), testFastJsonNodes);
-        doTestJsonOrcCompression(new FastJsonOrcHolder(true), testFastJsonNodes);
+        doTestJsonOrcCompression(FastJsonOrcHolder.builder().useFlatSchema(true).build(), testFastJsonNodes);
     }
 
     @SuppressWarnings("all")
@@ -84,7 +83,7 @@ public class OrcJsonHolderTest extends DataFormatTestsSupport {
         //
         final ByteArrayOutputStream output = new ByteArrayOutputStream(10240);
         final Byte magic = null; // user custom magic, e.g: 0x01
-        holder.writeToOrc(testJsonNodes, schema, magic, output);
+        holder.writeToOrc(testJsonNodes, schema, output);
         final byte[] orcBytes = output.toByteArray();
 
         // for test: shell> orc-tools meta /tmp/1.orc

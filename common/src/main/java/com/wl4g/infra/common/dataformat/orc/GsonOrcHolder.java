@@ -13,35 +13,28 @@
 
 package com.wl4g.infra.common.dataformat.orc;
 
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
 import org.apache.orc.RecordReader;
 import org.apache.orc.TypeDescription;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.util.Properties;
 
 /**
  * The {@link GsonOrcHolder} class provides conversion utilities between ORC and Fastjson.
  */
-@NoArgsConstructor
+@Getter
+@SuperBuilder
 public class GsonOrcHolder extends OrcJsonHolder {
 
-    private static final GsonOrcHolder DEFAULT = new GsonOrcHolder();
+    private static final GsonOrcHolder DEFAULT = GsonOrcHolder.builder().build();
 
     public static GsonOrcHolder getDefault() {
         return DEFAULT;
-    }
-
-    public GsonOrcHolder(boolean usePhysicalFsWriter,
-                         @Min(0) int batchMaxSize,
-                         @Nullable String timestampFormat,
-                         @Nullable Properties options) {
-        super(usePhysicalFsWriter, batchMaxSize, timestampFormat, options);
     }
 
     // ----- Get ORC schema from JSON -----

@@ -17,7 +17,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.hive.ql.exec.vector.BytesColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
@@ -32,14 +33,12 @@ import org.apache.orc.RecordReader;
 import org.apache.orc.TypeDescription;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import static com.wl4g.infra.common.lang.Assert2.isInstanceOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
@@ -50,19 +49,13 @@ import static java.util.Objects.nonNull;
 /**
  * The {@link JacksonOrcHolder} class provides conversion utilities between ORC and Fastjson.
  */
-@NoArgsConstructor
+@Getter
+@SuperBuilder
 public class JacksonOrcHolder extends OrcJsonHolder {
-    private static final JacksonOrcHolder DEFAULT = new JacksonOrcHolder();
+    private static final JacksonOrcHolder DEFAULT = JacksonOrcHolder.builder().build();
 
     public static JacksonOrcHolder getDefault() {
         return DEFAULT;
-    }
-
-    public JacksonOrcHolder(boolean usePhysicalFsWriter,
-                            @Min(0) int batchMaxSize,
-                            @Nullable String timestampFormat,
-                            @Nullable Properties options) {
-        super(usePhysicalFsWriter, batchMaxSize, timestampFormat, options);
     }
 
     // ----- Get ORC schema from JSON -----

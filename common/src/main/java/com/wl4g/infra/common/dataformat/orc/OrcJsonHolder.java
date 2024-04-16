@@ -13,7 +13,11 @@
 
 package com.wl4g.infra.common.dataformat.orc;
 
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -62,29 +66,32 @@ import static org.apache.orc.OrcFile.CompressionStrategy.COMPRESSION;
 /**
  * The {@link OrcJsonHolder} class provides conversion utilities between ORC and json.
  */
-@AllArgsConstructor
+@Getter
+@Setter(AccessLevel.PROTECTED)
+@SuperBuilder
 public abstract class OrcJsonHolder {
+    @SuppressWarnings("all")
     private static final String DEFAULT_DATE_FORMATTER = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
     private static final Configuration DEFAULT_CONF = new Configuration();
     private static final Path DEFAULT_DUMMY_PATH = new Path("/dev/null");
     private static final FileStatus DEFAULT_STATUS = new FileStatus(0, false, 0, 0, 0, DEFAULT_DUMMY_PATH);
 
-    private boolean usePhysicalFsWriter;
-    private @Min(0) int batchMaxSize;
-    private @Nullable String timestampFormat;
-    private @Nullable Properties options;
+    @Builder.Default
+    private boolean usePhysicalFsWriter = true;
+    @Builder.Default
+    private @Nullable Properties options = new Properties() {
+        {
+            setProperty(OrcConf.COMPRESSION_STRATEGY.name(), COMPRESSION.name());
+        }
+    };
+    @Builder.Default
+    private @Nullable WriterEncryptionVariant[] encryption = new WriterEncryptionVariant[0];
+    private @Nullable Byte magic;
+    @Builder.Default
+    private @Min(0) int batchMaxSize = 16 * 1024 * 1024;
+    @Builder.Default
+    private @Nullable String timestampFormat = DEFAULT_DATE_FORMATTER;
 
-    @SuppressWarnings("unused")
-    protected OrcJsonHolder() {
-        this.usePhysicalFsWriter = true;
-        this.batchMaxSize = 1024 * 1024;
-        this.timestampFormat = DEFAULT_DATE_FORMATTER;
-        this.options = new Properties() {
-            {
-                setProperty(OrcConf.COMPRESSION_STRATEGY.name(), COMPRESSION.name());
-            }
-        };
-    }
 
     // ----- Get ORC schema from JSON -----
 
@@ -185,7 +192,6 @@ public abstract class OrcJsonHolder {
     @SuppressWarnings("all")
     public FileSystem.Statistics writeToOrc(@NotNull List<?> records,
                                             @NotNull TypeDescription schema,
-                                            @Nullable Byte magic,
                                             @NotNull OutputStream orcOutput) throws IOException {
         notNullOf(records, "records");
         notNullOf(schema, "schema");
@@ -216,8 +222,7 @@ public abstract class OrcJsonHolder {
         final FileSystem.Statistics stats = new FileSystem.Statistics("stream://");
         final FSDataOutputStream outputStream = new FSDataOutputStream(orcOutput, stats);
         if (usePhysicalFsWriter) {
-            final PhysicalFsWriter physicalFsWriter = new PhysicalFsWriter(outputStream,
-                    writerOptions, new WriterEncryptionVariant[0]);
+            final PhysicalFsWriter physicalFsWriter = new PhysicalFsWriter(outputStream, writerOptions, encryption);
             writerOptions.physicalWriter(physicalFsWriter);
         } else {
             writerOptions.fileSystem(new OrcStreamFileSystem(outputStream, DEFAULT_STATUS, DEFAULT_CONF));
