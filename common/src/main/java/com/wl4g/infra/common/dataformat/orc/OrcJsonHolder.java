@@ -88,7 +88,7 @@ public abstract class OrcJsonHolder {
     private @Nullable WriterEncryptionVariant[] encryption = new WriterEncryptionVariant[0];
     private @Nullable Byte magic;
     @Builder.Default
-    private @Min(0) int batchMaxSize = 16 * 1024 * 1024;
+    private @Min(0) int batchMaxSize = 1024 * 1024;
     @Builder.Default
     private @Nullable String timestampFormat = DEFAULT_DATE_FORMATTER;
 

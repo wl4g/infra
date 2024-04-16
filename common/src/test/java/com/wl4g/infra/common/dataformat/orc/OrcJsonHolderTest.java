@@ -56,8 +56,8 @@ public class OrcJsonHolderTest extends DataFormatTestsSupport {
     @SuppressWarnings("all")
     @BeforeClass
     public static void setup() throws IOException {
-        for (int i = 0; i < 3; i++) {
-            final File testFile = generateTestData1(String.valueOf(i)).toFile();
+        for (int i = 0; i < 1000; i++) {
+            final File testFile = generateTestData2(String.valueOf(i)).toFile();
             testFiles.add(testFile);
             final String json = Files.toString(testFile, UTF_8);
             testJacksonNodes.add(parseToNode(json));
