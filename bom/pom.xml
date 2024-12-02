@@ -135,7 +135,7 @@
         <netty.version>4.1.79.Final</netty.version>
         <!-- cache -->
         <jedis.version>3.6.1</jedis.version>
-        <lettuce.version>6.1.8.RELEASE</lettuce.version>
+        <lettuce.version>6.5.1.RELEASE</lettuce.version>
         <jetcache.version>2.6.0</jetcache.version>
         <!-- 3Thirdparty library -->
         <aliyun-sdk-dysmsapi.version>2.1.0</aliyun-sdk-dysmsapi.version>
