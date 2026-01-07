@@ -132,7 +132,7 @@
         <!-- <protobuf.version>2.5.0</protobuf.version> hbase-1.2.5 dependency -->
         <protostuff.version>1.6.0</protostuff.version>
         <!-- networking -->
-        <netty.version>4.1.79.Final</netty.version>
+        <netty.version>4.1.125.Final</netty.version>
         <!-- cache -->
         <jedis.version>3.6.1</jedis.version>
         <lettuce.version>6.1.8.RELEASE</lettuce.version>
