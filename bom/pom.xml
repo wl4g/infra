@@ -70,7 +70,7 @@
         <javax-mail.version>1.6.2</javax-mail.version>
         <javax-servlet-api.version>4.0.1</javax-servlet-api.version>
         <jsr305.version>3.0.2</jsr305.version>
-        <hibernate-validator.version>6.0.16.Final</hibernate-validator.version>
+        <hibernate-validator.version>6.2.0.Final</hibernate-validator.version>
         <validation-api.version>2.0.1.Final</validation-api.version>
         <javassist.version>3.20.0-GA</javassist.version>
         <!-- jdbc -->
