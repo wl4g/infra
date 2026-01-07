@@ -150,7 +150,7 @@
         <kubernetes-client.version>16.0.0</kubernetes-client.version>
         <fabric8-kubernetes-client.version>5.12.1</fabric8-kubernetes-client.version>
         <!-- OSS -->
-        <minio.version>8.4.3</minio.version>
+        <minio.version>8.6.0</minio.version>
         <!-- RocksDB -->
         <rocksdb.version>6.20.3</rocksdb.version>
         <!-- ANTLR -->
