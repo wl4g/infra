@@ -79,7 +79,7 @@
         <mybatis-springboot.version>2.2.2</mybatis-springboot.version>
         <!-- logging. -->
         <slf4j-api.version>1.7.25</slf4j-api.version>
-        <logback.version>1.2.12</logback.version>
+        <logback.version>1.5.25</logback.version>
         <!-- runtime -->
         <swagger.version>1.6.2</swagger.version>
         <swagger-v3.version>2.2.2</swagger-v3.version>
