@@ -125,7 +125,7 @@
         <!-- serialization -->
         <!-- Note: Must be consistent with springboot -->
         <!-- <jackson.version>2.10.2</jackson.version> -->
-        <jackson.version>2.15.3</jackson.version>
+        <jackson.version>2.18.6</jackson.version>
         <jaxb-xml.version>2.3.3</jaxb-xml.version>
         <!-- <fastjson.version>1.2.56</fastjson.version> -->
         <protobuf.version>3.8.0</protobuf.version>
